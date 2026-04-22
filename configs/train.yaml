@@ -1,0 +1,16 @@
+seed: 42
+model:
+  base_model: runwayml/stable-diffusion-v1-5
+  lora_rank: 16
+training:
+  script: train_text_to_image_lora.py
+  train_data_dir: data/processed/lora_dataset
+  resolution: 512
+  batch_size: 4
+  learning_rate: 1.0e-4
+  max_train_steps: 2000
+  checkpointing_steps: 500
+  mixed_precision: fp16
+  report_to: tensorboard
+output:
+  checkpoint_dir: outputs/logs/lora

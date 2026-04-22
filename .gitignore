@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.venv/
+venv/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data and outputs
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/captions/*
+!data/captions/.gitkeep
+outputs/images/*
+!outputs/images/.gitkeep
+outputs/logs/*
+!outputs/logs/.gitkeep
+outputs/metrics/*
+!outputs/metrics/.gitkeep
+
+# macOS
+.DS_Store

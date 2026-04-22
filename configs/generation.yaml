@@ -1,0 +1,37 @@
+model:
+  base_model: runwayml/stable-diffusion-v1-5
+  lora_weights: outputs/logs/lora
+inference:
+  device: cuda
+  output_dir: outputs/images
+  output_csv: outputs/images/generated_dataset.csv
+  batch_size: 4
+  num_images: 200
+  guidance_scale: 7.5
+  steps: 30
+prompts:
+  components:
+    road_type:
+      - narrow street
+      - two-lane road
+      - urban intersection
+      - residential street
+    density:
+      - empty
+      - moderate traffic
+      - busy traffic
+    weather:
+      - clear weather
+      - light rain
+      - heavy rain
+      - foggy conditions
+    lighting:
+      - bright daytime
+      - overcast daylight
+      - sunset lighting
+    road_elements:
+      - with lane markings and sidewalks
+      - with parked cars and crosswalks
+      - with trees and traffic signs
+      - with buildings and streetlights
+negative_prompt: "blurry, low quality, distorted, warped buildings, text, watermark, artifacts"
