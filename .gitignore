@@ -1,4 +1,4 @@
-# Python
+# Python environments and caches
 __pycache__/
 *.py[cod]
 *.so
@@ -6,23 +6,41 @@ __pycache__/
 .venv/
 venv/
 .env
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
-# Jupyter
+# Jupyter and editor state
 .ipynb_checkpoints/
-
-# Data and outputs
-data/raw/*
-!data/raw/.gitkeep
-data/processed/*
-!data/processed/.gitkeep
-data/captions/*
-!data/captions/.gitkeep
-outputs/images/*
-!outputs/images/.gitkeep
-outputs/logs/*
-!outputs/logs/.gitkeep
-outputs/metrics/*
-!outputs/metrics/.gitkeep
-
-# macOS
+.vscode/
+.idea/
 .DS_Store
+
+# Datasets, generated artifacts, and checkpoints
+/leftImg8bit/
+/cityscapes_cropped/
+/real_cityscapes_512/
+/outputs/
+/outputs-sdxl/
+/outputs-metrics/
+/outputs-sdxl-metrics/
+/outputs-sdxl-metrics-kid/
+/data/raw/*
+!/data/raw/.gitkeep
+/data/processed/*
+!/data/processed/.gitkeep
+/data/captions/*
+!/data/captions/.gitkeep
+
+# Local run artifacts
+/logs/
+*.out
+*.err
+*.log
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+/metadata.jsonl
+/detailed_captions.csv
+/__huggingface_repos__.json
