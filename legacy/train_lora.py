@@ -23,11 +23,11 @@ RANK = args.rank
 # =========================
 
 BASE_MODEL = "stabilityai/stable-diffusion-xl-base-1.0"
-WORK_DIR = "./cityscapes_cropped"
+WORK_DIR = "./datasets/cityscapes_cropped"
 
 TRAIN_SCRIPT = "train_text_to_image_lora_sdxl.py"
-OUTPUT_DIR = f"outputs-sdxl/cityscapes-lora-r{RANK}"
-LOG_DIR = f"outputs-sdxl/logs-r{RANK}"
+OUTPUT_DIR = f"outputs/lora/outputs-sdxl/cityscapes-lora-r{RANK}"
+LOG_DIR = f"outputs/lora/outputs-sdxl/logs-r{RANK}"
 
 
 # Verify

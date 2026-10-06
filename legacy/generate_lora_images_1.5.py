@@ -37,15 +37,15 @@ TRAIN_SEED = args.seed
 
 BASE_MODEL = "stable-diffusion-v1-5/stable-diffusion-v1-5"
 
-CAPTIONS_PATH = "./cityscapes_cropped/metadata.jsonl"
+CAPTIONS_PATH = "./datasets/cityscapes_cropped/metadata.jsonl"
 
 # New training output structure:
-# outputs/rank_64/seed_3/
-LORA_PATH = f"./outputs/rank_{RANK}/seed_{TRAIN_SEED}"
+# outputs/lora/rank_64/seed_3/
+LORA_PATH = f"./outputs/lora/rank_{RANK}/seed_{TRAIN_SEED}"
 
 # Keep generated images separate from trained weights
 OUTPUT_DIR = (
-    f"./outputs/generated/"
+    f"./outputs/lora/generated/"
     f"rank_{RANK}/seed_{TRAIN_SEED}"
 )
 

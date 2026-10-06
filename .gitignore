@@ -17,20 +17,13 @@ venv/
 .DS_Store
 
 # Datasets, generated artifacts, and checkpoints
-/leftImg8bit/
-/cityscapes_cropped/
-/real_cityscapes_512/
+/datasets/
+/ovam/
 /outputs/
 /outputs-sdxl/
 /outputs-metrics/
 /outputs-sdxl-metrics/
 /outputs-sdxl-metrics-kid/
-/data/raw/*
-!/data/raw/.gitkeep
-/data/processed/*
-!/data/processed/.gitkeep
-/data/captions/*
-!/data/captions/.gitkeep
 
 # Local run artifacts
 /logs/
@@ -41,6 +34,4 @@ venv/
 *.ckpt
 *.pt
 *.pth
-/metadata.jsonl
-/detailed_captions.csv
 /__huggingface_repos__.json

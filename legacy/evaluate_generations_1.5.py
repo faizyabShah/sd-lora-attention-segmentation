@@ -30,10 +30,10 @@ import lpips
 
 BASE_DIR = "./outputs"
 
-CAPTIONS_PATH = "./cityscapes_cropped/metadata.jsonl"
+CAPTIONS_PATH = "./datasets/cityscapes_cropped/metadata.jsonl"
 
-OUTPUT_DIR = "./outputs-metrics"
-FID_STATS_PATH = "./outputs-metrics/cityscapes_fid_stats.npz"
+OUTPUT_DIR = "./outputs/lora/outputs-metrics"
+FID_STATS_PATH = "./outputs/lora/outputs-metrics/cityscapes_fid_stats.npz"
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -114,7 +114,7 @@ for e in entries:
     # metadata stores paths like:
     # images/000123.jpg
 
-    path = os.path.join("./cityscapes_cropped", e["file_name"])
+    path = os.path.join("./datasets/cityscapes_cropped", e["file_name"])
 
     real_images.append(path)
 
@@ -252,7 +252,7 @@ for DATASET_NAME, GEN_DIR in DATASETS.items():
 
     kid_score = fid.compute_kid(
         GEN_DIR,
-        "./cityscapes_cropped/images",
+        "./datasets/cityscapes_cropped/images",
         mode="clean"
     )
 

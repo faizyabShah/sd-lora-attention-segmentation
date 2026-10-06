@@ -9,11 +9,11 @@ from cleanfid import fid
 # PATHS
 # =========================================================
 
-BASE_DIR = "./outputs-sdxl"
+BASE_DIR = "./outputs/lora/outputs-sdxl"
 
-OUTPUT_DIR = "./outputs-sdxl-metrics-kid"
+OUTPUT_DIR = "./outputs/lora/outputs-sdxl-metrics-kid"
 
-REAL_DIR = "./cityscapes_cropped/images"
+REAL_DIR = "./datasets/cityscapes_cropped/images"
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 

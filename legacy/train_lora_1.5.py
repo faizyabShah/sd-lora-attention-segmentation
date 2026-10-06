@@ -26,11 +26,11 @@ SEED = args.seed
 # =========================
 
 BASE_MODEL = "stable-diffusion-v1-5/stable-diffusion-v1-5"
-WORK_DIR = "./cityscapes_cropped"
+WORK_DIR = "./datasets/cityscapes_cropped"
 
 TRAIN_SCRIPT = "train_text_to_image_lora.py"
-OUTPUT_DIR = f"outputs/rank_{RANK}/seed_{SEED}"
-LOG_DIR = f"outputs/logs/rank_{RANK}/seed_{SEED}"
+OUTPUT_DIR = f"outputs/lora/rank_{RANK}/seed_{SEED}"
+LOG_DIR = f"outputs/lora/logs/rank_{RANK}/seed_{SEED}"
 
 
 # Verify

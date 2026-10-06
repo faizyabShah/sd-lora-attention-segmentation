@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=sd15-metrics
-#SBATCH --output=eval_%A_%a.out
-#SBATCH --error=eval_%A_%a.err
+#SBATCH --output=logs/eval_%A_%a.out
+#SBATCH --error=logs/eval_%A_%a.err
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4
@@ -9,9 +9,9 @@
 #SBATCH --time=12:00:00
 #SBATCH --array=0-24
 
-# Submit this array with: sbatch run_evaluate.slurm
+# Submit this array with: sbatch jobs/run_evaluate.slurm
 # After it completes, submit the CPU summary job with a dependency:
-# sbatch --dependency=afterok:<array-job-id> run_evaluate_summary.slurm
+# sbatch --dependency=afterok:<array-job-id> jobs/run_evaluate_summary.slurm
 
 source ~/.bashrc
 conda activate trdp

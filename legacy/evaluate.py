@@ -30,14 +30,14 @@ RANK = args.rank
 # PATHS
 # =========================
 
-REAL_DIR = "./real_cityscapes_512"  # resized dataset (ALL images)
-GEN_DIR = f"./outputs/cityscapes-gen-lora-r{RANK}"
-OUT_DIR = f"./outputs/cityscapes-metrics-lora-r{RANK}"
-CAPTIONS_PATH = "./leftImg8bit/metadata.jsonl"
+REAL_DIR = "./datasets/real_cityscapes_512"  # resized dataset (ALL images)
+GEN_DIR = f"./outputs/lora/cityscapes-gen-lora-r{RANK}"
+OUT_DIR = f"./outputs/lora/cityscapes-metrics-lora-r{RANK}"
+CAPTIONS_PATH = "./datasets/leftImg8bit/metadata.jsonl"
 
 os.makedirs(OUT_DIR, exist_ok=True)
 
-FID_STATS_PATH = "./outputs/cityscapes_fid_stats.npz"
+FID_STATS_PATH = "./outputs/lora/cityscapes_fid_stats.npz"
 
 NUM_SAMPLES = 4000
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"

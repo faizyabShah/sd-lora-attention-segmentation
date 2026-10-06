@@ -1,10 +1,10 @@
 model:
   base_model: runwayml/stable-diffusion-v1-5
-  lora_weights: outputs/logs/lora
+  lora_weights: outputs/lora/logs/lora
 inference:
   device: cuda
-  output_dir: outputs/images
-  output_csv: outputs/images/generated_dataset.csv
+  output_dir: outputs/lora/images
+  output_csv: outputs/lora/images/generated_dataset.csv
   batch_size: 4
   num_images: 200
   guidance_scale: 7.5

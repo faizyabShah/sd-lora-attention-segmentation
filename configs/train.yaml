@@ -4,7 +4,7 @@ model:
   lora_rank: 16
 training:
   script: train_text_to_image_lora.py
-  train_data_dir: data/processed/lora_dataset
+  train_data_dir: datasets/data/processed/lora_dataset
   resolution: 512
   batch_size: 4
   learning_rate: 1.0e-4
@@ -13,4 +13,4 @@ training:
   mixed_precision: fp16
   report_to: tensorboard
 output:
-  checkpoint_dir: outputs/logs/lora
+  checkpoint_dir: outputs/lora/logs/lora

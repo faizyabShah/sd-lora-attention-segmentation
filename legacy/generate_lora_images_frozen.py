@@ -11,8 +11,8 @@ from diffusers import StableDiffusionXLPipeline
 
 BASE_MODEL = "stabilityai/stable-diffusion-xl-base-1.0"
 
-CAPTIONS_PATH = "./cityscapes_cropped/metadata.jsonl"
-OUTPUT_DIR = "./outputs-sdxl/cityscapes-gen-frozen"
+CAPTIONS_PATH = "./datasets/cityscapes_cropped/metadata.jsonl"
+OUTPUT_DIR = "./outputs/lora/outputs-sdxl/cityscapes-gen-frozen"
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 

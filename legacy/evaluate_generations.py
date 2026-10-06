@@ -28,12 +28,12 @@ import lpips
 # PATHS
 # =========================================================
 
-BASE_DIR = "./outputs-sdxl"
+BASE_DIR = "./outputs/lora/outputs-sdxl"
 
-CAPTIONS_PATH = "./cityscapes_cropped/metadata.jsonl"
+CAPTIONS_PATH = "./datasets/cityscapes_cropped/metadata.jsonl"
 
-OUTPUT_DIR = "./outputs-sdxl-metrics"
-FID_STATS_PATH = "./outputs-sdxl-metrics/cityscapes_fid_stats.npz"
+OUTPUT_DIR = "./outputs/lora/outputs-sdxl-metrics"
+FID_STATS_PATH = "./outputs/lora/outputs-sdxl-metrics/cityscapes_fid_stats.npz"
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -114,7 +114,7 @@ for e in entries:
     # metadata stores paths like:
     # images/000123.jpg
 
-    path = os.path.join("./cityscapes_cropped", e["file_name"])
+    path = os.path.join("./datasets/cityscapes_cropped", e["file_name"])
 
     real_images.append(path)
 

@@ -14,8 +14,8 @@ from unittest.mock import patch
 # =========================
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--src", type=str, default="./leftImg8bit")
-parser.add_argument("--dst", type=str, default="./cityscapes_cropped")
+parser.add_argument("--src", type=str, default="./datasets/leftImg8bit")
+parser.add_argument("--dst", type=str, default="./datasets/cityscapes_cropped")
 parser.add_argument("--save_every", type=int, default=100)
 args = parser.parse_args()
 

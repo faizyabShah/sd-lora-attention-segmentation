@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=cityscapes-caption
-#SBATCH --output=caption_%j.out
-#SBATCH --error=caption_%j.err
+#SBATCH --output=logs/caption_%j.out
+#SBATCH --error=logs/caption_%j.err
 
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:1
@@ -35,8 +35,8 @@ export TOKENIZERS_PARALLELISM=false
 # =========================
 
 python crop_and_caption.py \
-    --src ./leftImg8bit \
-    --dst ./cityscapes_cropped \
+    --src ./datasets/leftImg8bit \
+    --dst ./datasets/cityscapes_cropped \
     --save_every 100
 
 echo "=== DONE ==="

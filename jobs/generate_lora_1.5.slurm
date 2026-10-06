@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=gen-seed5-resume
-#SBATCH --output=gen_seed5_%j.out
-#SBATCH --error=gen_seed5_%j.err
+#SBATCH --output=logs/gen_seed5_%j.out
+#SBATCH --error=logs/gen_seed5_%j.err
 
 #SBATCH --partition=gpu
 #SBATCH --nodelist=renyi
@@ -39,7 +39,7 @@ do
     echo "RESUMING rank=$RANK, seed=$SEED"
     echo "========================================"
 
-    OUTPUT_DIR="./outputs/generated/rank_${RANK}/seed_${SEED}"
+    OUTPUT_DIR="./outputs/lora/generated/rank_${RANK}/seed_${SEED}"
 
     if [ -d "$OUTPUT_DIR" ]; then
         EXISTING=$(find "$OUTPUT_DIR" -maxdepth 1 -name "*.png" | wc -l)

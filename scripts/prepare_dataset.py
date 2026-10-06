@@ -13,8 +13,8 @@ from src.dataset.loader import load_captions_csv
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Filter captions and format metadata for LoRA training.")
-    parser.add_argument("--captions-csv", default="data/captions/captions.csv")
-    parser.add_argument("--output-dir", default="data/processed/lora_dataset")
+    parser.add_argument("--captions-csv", default="datasets/data/captions/captions.csv")
+    parser.add_argument("--output-dir", default="datasets/data/processed/lora_dataset")
     parser.add_argument("--max-tokens", type=int, default=77)
     args = parser.parse_args()
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=gen-frozen
-#SBATCH --output=gen_%A_%a.out
-#SBATCH --error=gen_%A_%a.err
+#SBATCH --output=logs/gen_%A_%a.out
+#SBATCH --error=logs/gen_%A_%a.err
 
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:1

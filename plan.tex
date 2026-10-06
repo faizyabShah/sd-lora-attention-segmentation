@@ -1,0 +1,329 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{enumitem}
+
+\setlist{nosep,leftmargin=1.3em}
+\captionsetup{font=small,labelfont=bf}
+\renewcommand{\arraystretch}{1.15}
+\setlength{\parskip}{0.45em}
+\setlength{\parindent}{0pt}
+
+\title{\vspace{-1.4cm}\textbf{Planned Experiments for the Attention-Map Segmentation Stage}}
+\author{Narmeen Sabah Siddiqui, Faizyab Ali Shah}
+\date{}
+
+\begin{document}
+
+\maketitle
+\vspace{-0.8em}
+
+\section*{Planned segmentation experiments}
+
+In the next phase, we will focus on attention-based semantic segmentation of the
+generated urban scenes. Rather than treating this as a single-method comparison,
+we plan to study how semantic localization, spatial refinement, attention resolution,
+and denoising timestep selection affect mask quality.
+
+The experiments are organized in two groups. We first prioritize experiments that
+can mainly be carried out using simpler operations on attention information extracted during image
+generation. Cross-attention and self-attention maps can be stored at different
+resolutions, layers, heads, and denoising timesteps, allowing several ablations and
+combinations to be evaluated afterwards without requiring a substantially different
+generation pipeline.
+
+After these experiments, we will move to methods that require additional
+optimization, more complex operations, external models, or more specialized segmentation procedures. The
+results of the first group will also help determine which configurations are worth
+using as inputs to these more complex methods.
+
+% =========================================================
+\subsection*{Attention-map experiments and ablations}
+% =========================================================
+
+\textbf{OVAM baseline.}
+OVAM remains the main cross-attention baseline. The current baseline aggregates
+cross-attention information across layers, heads, and timesteps before converting
+the resulting heatmap into a semantic mask. This configuration provides the
+reference against which the following attention-map experiments will be compared.
+
+For the baseline, we will keep the best post-processing configuration found in
+Phase~1 and, where necessary, revisit normalization, thresholding, and background
+handling. Once fixed, these settings should remain unchanged when comparing the
+subsequent attention strategies.
+
+\textbf{OVAM with self-attention refinement.}
+Cross-attention provides class-specific semantic information, whereas
+self-attention describes relationships between spatial locations. Instead of using
+the OVAM cross-attention heatmap directly as the final mask, we will investigate
+whether self-attention can propagate or refine the semantic response spatially.
+
+Because the self-attention maps can be stored during generation, several variants
+can be evaluated afterwards. The main ablations will include the self-attention
+resolution used for refinement ($16\times16$, $32\times32$, and $64\times64$),
+the strength of the refinement, and whether the refinement is applied using one
+resolution or progressively across multiple resolutions.
+
+A simple cross-attention/self-attention combination will first be evaluated before
+moving to the more specialized refinement mechanisms described later.
+
+\textbf{Resolution-specific cross-attention.}
+OVAM normally aggregates attention maps originating from several spatial
+resolutions. However, the information contained at each resolution is different.
+Lower-resolution maps may provide stronger semantic localization, while
+higher-resolution maps may contain finer spatial details.
+
+We will therefore store and evaluate the $16\times16$, $32\times32$, and
+$64\times64$ cross-attention maps separately, followed by combinations such as
+$16+32$, $16+64$, $32+64$, and all resolutions together.
+
+The main objective is not only to determine the best resolution overall, but also
+to determine whether this varies between classes. For example, large classes such
+as road, sky, building, or vegetation may benefit from coarse semantic attention,
+whereas person, pole, traffic sign, or traffic light may require finer-resolution
+information.
+
+\textbf{Denoising timestep selection.}
+The current OVAM formulation aggregates attention information across the diffusion
+trajectory. However, semantic and spatial information may not be equally useful at
+all denoising stages.
+
+Since the attention maps can be stored independently for each diffusion timestep,
+we will compare the complete trajectory against selected timestep ranges. Initial
+experiments will consider early, middle, and late windows, followed by smaller
+windows or individual timesteps if clear trends appear.
+
+For example, the experiment may compare:
+\[
+\text{all timesteps},
+\qquad
+\text{early},
+\qquad
+\text{middle},
+\qquad
+\text{late}.
+\]
+
+If necessary, this can later be extended to combinations of resolution and timestep,
+so that the attention used for a class can be written conceptually as
+\[
+A^{c}_{r,t},
+\]
+where $c$ denotes the class, $r$ the spatial resolution, and $t$ the selected
+timestep or timestep window.
+
+\textbf{Class- or scale-adaptive attention strategy.}
+The previous experiments can naturally lead to a simple adaptive strategy. Instead
+of selecting one global OVAM configuration for every class, each class
+can use the attention configuration that performs best for its spatial characteristics.
+
+For example, if the resolution and timestep experiments show that road performs
+best with coarse attention while traffic signs perform better with higher-resolution
+maps, those configurations can be selected independently.
+
+An initial adaptive strategy will therefore compare:
+\[
+\text{one global attention configuration}
+\]
+against
+\[
+\text{class-specific or scale-specific attention configurations}.
+\]
+
+This first version can be implemented entirely using the stored attention maps.
+More complex refinement methods such as SAM can later be incorporated if they
+prove useful.
+
+\vspace{0.5em}
+\hrule
+\vspace{0.8em}
+
+% =========================================================
+\subsection*{More method-specific extensions}
+% =========================================================
+
+The following experiments require additional optimization, an external segmentation
+model, or a more specialized processing pipeline. They will therefore be considered
+after the basic attention-map experiments above have established which attention
+sources are most useful for Cityscapes.
+
+\textbf{Above ablations with token optimization.}
+The current OVAM experiments query classes using their ordinary text embeddings,
+for example ``car'', ``road'', or ``traffic sign''. OVAM also provides a token
+optimization procedure in which the embedding representing a class is optimized
+using a very small amount of annotated data, while keeping the diffusion model
+itself frozen.
+
+We will compare ordinary class-name embeddings against optimized class tokens and
+measure the improvement separately for eachclass. This experiment can
+also help distinguish semantic failures from spatial-resolution failures. If a class
+remains poorly localized after token optimization, the limitation is more likely to
+come from the spatial attention representation rather than from the text embedding.
+
+\textbf{Above ablations with SAM-based refinement.}
+In this strategy, diffusion cross-attention is used primarily for semantic localization,
+while a segmentation foundation model such as SAM is responsible for obtaining the
+final spatial boundary.
+
+The response can be converted into different types of SAM prompts. We will
+compare high-confidence points, multiple points, bounding boxes, and coarse mask
+prompts. The purpose is to determine how much information should be transferred
+from diffusion attention to SAM.
+
+Particular attention will be given to smaller classes.
+
+\textbf{SeeDiff (2025).}
+SeeDiff uses a seeded-segmentation formulation. Instead of treating the
+cross-attention response as the final segmentation mask, it extracts
+high-confidence cross-attention locations as semantic seeds.
+
+These seeds are subsequently expanded using self-attention affinities. The
+expansion proceeds progressively from coarser self-attention maps towards
+higher-resolution maps, combining semantic consistency at coarse resolutions with
+finer spatial information at higher resolutions. A separate background expansion
+stage is then used to suppress incorrectly expanded foreground regions.
+
+The main factors to investigate will include the cross-attention seed threshold,
+the self-attention resolutions used during expansion, whether expansion is
+single-stage or progressive, and the effect of the background refinement.
+
+\textbf{Hierarchical or weighted attention fusion.}
+The previous ablations treat attention maps explicitly and allow us to identify
+which resolutions, timesteps, and potentially layers are most useful. A more
+advanced alternative is to combine this information through weighted or
+hierarchical fusion rather than a simple average.
+
+FA-Seg motivates a hierarchical multi-resolution combination of cross-attention
+and self-attention, where different scales contribute differently to semantic
+localization and spatial refinement. NERVE provides a different motivation by
+using uncertainty or entropy to avoid treating every self-attention map equally.
+
+We will therefore consider comparisons such as
+\[
+A_{\mathrm{uniform}}
+=
+\frac{1}{N}\sum_i A_i
+\]
+against
+\[
+A_{\mathrm{weighted}}
+=
+\sum_i w_i A_i,
+\]
+where the weights may depend on resolution, layer, head, or an uncertainty measure.
+
+This experiment will be carried out after the simpler resolution and timestep
+ablations, since their results can guide which attention maps should receive greater
+importance.
+
+\textbf{Comparison with existing diffusion-based segmentation methods.}
+In addition to the ablations and method-specific extensions described above, we
+will compare our approach against existing diffusion-based segmentation methods
+using the released OVAM benchmark data, including the generated images, prompts,
+seeds, and ground-truth masks. For methods already evaluated in the OVAM paper,
+namely DAAM, Attn2Mask, Grounded Diffusion, and DatasetDM, we will report the
+results published by OVAM. For methods not included in the OVAM comparison, we
+will reproduce them on the same benchmark where feasible. The main methods
+considered for reproduction are DiffSegmenter, DiffSeg, SeeDiff, FA-Seg,
+DiffuMask, and FreeSeg-Diff. This experiment will provide a broader comparison
+between our proposed strategies and other Stable-Diffusion-based segmentation
+approaches under a common evaluation setting.
+
+% =========================================================
+\subsection*{Experiment summary}
+% =========================================================
+
+The planned experiments are summarized below. The first group mainly reuses stored
+cross-attention and self-attention information and can therefore be evaluated through
+offline ablations. The second group requires additional method-specific components or
+optimization.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{p{3.2cm}p{3.0cm}p{3.6cm}p{2.1cm}}
+\toprule
+\textbf{Strategy} &
+\textbf{Main attention / refinement} &
+\textbf{Main ablation} &
+\textbf{Result} \\
+\midrule
+
+\multicolumn{4}{l}{\textbf{Attention-map experiments / easier ablations}} \\
+\midrule
+
+OVAM baseline
+& Cross-attention
+& Normalization, threshold, background handling
+& \\[1.2em]
+
+OVAM + self-attention refinement
+& Cross-attention + self-attention
+& SA resolution, refinement strength, single vs.\ multi-resolution
+& \\[1.2em]
+
+Resolution-specific cross-attention
+& Cross-attention
+& $16\times16$, $32\times32$, $64\times64$, and combinations
+& \\[1.2em]
+
+Denoising timestep selection
+& Cross-attention
+& Early, middle, late, individual, and all timesteps
+& \\[1.2em]
+
+Class-/scale-adaptive attention
+& Class-dependent attention selection
+& Global configuration vs.\ class-/scale-dependent configuration
+& \\[1.2em]
+
+\midrule
+\multicolumn{4}{l}{\textbf{Method-specific / harder extensions}} \\
+\midrule
+
+Above ablations + token optimization
+& Optimized class embeddings
+& Standard vs.\ optimized tokens across the previous attention configurations
+& \\[1.2em]
+
+Above ablations + SAM refinement
+& Diffusion attention + SAM
+& Point vs.\ multi-point vs.\ box vs.\ coarse-mask prompting
+& \\[1.2em]
+
+SeeDiff
+& CA seeds + multi-scale SA expansion
+& Seed threshold, SA resolutions, single vs.\ progressive expansion, background refinement
+& \\[1.2em]
+
+Hierarchical / weighted attention fusion
+& Multi-resolution / multi-layer CA/SA
+& Uniform vs.\ weighted vs.\ uncertainty-/entropy-based fusion
+& \\[1.2em]
+
+Comparison with existing methods
+& OVAM benchmark + reproduced SD-based methods
+& Report from OVAM: DAAM, Attn2Mask, Grounded Diffusion, DatasetDM; reproduce: DiffSegmenter, DiffSeg, SeeDiff, FA-Seg, DiffuMask, FreeSeg-Diff
+& \\[1.2em]
+
+\bottomrule
+\end{tabular}
+\caption{Planned segmentation experiments, ordered from attention-map ablations
+that can mainly reuse stored attention information to more method-specific extensions.}
+\end{table}
+
+The final evaluation will report overall mIoU together with per-class IoU.
+Particular attention will be given to the difference between large spatially coherent
+classes such as road, sky, vegetation, and building, and small or thin classes such as
+person, pole, traffic light, and traffic sign.
+
+\textbf{Final note.}
+The proposed order is tentative and may change according to the results of the
+earlier experiments. In particular, the resolution, timestep, and self-attention
+ablations are intended to guide the design of the later methods rather than treating
+all possible configurations equally.
+
+\end{document}

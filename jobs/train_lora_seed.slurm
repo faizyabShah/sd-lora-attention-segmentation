@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=lora-train
-#SBATCH --output=train_%A_%a.out
-#SBATCH --error=train_%A_%a.err
+#SBATCH --output=logs/train_%A_%a.out
+#SBATCH --error=logs/train_%A_%a.err
 
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:1

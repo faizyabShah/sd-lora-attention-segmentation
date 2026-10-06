@@ -22,9 +22,9 @@ RANK = args.rank
 
 BASE_MODEL = "stabilityai/stable-diffusion-xl-base-1.0"
 
-CAPTIONS_PATH = "./cityscapes_cropped/metadata.jsonl"
-LORA_PATH = f"./outputs-sdxl/cityscapes-lora-r{RANK}"
-OUTPUT_DIR = f"./outputs-sdxl/cityscapes-gen-lora-r{RANK}"
+CAPTIONS_PATH = "./datasets/cityscapes_cropped/metadata.jsonl"
+LORA_PATH = f"./outputs/lora/outputs-sdxl/cityscapes-lora-r{RANK}"
+OUTPUT_DIR = f"./outputs/lora/outputs-sdxl/cityscapes-gen-lora-r{RANK}"
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 

@@ -97,7 +97,7 @@ def generate(config_path: str = "configs/generation.yaml") -> pd.DataFrame:
         device=device,
     )
 
-    csv_path = Path(inf_cfg.get("output_csv", "outputs/images/generated_dataset.csv"))
+    csv_path = Path(inf_cfg.get("output_csv", "outputs/lora/images/generated_dataset.csv"))
     csv_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(csv_path, index=False)
     return df

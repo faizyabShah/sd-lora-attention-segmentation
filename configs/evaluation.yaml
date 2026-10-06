@@ -1,8 +1,8 @@
 paths:
-  real_dir: data/processed/images
-  generated_dir: outputs/images
-  captions_csv: data/captions/captions.csv
-  metrics_output_dir: outputs/metrics
+  real_dir: datasets/data/processed/images
+  generated_dir: outputs/lora/images
+  captions_csv: datasets/data/captions/captions.csv
+  metrics_output_dir: outputs/lora/metrics
 metrics:
   - fid
   - clip_score
