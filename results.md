@@ -1,5 +1,16 @@
 # Stable Diffusion 1.5 Cityscapes results
 
+> **VOC-Sim baseline correction (2026-10-12):** entries below that call
+> `ovam_unoptimized` (0.65404 mIoU) the OVAM baseline are mislabeled. That
+> configuration is our regenerated **OVAM cross-attention-only precursor**;
+> the authors' released precursor heatmaps score 0.66156. Published
+> unoptimized OVAM also fuses the highest-resolution self-attention maps and
+> applies DenseCRF; the authors' released masks score **0.70365 mIoU** on the
+> same 490 annotations. Our final 0.79974 result therefore gains **+0.09609
+> absolute** (13.66% relative), improves **17/20 classes**, and wins on
+> **376/490 images**. The old ablation scores remain valid; only their naming
+> and reported deltas against full OVAM were wrong. See `attention_analysis.md`.
+
 ## Experiment setup
 
 - Base model: `stable-diffusion-v1-5/stable-diffusion-v1-5`.

@@ -57,7 +57,7 @@ def update_results_markdown(
         f"Evaluated **{settings['images']} annotated images across {len(settings['classes'])} classes**. "
         "All entries were generated and scored in memory; generated images and attention tensors were not saved.",
         "",
-        f"**Unoptimized OVAM baseline:** {baseline['miou']:.5f} foreground mIoU.",
+        f"**OVAM cross-attention-only reference:** {baseline['miou']:.5f} foreground mIoU.",
         f"**Best regular ablation:** {best['miou']:.5f} foreground mIoU, "
         f"`{best_experiment}/{best['configuration']}` "
         f"({best['miou'] - baseline['miou']:+.5f} versus OVAM).",
@@ -164,11 +164,12 @@ def main() -> None:
     for experiment, configs in results.items():
         name = max(configs, key=lambda key: configs[key]["miou"])
         winners[experiment] = {"configuration": name, **configs[name]}
-    baseline = results.get("baseline", {}).get("ovam_unoptimized")
+    baseline_group = results.get("baseline", {})
+    baseline = baseline_group.get("ovam_cross_attention_only") or baseline_group.get("ovam_unoptimized")
     settings = {"classes": sorted(classes), "images": total_images, "shards": len(complete)}
     summary = {
         "settings": settings,
-        "ovam_unoptimized": baseline,
+        "ovam_cross_attention_only": baseline,
         "best_by_experiment": winners,
     }
     exhaustive_summary = None

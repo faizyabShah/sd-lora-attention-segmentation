@@ -12,13 +12,21 @@ from src.segmentation.attention_aggregation import (
     load_step_module_maps,
 )
 from src.segmentation.in_memory_dataset import InMemoryAttentionSample
-from src.segmentation.ovam_baseline import ovam_attention_map, ovam_mask
+from src.segmentation.ovam_baseline import ovam_cross_attention_map, ovam_cross_attention_mask
+from src.segmentation.ovam_reference import published_ovam_fused_map
 
 
 MODULE = "down_blocks.0.attentions.0.transformer_blocks.0.attn2"
 
 
 class AttentionSourceTests(unittest.TestCase):
+    def test_published_ovam_fusion_rescales_sa_before_multiplication(self):
+        cross = torch.tensor([[0.0, 1.0], [2.0, 4.0]])
+        self_attention = torch.tensor([[2.0, 4.0], [6.0, 10.0]])
+        actual = published_ovam_fused_map(cross, self_attention, (2, 2), 0.85)
+        expected_sa = torch.tensor([[0.85, 0.8875], [0.925, 1.0]])
+        torch.testing.assert_close(actual, (cross / 4.0) * expected_sa)
+
     def _sample(self, steps):
         return InMemoryAttentionSample(
             sample_id="sample",
@@ -50,7 +58,7 @@ class AttentionSourceTests(unittest.TestCase):
         torch.testing.assert_close(heads.flatten(1), expected, atol=1e-3, rtol=1e-3)
         torch.testing.assert_close(aggregate.flatten(), expected.mean(0), atol=1e-3, rtol=1e-3)
 
-    def test_ovam_map_uses_unconditional_query_and_prompt_softmax(self):
+    def test_ovam_cross_attention_map_uses_unconditional_query_and_prompt_softmax(self):
         torch.manual_seed(11)
         recorder = CompactAttentionRecorder((5,), 7, 5)
         recorder.register_module(MODULE, "cross", 2, 1 / math.sqrt(3), "test")
@@ -63,12 +71,12 @@ class AttentionSourceTests(unittest.TestCase):
 
         expected_heads = (query[0].float() @ key[1].float().transpose(-1, -2) * scale).softmax(-1)[:, :, 5]
         expected = expected_heads.sum(0).reshape(2, 2)
-        actual = ovam_attention_map(sample)
+        actual = ovam_cross_attention_map(sample)
         expected_64 = torch.nn.functional.interpolate(
             expected[None, None], size=(64, 64), mode="bilinear", align_corners=False
         )[0, 0]
         torch.testing.assert_close(actual, expected_64, atol=2e-3, rtol=2e-3)
-        self.assertEqual(tuple(ovam_mask(sample, (4, 4)).shape), (4, 4))
+        self.assertEqual(tuple(ovam_cross_attention_mask(sample, (4, 4)).shape), (4, 4))
 
 
 if __name__ == "__main__":

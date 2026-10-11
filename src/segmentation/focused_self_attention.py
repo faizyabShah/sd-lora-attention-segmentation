@@ -18,7 +18,7 @@ from .attention_aggregation import (
     resize_map,
 )
 from .metrics import BinarySegmentationMetrics
-from .ovam_baseline import ovam_attention_map
+from .ovam_baseline import ovam_cross_attention_map
 from .postprocessing import postprocess_mask
 from .stage1_suite import BEST_12_INDICES
 
@@ -67,12 +67,16 @@ def _normalize_seed(attention_map: torch.Tensor, method: str) -> torch.Tensor:
 
 
 @torch.inference_mode()
-def build_cross_attention_seeds(
+def build_cross_attention_layer_heads(
     sample: Any,
     tokenizer: Any,
-    fixed_head_rankings: dict[str, Sequence[int]],
-) -> dict[str, torch.Tensor]:
-    """Build the six semantic seeds selected by the first full-dataset study."""
+) -> tuple[tuple[str, ...], dict[int, int], torch.Tensor]:
+    """Return timestep-averaged CA maps as ``[layer, head, 64, 64]``.
+
+    Keeping this extraction separate lets the analysis code inspect individual
+    layers and heads while the experiment code continues to build exactly the
+    same semantic seeds from the same tensor.
+    """
     modules = tuple(sorted(name for names in sample.modules_by_resolution.values() for name in names))
     if len(modules) != 16:
         raise ValueError(f"Expected 16 cross-attention modules, found {len(modules)}")
@@ -97,8 +101,19 @@ def build_cross_attention_seeds(
     if torch.any(layer_counts == 0):
         raise RuntimeError("At least one cross-attention layer was never observed")
     layer_heads /= layer_counts[:, None, None, None]
-    layer_maps = layer_heads.mean(dim=1)
+    return modules, module_resolution, layer_heads
 
+
+@torch.inference_mode()
+def build_cross_attention_seeds_from_heads(
+    modules: Sequence[str],
+    module_resolution: dict[int, int],
+    layer_heads: torch.Tensor,
+    fixed_head_rankings: dict[str, Sequence[int]],
+    ovam_map: torch.Tensor,
+) -> dict[str, torch.Tensor]:
+    """Build selected CA seeds from already extracted per-layer head maps."""
+    layer_maps = layer_heads.mean(dim=1)
     best12 = torch.tensor(BEST_12_INDICES, dtype=torch.long)
     r8_r16 = torch.tensor(
         [index for index, resolution in module_resolution.items() if resolution in (8, 16)],
@@ -121,7 +136,7 @@ def build_cross_attention_seeds(
         "r8_r16_max": layer_maps[r8_r16].mean(dim=0),
         "mid_up_max": layer_maps[mid_up].mean(dim=0),
         "top4_heads_percentile": torch.stack(top4_maps).mean(dim=0),
-        "ovam_nonmiddle_max": ovam_attention_map(sample),
+        "ovam_nonmiddle_max": ovam_map,
     }
     methods = {
         "best12_percentile": "percentile_01_99",
@@ -132,6 +147,19 @@ def build_cross_attention_seeds(
         "ovam_nonmiddle_max": "max",
     }
     return {name: _normalize_seed(value, methods[name]) for name, value in raw.items()}
+
+
+@torch.inference_mode()
+def build_cross_attention_seeds(
+    sample: Any,
+    tokenizer: Any,
+    fixed_head_rankings: dict[str, Sequence[int]],
+) -> dict[str, torch.Tensor]:
+    """Build the six semantic seeds selected by the first full-dataset study."""
+    modules, module_resolution, layer_heads = build_cross_attention_layer_heads(sample, tokenizer)
+    return build_cross_attention_seeds_from_heads(
+        modules, module_resolution, layer_heads, fixed_head_rankings, ovam_cross_attention_map(sample)
+    )
 
 
 @torch.inference_mode()

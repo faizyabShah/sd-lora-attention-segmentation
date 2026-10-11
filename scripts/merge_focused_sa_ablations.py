@@ -50,7 +50,8 @@ def update_results_markdown(
     """Replace the focused full-dataset summary while retaining older sections."""
     with gzip.open(reference_results, "rt", encoding="utf-8") as handle:
         reference = json.load(handle)["results"]
-    baseline = reference["baseline"]["ovam_unoptimized"]
+    baseline_group = reference["baseline"]
+    baseline = baseline_group.get("ovam_cross_attention_only") or baseline_group["ovam_unoptimized"]
     previous = reference["self_attention/r64"][
         "module__up_blocks.3.attentions.2.transformer_blocks.0.attn1__iter4__continuous__non_residual"
     ]
@@ -65,7 +66,7 @@ def update_results_markdown(
         "for 1,632 configurations covering output calibration, cross-attention seeds, "
         "self-attention heads, and self-attention timestep weighting.",
         "",
-        f"- Unoptimized OVAM baseline: **{baseline['miou']:.5f} mIoU**.",
+        f"- OVAM cross-attention-only reference: **{baseline['miou']:.5f} mIoU**.",
         f"- Previous best: **{previous['miou']:.5f} mIoU**.",
         f"- New best: **{best['miou']:.5f} mIoU**, "
         f"`{best_experiment}/{best['configuration']}`.",

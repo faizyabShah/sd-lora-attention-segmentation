@@ -31,7 +31,7 @@ from src.segmentation.ablation_runner import (
 from src.segmentation.exhaustive_layer_search import run_exhaustive_layer_search
 from src.segmentation.in_memory_dataset import SingleSampleDataset
 from src.segmentation.metrics import BinarySegmentationMetrics
-from src.segmentation.ovam_baseline import ovam_mask
+from src.segmentation.ovam_baseline import ovam_cross_attention_mask
 from src.segmentation.self_attention_refinement import (
     run_progressive_self_attention,
     run_self_attention_screen,
@@ -181,8 +181,8 @@ def evaluate_sample(sample, tokenizer, args) -> tuple[dict, Any | None]:
     if "ovam" in args.suites:
         metric = BinarySegmentationMetrics()
         target = sample.load_target_mask()
-        metric.update(sample.classname, ovam_mask(sample, target.shape), target)
-        merge_results(local, "baseline", {"ovam_unoptimized": metric.result()})
+        metric.update(sample.classname, ovam_cross_attention_mask(sample, target.shape), target)
+        merge_results(local, "baseline", {"ovam_cross_attention_only": metric.result()})
 
     if "basic" in args.suites:
         # These change one OVAM aggregation axis while keeping OVAM's max

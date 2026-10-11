@@ -6,9 +6,10 @@ sample, evaluates every enabled configuration, atomically checkpoints only
 metric counts, releases the sample's attention tensors, and moves to the next
 sample. Generated images, latents, and attention tensors are never written.
 
-## Reference baseline
+## Cross-attention reference
 
-`baseline/ovam_unoptimized` reproduces OVAM's ordinary prompt baseline:
+`baseline/ovam_cross_attention_only` reproduces the cross-attention precursor
+used by OVAM with the ordinary prompt:
 
 1. use unconditional-branch cross-attention queries;
 2. compute keys from the ordinary, unoptimized prompt embedding;
@@ -19,12 +20,14 @@ sample. Generated images, latents, and attention tensors are never written.
 6. resize to the annotation size, divide by the maximum, and threshold with
    strict `> 0.4`.
 
-There is no token optimization, morphology, self-attention refinement, or CRF
-in this baseline.
+There is no token optimization, morphology, self-attention fusion, or CRF in
+this reference. The published OVAM pseudo-mask pipeline additionally multiplies
+this map by aggregated high-resolution self-attention, then applies DenseCRF.
+The authors' released unoptimized masks score 0.70365 mIoU on these 490 images.
 
 ## Included families
 
-- the exact unoptimized OVAM reference;
+- the OVAM cross-attention precursor;
 - timestep windows, all nonempty resolution combinations, and their Cartesian
   product;
 - individual cross-attention layers, regions, leave-one-out, leave-two-out,
@@ -39,8 +42,8 @@ The learned layer weights and head rankings are frozen from the earlier
 image being scored. The old per-class layer lookup exists for only four VOC
 classes, so it is not presented as a 20-class method.
 
-The direct timestep, resolution, and layer studies use OVAM maps and keep the
-published resize, maximum normalization, and strict 0.4 threshold fixed. The
+The direct timestep, resolution, and layer studies use OVAM cross-attention
+maps and keep its resize, maximum normalization, and strict 0.4 threshold fixed. The
 calibrated Stage 1 and self-attention families are labeled separately and keep
 the settings selected by the earlier 100-image development experiments.
 

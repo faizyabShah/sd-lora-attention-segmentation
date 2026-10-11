@@ -1,4 +1,9 @@
-"""Faithful unoptimized OVAM baseline used as the experiment reference."""
+"""OVAM cross-attention heatmap before the paper's mask postprocessing.
+
+The published OVAM pseudo-mask additionally multiplies this heatmap by a
+highest-resolution self-attention fusion map and applies DenseCRF.  Functions
+in this module intentionally expose only the cross-attention precursor.
+"""
 
 from __future__ import annotations
 
@@ -36,8 +41,8 @@ def _prompt_token_count(sample: AttentionSample) -> int:
 
 
 @torch.inference_mode()
-def ovam_attention_map(sample: AttentionSample) -> torch.Tensor:
-    """Return OVAM's summed 64x64 map for the ordinary prompt embedding.
+def ovam_cross_attention_map(sample: AttentionSample) -> torch.Tensor:
+    """Return OVAM's summed 64x64 CA map for the ordinary prompt embedding.
 
     The original code selects ``len(prompt.split())`` after also retaining SOT,
     which corresponds to the final whitespace-delimited class word for VOC-Sim.
@@ -74,17 +79,23 @@ def ovam_attention_map(sample: AttentionSample) -> torch.Tensor:
     return total
 
 
-def ovam_mask(
+def ovam_cross_attention_mask(
     sample: AttentionSample,
     output_shape: tuple[int, int],
     threshold: float = OVAM_THRESHOLD,
 ) -> torch.Tensor:
-    """Apply OVAM's published interpolation, max normalization, and threshold."""
-    heatmap = ovam_attention_map(sample)
+    """Threshold the CA precursor without OVAM's SA fusion or DenseCRF."""
+    heatmap = ovam_cross_attention_map(sample)
     resized = F.interpolate(
         heatmap[None, None], size=output_shape, mode="bilinear", align_corners=False
     )[0, 0]
     maximum = resized.max()
     normalized = resized / maximum if maximum > 0 else torch.zeros_like(resized)
     return normalized > threshold
+
+
+# Backward-compatible names for saved experiment code.  These are deliberately
+# aliases rather than the name of the published full OVAM pseudo-mask pipeline.
+ovam_attention_map = ovam_cross_attention_map
+ovam_mask = ovam_cross_attention_mask
 

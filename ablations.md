@@ -1,5 +1,15 @@
 # Full VOC-Sim ablation results
 
+> **Baseline correction (2026-10-12):** the row named `ovam_unoptimized`
+> (0.654043 mIoU) is our regenerated OVAM **cross-attention-only precursor**,
+> without the paper's self-attention fusion or DenseCRF. The authors' released
+> precursor heatmaps score 0.661563. Their released unoptimized
+> OVAM masks score **0.703646 mIoU** on these 490 annotations. All configuration
+> scores and within-project rankings in this file remain valid. Any delta
+> described as being versus OVAM should use 0.703646; the final 0.799737 method
+> is **+0.096090 mIoU** above the published pipeline. See
+> `attention_analysis.md` for the corrected comparison.
+
 This document contains every evaluated configuration for the full VOC-Sim experiment: **490 annotated images across 20 classes**. Tables are sorted by foreground mIoU within each experiment family. No configuration has been omitted.
 
 For regular configurations, `mIoU` is the macro mean of the 20 class IoUs, `Mean image IoU` averages per-image foreground IoU, and `Mean background IoU` averages class-level background IoU. The class columns contain pooled foreground IoU. Raw TP, FP, FN, TN, image counts, and full-precision values remain in the machine-readable source files listed below.
