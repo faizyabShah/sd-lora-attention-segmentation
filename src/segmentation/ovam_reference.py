@@ -72,3 +72,28 @@ def load_released_ovam_reference(
         cross_attention, self_attention, tuple(prediction.shape), self_attention_min=0.85
     )
     return fused, prediction
+
+
+def load_released_ovam_components(
+    row: Mapping[str, str], manifest_root: Path
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Load released CA, SA, fused map, and post-CRF prediction for validation."""
+    image_stem = Path(row["image"]).stem
+    heatmap_path = manifest_root / "heatmaps" / f"{image_stem}_heatmap_token0.npy"
+    evaluation_root = manifest_root.parents[1]
+    sa_path = evaluation_root / "ovam_sa" / "voc_sim" / "sa" / (
+        f"sa15_{row['classname']}_{row['seed']}_sa.npy"
+    )
+    mask_path = evaluation_root / "ovam_sa" / "voc_sim" / "mask" / (
+        f"{image_stem}_ovamsa_crf_mask.png"
+    )
+    missing = [path for path in (heatmap_path, sa_path, mask_path) if not path.is_file()]
+    if missing:
+        raise FileNotFoundError(f"Missing released OVAM artifact: {missing[0]}")
+    stored_heatmap = np.load(heatmap_path)
+    ca = torch.from_numpy(stored_heatmap[1])
+    sa = torch.from_numpy(np.load(sa_path))
+    mask_rgb = np.asarray(Image.open(mask_path).convert("RGB"))
+    prediction = torch.from_numpy(np.any(mask_rgb != 0, axis=-1))
+    fused = published_ovam_fused_map(ca, sa, tuple(prediction.shape))
+    return ca, sa, fused, prediction

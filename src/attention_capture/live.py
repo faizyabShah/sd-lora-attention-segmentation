@@ -114,11 +114,12 @@ def generate_attention_sample(
         width=512,
         num_inference_steps=steps,
         guidance_scale=7.5,
-        output_type="latent",
+        output_type="pil",
         callback_on_step_end=on_step_end,
         callback_on_step_end_tensor_inputs=["latents"],
     )
     recorder.finalize()
+    generated_image = np.asarray(result.images[0].convert("RGB")).copy()
     del result, initial_noise, prompt_embeds, negative_prompt_embeds
 
     cross: dict[int, list[str]] = {}
@@ -140,6 +141,7 @@ def generate_attention_sample(
         self_modules_by_resolution={key: tuple(sorted(value)) for key, value in self_attention.items()},
         cross_map_key="ovam_target_map" if cross_map_kind == "ovam" else "target_maps",
         target_mask=target,
+        generated_image=generated_image,
         steps=recorder.steps,
     )
 

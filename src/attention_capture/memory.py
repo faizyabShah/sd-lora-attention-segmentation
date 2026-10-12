@@ -71,6 +71,32 @@ class CompactAttentionRecorder:
         conditional = 1 if query.shape[0] > 1 else 0
 
         if kind == "self":
+            # Reproduce OVAM's released SelfAttentionHooker exactly.  Its
+            # pseudo-mask pipeline applies attention to an all-ones value,
+            # sums the CFG branches and feature channels, and retains one
+            # spatial vector per head.  Compute this while Q/K are on device;
+            # retaining the tiny result avoids materializing it again later.
+            ovam_value = torch.ones_like(key)
+            ovam_output = torch.nn.functional.scaled_dot_product_attention(
+                query,
+                key,
+                ovam_value,
+                attn_mask=attention_mask,
+                dropout_p=0.0,
+                is_causal=False,
+            )
+            # The all-ones construction is constant in exact arithmetic.  Its
+            # released implementation relies on tiny float32 roundoff before
+            # min-max scaling, so casting this particular tensor to float16
+            # would erase the map completely.
+            bucket[f"{module_name}.ovam_self_map"] = (
+                ovam_output.sum(dim=0)
+                .sum(dim=-1)
+                .detach()
+                .to(device="cpu", dtype=torch.float32, copy=True)
+                .contiguous()
+            )
+            del ovam_value, ovam_output
             # Keep a singleton branch dimension for compatibility with saved data.
             bucket[f"{module_name}.q"] = self._cpu(query[conditional : conditional + 1])
             bucket[f"{module_name}.k"] = self._cpu(key[conditional : conditional + 1])

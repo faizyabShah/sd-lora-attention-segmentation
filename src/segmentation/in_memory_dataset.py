@@ -34,6 +34,7 @@ class InMemoryAttentionSample:
     cross_map_key: str
     target_mask: np.ndarray
     steps: list[dict[str, torch.Tensor]] = field(repr=False)
+    generated_image: np.ndarray | None = field(default=None, repr=False)
 
     @contextmanager
     def open_attention(self, step_index: int):
@@ -50,6 +51,7 @@ class InMemoryAttentionSample:
         for step in self.steps:
             step.clear()
         self.steps.clear()
+        self.generated_image = None
 
 
 class SingleSampleDataset:

@@ -20,7 +20,8 @@ if str(ROOT) not in sys.path:
 from scripts.run_streaming_voc_ablations import read_rows, save_checkpoint
 from src.attention_capture.live import generate_attention_sample
 from src.segmentation.attention_analysis import analyze_attention_sample
-from src.segmentation.ovam_reference import load_released_ovam_reference
+from src.segmentation.ovam_full import ovam_full_prediction
+from src.segmentation.ovam_reference import load_released_ovam_components
 
 
 def parse_args() -> argparse.Namespace:
@@ -44,6 +45,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model-dtype", choices=("float16", "float32"), default="float32")
     parser.add_argument("--max-samples", type=int)
     parser.add_argument("--panels-per-class", type=int, default=3)
+    parser.add_argument(
+        "--densecrf-site-packages",
+        type=Path,
+        default=Path("/home/shafa/miniconda3/envs/ovam_sdxl/lib/python3.10/site-packages"),
+    )
     parser.add_argument(
         "--fixed-stage1-results",
         type=Path,
@@ -82,7 +88,7 @@ def save_visualizations(
     image = Image.open(original_path).convert("RGB").resize((size, size), Image.Resampling.LANCZOS)
     annotation = np.any(np.asarray(Image.open(annotation_path).convert("RGB")) != 0, axis=-1)
     methods = [
-        ("ovam_published", "Published OVAM", display["ovam"]),
+        ("ovam_implemented", "Our full OVAM reproduction", display["ovam"]),
         ("top4_ca_seed", "Top-4 CA seed", display["top4_ca"]),
         ("sa_before_joint", "SA before joint tuning", display["focused"]),
         ("final_sa", "Final SA map", display["winner"]),
@@ -130,7 +136,7 @@ def main() -> None:
         "head_rankings"
     ]
     signature = {
-        "suite": "attention_explanation_corrected_ovam_v2",
+        "suite": "attention_explanation_live_full_ovam_highest_resolution_v4",
         "manifest": str(args.manifest),
         "model": args.model,
         "classname": classname,
@@ -163,17 +169,49 @@ def main() -> None:
         print(f"[{classname}] {row['image_id']} ({len(completed) + 1}/{len(rows)})", flush=True)
         sample = generate_attention_sample(pipe, row, args.manifest.parent, args.storage_dtype)
         try:
-            published_ovam_map, published_ovam_prediction = load_released_ovam_reference(
-                row, args.manifest.parent
+            released_ca, released_sa, released_ovam_map, released_ovam_prediction = (
+                load_released_ovam_components(
+                    row, args.manifest.parent
+                )
+            )
+            live_ca, live_sa, implemented_ovam_map, implemented_ovam_prediction = (
+                ovam_full_prediction(sample, args.densecrf_site_packages)
             )
             record, display = analyze_attention_sample(
                 sample,
                 pipe.tokenizer,
                 rankings,
-                published_ovam_map,
-                published_ovam_prediction,
+                implemented_ovam_map,
+                implemented_ovam_prediction,
+                released_ovam_map,
+                released_ovam_prediction,
                 device=args.device,
             )
+
+            def correlation(left: torch.Tensor, right: torch.Tensor) -> float:
+                left = left.float().flatten()
+                right = right.float().flatten()
+                return float(torch.corrcoef(torch.stack((left, right)))[0, 1])
+            record["ovam_reproduction_validation"] = {
+                "cross_attention_correlation": correlation(live_ca, released_ca),
+                "self_attention_correlation": correlation(live_sa, released_sa),
+                "fused_map_correlation": correlation(
+                    torch.nn.functional.interpolate(
+                        implemented_ovam_map[None, None], size=(64, 64), mode="bilinear",
+                        align_corners=False,
+                    )[0, 0],
+                    torch.nn.functional.interpolate(
+                        released_ovam_map[None, None], size=(64, 64), mode="bilinear",
+                        align_corners=False,
+                    )[0, 0],
+                ),
+                "post_crf_mask_iou": float(
+                    (implemented_ovam_prediction & released_ovam_prediction).sum()
+                    / (implemented_ovam_prediction | released_ovam_prediction).sum().clamp_min(1)
+                ),
+                "live_sa_unique_values": int(torch.unique(live_sa).numel()),
+                "released_sa_unique_values": int(torch.unique(released_sa).numel()),
+            }
             record["seed"] = int(row["seed"])
             record["source_image"] = row["image"]
             record["source_annotation"] = row["annotation"]

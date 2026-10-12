@@ -162,6 +162,10 @@ def map_statistics(
     scores_np = flat.numpy()
     truth_flat = truth.flatten().numpy()
     return {
+        "tp": intersection,
+        "fp": int((full_pred & ~full_truth).sum()),
+        "fn": int((~full_pred & full_truth).sum()),
+        "tn": int((~full_pred & ~full_truth).sum()),
         "iou": intersection / union if union else 1.0,
         "iou_at_64": float((pred64 & truth).sum() / (pred64 | truth).sum().clamp_min(1)),
         "soft_iou": float(soft_intersection / soft_union.clamp_min(1e-12)),
@@ -230,8 +234,10 @@ def analyze_attention_sample(
     sample: Any,
     tokenizer: Any,
     fixed_head_rankings: dict[str, Sequence[int]],
-    published_ovam_map: torch.Tensor,
-    published_ovam_prediction: torch.Tensor,
+    implemented_ovam_map: torch.Tensor,
+    implemented_ovam_prediction: torch.Tensor,
+    released_ovam_map: torch.Tensor,
+    released_ovam_prediction: torch.Tensor,
     device: str = "cuda",
 ) -> tuple[dict[str, Any], dict[str, torch.Tensor]]:
     """Profile one image under the baseline and the selected winning pipeline."""
@@ -269,8 +275,11 @@ def analyze_attention_sample(
     ovam_pred = attention_to_mask(ovam_raw, target.shape, 0.40, "ovam_max_after_resize")
 
     selected = {
+        "ovam_implemented": map_statistics(
+            implemented_ovam_map, target, implemented_ovam_prediction, threshold=0.40
+        ),
         "ovam_published": map_statistics(
-            published_ovam_map, target, published_ovam_prediction, threshold=0.40
+            released_ovam_map, target, released_ovam_prediction, threshold=0.40
         ),
         "ovam_cross_attention_only": map_statistics(ovam_raw, target, ovam_pred),
         "top4_ca_seed": map_statistics(top4, target),
@@ -323,7 +332,7 @@ def analyze_attention_sample(
         "winning_module_steps": sa_steps,
     }
     display = {
-        "ovam": normalize_map(published_ovam_map, "max"),
+        "ovam": normalize_map(implemented_ovam_map, "max"),
         "ovam_ca_reproduced": normalize_map(ovam_raw, "max"),
         "top4_ca": normalize_map(top4, "percentile_01_99"),
         "focused": normalize_map(prior_map, "percentile_01_99"),
