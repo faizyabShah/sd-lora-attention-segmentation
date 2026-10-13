@@ -1,0 +1,128 @@
+{
+  "results": {
+    "all_sa_calls": {
+      "background_iou": 0.9441418087820611,
+      "fn": 37314,
+      "fp": 588530,
+      "image_iou_sum": 36.52175539079508,
+      "images": 48,
+      "iou": 0.6877957575533847,
+      "mean_image_iou": 0.7608699039748975,
+      "tn": 10578314,
+      "tp": 1378754
+    },
+    "all_sa_heads": {
+      "background_iou": 0.9367188135624857,
+      "fn": 30307,
+      "fp": 678262,
+      "image_iou_sum": 35.7246230749514,
+      "images": 48,
+      "iou": 0.6616727067845086,
+      "mean_image_iou": 0.7442629807281542,
+      "tn": 10488582,
+      "tp": 1385761
+    },
+    "full_system": {
+      "background_iou": 0.9474707863710718,
+      "fn": 31953,
+      "fp": 556311,
+      "image_iou_sum": 37.251029789890744,
+      "images": 48,
+      "iou": 0.7017490046284208,
+      "mean_image_iou": 0.7760631206227239,
+      "tn": 10610533,
+      "tp": 1384115
+    },
+    "max_normalization": {
+      "background_iou": 0.8577617932718297,
+      "fn": 6476,
+      "fp": 1582797,
+      "image_iou_sum": 30.436215109734718,
+      "images": 48,
+      "iou": 0.4700418324932933,
+      "mean_image_iou": 0.63408781478614,
+      "tn": 9584047,
+      "tp": 1409592
+    },
+    "one_sa_pass": {
+      "background_iou": 0.9566026234857126,
+      "fn": 38096,
+      "fp": 448169,
+      "image_iou_sum": 37.276972077316984,
+      "images": 48,
+      "iou": 0.7391613834507094,
+      "mean_image_iou": 0.7766035849441039,
+      "tn": 10718675,
+      "tp": 1377972
+    },
+    "without_ca_head_filter": {
+      "background_iou": 0.9474553609775288,
+      "fn": 32662,
+      "fp": 555812,
+      "image_iou_sum": 37.39232444774084,
+      "images": 48,
+      "iou": 0.7015670324766213,
+      "mean_image_iou": 0.7790067593279342,
+      "tn": 10611032,
+      "tp": 1383406
+    },
+    "without_ca_layer_filter": {
+      "background_iou": 0.9472492564622653,
+      "fn": 29965,
+      "fp": 560675,
+      "image_iou_sum": 37.163411436339715,
+      "images": 48,
+      "iou": 0.7012054677821042,
+      "mean_image_iou": 0.7742377382570774,
+      "tn": 10606169,
+      "tp": 1386103
+    },
+    "without_component_cleanup": {
+      "background_iou": 0.9466405149330293,
+      "fn": 30884,
+      "fp": 566621,
+      "image_iou_sum": 37.068131346460895,
+      "images": 48,
+      "iou": 0.6986390704744919,
+      "mean_image_iou": 0.772252736384602,
+      "tn": 10600223,
+      "tp": 1385184
+    },
+    "without_sa_propagation": {
+      "background_iou": 0.9385709965311164,
+      "fn": 115172,
+      "fp": 577871,
+      "image_iou_sum": 30.870899011475576,
+      "images": 48,
+      "iou": 0.6524251744912959,
+      "mean_image_iou": 0.6431437294057412,
+      "tn": 10588973,
+      "tp": 1300896
+    }
+  },
+  "settings": {
+    "class_shard": 2,
+    "classname": "bird",
+    "completed": 48,
+    "component_labels": {
+      "all_sa_calls": "All SA calls instead of calls 15--30",
+      "all_sa_heads": "All SA heads",
+      "full_system": "Full system",
+      "max_normalization": "Max normalization instead of percentile 1--99",
+      "one_sa_pass": "One SA pass instead of four",
+      "without_ca_head_filter": "Without CA head filtering",
+      "without_ca_layer_filter": "Without CA layer filtering",
+      "without_component_cleanup": "Without 1% component cleanup",
+      "without_sa_propagation": "Without SA propagation"
+    },
+    "dataset": "coco_cap",
+    "expected": 48,
+    "fixed_stage1_results": "outputs/segmentation/voc_sim_100_stage1_suite/results.json",
+    "manifest": "datasets/ovam_experiment_with_dataset/evaluation/ovam/coco_captions/ovam_coco_cap.csv",
+    "model": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+    "model_dtype": "float32",
+    "selection_source": "all method choices frozen from VOC-Sim",
+    "storage_dtype": "float16",
+    "suite": "final_component_leave_one_change_v1"
+  }
+}

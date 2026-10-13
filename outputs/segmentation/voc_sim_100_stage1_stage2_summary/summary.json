@@ -1,0 +1,1064 @@
+{
+  "best_overall": {
+    "configuration": "all_modules_all_steps__iter4__seed_t0.60__background_difference",
+    "experiment": "64",
+    "family": "self_attention_resolution",
+    "miou": 0.835512207431694
+  },
+  "self_attention_progressive": {
+    "16-32": {
+      "classes": 4,
+      "configuration": "iter4__residual_a0.75__seed_t0.70__background_ratio",
+      "images": 99,
+      "mean_background_iou": 0.908066604923151,
+      "mean_image_iou": 0.7600035594032659,
+      "miou": 0.7741753290840669,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9282332345996491,
+          "fn": 49830,
+          "fp": 316877,
+          "images": 24,
+          "iou": 0.7631792402506236,
+          "mean_image_iou": 0.748226203408489,
+          "tn": 4742998,
+          "tp": 1181751
+        },
+        "bicycle": {
+          "background_iou": 0.8100589012480786,
+          "fn": 47566,
+          "fp": 789705,
+          "images": 25,
+          "iou": 0.719301733429663,
+          "mean_image_iou": 0.7161730528835771,
+          "tn": 3570785,
+          "tp": 2145544
+        },
+        "bird": {
+          "background_iou": 0.9500356807925964,
+          "fn": 139691,
+          "fp": 136661,
+          "images": 25,
+          "iou": 0.7872521584492269,
+          "mean_image_iou": 0.7911881660018844,
+          "tn": 5254635,
+          "tp": 1022613
+        },
+        "boat": {
+          "background_iou": 0.9439386030522802,
+          "fn": 76047,
+          "fp": 213719,
+          "images": 25,
+          "iou": 0.8269681842067549,
+          "mean_image_iou": 0.7839557210793222,
+          "tn": 4878960,
+          "tp": 1384874
+        }
+      }
+    },
+    "16-32-64": {
+      "classes": 4,
+      "configuration": "iter4__residual_a0.75__seed_t0.60__foreground",
+      "images": 99,
+      "mean_background_iou": 0.9208737831848854,
+      "mean_image_iou": 0.7932137817688938,
+      "miou": 0.8048231517967458,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9539181331111221,
+          "fn": 31976,
+          "fp": 202666,
+          "images": 24,
+          "iou": 0.8364005641984958,
+          "mean_image_iou": 0.8210753534172879,
+          "tn": 4857209,
+          "tp": 1199605
+        },
+        "bicycle": {
+          "background_iou": 0.8286801889501904,
+          "fn": 51043,
+          "fp": 704740,
+          "images": 25,
+          "iou": 0.7391918146211847,
+          "mean_image_iou": 0.7352380683905634,
+          "tn": 3655750,
+          "tp": 2142067
+        },
+        "bird": {
+          "background_iou": 0.9573403351442028,
+          "fn": 120421,
+          "fp": 114707,
+          "images": 25,
+          "iou": 0.8158762923733625,
+          "mean_image_iou": 0.8230654899837115,
+          "tn": 5276589,
+          "tp": 1041883
+        },
+        "boat": {
+          "background_iou": 0.9435564755340262,
+          "fn": 62031,
+          "fp": 228919,
+          "images": 25,
+          "iou": 0.8278239359939402,
+          "mean_image_iou": 0.7945906781499482,
+          "tn": 4863760,
+          "tp": 1398890
+        }
+      }
+    },
+    "16-8": {
+      "classes": 4,
+      "configuration": "cross_attention_baseline",
+      "images": 99,
+      "mean_background_iou": 0.8951362941817287,
+      "mean_image_iou": 0.7279423353864385,
+      "miou": 0.7439362812172995,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9062295084521336,
+          "fn": 74864,
+          "fp": 406623,
+          "images": 24,
+          "iou": 0.7060884969149142,
+          "mean_image_iou": 0.6936614948181492,
+          "tn": 4653252,
+          "tp": 1156717
+        },
+        "bicycle": {
+          "background_iou": 0.7950136758752537,
+          "fn": 99188,
+          "fp": 814985,
+          "images": 25,
+          "iou": 0.6960957017647381,
+          "mean_image_iou": 0.6967781802372454,
+          "tn": 3545505,
+          "tp": 2093922
+        },
+        "bird": {
+          "background_iou": 0.9506048800603263,
+          "fn": 142611,
+          "fp": 130737,
+          "images": 25,
+          "iou": 0.7886006708217296,
+          "mean_image_iou": 0.7773980215592695,
+          "tn": 5260559,
+          "tp": 1019693
+        },
+        "boat": {
+          "background_iou": 0.928697112339201,
+          "fn": 107447,
+          "fp": 263337,
+          "images": 25,
+          "iou": 0.7849602553678162,
+          "mean_image_iou": 0.7425604113083577,
+          "tn": 4829342,
+          "tp": 1353474
+        }
+      }
+    },
+    "32-16": {
+      "classes": 4,
+      "configuration": "iter4__residual_a0.50__seed_t0.40__background_difference",
+      "images": 99,
+      "mean_background_iou": 0.894730830256574,
+      "mean_image_iou": 0.7295843880892203,
+      "miou": 0.7495953264043336,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9065611067284289,
+          "fn": 52418,
+          "fp": 425269,
+          "images": 24,
+          "iou": 0.7116896520505779,
+          "mean_image_iou": 0.6948323040554922,
+          "tn": 4634606,
+          "tp": 1179163
+        },
+        "bicycle": {
+          "background_iou": 0.7891255423977327,
+          "fn": 76752,
+          "fp": 858949,
+          "images": 25,
+          "iou": 0.6934197536810396,
+          "mean_image_iou": 0.6911320232519854,
+          "tn": 3501541,
+          "tp": 2116358
+        },
+        "bird": {
+          "background_iou": 0.9510429914479573,
+          "fn": 109612,
+          "fp": 159696,
+          "images": 25,
+          "iou": 0.7962874432677761,
+          "mean_image_iou": 0.7786049490652891,
+          "tn": 5231600,
+          "tp": 1052692
+        },
+        "boat": {
+          "background_iou": 0.9321936804521773,
+          "fn": 83166,
+          "fp": 267789,
+          "images": 25,
+          "iou": 0.7969844566179406,
+          "mean_image_iou": 0.7523781926227657,
+          "tn": 4824890,
+          "tp": 1377755
+        }
+      }
+    },
+    "32-16-8": {
+      "classes": 4,
+      "configuration": "cross_attention_baseline",
+      "images": 99,
+      "mean_background_iou": 0.8951362941817287,
+      "mean_image_iou": 0.7279423353864385,
+      "miou": 0.7439362812172995,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9062295084521336,
+          "fn": 74864,
+          "fp": 406623,
+          "images": 24,
+          "iou": 0.7060884969149142,
+          "mean_image_iou": 0.6936614948181492,
+          "tn": 4653252,
+          "tp": 1156717
+        },
+        "bicycle": {
+          "background_iou": 0.7950136758752537,
+          "fn": 99188,
+          "fp": 814985,
+          "images": 25,
+          "iou": 0.6960957017647381,
+          "mean_image_iou": 0.6967781802372454,
+          "tn": 3545505,
+          "tp": 2093922
+        },
+        "bird": {
+          "background_iou": 0.9506048800603263,
+          "fn": 142611,
+          "fp": 130737,
+          "images": 25,
+          "iou": 0.7886006708217296,
+          "mean_image_iou": 0.7773980215592695,
+          "tn": 5260559,
+          "tp": 1019693
+        },
+        "boat": {
+          "background_iou": 0.928697112339201,
+          "fn": 107447,
+          "fp": 263337,
+          "images": 25,
+          "iou": 0.7849602553678162,
+          "mean_image_iou": 0.7425604113083577,
+          "tn": 4829342,
+          "tp": 1353474
+        }
+      }
+    },
+    "32-64": {
+      "classes": 4,
+      "configuration": "iter4__residual_a0.75__seed_t0.60__background_ratio",
+      "images": 99,
+      "mean_background_iou": 0.9276934407860283,
+      "mean_image_iou": 0.8096135106571689,
+      "miou": 0.8180833584516118,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.95471984726374,
+          "fn": 40682,
+          "fp": 190272,
+          "images": 24,
+          "iou": 0.8375682999578719,
+          "mean_image_iou": 0.8256684825088444,
+          "tn": 4869603,
+          "tp": 1190899
+        },
+        "bicycle": {
+          "background_iou": 0.8397938326183457,
+          "fn": 38654,
+          "fp": 666116,
+          "images": 25,
+          "iou": 0.7535102157017318,
+          "mean_image_iou": 0.7522882115083762,
+          "tn": 3694374,
+          "tp": 2154456
+        },
+        "bird": {
+          "background_iou": 0.9610406786535765,
+          "fn": 150972,
+          "fp": 64951,
+          "images": 25,
+          "iou": 0.8240601993880652,
+          "mean_image_iou": 0.8355544444929105,
+          "tn": 5326345,
+          "tp": 1011332
+        },
+        "boat": {
+          "background_iou": 0.9552194046084512,
+          "fn": 72527,
+          "fp": 158774,
+          "images": 25,
+          "iou": 0.8571947187587786,
+          "mean_image_iou": 0.8255851029926115,
+          "tn": 4933905,
+          "tp": 1388394
+        }
+      }
+    },
+    "64-32": {
+      "classes": 4,
+      "configuration": "iter4__residual_a0.75__seed_t0.60__background_ratio",
+      "images": 99,
+      "mean_background_iou": 0.9229378487981557,
+      "mean_image_iou": 0.7963934008692521,
+      "miou": 0.8065001570972266,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.94709663282162,
+          "fn": 42201,
+          "fp": 227716,
+          "images": 24,
+          "iou": 0.8150362811682611,
+          "mean_image_iou": 0.801447468762464,
+          "tn": 4832159,
+          "tp": 1189380
+        },
+        "bicycle": {
+          "background_iou": 0.8336217183567574,
+          "fn": 41611,
+          "fp": 690803,
+          "images": 25,
+          "iou": 0.7460346411282172,
+          "mean_image_iou": 0.7444728937160434,
+          "tn": 3669687,
+          "tp": 2151499
+        },
+        "bird": {
+          "background_iou": 0.9586804679408804,
+          "fn": 149062,
+          "fp": 79863,
+          "images": 25,
+          "iou": 0.8157051346558072,
+          "mean_image_iou": 0.8249620523157069,
+          "tn": 5311433,
+          "tp": 1013242
+        },
+        "boat": {
+          "background_iou": 0.9523525760733647,
+          "fn": 74274,
+          "fp": 171918,
+          "images": 25,
+          "iou": 0.8492245714366206,
+          "mean_image_iou": 0.8148933513985227,
+          "tn": 4920761,
+          "tp": 1386647
+        }
+      }
+    },
+    "64-32-16": {
+      "classes": 4,
+      "configuration": "iter4__residual_a0.50__seed_t0.60__background_ratio",
+      "images": 99,
+      "mean_background_iou": 0.902731663124681,
+      "mean_image_iou": 0.7468581592411407,
+      "miou": 0.7605111314212324,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9213016129492015,
+          "fn": 62047,
+          "fp": 341040,
+          "images": 24,
+          "iou": 0.7436845877042212,
+          "mean_image_iou": 0.7273105665494669,
+          "tn": 4718835,
+          "tp": 1169534
+        },
+        "bicycle": {
+          "background_iou": 0.8006147176693429,
+          "fn": 72114,
+          "fp": 811682,
+          "images": 25,
+          "iou": 0.7058711551415207,
+          "mean_image_iou": 0.7036714382390141,
+          "tn": 3548808,
+          "tp": 2120996
+        },
+        "bird": {
+          "background_iou": 0.9480586848677874,
+          "fn": 166457,
+          "fp": 122220,
+          "images": 25,
+          "iou": 0.7752653901367355,
+          "mean_image_iou": 0.779088869841721,
+          "tn": 5269076,
+          "tp": 995847
+        },
+        "boat": {
+          "background_iou": 0.9409516370123922,
+          "fn": 92071,
+          "fp": 214080,
+          "images": 25,
+          "iou": 0.8172233927024521,
+          "mean_image_iou": 0.7765798586266941,
+          "tn": 4878599,
+          "tp": 1368850
+        }
+      }
+    },
+    "64-32-16-8": {
+      "classes": 4,
+      "configuration": "cross_attention_baseline",
+      "images": 99,
+      "mean_background_iou": 0.8951362941817287,
+      "mean_image_iou": 0.7279423353864385,
+      "miou": 0.7439362812172995,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9062295084521336,
+          "fn": 74864,
+          "fp": 406623,
+          "images": 24,
+          "iou": 0.7060884969149142,
+          "mean_image_iou": 0.6936614948181492,
+          "tn": 4653252,
+          "tp": 1156717
+        },
+        "bicycle": {
+          "background_iou": 0.7950136758752537,
+          "fn": 99188,
+          "fp": 814985,
+          "images": 25,
+          "iou": 0.6960957017647381,
+          "mean_image_iou": 0.6967781802372454,
+          "tn": 3545505,
+          "tp": 2093922
+        },
+        "bird": {
+          "background_iou": 0.9506048800603263,
+          "fn": 142611,
+          "fp": 130737,
+          "images": 25,
+          "iou": 0.7886006708217296,
+          "mean_image_iou": 0.7773980215592695,
+          "tn": 5260559,
+          "tp": 1019693
+        },
+        "boat": {
+          "background_iou": 0.928697112339201,
+          "fn": 107447,
+          "fp": 263337,
+          "images": 25,
+          "iou": 0.7849602553678162,
+          "mean_image_iou": 0.7425604113083577,
+          "tn": 4829342,
+          "tp": 1353474
+        }
+      }
+    },
+    "8-16": {
+      "classes": 4,
+      "configuration": "cross_attention_baseline",
+      "images": 99,
+      "mean_background_iou": 0.8951362941817287,
+      "mean_image_iou": 0.7279423353864385,
+      "miou": 0.7439362812172995,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9062295084521336,
+          "fn": 74864,
+          "fp": 406623,
+          "images": 24,
+          "iou": 0.7060884969149142,
+          "mean_image_iou": 0.6936614948181492,
+          "tn": 4653252,
+          "tp": 1156717
+        },
+        "bicycle": {
+          "background_iou": 0.7950136758752537,
+          "fn": 99188,
+          "fp": 814985,
+          "images": 25,
+          "iou": 0.6960957017647381,
+          "mean_image_iou": 0.6967781802372454,
+          "tn": 3545505,
+          "tp": 2093922
+        },
+        "bird": {
+          "background_iou": 0.9506048800603263,
+          "fn": 142611,
+          "fp": 130737,
+          "images": 25,
+          "iou": 0.7886006708217296,
+          "mean_image_iou": 0.7773980215592695,
+          "tn": 5260559,
+          "tp": 1019693
+        },
+        "boat": {
+          "background_iou": 0.928697112339201,
+          "fn": 107447,
+          "fp": 263337,
+          "images": 25,
+          "iou": 0.7849602553678162,
+          "mean_image_iou": 0.7425604113083577,
+          "tn": 4829342,
+          "tp": 1353474
+        }
+      }
+    },
+    "8-16-32": {
+      "classes": 4,
+      "configuration": "cross_attention_baseline",
+      "images": 99,
+      "mean_background_iou": 0.8951362941817287,
+      "mean_image_iou": 0.7279423353864385,
+      "miou": 0.7439362812172995,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9062295084521336,
+          "fn": 74864,
+          "fp": 406623,
+          "images": 24,
+          "iou": 0.7060884969149142,
+          "mean_image_iou": 0.6936614948181492,
+          "tn": 4653252,
+          "tp": 1156717
+        },
+        "bicycle": {
+          "background_iou": 0.7950136758752537,
+          "fn": 99188,
+          "fp": 814985,
+          "images": 25,
+          "iou": 0.6960957017647381,
+          "mean_image_iou": 0.6967781802372454,
+          "tn": 3545505,
+          "tp": 2093922
+        },
+        "bird": {
+          "background_iou": 0.9506048800603263,
+          "fn": 142611,
+          "fp": 130737,
+          "images": 25,
+          "iou": 0.7886006708217296,
+          "mean_image_iou": 0.7773980215592695,
+          "tn": 5260559,
+          "tp": 1019693
+        },
+        "boat": {
+          "background_iou": 0.928697112339201,
+          "fn": 107447,
+          "fp": 263337,
+          "images": 25,
+          "iou": 0.7849602553678162,
+          "mean_image_iou": 0.7425604113083577,
+          "tn": 4829342,
+          "tp": 1353474
+        }
+      }
+    },
+    "8-16-32-64": {
+      "classes": 4,
+      "configuration": "iter4__residual_a0.75__seed_t0.70__foreground",
+      "images": 99,
+      "mean_background_iou": 0.9054826925910546,
+      "mean_image_iou": 0.7643477654844845,
+      "miou": 0.7743704646677254,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9506549683146792,
+          "fn": 47853,
+          "fp": 204188,
+          "images": 24,
+          "iou": 0.8244557446218717,
+          "mean_image_iou": 0.8088684868225021,
+          "tn": 4855687,
+          "tp": 1183728
+        },
+        "bicycle": {
+          "background_iou": 0.7950908988037325,
+          "fn": 146445,
+          "fp": 777067,
+          "images": 25,
+          "iou": 0.6890717287218909,
+          "mean_image_iou": 0.6892581762981316,
+          "tn": 3583423,
+          "tp": 2046665
+        },
+        "bird": {
+          "background_iou": 0.9561346878709241,
+          "fn": 116906,
+          "fp": 124713,
+          "images": 25,
+          "iou": 0.8122643290648065,
+          "mean_image_iou": 0.8182560691675769,
+          "tn": 5266583,
+          "tp": 1045398
+        },
+        "boat": {
+          "background_iou": 0.9200502153748825,
+          "fn": 66697,
+          "fp": 345794,
+          "images": 25,
+          "iou": 0.7716900562623324,
+          "mean_image_iou": 0.7427891585032482,
+          "tn": 4746885,
+          "tp": 1394224
+        }
+      }
+    }
+  },
+  "self_attention_resolution": {
+    "16": {
+      "classes": 4,
+      "configuration": "window__steps_26_30__iter4__continuous__residual_a0.25",
+      "images": 99,
+      "mean_background_iou": 0.8943400755393052,
+      "mean_image_iou": 0.728864767335396,
+      "miou": 0.7480922925410317,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9039298362323661,
+          "fn": 51025,
+          "fp": 439980,
+          "images": 24,
+          "iou": 0.7062595980643243,
+          "mean_image_iou": 0.69093800405548,
+          "tn": 4619895,
+          "tp": 1180556
+        },
+        "bicycle": {
+          "background_iou": 0.7931417057167943,
+          "fn": 72274,
+          "fp": 844680,
+          "images": 25,
+          "iou": 0.6981509584270144,
+          "mean_image_iou": 0.6980256205886234,
+          "tn": 3515810,
+          "tp": 2120836
+        },
+        "bird": {
+          "background_iou": 0.9517641481108604,
+          "fn": 107477,
+          "fp": 157761,
+          "images": 25,
+          "iou": 0.7990720153931814,
+          "mean_image_iou": 0.7811480769258797,
+          "tn": 5233535,
+          "tp": 1054827
+        },
+        "boat": {
+          "background_iou": 0.9285246120972002,
+          "fn": 79493,
+          "fp": 290190,
+          "images": 25,
+          "iou": 0.7888865982796065,
+          "mean_image_iou": 0.7438302972404037,
+          "tn": 4802489,
+          "tp": 1381428
+        }
+      }
+    },
+    "32": {
+      "classes": 4,
+      "configuration": "all_modules_all_steps__iter4__seed_t0.70__background_ratio",
+      "images": 99,
+      "mean_background_iou": 0.9240275962679555,
+      "mean_image_iou": 0.790556562002144,
+      "miou": 0.8014373493135006,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.942030694233187,
+          "fn": 79983,
+          "fp": 217971,
+          "images": 24,
+          "iou": 0.7944509751978542,
+          "mean_image_iou": 0.7771913329214497,
+          "tn": 4841904,
+          "tp": 1151598
+        },
+        "bicycle": {
+          "background_iou": 0.8449704424576234,
+          "fn": 78986,
+          "fp": 609264,
+          "images": 25,
+          "iou": 0.7544046583361107,
+          "mean_image_iou": 0.751280104798258,
+          "tn": 3751226,
+          "tp": 2114124
+        },
+        "bird": {
+          "background_iou": 0.9580585503790432,
+          "fn": 155961,
+          "fp": 76699,
+          "images": 25,
+          "iou": 0.8122199865537049,
+          "mean_image_iou": 0.8248094839219016,
+          "tn": 5314597,
+          "tp": 1006343
+        },
+        "boat": {
+          "background_iou": 0.9510506980019687,
+          "fn": 83166,
+          "fp": 170188,
+          "images": 25,
+          "iou": 0.8446737771663329,
+          "mean_image_iou": 0.8084107172037386,
+          "tn": 4922491,
+          "tp": 1377755
+        }
+      }
+    },
+    "64": {
+      "classes": 4,
+      "configuration": "all_modules_all_steps__iter4__seed_t0.60__background_difference",
+      "images": 99,
+      "mean_background_iou": 0.9308611527975478,
+      "mean_image_iou": 0.8236701089714837,
+      "miou": 0.835512207431694,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9590769130849371,
+          "fn": 21120,
+          "fp": 186810,
+          "images": 24,
+          "iou": 0.8534043151712045,
+          "mean_image_iou": 0.8410217181721129,
+          "tn": 4873065,
+          "tp": 1210461
+        },
+        "bicycle": {
+          "background_iou": 0.8360555463901104,
+          "fn": 34035,
+          "fp": 686423,
+          "images": 25,
+          "iou": 0.7498004016623528,
+          "mean_image_iou": 0.7502430135403609,
+          "tn": 3674067,
+          "tp": 2159075
+        },
+        "bird": {
+          "background_iou": 0.9719913541644193,
+          "fn": 78158,
+          "fp": 75034,
+          "images": 25,
+          "iou": 0.8761922772920576,
+          "mean_image_iou": 0.8680950177900282,
+          "tn": 5316262,
+          "tp": 1084146
+        },
+        "boat": {
+          "background_iou": 0.9563207975507244,
+          "fn": 50066,
+          "fp": 174565,
+          "images": 25,
+          "iou": 0.8626518356011608,
+          "mean_image_iou": 0.836014750751458,
+          "tn": 4918114,
+          "tp": 1410855
+        }
+      }
+    },
+    "8": {
+      "classes": 4,
+      "configuration": "cross_attention_baseline",
+      "images": 99,
+      "mean_background_iou": 0.8951362941817287,
+      "mean_image_iou": 0.7279423353864385,
+      "miou": 0.7439362812172995,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9062295084521336,
+          "fn": 74864,
+          "fp": 406623,
+          "images": 24,
+          "iou": 0.7060884969149142,
+          "mean_image_iou": 0.6936614948181492,
+          "tn": 4653252,
+          "tp": 1156717
+        },
+        "bicycle": {
+          "background_iou": 0.7950136758752537,
+          "fn": 99188,
+          "fp": 814985,
+          "images": 25,
+          "iou": 0.6960957017647381,
+          "mean_image_iou": 0.6967781802372454,
+          "tn": 3545505,
+          "tp": 2093922
+        },
+        "bird": {
+          "background_iou": 0.9506048800603263,
+          "fn": 142611,
+          "fp": 130737,
+          "images": 25,
+          "iou": 0.7886006708217296,
+          "mean_image_iou": 0.7773980215592695,
+          "tn": 5260559,
+          "tp": 1019693
+        },
+        "boat": {
+          "background_iou": 0.928697112339201,
+          "fn": 107447,
+          "fp": 263337,
+          "images": 25,
+          "iou": 0.7849602553678162,
+          "mean_image_iou": 0.7425604113083577,
+          "tn": 4829342,
+          "tp": 1353474
+        }
+      }
+    }
+  },
+  "stage1": {
+    "class_adaptive": {
+      "classes": 4,
+      "configuration": "class_layers__percentile__t0.45",
+      "images": 99,
+      "mean_background_iou": 0.9116561343476075,
+      "mean_image_iou": 0.7558331851994383,
+      "miou": 0.7690781726284135,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9191096188801097,
+          "fn": 109417,
+          "fp": 308729,
+          "images": 24,
+          "iou": 0.7285312696794801,
+          "mean_image_iou": 0.7225490024552897,
+          "tn": 4751146,
+          "tp": 1122164
+        },
+        "bicycle": {
+          "background_iou": 0.8360409371865635,
+          "fn": 147001,
+          "fp": 592043,
+          "images": 25,
+          "iou": 0.734648688958919,
+          "mean_image_iou": 0.7361161081249321,
+          "tn": 3768447,
+          "tp": 2046109
+        },
+        "bird": {
+          "background_iou": 0.9541117599513218,
+          "fn": 114254,
+          "fp": 138386,
+          "images": 25,
+          "iou": 0.805764632618072,
+          "mean_image_iou": 0.7901703009352182,
+          "tn": 5252910,
+          "tp": 1048050
+        },
+        "boat": {
+          "background_iou": 0.9373622213724355,
+          "fn": 98166,
+          "fp": 226977,
+          "images": 25,
+          "iou": 0.8073680992571826,
+          "mean_image_iou": 0.7731659619725473,
+          "tn": 4865702,
+          "tp": 1362755
+        }
+      }
+    },
+    "fusion": {
+      "classes": 4,
+      "configuration": "inverse_entropy_heads",
+      "images": 99,
+      "mean_background_iou": 0.8970112152876691,
+      "mean_image_iou": 0.729760516976392,
+      "miou": 0.7439566755463534,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9086747588381036,
+          "fn": 89052,
+          "fp": 381175,
+          "images": 24,
+          "iou": 0.7084326457319025,
+          "mean_image_iou": 0.6971774969847712,
+          "tn": 4678700,
+          "tp": 1142529
+        },
+        "bicycle": {
+          "background_iou": 0.8002461305247935,
+          "fn": 109496,
+          "fp": 783401,
+          "images": 25,
+          "iou": 0.7000189147629556,
+          "mean_image_iou": 0.7005531273841129,
+          "tn": 3577089,
+          "tp": 2083614
+        },
+        "bird": {
+          "background_iou": 0.9496853228559773,
+          "fn": 163286,
+          "fp": 116191,
+          "images": 25,
+          "iou": 0.7814015698145085,
+          "mean_image_iou": 0.7756677571419552,
+          "tn": 5275105,
+          "tp": 999018
+        },
+        "boat": {
+          "background_iou": 0.9294386489318024,
+          "fn": 112210,
+          "fp": 255054,
+          "images": 25,
+          "iou": 0.7859735718760471,
+          "mean_image_iou": 0.7443403655950641,
+          "tn": 4837625,
+          "tp": 1348711
+        }
+      }
+    },
+    "heads": {
+      "classes": 4,
+      "configuration": "global_leave_head_4",
+      "images": 99,
+      "mean_background_iou": 0.8982172058367386,
+      "mean_image_iou": 0.7298435246779487,
+      "miou": 0.7455863466235929,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9067206225073864,
+          "fn": 67775,
+          "fp": 410529,
+          "images": 24,
+          "iou": 0.7087259684186809,
+          "mean_image_iou": 0.696176542279796,
+          "tn": 4649346,
+          "tp": 1163806
+        },
+        "bicycle": {
+          "background_iou": 0.8104114884472359,
+          "fn": 149989,
+          "fp": 705146,
+          "images": 25,
+          "iou": 0.7049484241557682,
+          "mean_image_iou": 0.7065142669385499,
+          "tn": 3655344,
+          "tp": 2043121
+        },
+        "bird": {
+          "background_iou": 0.9515323075986756,
+          "fn": 129495,
+          "fp": 138085,
+          "images": 25,
+          "iou": 0.79423080324426,
+          "mean_image_iou": 0.7793069523482659,
+          "tn": 5253211,
+          "tp": 1032809
+        },
+        "boat": {
+          "background_iou": 0.9242044047936566,
+          "fn": 107610,
+          "fp": 286549,
+          "images": 25,
+          "iou": 0.7744401906756625,
+          "mean_image_iou": 0.736029657849257,
+          "tn": 4806130,
+          "tp": 1353311
+        }
+      }
+    },
+    "postprocessing": {
+      "classes": 4,
+      "configuration": "remove_fraction_0.001",
+      "images": 99,
+      "mean_background_iou": 0.8954250187963306,
+      "mean_image_iou": 0.7282620718439143,
+      "miou": 0.7442443196241784,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9065193250538054,
+          "fn": 75764,
+          "fp": 404319,
+          "images": 24,
+          "iou": 0.706532795403142,
+          "mean_image_iou": 0.6941757685431055,
+          "tn": 4655556,
+          "tp": 1155817
+        },
+        "bicycle": {
+          "background_iou": 0.7958398557219976,
+          "fn": 99788,
+          "fp": 810823,
+          "images": 25,
+          "iou": 0.696860415994631,
+          "mean_image_iou": 0.6974169106458344,
+          "tn": 3549667,
+          "tp": 2093322
+        },
+        "bird": {
+          "background_iou": 0.950647633379012,
+          "fn": 143008,
+          "fp": 130123,
+          "images": 25,
+          "iou": 0.7886681414114685,
+          "mean_image_iou": 0.7775506535466734,
+          "tn": 5261173,
+          "tp": 1019296
+        },
+        "boat": {
+          "background_iou": 0.9286932610305075,
+          "fn": 107671,
+          "fp": 263149,
+          "images": 25,
+          "iou": 0.784915925687472,
+          "mean_image_iou": 0.7425415025080118,
+          "tn": 4829530,
+          "tp": 1353250
+        }
+      }
+    },
+    "time_layer": {
+      "classes": 4,
+      "configuration": "best12__trailing_05_30",
+      "images": 99,
+      "mean_background_iou": 0.9084002638000834,
+      "mean_image_iou": 0.7499691535257531,
+      "miou": 0.7624564432453329,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9167056402944043,
+          "fn": 101735,
+          "fp": 328198,
+          "images": 24,
+          "iou": 0.7243628744841417,
+          "mean_image_iou": 0.7131010466754267,
+          "tn": 4731677,
+          "tp": 1129846
+        },
+        "bicycle": {
+          "background_iou": 0.8256128749544743,
+          "fn": 125988,
+          "fp": 656396,
+          "images": 25,
+          "iou": 0.7254317064080581,
+          "mean_image_iou": 0.727708904427499,
+          "tn": 3704094,
+          "tp": 2067122
+        },
+        "bird": {
+          "background_iou": 0.9516604001219435,
+          "fn": 158812,
+          "fp": 109478,
+          "images": 25,
+          "iou": 0.7890440342763146,
+          "mean_image_iou": 0.7825429354895038,
+          "tn": 5281818,
+          "tp": 1003492
+        },
+        "boat": {
+          "background_iou": 0.9396221398295113,
+          "fn": 112474,
+          "fp": 201802,
+          "images": 25,
+          "iou": 0.8109871578128167,
+          "mean_image_iou": 0.7750490032365698,
+          "tn": 4890877,
+          "tp": 1348447
+        }
+      }
+    }
+  }
+}

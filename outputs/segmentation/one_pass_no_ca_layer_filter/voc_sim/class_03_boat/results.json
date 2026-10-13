@@ -1,0 +1,32 @@
+{
+  "results": {
+    "one_sa_pass_without_ca_layer_filter": {
+      "background_iou": 0.9476975548736392,
+      "fn": 23621,
+      "fp": 243974,
+      "image_iou_sum": 20.35497221178558,
+      "images": 25,
+      "iou": 0.843043119957534,
+      "mean_image_iou": 0.8141988884714232,
+      "tn": 4848705,
+      "tp": 1437300
+    }
+  },
+  "settings": {
+    "class_shard": 3,
+    "classname": "boat",
+    "completed": 25,
+    "component_labels": {
+      "one_sa_pass_without_ca_layer_filter": "One SA pass without CA layer filtering"
+    },
+    "dataset": "voc_sim",
+    "expected": 25,
+    "fixed_stage1_results": "outputs/segmentation/voc_sim_100_stage1_suite/results.json",
+    "manifest": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/ovam_voc_sim.csv",
+    "model": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+    "model_dtype": "float32",
+    "selection_source": "all remaining choices frozen from VOC-Sim",
+    "storage_dtype": "float16",
+    "suite": "one_sa_pass_without_ca_layer_filter_v1"
+  }
+}

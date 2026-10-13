@@ -1,0 +1,577 @@
+{
+  "best_by_experiment": {
+    "baseline": {
+      "classes": 1,
+      "configuration": "ovam_unoptimized",
+      "images": 1,
+      "mean_background_iou": 0.9013610171324404,
+      "mean_image_iou": 0.7800955158083255,
+      "miou": 0.7800955158083255,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9013610171324404,
+          "fn": 1533,
+          "fp": 17622,
+          "image_iou_sum": 0.7800955158083255,
+          "images": 1,
+          "iou": 0.7800955158083255,
+          "mean_image_iou": 0.7800955158083255,
+          "tn": 175038,
+          "tp": 67951
+        }
+      }
+    },
+    "layers": {
+      "classes": 1,
+      "configuration": "layer_05",
+      "images": 1,
+      "mean_background_iou": 0.9344239876415023,
+      "mean_image_iou": 0.8332775316781704,
+      "miou": 0.8332775316781704,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9344239876415023,
+          "fn": 4775,
+          "fp": 8172,
+          "image_iou_sum": 0.8332775316781704,
+          "images": 1,
+          "iou": 0.8332775316781704,
+          "mean_image_iou": 0.8332775316781704,
+          "tn": 184488,
+          "tp": 64709
+        }
+      }
+    },
+    "resolution": {
+      "classes": 1,
+      "configuration": "r16",
+      "images": 1,
+      "mean_background_iou": 0.9136908865297119,
+      "mean_image_iou": 0.796887580364117,
+      "miou": 0.796887580364117,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9136908865297119,
+          "fn": 3171,
+          "fp": 13731,
+          "image_iou_sum": 0.796887580364117,
+          "images": 1,
+          "iou": 0.796887580364117,
+          "mean_image_iou": 0.796887580364117,
+          "tn": 178929,
+          "tp": 66313
+        }
+      }
+    },
+    "self_attention/progressive_16-32": {
+      "classes": 1,
+      "configuration": "iter4__non_residual__seed_t0.80__foreground",
+      "images": 1,
+      "mean_background_iou": 0.960759272038149,
+      "mean_image_iou": 0.8991770091825664,
+      "miou": 0.8991770091825664,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.960759272038149,
+          "fn": 1526,
+          "fp": 6094,
+          "image_iou_sum": 0.8991770091825664,
+          "images": 1,
+          "iou": 0.8991770091825664,
+          "mean_image_iou": 0.8991770091825664,
+          "tn": 186566,
+          "tp": 67958
+        }
+      }
+    },
+    "self_attention/progressive_16-32-64": {
+      "classes": 1,
+      "configuration": "iter2__non_residual__seed_t0.80__foreground",
+      "images": 1,
+      "mean_background_iou": 0.9753450971176344,
+      "mean_image_iou": 0.9322457460549223,
+      "miou": 0.9322457460549223,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9753450971176344,
+          "fn": 3082,
+          "fp": 1744,
+          "image_iou_sum": 0.9322457460549223,
+          "images": 1,
+          "iou": 0.9322457460549223,
+          "mean_image_iou": 0.9322457460549223,
+          "tn": 190916,
+          "tp": 66402
+        }
+      }
+    },
+    "self_attention/progressive_16-8": {
+      "classes": 1,
+      "configuration": "cross_attention_baseline",
+      "images": 1,
+      "mean_background_iou": 0.9239165427480799,
+      "mean_image_iou": 0.8169535283993116,
+      "miou": 0.8169535283993116,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9239165427480799,
+          "fn": 3033,
+          "fp": 11856,
+          "image_iou_sum": 0.8169535283993116,
+          "images": 1,
+          "iou": 0.8169535283993116,
+          "mean_image_iou": 0.8169535283993116,
+          "tn": 180804,
+          "tp": 66451
+        }
+      }
+    },
+    "self_attention/progressive_32-16": {
+      "classes": 1,
+      "configuration": "iter1__residual_a0.50__seed_t0.60__background_ratio",
+      "images": 1,
+      "mean_background_iou": 0.9302786728515279,
+      "mean_image_iou": 0.8238369120654396,
+      "miou": 0.8238369120654396,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9302786728515279,
+          "fn": 5027,
+          "fp": 8756,
+          "image_iou_sum": 0.8238369120654396,
+          "images": 1,
+          "iou": 0.8238369120654396,
+          "mean_image_iou": 0.8238369120654396,
+          "tn": 183904,
+          "tp": 64457
+        }
+      }
+    },
+    "self_attention/progressive_32-16-8": {
+      "classes": 1,
+      "configuration": "cross_attention_baseline",
+      "images": 1,
+      "mean_background_iou": 0.9239165427480799,
+      "mean_image_iou": 0.8169535283993116,
+      "miou": 0.8169535283993116,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9239165427480799,
+          "fn": 3033,
+          "fp": 11856,
+          "image_iou_sum": 0.8169535283993116,
+          "images": 1,
+          "iou": 0.8169535283993116,
+          "mean_image_iou": 0.8169535283993116,
+          "tn": 180804,
+          "tp": 66451
+        }
+      }
+    },
+    "self_attention/progressive_32-64": {
+      "classes": 1,
+      "configuration": "iter2__non_residual__seed_t0.30__background_difference",
+      "images": 1,
+      "mean_background_iou": 0.9732549043825521,
+      "mean_image_iou": 0.9288325915782266,
+      "miou": 0.9288325915782266,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9732549043825521,
+          "fn": 1656,
+          "fp": 3541,
+          "image_iou_sum": 0.9288325915782266,
+          "images": 1,
+          "iou": 0.9288325915782266,
+          "mean_image_iou": 0.9288325915782266,
+          "tn": 189119,
+          "tp": 67828
+        }
+      }
+    },
+    "self_attention/progressive_64-32": {
+      "classes": 1,
+      "configuration": "iter4__residual_a0.75__seed_t0.60__background_ratio",
+      "images": 1,
+      "mean_background_iou": 0.9661146613761201,
+      "mean_image_iou": 0.9086295812418346,
+      "miou": 0.9086295812418346,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9661146613761201,
+          "fn": 3413,
+          "fp": 3231,
+          "image_iou_sum": 0.9086295812418346,
+          "images": 1,
+          "iou": 0.9086295812418346,
+          "mean_image_iou": 0.9086295812418346,
+          "tn": 189429,
+          "tp": 66071
+        }
+      }
+    },
+    "self_attention/progressive_64-32-16": {
+      "classes": 1,
+      "configuration": "iter4__residual_a0.50__seed_t0.60__background_ratio",
+      "images": 1,
+      "mean_background_iou": 0.9349802832321308,
+      "mean_image_iou": 0.8348567161873375,
+      "miou": 0.8348567161873375,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9349802832321308,
+          "fn": 4634,
+          "fp": 8194,
+          "image_iou_sum": 0.8348567161873375,
+          "images": 1,
+          "iou": 0.8348567161873375,
+          "mean_image_iou": 0.8348567161873375,
+          "tn": 184466,
+          "tp": 64850
+        }
+      }
+    },
+    "self_attention/progressive_64-32-16-8": {
+      "classes": 1,
+      "configuration": "cross_attention_baseline",
+      "images": 1,
+      "mean_background_iou": 0.9239165427480799,
+      "mean_image_iou": 0.8169535283993116,
+      "miou": 0.8169535283993116,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9239165427480799,
+          "fn": 3033,
+          "fp": 11856,
+          "image_iou_sum": 0.8169535283993116,
+          "images": 1,
+          "iou": 0.8169535283993116,
+          "mean_image_iou": 0.8169535283993116,
+          "tn": 180804,
+          "tp": 66451
+        }
+      }
+    },
+    "self_attention/progressive_8-16": {
+      "classes": 1,
+      "configuration": "cross_attention_baseline",
+      "images": 1,
+      "mean_background_iou": 0.9239165427480799,
+      "mean_image_iou": 0.8169535283993116,
+      "miou": 0.8169535283993116,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9239165427480799,
+          "fn": 3033,
+          "fp": 11856,
+          "image_iou_sum": 0.8169535283993116,
+          "images": 1,
+          "iou": 0.8169535283993116,
+          "mean_image_iou": 0.8169535283993116,
+          "tn": 180804,
+          "tp": 66451
+        }
+      }
+    },
+    "self_attention/progressive_8-16-32": {
+      "classes": 1,
+      "configuration": "iter4__residual_a0.75__seed_t0.80__background_ratio",
+      "images": 1,
+      "mean_background_iou": 0.94683188239159,
+      "mean_image_iou": 0.8666683829776279,
+      "miou": 0.8666683829776279,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.94683188239159,
+          "fn": 2156,
+          "fp": 8202,
+          "image_iou_sum": 0.8666683829776279,
+          "images": 1,
+          "iou": 0.8666683829776279,
+          "mean_image_iou": 0.8666683829776279,
+          "tn": 184458,
+          "tp": 67328
+        }
+      }
+    },
+    "self_attention/progressive_8-16-32-64": {
+      "classes": 1,
+      "configuration": "iter4__residual_a0.75__seed_t0.80__background_ratio",
+      "images": 1,
+      "mean_background_iou": 0.9711026342306032,
+      "mean_image_iou": 0.9232617510136657,
+      "miou": 0.9232617510136657,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9711026342306032,
+          "fn": 1856,
+          "fp": 3765,
+          "image_iou_sum": 0.9232617510136657,
+          "images": 1,
+          "iou": 0.9232617510136657,
+          "mean_image_iou": 0.9232617510136657,
+          "tn": 188895,
+          "tp": 67628
+        }
+      }
+    },
+    "self_attention/r16": {
+      "classes": 1,
+      "configuration": "module__down_blocks.2.attentions.0.transformer_blocks.0.attn1__iter4__continuous__residual_a0.25",
+      "images": 1,
+      "mean_background_iou": 0.9258179495632108,
+      "mean_image_iou": 0.8252226887696901,
+      "miou": 0.8252226887696901,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9258179495632108,
+          "fn": 1484,
+          "fp": 12918,
+          "image_iou_sum": 0.8252226887696901,
+          "images": 1,
+          "iou": 0.8252226887696901,
+          "mean_image_iou": 0.8252226887696901,
+          "tn": 179742,
+          "tp": 68000
+        }
+      }
+    },
+    "self_attention/r32": {
+      "classes": 1,
+      "configuration": "subset__2_4__iter4__continuous__non_residual",
+      "images": 1,
+      "mean_background_iou": 0.9661467164010399,
+      "mean_image_iou": 0.9110784221109597,
+      "miou": 0.9110784221109597,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9661467164010399,
+          "fn": 1974,
+          "fp": 4615,
+          "image_iou_sum": 0.9110784221109597,
+          "images": 1,
+          "iou": 0.9110784221109597,
+          "mean_image_iou": 0.9110784221109597,
+          "tn": 188045,
+          "tp": 67510
+        }
+      }
+    },
+    "self_attention/r64": {
+      "classes": 1,
+      "configuration": "module__up_blocks.3.attentions.2.transformer_blocks.0.attn1__iter4__continuous__non_residual",
+      "images": 1,
+      "mean_background_iou": 0.9771343979532887,
+      "mean_image_iou": 0.9390275771955161,
+      "miou": 0.9390275771955161,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9771343979532887,
+          "fn": 1212,
+          "fp": 3221,
+          "image_iou_sum": 0.9390275771955161,
+          "images": 1,
+          "iou": 0.9390275771955161,
+          "mean_image_iou": 0.9390275771955161,
+          "tn": 189439,
+          "tp": 68272
+        }
+      }
+    },
+    "self_attention/r8": {
+      "classes": 1,
+      "configuration": "window__steps_10_14__iter1__continuous__residual_a0.10",
+      "images": 1,
+      "mean_background_iou": 0.9236770204199022,
+      "mean_image_iou": 0.8194135588689196,
+      "miou": 0.8194135588689196,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9236770204199022,
+          "fn": 2052,
+          "fp": 12809,
+          "image_iou_sum": 0.8194135588689196,
+          "images": 1,
+          "iou": 0.8194135588689196,
+          "mean_image_iou": 0.8194135588689196,
+          "tn": 179851,
+          "tp": 67432
+        }
+      }
+    },
+    "stage1/fusion": {
+      "classes": 1,
+      "configuration": "region_weights__down-2_mid-0.5_up-2",
+      "images": 1,
+      "mean_background_iou": 0.9319384628020266,
+      "mean_image_iou": 0.8354840310693104,
+      "miou": 0.8354840310693104,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9319384628020266,
+          "fn": 2149,
+          "fp": 11110,
+          "image_iou_sum": 0.8354840310693104,
+          "images": 1,
+          "iou": 0.8354840310693104,
+          "mean_image_iou": 0.8354840310693104,
+          "tn": 181550,
+          "tp": 67335
+        }
+      }
+    },
+    "stage1/heads": {
+      "classes": 1,
+      "configuration": "layer_05__leave_head_2",
+      "images": 1,
+      "mean_background_iou": 0.93518620842082,
+      "mean_image_iou": 0.8301544050862852,
+      "miou": 0.8301544050862852,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.93518620842082,
+          "fn": 6418,
+          "fp": 6485,
+          "image_iou_sum": 0.8301544050862852,
+          "images": 1,
+          "iou": 0.8301544050862852,
+          "mean_image_iou": 0.8301544050862852,
+          "tn": 186175,
+          "tp": 63066
+        }
+      }
+    },
+    "stage1/postprocessing": {
+      "classes": 1,
+      "configuration": "fill_holes",
+      "images": 1,
+      "mean_background_iou": 0.929726950172263,
+      "mean_image_iou": 0.8319891812146545,
+      "miou": 0.8319891812146545,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.929726950172263,
+          "fn": 1810,
+          "fp": 11856,
+          "image_iou_sum": 0.8319891812146545,
+          "images": 1,
+          "iou": 0.8319891812146545,
+          "mean_image_iou": 0.8319891812146545,
+          "tn": 180804,
+          "tp": 67674
+        }
+      }
+    },
+    "stage1/time_layer": {
+      "classes": 1,
+      "configuration": "best12__leave_step_17",
+      "images": 1,
+      "mean_background_iou": 0.9257809301563907,
+      "mean_image_iou": 0.8214773692438361,
+      "miou": 0.8214773692438361,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9257809301563907,
+          "fn": 2748,
+          "fp": 11755,
+          "image_iou_sum": 0.8214773692438361,
+          "images": 1,
+          "iou": 0.8214773692438361,
+          "mean_image_iou": 0.8214773692438361,
+          "tn": 180905,
+          "tp": 66736
+        }
+      }
+    },
+    "threshold_normalization": {
+      "classes": 1,
+      "configuration": "best_12_layers__ovam_max_after_resize__t0.40",
+      "images": 1,
+      "mean_background_iou": 0.9227268290928891,
+      "mean_image_iou": 0.8176915432532661,
+      "miou": 0.8176915432532661,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9227268290928891,
+          "fn": 2013,
+          "fp": 13030,
+          "image_iou_sum": 0.8176915432532661,
+          "images": 1,
+          "iou": 0.8176915432532661,
+          "mean_image_iou": 0.8176915432532661,
+          "tn": 179630,
+          "tp": 67471
+        }
+      }
+    },
+    "time_resolution": {
+      "classes": 1,
+      "configuration": "all_00_30__r16",
+      "images": 1,
+      "mean_background_iou": 0.9136908865297119,
+      "mean_image_iou": 0.796887580364117,
+      "miou": 0.796887580364117,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9136908865297119,
+          "fn": 3171,
+          "fp": 13731,
+          "image_iou_sum": 0.796887580364117,
+          "images": 1,
+          "iou": 0.796887580364117,
+          "mean_image_iou": 0.796887580364117,
+          "tn": 178929,
+          "tp": 66313
+        }
+      }
+    },
+    "time_window": {
+      "classes": 1,
+      "configuration": "all_00_30",
+      "images": 1,
+      "mean_background_iou": 0.9013610171324404,
+      "mean_image_iou": 0.7800955158083255,
+      "miou": 0.7800955158083255,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9013610171324404,
+          "fn": 1533,
+          "fp": 17622,
+          "image_iou_sum": 0.7800955158083255,
+          "images": 1,
+          "iou": 0.7800955158083255,
+          "mean_image_iou": 0.7800955158083255,
+          "tn": 175038,
+          "tp": 67951
+        }
+      }
+    }
+  },
+  "ovam_unoptimized": {
+    "classes": 1,
+    "images": 1,
+    "mean_background_iou": 0.9013610171324404,
+    "mean_image_iou": 0.7800955158083255,
+    "miou": 0.7800955158083255,
+    "per_class": {
+      "aeroplane": {
+        "background_iou": 0.9013610171324404,
+        "fn": 1533,
+        "fp": 17622,
+        "image_iou_sum": 0.7800955158083255,
+        "images": 1,
+        "iou": 0.7800955158083255,
+        "mean_image_iou": 0.7800955158083255,
+        "tn": 175038,
+        "tp": 67951
+      }
+    }
+  },
+  "settings": {
+    "classes": [
+      "aeroplane"
+    ],
+    "images": 1,
+    "shards": 1
+  }
+}

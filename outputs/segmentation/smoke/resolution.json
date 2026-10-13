@@ -1,0 +1,183 @@
+{
+  "results": {
+    "r16": {
+      "classes": 1,
+      "images": 1,
+      "mean_background_iou": 0.9066821569957874,
+      "mean_image_iou": 0.7497840370670925,
+      "miou": 0.7497840370670925,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9066821569957874,
+          "fn": 12199,
+          "fp": 6918,
+          "images": 1,
+          "iou": 0.7497840370670925,
+          "mean_image_iou": 0.7497840370670925,
+          "tn": 185742,
+          "tp": 57285
+        }
+      }
+    },
+    "r16_r32": {
+      "classes": 1,
+      "images": 1,
+      "mean_background_iou": 0.892850104634904,
+      "mean_image_iou": 0.6822065740766512,
+      "miou": 0.6822065740766512,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.892850104634904,
+          "fn": 20462,
+          "fp": 2374,
+          "images": 1,
+          "iou": 0.6822065740766512,
+          "mean_image_iou": 0.6822065740766512,
+          "tn": 190286,
+          "tp": 49022
+        }
+      }
+    },
+    "r16_r32_r64": {
+      "classes": 1,
+      "images": 1,
+      "mean_background_iou": 0.9132581648522551,
+      "mean_image_iou": 0.7595646082551999,
+      "miou": 0.7595646082551999,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9132581648522551,
+          "fn": 13100,
+          "fp": 4748,
+          "images": 1,
+          "iou": 0.7595646082551999,
+          "mean_image_iou": 0.7595646082551999,
+          "tn": 187912,
+          "tp": 56384
+        }
+      }
+    },
+    "r16_r64": {
+      "classes": 1,
+      "images": 1,
+      "mean_background_iou": 0.9199146550227008,
+      "mean_image_iou": 0.7897041003791581,
+      "miou": 0.7897041003791581,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9199146550227008,
+          "fn": 8875,
+          "fp": 7265,
+          "images": 1,
+          "iou": 0.7897041003791581,
+          "mean_image_iou": 0.7897041003791581,
+          "tn": 185395,
+          "tp": 60609
+        }
+      }
+    },
+    "r32": {
+      "classes": 1,
+      "images": 1,
+      "mean_background_iou": 0.7688853945498955,
+      "mean_image_iou": 0.16664508051634072,
+      "miou": 0.16664508051634072,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.7688853945498955,
+          "fn": 57904,
+          "fp": 5,
+          "images": 1,
+          "iou": 0.16664508051634072,
+          "mean_image_iou": 0.16664508051634072,
+          "tn": 192655,
+          "tp": 11580
+        }
+      }
+    },
+    "r32_r64": {
+      "classes": 1,
+      "images": 1,
+      "mean_background_iou": 0.8077433109476602,
+      "mean_image_iou": 0.3798619134070529,
+      "miou": 0.3798619134070529,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.8077433109476602,
+          "fn": 41865,
+          "fp": 3224,
+          "images": 1,
+          "iou": 0.3798619134070529,
+          "mean_image_iou": 0.3798619134070529,
+          "tn": 189436,
+          "tp": 27619
+        }
+      }
+    },
+    "r64": {
+      "classes": 1,
+      "images": 1,
+      "mean_background_iou": 0.8028417057073488,
+      "mean_image_iou": 0.3794198374683817,
+      "miou": 0.3794198374683817,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.8028417057073488,
+          "fn": 41284,
+          "fp": 4840,
+          "images": 1,
+          "iou": 0.3794198374683817,
+          "mean_image_iou": 0.3794198374683817,
+          "tn": 187820,
+          "tp": 28200
+        }
+      }
+    }
+  },
+  "settings": {
+    "ablations": [
+      "time_window",
+      "resolution"
+    ],
+    "branch": 1,
+    "capture_dir": "outputs/attention/voc_sim",
+    "classes": [
+      "aeroplane"
+    ],
+    "configurations": {
+      "r16": [
+        16
+      ],
+      "r16_r32": [
+        16,
+        32
+      ],
+      "r16_r32_r64": [
+        16,
+        32,
+        64
+      ],
+      "r16_r64": [
+        16,
+        64
+      ],
+      "r32": [
+        32
+      ],
+      "r32_r64": [
+        32,
+        64
+      ],
+      "r64": [
+        64
+      ]
+    },
+    "model": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+    "normalization": "minmax",
+    "primary_metric": "macro mean of accumulated foreground IoU across target classes",
+    "samples": 1,
+    "started_at_utc": "2026-10-06T00:32:26.057020+00:00",
+    "threshold": 0.4,
+    "working_size": 64
+  }
+}

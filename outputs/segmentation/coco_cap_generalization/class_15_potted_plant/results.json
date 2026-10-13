@@ -1,0 +1,72 @@
+{
+  "caption_subgroups": {
+    "frozen_best_voc": {
+      "class_absent": {
+        "background_iou": 0.8057052316661326,
+        "fn": 78986,
+        "fp": 447322,
+        "image_iou_sum": 9.296973341540225,
+        "images": 14,
+        "iou": 0.6461823501255788,
+        "mean_image_iou": 0.6640695243957303,
+        "tn": 2182504,
+        "tp": 961204
+      }
+    },
+    "ovam": {
+      "class_absent": {
+        "background_iou": 0.7860789888615627,
+        "fn": 293295,
+        "fp": 332022,
+        "image_iou_sum": 7.753920350820846,
+        "images": 14,
+        "iou": 0.5443000061215031,
+        "mean_image_iou": 0.5538514536300604,
+        "tn": 2297804,
+        "tp": 746895
+      }
+    }
+  },
+  "results": {
+    "frozen_best_voc": {
+      "background_iou": 0.8057052316661326,
+      "fn": 78986,
+      "fp": 447322,
+      "image_iou_sum": 9.296973341540225,
+      "images": 14,
+      "iou": 0.6461823501255788,
+      "mean_image_iou": 0.6640695243957303,
+      "tn": 2182504,
+      "tp": 961204
+    },
+    "ovam": {
+      "background_iou": 0.7860789888615627,
+      "fn": 293295,
+      "fp": 332022,
+      "image_iou_sum": 7.753920350820846,
+      "images": 14,
+      "iou": 0.5443000061215031,
+      "mean_image_iou": 0.5538514536300604,
+      "tn": 2297804,
+      "tp": 746895
+    }
+  },
+  "settings": {
+    "attribution": "separate lowercase category encoding",
+    "best_method_source": "frozen VOC-Sim selections; no COCO-Cap tuning",
+    "class_shard": 15,
+    "classname": "potted plant",
+    "completed": 14,
+    "expected": 14,
+    "fixed_stage1_results": "outputs/segmentation/voc_sim_100_stage1_suite/results.json",
+    "manifest": "datasets/ovam_experiment_with_dataset/evaluation/ovam/coco_captions/ovam_coco_cap.csv",
+    "model": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+    "model_dtype": "float32",
+    "ovam_parameters": {
+      "self_attention_minimum": 0.91,
+      "threshold": 0.5
+    },
+    "storage_dtype": "float16",
+    "suite": "coco_cap_untuned_generalization_v1"
+  }
+}

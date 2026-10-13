@@ -1,0 +1,94 @@
+{
+  "caption_subgroups": {
+    "frozen_best_voc": {
+      "class_absent": {
+        "background_iou": 0.8507156408413667,
+        "fn": 99555,
+        "fp": 117308,
+        "image_iou_sum": 6.033071276708543,
+        "images": 8,
+        "iou": 0.748223389150048,
+        "mean_image_iou": 0.7541339095885679,
+        "tn": 1235821,
+        "tp": 644468
+      },
+      "class_present": {
+        "background_iou": 0.8910011531729818,
+        "fn": 98594,
+        "fp": 460024,
+        "image_iou_sum": 18.195142311208407,
+        "images": 25,
+        "iou": 0.7188958690195589,
+        "mean_image_iou": 0.7278056924483363,
+        "tn": 4566372,
+        "tp": 1428610
+      }
+    },
+    "ovam": {
+      "class_absent": {
+        "background_iou": 0.7711102170075796,
+        "fn": 187831,
+        "fp": 164879,
+        "image_iou_sum": 5.514222374430928,
+        "images": 8,
+        "iou": 0.6119383607913724,
+        "mean_image_iou": 0.689277796803866,
+        "tn": 1188250,
+        "tp": 556192
+      },
+      "class_present": {
+        "background_iou": 0.8012622742746337,
+        "fn": 365776,
+        "fp": 705852,
+        "image_iou_sum": 14.390723850793842,
+        "images": 25,
+        "iou": 0.5201069744780248,
+        "mean_image_iou": 0.5756289540317536,
+        "tn": 4320544,
+        "tp": 1161428
+      }
+    }
+  },
+  "results": {
+    "frozen_best_voc": {
+      "background_iou": 0.8821040690067644,
+      "fn": 198149,
+      "fp": 577332,
+      "image_iou_sum": 24.228213587916947,
+      "images": 33,
+      "iou": 0.7277637570434735,
+      "mean_image_iou": 0.7341882905429378,
+      "tn": 5802193,
+      "tp": 2073078
+    },
+    "ovam": {
+      "background_iou": 0.7945606689732722,
+      "fn": 553607,
+      "fp": 870731,
+      "image_iou_sum": 19.904946225224773,
+      "images": 33,
+      "iou": 0.54667185239268,
+      "mean_image_iou": 0.6031801886431749,
+      "tn": 5508794,
+      "tp": 1717620
+    }
+  },
+  "settings": {
+    "attribution": "separate lowercase category encoding",
+    "best_method_source": "frozen VOC-Sim selections; no COCO-Cap tuning",
+    "class_shard": 18,
+    "classname": "train",
+    "completed": 33,
+    "expected": 33,
+    "fixed_stage1_results": "outputs/segmentation/voc_sim_100_stage1_suite/results.json",
+    "manifest": "datasets/ovam_experiment_with_dataset/evaluation/ovam/coco_captions/ovam_coco_cap.csv",
+    "model": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+    "model_dtype": "float32",
+    "ovam_parameters": {
+      "self_attention_minimum": 0.91,
+      "threshold": 0.5
+    },
+    "storage_dtype": "float16",
+    "suite": "coco_cap_untuned_generalization_v1"
+  }
+}

@@ -1,0 +1,200 @@
+{
+  "best_by_experiment": {
+    "focused/cross_attention_seeds": {
+      "classes": 1,
+      "configuration": "best12_percentile",
+      "images": 1,
+      "mean_background_iou": 0.9239165427480799,
+      "mean_image_iou": 0.8169535283993116,
+      "miou": 0.8169535283993116,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9239165427480799,
+          "fn": 3033,
+          "fp": 11856,
+          "image_iou_sum": 0.8169535283993116,
+          "images": 1,
+          "iou": 0.8169535283993116,
+          "mean_image_iou": 0.8169535283993116,
+          "tn": 180804,
+          "tp": 66451
+        }
+      }
+    },
+    "focused/output_calibration": {
+      "classes": 1,
+      "configuration": "r8_r16_max__r64__iter4__minmax__t0.45",
+      "images": 1,
+      "mean_background_iou": 0.9802706097987932,
+      "mean_image_iou": 0.9465908457378603,
+      "miou": 0.9465908457378603,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9802706097987932,
+          "fn": 1568,
+          "fp": 2264,
+          "image_iou_sum": 0.9465908457378603,
+          "images": 1,
+          "iou": 0.9465908457378603,
+          "mean_image_iou": 0.9465908457378603,
+          "tn": 190396,
+          "tp": 67916
+        }
+      }
+    },
+    "focused/postprocessing": {
+      "classes": 1,
+      "configuration": "best12_percentile__r64__iter4__percentile_01_99__t0.50__none",
+      "images": 1,
+      "mean_background_iou": 0.9782312157699329,
+      "mean_image_iou": 0.9405337255725993,
+      "miou": 0.9405337255725993,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9782312157699329,
+          "fn": 2344,
+          "fp": 1901,
+          "image_iou_sum": 0.9405337255725993,
+          "images": 1,
+          "iou": 0.9405337255725993,
+          "mean_image_iou": 0.9405337255725993,
+          "tn": 190759,
+          "tp": 67140
+        }
+      }
+    },
+    "focused/sa_heads": {
+      "classes": 1,
+      "configuration": "iter3__head_3",
+      "images": 1,
+      "mean_background_iou": 0.9784819970849234,
+      "mean_image_iou": 0.9421000845355396,
+      "miou": 0.9421000845355396,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9784819970849234,
+          "fn": 1503,
+          "fp": 2675,
+          "image_iou_sum": 0.9421000845355396,
+          "images": 1,
+          "iou": 0.9421000845355396,
+          "mean_image_iou": 0.9421000845355396,
+          "tn": 189985,
+          "tp": 67981
+        }
+      }
+    },
+    "focused/sa_time": {
+      "classes": 1,
+      "configuration": "iter4__step_30",
+      "images": 1,
+      "mean_background_iou": 0.9782820382667067,
+      "mean_image_iou": 0.9427740852451857,
+      "miou": 0.9427740852451857,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9782820382667067,
+          "fn": 406,
+          "fp": 3787,
+          "image_iou_sum": 0.9427740852451857,
+          "images": 1,
+          "iou": 0.9427740852451857,
+          "mean_image_iou": 0.9427740852451857,
+          "tn": 188873,
+          "tp": 69078
+        }
+      }
+    },
+    "focused/seed_operator": {
+      "classes": 1,
+      "configuration": "r8_r16_max__r64__iter4",
+      "images": 1,
+      "mean_background_iou": 0.9794628263234695,
+      "mean_image_iou": 0.9448230958911701,
+      "miou": 0.9448230958911701,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9794628263234695,
+          "fn": 1281,
+          "fp": 2702,
+          "image_iou_sum": 0.9448230958911701,
+          "images": 1,
+          "iou": 0.9448230958911701,
+          "mean_image_iou": 0.9448230958911701,
+          "tn": 189958,
+          "tp": 68203
+        }
+      }
+    }
+  },
+  "configuration_count": 1344,
+  "settings": {
+    "classes": [
+      "aeroplane"
+    ],
+    "images": 1,
+    "shards": 1,
+    "suite_metadata": {
+      "iterations": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "module32": "up_blocks.2.attentions.2.transformer_blocks.0.attn1",
+      "module64": "up_blocks.3.attentions.2.transformer_blocks.0.attn1",
+      "normalizations": [
+        "ovam_max_after_resize",
+        "minmax",
+        "max",
+        "percentile_01_99"
+      ],
+      "output_thresholds": [
+        0.25,
+        0.3,
+        0.35,
+        0.4,
+        0.45,
+        0.5,
+        0.55,
+        0.6,
+        0.65
+      ],
+      "parallel_r64_weights": [
+        0.25,
+        0.5,
+        0.75
+      ],
+      "postprocessing": [
+        "none",
+        "largest_component",
+        "remove_fraction_0.001",
+        "remove_fraction_0.005",
+        "remove_fraction_0.01",
+        "fill_holes",
+        "closing_fill_r1",
+        "closing_fill_r2",
+        "closing_fill_r4"
+      ],
+      "seed_names": [
+        "best12_percentile",
+        "all16_percentile",
+        "r8_r16_max",
+        "mid_up_max",
+        "top4_heads_percentile",
+        "ovam_nonmiddle_max"
+      ],
+      "selection_note": "No dataset-learned head or timestep weights are fit in this evaluation-only run; head ranking is per-image and label-free, and temporal weights are fixed.",
+      "temporal_weight_schemes": [
+        "late_linear",
+        "late_quadratic",
+        "late_exp_0.05",
+        "late_exp_0.10",
+        "late_exp_0.20",
+        "snr",
+        "sqrt_snr",
+        "log1p_snr"
+      ]
+    }
+  }
+}
