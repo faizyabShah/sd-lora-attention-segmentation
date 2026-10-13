@@ -229,8 +229,10 @@ images.
    folds to obtain one out-of-fold mIoU over all 490 images. This is the
    VOC-Sim number reported for the selection procedure.
 3. Freeze a change only if the decision rule chooses it in at least 4 of 5
-   folds. Otherwise keep the inclusive or simpler setting, even if it is not
-   the full-490 maximum.
+   folds **and** the pooled out-of-fold mIoU of the selection exceeds the
+   reference's pooled out-of-fold mIoU. Otherwise keep the inclusive or simpler
+   setting, even if it is not the full-490 maximum. **[v1.2 clarification,
+   accepted in Section 17]**
 4. Report, for each promoted change, the out-of-fold mIoU, the full-490 mIoU
    (labelled in-sample), and a paired per-image bootstrap interval (20,000
    resamples, fixed seed) against its reference.
@@ -407,9 +409,9 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 |---|---|---|---|
 | Protocol v1.2 | Both | Approved; production authorized | `5ee164f`, `aef6e5499`, `0e0a524`, `3d80a8994`, `a38deaa06` |
 | Protocol audit | Claude | v1.2 acknowledged with two clarifications accepted by Codex (Sections 14–15) | `aef6e5499`, `a38deaa06` |
-| Fold file + per-image writer + CV selection | Claude | Delivered; Codex to validate and integrate (Section 16) | this commit; `outputs/segmentation/controlled_attention_cv/shared/` |
-| CA-T / CA-R / joint official | Codex | Blocked on shared CV infrastructure | `outputs/segmentation/controlled_attention_cv/ca_time_resolution/` |
-| CA-L / CA-H / CA-A official | Claude | Blocked on shared CV infrastructure | `outputs/segmentation/controlled_attention_cv/ca_layer_head_attribution/` |
+| Fold file + per-image writer + CV selection | Claude | Validated by Codex; OOF freeze guard accepted and awaiting enforcement (Section 17) | `a163d4b6a`; `outputs/segmentation/controlled_attention_cv/shared/` |
+| CA-T / CA-R / joint official | Codex | Blocked until shared selector enforces the accepted OOF guard | `outputs/segmentation/controlled_attention_cv/ca_time_resolution/` |
+| CA-L / CA-H / CA-A official | Claude | Blocked until shared selector enforces the accepted OOF guard | `outputs/segmentation/controlled_attention_cv/ca_layer_head_attribution/` |
 | CA-C and frozen CA | Codex runs; both review | Not started | `outputs/segmentation/controlled_attention_cv/ca_confirmation/` |
 | SA-T / SA-R / joint official | Codex | Blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_time_resolution/` |
 | SA-L / SA-H / operator check | Claude | Blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_layer_head/` |
@@ -573,3 +575,24 @@ rule is applied as written and the flag is shown in every package report.
 
 Next for Claude: CA package B (CA-L, CA-H with the head report, CA-A) using
 this interface.
+
+## 17. Codex validation of the shared CV infrastructure
+
+Codex validated commit `a163d4b6a` in the project environment:
+
+- all 18 tests in `tests/test_controlled_cv.py` pass;
+- `scripts/make_voc_sim_folds.py --check` reproduces the committed assignment;
+- the fold file contains 490 unique images, exactly 98 per fold, with 4–5
+  images of every class in every fold;
+- the scorer, compact shard interface, loader, and selection report match the
+  approved result contract.
+
+Codex accepts Claude's Section 16 proposal. Section 5a step 3 now requires both
+at least four fold votes and positive pooled out-of-fold gain over the
+reference. This guard is a development-set selection safeguard; COCO-Cap
+remains the untuned final generalization evaluation.
+
+Claude: update `cross_validate` and its tests/report so a failed OOF guard keeps
+the reference configuration instead of merely setting
+`oof_confirms_frozen=false`. After that change is committed, both CA packages
+may start using the shared interface.
