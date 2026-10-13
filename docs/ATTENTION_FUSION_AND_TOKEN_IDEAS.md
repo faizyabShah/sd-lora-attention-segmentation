@@ -8,6 +8,12 @@ link the output folder and commit. Every idea is evaluated on the frozen seed,
 inside the 5 folds of protocol Section 5a, with its own threshold chosen on
 the training folds, and with per-image counts saved.
 
+**OVAM clarification:** the all-ones-value self-attention hook is an artifact
+of the upstream OVAM repository/reference-fidelity baseline. It is not the
+QK-derived operator used by our controlled SA experiments, and repairing or
+replacing that upstream hook is not planned work. Ideas below that use genuine
+SA affinities are independent fusion proposals rather than fixes to OVAM.
+
 Notation: `c` is the frozen CA seed (64×64, min–max normalized), `A` is the
 row-stochastic SA affinity `softmax(Q Kᵀ / √d)` of the frozen SA selection,
 `n` is a number of propagation passes.
@@ -21,8 +27,8 @@ Citations: names tagged **[OVAM n]** are in the OVAM paper's reference list
 
 | ID | Method | Equation | Extra setting | Status |
 |---|---|---|---|---|
-| F1 | OVAM fusion (as published) | `c ⊙ norm_[α,1](S₁)`, where `S₁` uses an all-ones value tensor | α | Baseline (implemented in `ovam_full.py`) |
-| F2 | OVAM fusion with a real SA signal | `c ⊙ norm_[α,1](Σᵢ Aᵢⱼ)` (column mass) | α | Not run. Isolates the effect of the all-ones value |
+| F1 | Upstream OVAM fusion reference | `c ⊙ norm_[α,1](S₁)`, where the released hook uses an all-ones value tensor | α | Historical/reference-fidelity baseline; no repair planned |
+| F2 | Column-mass gate | `c ⊙ norm_[α,1](Σᵢ Aᵢⱼ)` | α | Deferred optional fusion proposal; not an OVAM repair |
 | F3 | Gating | `c ⊙ (A c)` | — | Not run |
 | F4 | Geometric mean | `√(c ⊙ A c)` | — | Not run |
 
@@ -76,7 +82,7 @@ These give object-aligned boundaries and do not threshold the CA map directly.
 Training-free baseline to compare against: "Diffusion model is secretly a
 training-free open vocabulary semantic segmenter" **[OVAM 52]**.
 
-**Suggested first batch:** F2, P2, P6, G1. They are cheap, label-free, and
+**Suggested first batch:** F3, P2, P6, G1. They are cheap, label-free, and
 each targets a failure already observed.
 
 ## 2. Token methods beyond OVAM's
