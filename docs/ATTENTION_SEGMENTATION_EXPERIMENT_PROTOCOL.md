@@ -42,10 +42,14 @@ reported as untuned generalization.
 ### OVAM self-attention clarification **[v1.2]**
 
 The all-ones-value self-attention behavior described in Narmeen's review
-belongs only to the upstream OVAM repository. It is not part of our recreated
-OVAM experiment definition, our controlled experiments, or our proposed
-method, and it is not an open implementation problem for this study. Our SA
-experiments use genuine QK-derived affinities,
+originates in the upstream OVAM repository. Our shared, reference-fidelity
+OVAM baseline deliberately reproduces that hook in
+`src/segmentation/ovam_full.py` through the compact capture in
+`src/attention_capture/memory.py`; both collaborators must call that same
+implementation when reporting a regenerated OVAM baseline. It is not the
+self-attention operator in our controlled experiments or proposed method, and
+it is not an open implementation problem for this study. Our SA experiments
+use genuine QK-derived affinities,
 `A = softmax(QK^T / sqrt(d))`, and propagate the CA seed with `A x`, as defined
 in Section 6. Claude should not implement, repair, or schedule an experiment to
 replace the upstream all-ones hook. OVAM remains a comparison baseline while
