@@ -98,7 +98,39 @@ Each row is the mean ± sample standard deviation across five seeds. Every run u
 
 Machine-readable files: `outputs/lora/outputs-metrics/sd15-checkpoints/checkpoint_summary.json` and `outputs/lora/outputs-metrics/sd15-checkpoints/all_metrics.json`.
 
-## Attention segmentation ablations
+## Official controlled CA screening on full VOC-Sim
+
+Protocol v1.2 evaluates all 490 annotated VOC-Sim images with five fixed,
+class-stratified folds. Every comparison uses conditional cross-attention, all
+tokenizer pieces of the class name, equal module-call weighting, min-max
+normalization, threshold 0.45, and no self-attention or postprocessing.
+
+| Screen | Inclusive reference | Cross-validated choice | Votes | OOF mIoU reference | OOF mIoU choice | Gain | Decision |
+|---|---|---|---:|---:|---:|---:|---|
+| CA timesteps | calls 0–30 | calls 0–30 | 5/5 | 0.66610 | 0.66610 | +0.00000 | Keep all calls |
+| CA resolutions | 8+16+32+64 | 8+16+64 | 5/5 | 0.66610 | 0.69571 | +0.02960 | Promote to combined CA confirmation |
+
+For the resolution change, the paired mean image-IoU gain is **+0.02111**
+(95% bootstrap interval **[+0.01394, +0.02859]**). Twelve of twenty classes
+improve. The largest gains are sheep (+0.14117), horse (+0.14041), dog
+(+0.13858), cat (+0.08755), and cow (+0.06465); the largest losses are
+motorbike (-0.04175) and person (-0.04062).
+
+The resolution gain remains positive at thresholds 0.35, 0.45, and 0.55, but
+its magnitude varies (+0.00094, +0.02960, and +0.04422 respectively), while
+mean AP decreases from 0.92183 to 0.91314. It passes the protocol's formal
+calibration check but requires confirmation alongside the layer, head, and
+attribution selections.
+
+The joint timestep-resolution grid is interaction evidence only. Its
+in-sample maximum is calls 0–25 with resolutions 8+16 at **0.69680 mIoU**
+(+0.03069 over the inclusive reference); it is not an automatically selected
+configuration.
+
+Machine-readable results and all compact per-image records are in
+`outputs/segmentation/controlled_attention_cv/ca_time_resolution/`.
+
+## Earlier attention segmentation ablations
 
 These results use the stored Stable Diffusion 1.5 cross-attention probabilities for
 the annotated VOC-Sim captures. Of the first 100 captures, 99 have masks and were

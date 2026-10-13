@@ -410,7 +410,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Protocol v1.2 | Both | Approved; production authorized | `5ee164f`, `aef6e5499`, `0e0a524`, `3d80a8994`, `a38deaa06` |
 | Protocol audit | Claude | v1.2 acknowledged with two clarifications accepted by Codex (Sections 14–15) | `aef6e5499`, `a38deaa06` |
 | Fold file + per-image writer + CV selection | Claude | Validated by Codex; OOF freeze guard enforced (Section 18) | `a163d4b6a`, this commit; `outputs/segmentation/controlled_attention_cv/shared/` |
-| CA-T / CA-R / joint official | Codex | Submitted: smoke → production array → selection/merge | `408c85191`; jobs `232263` → `232264` → `232265`; `outputs/segmentation/controlled_attention_cv/ca_time_resolution/` |
+| CA-T / CA-R / joint official | Codex | Complete: keep all calls; promote resolutions 8+16+64 to CA-C | `16530b54b`; jobs `232263` → `232264` → `232265`; `outputs/segmentation/controlled_attention_cv/ca_time_resolution/` |
 | CA-L / CA-H / CA-A official | Claude | Unblocked (OOF guard enforced); runner next | `outputs/segmentation/controlled_attention_cv/ca_layer_head_attribution/` |
 | CA-C and frozen CA | Codex runs; both review | Not started | `outputs/segmentation/controlled_attention_cv/ca_confirmation/` |
 | SA-T / SA-R / joint official | Codex | Blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_time_resolution/` |
@@ -639,3 +639,31 @@ Submitted from commit `408c85191` on Renyi. Job `232263` is the one-image
 smoke check; array `232264` runs the 20 resumable class shards with at most one
 GPU task at a time; job `232265` runs cross-validated selection and adds the
 nonselecting joint-grid diagnostic after every array task succeeds.
+
+## 20. Codex: CA package A results
+
+All jobs completed successfully: 20/20 shards, 490/490 unique images, and
+1,279 configurations. The compact package is in
+`outputs/segmentation/controlled_attention_cv/ca_time_resolution/`.
+
+| Screen | Inclusive reference | Fold choice | Votes | OOF mIoU reference → choice | OOF gain | Package decision |
+|---|---|---|---:|---:|---:|---|
+| CA-T | calls 0–30 | calls 0–30 | 5/5 | 0.66610 → 0.66610 | +0.00000 | Keep all calls |
+| CA-R | 8+16+32+64 | 8+16+64 | 5/5 | 0.66610 → 0.69571 | +0.02960 | Promote; test in CA-C |
+
+The CA-R paired mean image-IoU gain is +0.02111 with a 95% bootstrap interval
+of [+0.01394, +0.02859]. It improves 12 of 20 pooled class IoUs. The largest
+gains are sheep (+0.14117), horse (+0.14041), dog (+0.13858), cat (+0.08755),
+and cow (+0.06465); the largest losses are motorbike (-0.04175) and person
+(-0.04062).
+
+The promoted resolution subset has positive mIoU gains at all three diagnostic
+thresholds (+0.00094 at 0.35, +0.02960 at 0.45, +0.04422 at 0.55), so it does
+not trigger the protocol's sign-reversal calibration flag. Its mean AP falls
+from 0.92183 to 0.91314, and the gain is much smaller at threshold 0.35. CA-C
+must therefore verify that the fixed-threshold benefit survives interaction
+with any promoted layer, head, or attribution changes.
+
+The joint grid is diagnostic only. Its in-sample maximum is calls 0–25 with
+resolutions 8+16 at 0.69680 mIoU (+0.03069 over the inclusive reference). It
+does not override the cross-validated one-axis decisions.
