@@ -1,0 +1,12 @@
+\begin{table}[H]\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.40cm}>{\raggedright\arraybackslash}p{1.40cm}>{\raggedright\arraybackslash}p{1.40cm}rrr>{\raggedright\arraybackslash}p{1.40cm}>{\raggedright\arraybackslash}p{1.40cm}>{\raggedright\arraybackslash}p{1.40cm}}
+\toprule
+Screen & Reference & Vote winner (votes) & OOF mIoU selection & OOF mIoU reference & OOF gain & Paired $\Delta$ image IoU [95\% CI] & Calibration-dependent & Outcome \\
+\midrule
+CA-L & L/\allowbreak{}all\_\allowbreak{}16 & L/\allowbreak{}leave2\_\allowbreak{}10\_\allowbreak{}11 (5/\allowbreak{}5) & 0.6923 & 0.6661 & 0.0262 & +0.0209 [+0.0155, +0.0265] & yes & fold vote and OOF guard passed \\
+CA-H & H/\allowbreak{}0\_\allowbreak{}1\_\allowbreak{}2\_\allowbreak{}3\_\allowbreak{}4\_\allowbreak{}5\_\allowbreak{}6\_\allowbreak{}7 & H/\allowbreak{}0\_\allowbreak{}2\_\allowbreak{}3\_\allowbreak{}4\_\allowbreak{}5\_\allowbreak{}6\_\allowbreak{}7 (4/\allowbreak{}5) & 0.6741 & 0.6661 & 0.0080 & +0.0089 [+0.0047, +0.0131] & yes & fold vote and OOF guard passed \\
+CA-A & A/\allowbreak{}cond\_\allowbreak{}padded\_\allowbreak{}all & A/\allowbreak{}cond\_\allowbreak{}padded\_\allowbreak{}all (5/\allowbreak{}5) & 0.6661 & 0.6661 & 0.0000 & +0.0000 [+0.0000, +0.0000] & no & reference won the fold vote \\
+\bottomrule
+\end{tabular}
+\caption{Controlled CA package B: cross-validated selection (VOC-Sim, 5 folds, threshold 0.45)}\label{tab:a1_cv_summary}
+\end{table}

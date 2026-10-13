@@ -1,0 +1,36 @@
+**Remove-one-component ablations of the final and revised systems**
+
+| System | Dataset | Change | mIoU | Δ vs full |
+|---|---|---|---:|---:|
+| final (4 passes, 12 layers) | VOC-Sim | all sa calls | 0.7938 | -0.0060 |
+| final (4 passes, 12 layers) | VOC-Sim | all sa heads | 0.7940 | -0.0059 |
+| final (4 passes, 12 layers) | VOC-Sim | full system | 0.7999 | 0.0000 |
+| final (4 passes, 12 layers) | VOC-Sim | max normalization | 0.7176 | -0.0822 |
+| final (4 passes, 12 layers) | VOC-Sim | one sa pass | 0.7801 | -0.0198 |
+| final (4 passes, 12 layers) | VOC-Sim | without ca head filter | 0.7832 | -0.0167 |
+| final (4 passes, 12 layers) | VOC-Sim | without ca layer filter | 0.7975 | -0.0024 |
+| final (4 passes, 12 layers) | VOC-Sim | without component cleanup | 0.7992 | -0.0006 |
+| final (4 passes, 12 layers) | VOC-Sim | without sa propagation | 0.6805 | -0.1194 |
+| final (4 passes, 12 layers) | COCO-Cap | all sa calls | 0.6054 | -0.0024 |
+| final (4 passes, 12 layers) | COCO-Cap | all sa heads | 0.5935 | -0.0143 |
+| final (4 passes, 12 layers) | COCO-Cap | full system | 0.6078 | 0.0000 |
+| final (4 passes, 12 layers) | COCO-Cap | max normalization | 0.4898 | -0.1181 |
+| final (4 passes, 12 layers) | COCO-Cap | one sa pass | 0.6263 | 0.0185 |
+| final (4 passes, 12 layers) | COCO-Cap | without ca head filter | 0.6026 | -0.0052 |
+| final (4 passes, 12 layers) | COCO-Cap | without ca layer filter | 0.6120 | 0.0042 |
+| final (4 passes, 12 layers) | COCO-Cap | without component cleanup | 0.6051 | -0.0027 |
+| final (4 passes, 12 layers) | COCO-Cap | without sa propagation | 0.5739 | -0.0339 |
+| revised (1 pass, 16 layers) | VOC-Sim | all sa calls | 0.7802 | -0.0022 |
+| revised (1 pass, 16 layers) | VOC-Sim | all sa heads | 0.7837 | 0.0013 |
+| revised (1 pass, 16 layers) | VOC-Sim | max normalization | 0.7804 | -0.0021 |
+| revised (1 pass, 16 layers) | VOC-Sim | revised full system | 0.7824 | 0.0000 |
+| revised (1 pass, 16 layers) | VOC-Sim | without ca head filter | 0.7625 | -0.0199 |
+| revised (1 pass, 16 layers) | VOC-Sim | without component cleanup | 0.7824 | -0.0001 |
+| revised (1 pass, 16 layers) | VOC-Sim | without sa propagation | 0.6969 | -0.0855 |
+| revised (1 pass, 16 layers) | COCO-Cap | all sa calls | 0.6240 | -0.0083 |
+| revised (1 pass, 16 layers) | COCO-Cap | all sa heads | 0.6274 | -0.0049 |
+| revised (1 pass, 16 layers) | COCO-Cap | max normalization | 0.6147 | -0.0176 |
+| revised (1 pass, 16 layers) | COCO-Cap | revised full system | 0.6322 | 0.0000 |
+| revised (1 pass, 16 layers) | COCO-Cap | without ca head filter | 0.6253 | -0.0069 |
+| revised (1 pass, 16 layers) | COCO-Cap | without component cleanup | 0.6288 | -0.0034 |
+| revised (1 pass, 16 layers) | COCO-Cap | without sa propagation | 0.5862 | -0.0460 |

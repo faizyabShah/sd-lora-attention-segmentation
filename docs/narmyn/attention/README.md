@@ -2,6 +2,7 @@
 
 | Document | Content |
 |---|---|
+| `evidence/EVIDENCE.md` | every experiment run so far (tier B exploratory, tier A controlled), where each setting came from, full per-configuration tables and figures; `evidence/evidence_section.tex` for the report (built by `scripts/narmyn/attention/build_evidence.py`) |
 | `TOKEN_CRF_EXPERIMENT.md` | OVAM's released optimized tokens and DenseCRF on the earlier final method, on all 490 VOC-Sim and 707 COCO-Cap images (exploratory, pre-protocol) |
 | `attention_report_for_review_d980b91.md` | code-level review of the VOC-Sim pipeline as of `d980b91`: exact final-method settings, baselines, metric code, selection provenance, open issues |
 | `figures/ovam_sa_issue.png` | analysis of the upstream OVAM repository's all-ones-value hook and its rounding residue; this historical/reference-fidelity behavior is not the QK-derived SA operator used in our controlled experiments |

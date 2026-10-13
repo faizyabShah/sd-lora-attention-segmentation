@@ -1,0 +1,19 @@
+**How the method developed, with the baselines it is compared against**
+
+| Dataset | Method | mIoU | Evidence |
+|---|---|---:|---|
+| VOC-Sim | OVAM CA only (released heatmaps) | 0.6616 | B16 |
+| VOC-Sim | OVAM CA only (regenerated) | 0.6540 | B8 |
+| VOC-Sim | OVAM, implemented (CA×SA, DenseCRF) | 0.6934 | attention_analysis.md |
+| VOC-Sim | OVAM, released masks | 0.7036 | B16 |
+| VOC-Sim | + SA propagation at U3.2, 4 passes | 0.7777 | B8 |
+| VOC-Sim | + top-4-head CA seed, 2 passes, t=0.45 | 0.7922 | B9 |
+| VOC-Sim | + heads {0,1,2,4,5,6}, calls 15–30, 4 passes, 1% cleanup | 0.7997 | B10 |
+| VOC-Sim | Revised: 1 pass, all 16 CA layers | 0.7824 | B13 |
+| VOC-Sim | OVAM token-optimized, released masks | 0.8247 | B16 |
+| VOC-Sim | Earlier final + optimized token + DenseCRF (1 pass) | 0.8525 | B17 |
+| COCO-Cap | OVAM, implemented (paper COCO parameters) | 0.5717 | B17 |
+| COCO-Cap | Final method, frozen from VOC | 0.6080 | B12 |
+| COCO-Cap | Revised: 1 pass, all 16 CA layers | 0.6322 | B13 |
+| COCO-Cap | Earlier final + optimized token + DenseCRF (1 pass) | 0.6612 | B17 |
+| COCO-Cap | OVAM token-optimized (paper Table 1) | 0.6920 | OVAM paper |
