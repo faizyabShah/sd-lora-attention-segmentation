@@ -1,0 +1,30 @@
+{
+  "package": "shared CV infrastructure",
+  "protocol": "v1.2 approved",
+  "base_commit": "1cb5c01948a0313b08db5efade47b63b44754425",
+  "fold_file": "configs/voc_sim_folds.csv",
+  "fold_count": 5,
+  "fold_seed": 20261013,
+  "fold_builder": "scripts/make_voc_sim_folds.py (stratified by class; one dealing counter across sorted classes)",
+  "thresholds": [
+    0.35,
+    0.45,
+    0.55
+  ],
+  "selection_threshold": 0.45,
+  "decision_rule": {
+    "promote": 0.01,
+    "conditional": 0.005,
+    "conditional_min_classes": 12,
+    "conditional_max_class_loss": 0.05,
+    "tie_margin": 0.002,
+    "freeze_min_folds": 4
+  },
+  "bootstrap": {
+    "resamples": 20000,
+    "seed": 20261013,
+    "statistic": "mean paired per-image IoU difference at 0.45"
+  },
+  "ap": "average precision of the normalized 64x64 map against the nearest-downsampled 64x64 target (attention_analysis definition)",
+  "storage": "one .npz per shard: configurations, image_ids, classes, folds, thresholds, counts int32 [C,N,T,4] (tp,fp,fn,tn), ap float32 [C,N], settings (JSON string), commits, complete"
+}

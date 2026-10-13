@@ -1,0 +1,159 @@
+{
+  "images": 490,
+  "classes": 20,
+  "fold_sizes": {
+    "0": 98,
+    "1": 98,
+    "2": 98,
+    "3": 98,
+    "4": 98
+  },
+  "per_class_per_fold": {
+    "aeroplane": [
+      5,
+      5,
+      5,
+      5,
+      4
+    ],
+    "bicycle": [
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    "bird": [
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    "boat": [
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    "bottle": [
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    "bus": [
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    "car": [
+      5,
+      5,
+      4,
+      4,
+      5
+    ],
+    "cat": [
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    "chair": [
+      5,
+      4,
+      5,
+      5,
+      5
+    ],
+    "cow": [
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    "dining-table": [
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    "dog": [
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    "horse": [
+      4,
+      5,
+      5,
+      5,
+      4
+    ],
+    "motorbike": [
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    "person": [
+      5,
+      5,
+      5,
+      4,
+      5
+    ],
+    "potted-plant": [
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    "sheep": [
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    "sofa": [
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    "train": [
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    "tv": [
+      4,
+      4,
+      4,
+      5,
+      5
+    ]
+  },
+  "tests": {
+    "suite": "tests/test_controlled_cv.py",
+    "result": "18 passed",
+    "existing_suites": "tests/test_attention_sources.py, tests/test_focused_self_attention.py: 6 passed"
+  },
+  "gpu_cpu_parity": "score_maps on CUDA (A100, torch 2.11) vs CPU, 200 random maps, 512x512 target: identical counts for minmax and percentile_01_99; AP difference <= 1e-16"
+}
