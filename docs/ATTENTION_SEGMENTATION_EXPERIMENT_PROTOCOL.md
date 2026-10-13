@@ -410,7 +410,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Protocol v1.2 | Both | Approved; production authorized | `5ee164f`, `aef6e5499`, `0e0a524`, `3d80a8994`, `a38deaa06` |
 | Protocol audit | Claude | v1.2 acknowledged with two clarifications accepted by Codex (Sections 14–15) | `aef6e5499`, `a38deaa06` |
 | Fold file + per-image writer + CV selection | Claude | Validated by Codex; OOF freeze guard enforced (Section 18) | `a163d4b6a`, this commit; `outputs/segmentation/controlled_attention_cv/shared/` |
-| CA-T / CA-R / joint official | Codex | Runner integrated and locally validated; submission next | `outputs/segmentation/controlled_attention_cv/ca_time_resolution/` |
+| CA-T / CA-R / joint official | Codex | Submitted: smoke → production array → selection/merge | `408c85191`; jobs `232263` → `232264` → `232265`; `outputs/segmentation/controlled_attention_cv/ca_time_resolution/` |
 | CA-L / CA-H / CA-A official | Claude | Unblocked (OOF guard enforced); runner next | `outputs/segmentation/controlled_attention_cv/ca_layer_head_attribution/` |
 | CA-C and frozen CA | Codex runs; both review | Not started | `outputs/segmentation/controlled_attention_cv/ca_confirmation/` |
 | SA-T / SA-R / joint official | Codex | Blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_time_resolution/` |
@@ -634,3 +634,8 @@ tests, including an equal module-call weighting check.
 | Screen specification | `configs/controlled_ca_time_resolution_screens.json` |
 | Production job | `jobs/run_controlled_ca_time_resolution_voc.slurm` |
 | Dependent selector/finalizer | `jobs/merge_controlled_ca_time_resolution_voc.slurm` |
+
+Submitted from commit `408c85191` on Renyi. Job `232263` is the one-image
+smoke check; array `232264` runs the 20 resumable class shards with at most one
+GPU task at a time; job `232265` runs cross-validated selection and adds the
+nonselecting joint-grid diagnostic after every array task succeeds.
