@@ -11,7 +11,7 @@ this interface before CA package A (step 3).
 | `scripts/make_voc_sim_folds.py` | rebuilds the fold file from the manifest; `--check` verifies the committed file |
 | `src/segmentation/controlled_cv.py` | scorer, shard writer and loader, metrics, decision rule, cross-validated selection, paired bootstrap |
 | `scripts/select_controlled_cv.py` | turns a package's shards plus a screen spec into `fold_results.json`, `summary.json`, `report.md` |
-| `tests/test_controlled_cv.py` | synthetic test (18 tests): parity with `attention_to_mask`, `normalize_map`, `BinarySegmentationMetrics` and `attention_analysis` AP; writer/loader guards; decision-rule bands; CV procedure |
+| `tests/test_controlled_cv.py` | synthetic test (19 tests): parity with `attention_to_mask`, `normalize_map`, `BinarySegmentationMetrics` and `attention_analysis` AP; writer/loader guards; decision-rule bands; CV procedure |
 
 ## How a runner uses it
 
@@ -52,13 +52,18 @@ python scripts/select_controlled_cv.py --package-dir <output root> --spec <spec.
 with a spec such as
 `{"screens": [{"name": "CA-H", "reference": "heads/all", "prefix": "heads/", "inclusiveness": {"heads/0_1": 2}}]}`.
 
-## One property of the Section 5a rule for both agents to note
+## Freezing rule (Section 5a step 3)
 
-`tests/test_controlled_cv.py::test_gain_in_one_fold_only_is_frozen_but_oof_shows_no_gain`
-shows that a gain confined to one fold is chosen by the four training sets
-that contain that fold, so the 4-of-5 vote freezes it even though every
-held-out fold scores exactly like the reference. The selector therefore also
-reports `oof_gain` and `oof_confirms_frozen`, and `report.md` marks a frozen
-change that the held-out folds do not confirm. Protocol Section 16 proposes
-requiring `oof_confirms_frozen` before freezing; until Codex agrees, the rule
-is applied as written and the flag is reported.
+A change is frozen only if it wins at least 4 of 5 fold votes **and** the
+pooled out-of-fold mIoU of the selection exceeds the reference's. Otherwise
+the reference is kept. `fold_results.json` reports `vote_winner`,
+`vote_winner_votes`, `vote_passed`, `oof_gain`, `oof_guard_passed`, `frozen`
+and `freeze_reason` for every screen, and `report.md` shows the vote winner,
+the OOF gain, the frozen choice and why.
+
+The guard exists because a gain confined to one fold wins the four training
+sets that contain that fold, although every held-out fold scores exactly like
+the reference
+(`tests/test_controlled_cv.py::test_gain_in_one_fold_only_is_rejected_by_oof_guard`).
+Proposed in Section 16, accepted by Codex in Section 17, enforced in
+`cross_validate` from the commit that adds this paragraph.

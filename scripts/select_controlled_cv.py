@@ -53,18 +53,19 @@ def report(results, screens: dict, rows: dict) -> str:
         f"{len(results.configurations)} configurations; shards complete: "
         f"{sum(results.complete)}/{len(results.complete)}. Selection at threshold 0.45.",
         "",
-        "| Screen | Reference | Frozen | Fold votes | OOF mIoU (selection) | OOF mIoU (reference) | "
-        "In-sample Δ | Paired Δ image IoU [95% CI] | Calibration-dependent | OOF confirms |",
-        "|---|---|---|---:|---:|---:|---:|---|:---:|:---:|",
+        "| Screen | Reference | Vote winner (votes) | OOF gain | Frozen | Why | OOF mIoU (selection / reference) | "
+        "In-sample Δ (frozen) | Paired Δ image IoU [95% CI] (frozen) | Calibration-dependent |",
+        "|---|---|---|---:|---|---|---|---:|---|:---:|",
     ]
     for name, cv in screens.items():
         b = cv["paired_bootstrap_frozen_vs_reference"]
         lines.append(
-            f"| {name} | `{cv['reference']}` | `{cv['frozen']}` | {cv['frozen_votes']}/5 | "
-            f"{cv['out_of_fold_miou_selection']:.4f} | {cv['out_of_fold_miou_reference']:.4f} | "
+            f"| {name} | `{cv['reference']}` | `{cv['vote_winner']}` ({cv['vote_winner_votes']}/5) | "
+            f"{cv['oof_gain']:+.4f} | `{cv['frozen']}` | {cv['freeze_reason']} | "
+            f"{cv['out_of_fold_miou_selection']:.4f} / {cv['out_of_fold_miou_reference']:.4f} | "
             f"{cv['in_sample_miou_frozen'] - cv['in_sample_miou_reference']:+.4f} | "
             f"{b['mean']:+.4f} [{b['ci_low']:+.4f}, {b['ci_high']:+.4f}] | "
-            f"{'yes' if cv['calibration_dependent'] else 'no'} | {'yes' if cv['oof_confirms_frozen'] else '**no**'} |"
+            f"{'yes' if cv['calibration_dependent'] else 'no'} |"
         )
     for name, cv in screens.items():
         lines += ["", f"## {name}", "", "| Fold | Chosen | Reason | Train mIoU chosen / ref | Held-out mIoU chosen / ref |",

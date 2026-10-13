@@ -260,6 +260,7 @@ class CrossValidationTests(unittest.TestCase):
         out = cv.cross_validate(results, "ref", ["better"])
         self.assertEqual(out["frozen"], "better")
         self.assertEqual(out["frozen_votes"], 5)
+        self.assertTrue(out["oof_guard_passed"])
         self.assertAlmostEqual(out["out_of_fold_miou_selection"], 0.63)
         self.assertAlmostEqual(out["out_of_fold_miou_reference"], 0.60)
         self.assertFalse(out["calibration_dependent"])
@@ -276,12 +277,12 @@ class CrossValidationTests(unittest.TestCase):
         self.assertEqual(out["selection_counts"], {"ref": 5})
         self.assertAlmostEqual(out["out_of_fold_miou_selection"], out["out_of_fold_miou_reference"])
 
-    def test_gain_in_one_fold_only_is_frozen_but_oof_shows_no_gain(self):
-        """Documents a property of the Section 5a rule as written.
+    def test_gain_in_one_fold_only_is_rejected_by_oof_guard(self):
+        """A gain confined to fold 0 wins the 4-of-5 vote but not the OOF guard.
 
-        A gain confined to fold 0 is selected in the four training sets that
-        contain fold 0, so the 4-of-5 vote freezes it, although every held-out
-        fold scores exactly like the reference. ``oof_gain`` exposes this.
+        The four training sets that contain fold 0 all choose it, yet every
+        held-out fold scores exactly like the reference, so the reference is
+        kept (protocol Section 5a step 3).
         """
         n = len(CLASSES) * 10
         values = np.full(n, 0.6)
@@ -290,9 +291,33 @@ class CrossValidationTests(unittest.TestCase):
         results = synthetic_results({"ref": np.full(n, 0.6), "lucky": values})
         out = cv.cross_validate(results, "ref", ["lucky"])
         self.assertEqual(out["selection_counts"], {"lucky": 4, "ref": 1})
-        self.assertEqual(out["frozen"], "lucky")
+        self.assertEqual(out["vote_winner"], "lucky")
+        self.assertTrue(out["vote_passed"])
         self.assertAlmostEqual(out["oof_gain"], 0.0)
-        self.assertFalse(out["oof_confirms_frozen"])
+        self.assertFalse(out["oof_guard_passed"])
+        self.assertEqual(out["frozen"], "ref")
+        self.assertIn("OOF guard failed", out["freeze_reason"])
+
+    def test_vote_and_guard_both_needed(self):
+        n = len(CLASSES) * 10
+        folds = np.array([i % 10 % 5 for i in range(n)])
+        # Real but small held-out gain everywhere: vote 5/5 and positive OOF gain.
+        results = synthetic_results({"ref": np.full(n, 0.6), "steady": np.full(n, 0.62)})
+        out = cv.cross_validate(results, "ref", ["steady"])
+        self.assertEqual(out["frozen"], "steady")
+        self.assertTrue(out["vote_passed"] and out["oof_guard_passed"])
+        self.assertEqual(out["freeze_reason"], "fold vote and OOF guard passed")
+        # +0.04 on folds 0-1, -0.01 on folds 2-4: the three training sets that
+        # hold out a losing fold promote it (+0.015), the two that hold out a
+        # winning fold do not (+0.0025), so it wins only 3 of 5 votes.
+        values = np.full(n, 0.6)
+        values[np.isin(folds, [0, 1])] += 0.04
+        values[np.isin(folds, [2, 3, 4])] -= 0.01
+        out = cv.cross_validate(synthetic_results({"ref": np.full(n, 0.6), "split": values}), "ref", ["split"])
+        self.assertEqual(out["selection_counts"], {"split": 3, "ref": 2})
+        self.assertFalse(out["vote_passed"])
+        self.assertEqual(out["frozen"], "ref")
+        self.assertIn("fewer than 4 fold votes", out["freeze_reason"])
 
     def test_selector_script_end_to_end(self):
         n = len(CLASSES) * 10
@@ -312,7 +337,9 @@ class CrossValidationTests(unittest.TestCase):
             folds_out = json.loads((Path(tmp) / "fold_results.json").read_text())
             self.assertEqual(folds_out["screens"]["S"]["frozen"], "better")
             self.assertTrue((Path(tmp) / "summary.json").exists())
-            self.assertIn("| S |", (Path(tmp) / "report.md").read_text())
+            report = (Path(tmp) / "report.md").read_text()
+            self.assertIn("| S |", report)
+            self.assertIn("fold vote and OOF guard passed", report)
 
 
 if __name__ == "__main__":

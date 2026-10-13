@@ -478,7 +478,13 @@ def decide(results: Results, reference: str, candidates: Sequence[str],
 def cross_validate(results: Results, reference: str, candidates: Sequence[str],
                    inclusiveness: Mapping[str, float] | None = None,
                    folds: int = FOLD_COUNT, freeze_min_folds: int = FREEZE_MIN_FOLDS) -> dict:
-    """Section 5a: select on four folds, score on the fifth, rotate, then freeze."""
+    """Section 5a: select on four folds, score on the fifth, rotate, then freeze.
+
+    A change is frozen only if it wins at least ``freeze_min_folds`` fold votes
+    **and** the pooled out-of-fold mIoU of the selection procedure exceeds the
+    reference's pooled out-of-fold mIoU (the OOF guard, protocol Section 5a
+    step 3). Otherwise the reference is kept.
+    """
     if set(np.unique(results.folds)) != set(range(folds)):
         raise ValueError(f"Results must contain all {folds} folds")
     ref = results.index(reference)
@@ -502,8 +508,6 @@ def cross_validate(results: Results, reference: str, candidates: Sequence[str],
     picks: dict[str, int] = {}
     for row in per_fold:
         picks[row["chosen"]] = picks.get(row["chosen"], 0) + 1
-    top, votes = max(picks.items(), key=lambda kv: (kv[1], kv[0] == reference))
-    frozen = top if votes >= freeze_min_folds else reference
 
     def pooled(counts: np.ndarray) -> float:
         classes = np.array(results.classes)
@@ -512,6 +516,19 @@ def cross_validate(results: Results, reference: str, candidates: Sequence[str],
             tp, fp, fn = counts[classes == name, :3].sum(axis=0)
             values.append(tp / (tp + fp + fn) if tp + fp + fn else 1.0)
         return float(np.mean(values))
+
+    oof_selection, oof_reference = pooled(oof), pooled(oof_ref)
+    vote_winner, votes = max(picks.items(), key=lambda kv: (kv[1], kv[0] == reference))
+    vote_passed = vote_winner != reference and votes >= freeze_min_folds
+    oof_guard_passed = oof_selection > oof_reference
+    if vote_winner == reference:
+        frozen, freeze_reason = reference, "reference won the fold vote"
+    elif not vote_passed:
+        frozen, freeze_reason = reference, f"fewer than {freeze_min_folds} fold votes"
+    elif not oof_guard_passed:
+        frozen, freeze_reason = reference, "OOF guard failed: no out-of-fold gain over the reference"
+    else:
+        frozen, freeze_reason = vote_winner, "fold vote and OOF guard passed"
 
     f = results.index(frozen)
     calibration = {
@@ -523,15 +540,16 @@ def cross_validate(results: Results, reference: str, candidates: Sequence[str],
         "candidates": list(candidates),
         "folds": per_fold,
         "selection_counts": picks,
+        "vote_winner": vote_winner,
+        "vote_winner_votes": votes,
+        "vote_passed": vote_passed,
+        "oof_guard_passed": oof_guard_passed,
         "frozen": frozen,
         "frozen_votes": picks.get(frozen, 0),
-        "out_of_fold_miou_selection": pooled(oof),
-        "out_of_fold_miou_reference": pooled(oof_ref),
-        "oof_gain": pooled(oof) - pooled(oof_ref),
-        # A frozen change should also improve the held-out folds; see the
-        # one-fold test in tests/test_controlled_cv.py for why the vote alone
-        # is not sufficient.
-        "oof_confirms_frozen": frozen == reference or pooled(oof) > pooled(oof_ref),
+        "freeze_reason": freeze_reason,
+        "out_of_fold_miou_selection": oof_selection,
+        "out_of_fold_miou_reference": oof_reference,
+        "oof_gain": oof_selection - oof_reference,
         "in_sample_miou_frozen": miou(results, f),
         "in_sample_miou_reference": miou(results, ref),
         "paired_bootstrap_frozen_vs_reference": paired_bootstrap(image_ious(results, f), image_ious(results, ref)),

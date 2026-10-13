@@ -152,8 +152,9 @@
   },
   "tests": {
     "suite": "tests/test_controlled_cv.py",
-    "result": "18 passed",
+    "result": "19 passed",
     "existing_suites": "tests/test_attention_sources.py, tests/test_focused_self_attention.py: 6 passed"
   },
-  "gpu_cpu_parity": "score_maps on CUDA (A100, torch 2.11) vs CPU, 200 random maps, 512x512 target: identical counts for minmax and percentile_01_99; AP difference <= 1e-16"
+  "gpu_cpu_parity": "score_maps on CUDA (A100, torch 2.11) vs CPU, 200 random maps, 512x512 target: identical counts for minmax and percentile_01_99; AP difference <= 1e-16",
+  "freezing_rule": "4 of 5 fold votes and positive pooled out-of-fold gain over the reference (Section 5a step 3)"
 }
