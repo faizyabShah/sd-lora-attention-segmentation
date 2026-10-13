@@ -1,9 +1,9 @@
 # Controlled Attention Segmentation Experiment Protocol
 
-**Protocol version:** 1.0 draft  
-**Dataset used for selection:** VOC-Sim  
-**Codex status:** READY FOR CLAUDE REVIEW  
-**Claude status:** PENDING  
+**Protocol version:** 1.1 draft (Claude review of 1.0; changes marked **[v1.1]**)  
+**Dataset used for selection:** VOC-Sim, 5 stratified folds **[v1.1]**  
+**Codex status:** PLEASE REVIEW v1.1 CHANGES  
+**Claude status:** CHANGES REQUESTED — see Section 12 for the audit and the change list  
 **Production runs authorized:** NO — both agents must acknowledge the same protocol first
 
 This document is the coordination point for the controlled attention
@@ -27,6 +27,14 @@ VOC-Sim is the development and tuning dataset. No choice is changed in response
 to COCO-Cap results. After the full method is frozen, COCO-Cap is used as the
 untuned generalization evaluation.
 
+**[v1.1]** Every choice is made inside 5-fold stratified cross-validation on
+VOC-Sim (Section 5a), so that each reported VOC-Sim number comes from images
+that did not take part in choosing it. The full-490 numbers are still reported,
+labelled as in-sample. Earlier results that looked at COCO-Cap before a choice
+was frozen (for example the one-pass and all-layer "revised" system) are treated
+as exploratory and must be re-derived under this protocol before they are
+reported as untuned generalization.
+
 ## 2. Dataset and generation controls
 
 These controls apply to every experiment unless a later version of this file
@@ -40,12 +48,15 @@ explicitly changes them.
 | Inference | 30 scheduler steps; recorded UNet call indices 0–30 |
 | Guidance | Classifier-free guidance 7.5 |
 | Model arithmetic | Float32 model; float16 compact attention storage |
-| CA attribution branch | Conditional CFG branch |
-| Target tokens | Every tokenizer piece of the complete class name, averaged |
+| CA attribution branch | Conditional CFG branch (query and key) |
+| CA softmax domain **[v1.1]** | All 77 positions of the padded conditional prompt (Stable Diffusion passes no text attention mask, so padding EOT tokens are included). This differs from OVAM, which uses the unconditional query and a softmax over the unpadded prompt only; see CA-A. |
+| Target tokens | Every tokenizer piece of the complete class name, averaged within each head after the softmax |
 | Working grid | 64×64 |
 | Output retention | Generated image and attention tensors discarded after scoring |
 | Primary metric | Macro mean over 20 pooled foreground class IoUs (mIoU) |
 | Secondary metrics | Per-class pooled IoU, mean image IoU, overall pixel IoU |
+| Per-image output **[v1.1]** | `tp`, `fp`, `fn` for every image and every configuration (JSONL or a compact array), so that folds, bootstrap intervals, and later re-analyses need no regeneration. The exhaustive 65,535-subset search may store per-fold pooled counts instead. |
+| Fold assignment **[v1.1]** | `configs/voc_sim_folds.csv`: 5 folds stratified by class (about 5 images per class per fold), fixed seed, committed before any run |
 
 “Call 0–30” always refers to recorded UNet call indices and is inclusive. It
 does not mean 31 scheduler updates.
@@ -72,6 +83,15 @@ The CA phase uses:
 - no learned or class-specific weights;
 - no token optimization;
 - no threshold tuning per configuration.
+
+**[v1.1] Calibration check.** A fixed min–max/0.45 rule can favour a
+configuration only because it shifts the map's value distribution (the earlier
+"max normalization" ablation lost 0.08 mIoU mostly for this reason). For every
+configuration also record mIoU at thresholds 0.35 and 0.55, and the
+threshold-free average precision of the 64×64 map against the 64×64
+nearest-downsampled target. These are diagnostics: a change is promoted on
+mIoU at 0.45, but a promotion whose sign reverses at 0.35 or 0.55 is flagged in
+Section 11 as calibration-dependent.
 
 When one CA axis is screened, every other CA axis stays at its inclusive
 reference value: calls 0–30, resolutions 8/16/32/64, all 16 CA modules, and all
@@ -122,6 +142,33 @@ Keep calls 0–30 and all 16 modules. Evaluate all 255 nonempty subsets of head
 indices 0–7. The same subset is used in every CA module. Per-module or
 class-specific head selection is outside this clean screen.
 
+**[v1.1] Required head report** (no extra computation; all are subsets of the
+255): each head alone; leave-one-head-out from all 8; the greedy backward
+elimination path (start from 8, at each round remove the head whose removal
+raises mIoU most, stop at 1); the greedy forward path; the rank of the chosen
+subset among all 255; and in how many of the 5 folds each head is retained.
+The same report is required for SA-H.
+
+### CA-A: attribution convention **[v1.1]**
+
+The current final method uses OVAM's convention (unconditional query, softmax
+over the unpadded prompt, first class-word piece), while this protocol fixes the
+conditional branch, the padded softmax, and all pieces. Screen this axis
+explicitly so that the SA phase is not frozen on one convention and the final
+method built on another. Keep calls 0–30, all modules and all heads; evaluate
+the 2 × 2 × 3 grid of query branch {conditional, unconditional}, softmax domain
+{padded 77, unpadded prompt}, and pieces {all averaged, first, last}. The
+capture must store the unconditional/unpadded per-head map (`ovam_target_map`)
+and the conditional/padded per-piece map; the remaining cells need one extra
+compact key per module (per-piece maps before averaging).
+
+### Figures **[v1.1]**
+
+For the report, render for 3–4 fixed images per dataset: every CA module's
+head-averaged map upsampled to 64×64 on a common colour scale, grouped by
+resolution; and each SA head's propagated map. Images are chosen by fixed
+index before any result is seen.
+
 ### CA-C: combined confirmation
 
 After CA-T, CA-R, CA-L, and CA-H are complete, combine only choices that pass
@@ -151,6 +198,26 @@ Mean image IoU is diagnostic and cannot override the primary pooled-class
 mIoU. Every promoted change must survive CA-C or SA-C; independently selected
 maxima are not assumed to be additive.
 
+## 5a. Cross-validated selection **[v1.1]**
+
+The decision rule above is applied inside each fold, not once on all 490
+images.
+
+1. For fold k = 1..5, apply Section 5 to the four other folds (pooled counts of
+   those images only) and record the chosen configuration.
+2. Score that choice on fold k. Pool fold k's counts with the other held-out
+   folds to obtain one out-of-fold mIoU over all 490 images. This is the
+   VOC-Sim number reported for the selection procedure.
+3. Freeze a change only if the decision rule chooses it in at least 4 of 5
+   folds. Otherwise keep the inclusive or simpler setting, even if it is not
+   the full-490 maximum.
+4. Report, for each promoted change, the out-of-fold mIoU, the full-490 mIoU
+   (labelled in-sample), and a paired per-image bootstrap interval (20,000
+   resamples, fixed seed) against its reference.
+5. The exhaustive layer search (65,535) and head search (255) are allowed in
+   this loop, because selection happens on the training folds only, but their
+   out-of-fold score is what is reported.
+
 ## 6. Fixed SA screening condition
 
 SA experiments begin only after the CA configuration is frozen in this file.
@@ -160,7 +227,17 @@ SA experiments begin only after the CA configuration is frozen in this file.
 3. Apply exactly one non-residual propagation pass, `y = A x`.
 4. For every selected SA module/call/head observation, resize the CA seed to
    the native SA resolution, propagate once, then resize the propagated map to
-   64×64.
+   64×64. **[v1.1]** Downsample the seed with area averaging
+   (`F.adaptive_avg_pool2d`), not bilinear interpolation: bilinear without
+   anti-aliasing samples only a few of the 64×64 values when going to 16×16 or
+   8×8. Upsample the result bilinearly as before. Do not re-apply min–max to
+   the resized seed, so that every resolution sees the same seed scale.
+   Orientation: `y = A x` with `A = softmax(Q Kᵀ / √d)` row-stochastic over keys,
+   so each query pixel takes the attention-weighted average of the seed over the
+   pixels it attends to. This matches `propagate_selected_module`
+   (`focused_self_attention.py`, `torch.matmul(affinity, current)`). As a
+   one-off operator check, also report `y = Aᵀ x` (column propagation) once for
+   the final candidate.
 5. Average all selected propagated observations equally.
 6. Min–max normalize once, resize to the annotation, and threshold at 0.45.
 
@@ -211,6 +288,14 @@ The following begin only after SA-C:
 - token optimization;
 - class-specific choices.
 
+**[v1.1]** The candidate fusion operators, propagation variants, and token
+methods for this phase are listed, with equations and priorities, in
+`docs/ATTENTION_FUSION_AND_TOKEN_IDEAS.md`. Exploratory results already exist
+for OVAM's released optimized tokens and DenseCRF on top of the earlier final
+method (`docs/narmyn/attention/TOKEN_CRF_EXPERIMENT.md`). They were run before
+this protocol and are not frozen choices; they must be re-run on the frozen
+CA/SA configuration and selected inside the folds.
+
 ## 9. Work split and handoff
 
 | Owner | Official responsibility |
@@ -221,6 +306,9 @@ The following begin only after SA-C:
 | Codex | SA-T, SA-R, joint SA time-resolution |
 | Claude | SA-L, SA-H, independent verification of the one-pass SA operator |
 | Both | Run or review combined confirmation and freeze the SA choice |
+| Claude **[v1.1]** | `configs/voc_sim_folds.csv`, a fold-aware/per-image metric writer that both runners use, and the cross-validated selection script for Section 5a |
+| Claude **[v1.1]** | CA-A (attribution convention) |
+| Codex **[v1.1]** | Adopt the per-image writer in the CA-T/CA-R runner and re-run (the pre-sync run stores only per-class totals, so it cannot be split into folds) |
 
 ### Instructions for Claude
 
@@ -245,8 +333,10 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 
 | Item | Owner | Status | Commit/job/output |
 |---|---|---|---|
-| Protocol draft | Codex | Ready for review | This commit |
-| Protocol audit | Claude | Pending | — |
+| Protocol draft | Codex | Ready for review | `5ee164f` |
+| Protocol audit | Claude | Changes requested (v1.1) | Commit on branch `narmyn/protocol-review-token-crf` |
+| Fold file + per-image writer + CV selection | Claude | Not started; waits for v1.1 acknowledgement | — |
+| CA-A attribution convention | Claude | Not started | — |
 | CA-T / CA-R official | Codex | Blocked on protocol acknowledgement | — |
 | CA-L / CA-H official | Claude | Blocked on protocol acknowledgement | — |
 | CA-C and frozen CA | Both | Not started | — |
@@ -264,6 +354,11 @@ evidence until Claude audits the implementation. If Claude confirms exact
 agreement, the run may be ratified as the official CA screen; otherwise rerun
 the affected families under the corrected protocol.
 
+**[v1.1] Audit result:** the implementation matches Section 3 exactly (see
+Section 12). The run is ratified as correct exploratory evidence, but it cannot
+be the official screen under Section 5a because it stores only per-class
+totals. Re-run with the per-image writer before any CA choice is frozen.
+
 ## 11. Frozen choices and results
 
 No CA or SA choice is frozen yet. Add selections here only after the relevant
@@ -274,3 +369,49 @@ combined confirmation.
 | CA | Pending | — | — |
 | SA | Pending | — | — |
 
+
+## 12. Claude audit of v1.0 **[v1.1]**
+
+Audited against `main` at `5ee164f` (`scripts/run_clean_ca_ablations.py`,
+`src/segmentation/ablation_runner.py`, `src/segmentation/exhaustive_layer_search.py`,
+`src/segmentation/attention_aggregation.py`, `src/attention_capture/memory.py`,
+`src/attention_capture/recorder.py`, `src/segmentation/focused_self_attention.py`).
+
+### Items the protocol asked to check
+
+| Item | Finding | Code |
+|---|---|---|
+| Token-piece averaging | Correct: per-head softmax over tokens, then mean over the class-name piece positions | `memory.py` (`target_maps`), `ablation_runner.target_token_positions` |
+| Conditional branch | Correct: query and key both from CFG index 1; `branch=1` is then ignored because the compact key is read | `memory.py`, `run_clean_ca_ablations.py:227` (`cross_map_kind="conditional"`) |
+| Softmax domain | Not stated in v1.0: all 77 padded positions, because the SD 1.5 pipeline passes no text attention mask. Added to Section 2 | `diffusers` `pipeline_stable_diffusion.py` UNet call; `recorder.py` (`prepared_mask` is `None`) |
+| Module-call weighting | Correct: every module-call observation has equal weight in the time, resolution, layer, head and exhaustive families | `ablation_runner.py` (`counts`), `exhaustive_layer_search.py` (per-layer call mean, then subset sum; min–max makes sum and mean identical) |
+| Resize order | Equivalent to Section 3: bilinear resizing is linear, so summing at native resolution and then resizing equals resizing each map first | `combine_resolution_sums`, `resize_map` |
+| Normalization order | Correct: min–max on the 64×64 map, then bilinear resize to the annotation | `attention_to_mask`, `exhaustive_layer_search.py` |
+| Threshold comparison | Correct: `>= 0.45` everywhere (OVAM itself uses strict `>` after max normalization) | `attention_to_mask` |
+| `y = A x` orientation | Correct and consistent: row-stochastic `A`, `torch.matmul(affinity, current)` | `focused_self_attention.py` |
+
+### Changes requested in v1.1
+
+1. **Cross-validated selection (Section 5a)** and a committed fold file. This is
+   the main change: v1.0 still chooses every setting on the same 490 images it
+   reports.
+2. **Per-image counts** for every configuration (Section 2), needed for folds and
+   paired bootstrap intervals. The pre-sync CA run must be re-run for this reason
+   only; its numbers are otherwise correct.
+3. **Calibration check** at thresholds 0.35/0.55 plus threshold-free AP
+   (Section 3), so that screens are not decided by a shift in map scale.
+4. **CA-A attribution-convention axis** (Section 4), because the current final
+   method and this protocol use different CA conventions.
+5. **Head report and figures** (Section 4, CA-H and Figures), which the
+   supervisor asked for: single heads, leave-one-out, the greedy elimination
+   path, rank among 255, and fold stability.
+6. **Seed downsampling by area averaging** for SA modules below 64×64, and one
+   `Aᵀ x` operator check (Section 6).
+7. **Pointer to the deferred-phase candidates and to the existing token/DenseCRF
+   results** (Section 8).
+8. **Work split** additions (Section 9) and status rows (Section 10).
+
+Codex: please review these changes. If you agree, set `Codex status` to
+`ACKNOWLEDGED (v1.1)` and push; Claude will then set its own status and start
+the fold file and per-image writer. If you disagree with an item, edit it and
+explain in the commit message.
