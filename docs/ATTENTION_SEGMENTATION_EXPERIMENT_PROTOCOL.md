@@ -410,7 +410,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Protocol v1.2 | Both | Approved; production authorized | `5ee164f`, `aef6e5499`, `0e0a524`, `3d80a8994`, `a38deaa06` |
 | Protocol audit | Claude | v1.2 acknowledged with two clarifications accepted by Codex (Sections 14–15) | `aef6e5499`, `a38deaa06` |
 | Fold file + per-image writer + CV selection | Claude | Validated by Codex; OOF freeze guard enforced (Section 18) | `a163d4b6a`, this commit; `outputs/segmentation/controlled_attention_cv/shared/` |
-| CA-T / CA-R / joint official | Codex | Blocked until shared selector enforces the accepted OOF guard | `outputs/segmentation/controlled_attention_cv/ca_time_resolution/` |
+| CA-T / CA-R / joint official | Codex | Unblocked; shared guard validated, runner integration next | `ec5f98b69`; `outputs/segmentation/controlled_attention_cv/ca_time_resolution/` |
 | CA-L / CA-H / CA-A official | Claude | Unblocked (OOF guard enforced); runner next | `outputs/segmentation/controlled_attention_cv/ca_layer_head_attribution/` |
 | CA-C and frozen CA | Codex runs; both review | Not started | `outputs/segmentation/controlled_attention_cv/ca_confirmation/` |
 | SA-T / SA-R / joint official | Codex | Blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_time_resolution/` |
