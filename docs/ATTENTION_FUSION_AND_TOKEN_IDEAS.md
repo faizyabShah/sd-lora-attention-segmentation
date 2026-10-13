@@ -27,7 +27,7 @@ Citations: names tagged **[OVAM n]** are in the OVAM paper's reference list
 
 | ID | Method | Equation | Extra setting | Status |
 |---|---|---|---|---|
-| F1 | Upstream OVAM fusion reference | `c ⊙ norm_[α,1](S₁)`, where the released hook uses an all-ones value tensor | α | Historical/reference-fidelity baseline; no repair planned |
+| F1 | Upstream OVAM fusion reference | `c ⊙ norm_[α,1](S₁)`, where the released hook uses an all-ones value tensor | α | Reference-fidelity baseline, reproduced in `ovam_full.py`; no repair planned |
 | F2 | Column-mass gate | `c ⊙ norm_[α,1](Σᵢ Aᵢⱼ)` | α | Deferred optional fusion proposal; not an OVAM repair |
 | F3 | Gating | `c ⊙ (A c)` | — | Not run |
 | F4 | Geometric mean | `√(c ⊙ A c)` | — | Not run |
