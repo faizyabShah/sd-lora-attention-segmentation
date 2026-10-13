@@ -53,6 +53,8 @@ def generate_attention_sample(
     if cross_map_kind not in ("ovam", "conditional"):
         raise ValueError(f"Unknown cross-map kind: {cross_map_kind}")
     prompt = row["prompt"]
+    separate_attribution_prompt = row.get("attribution_prompt", "").strip()
+    attribution_prompt = separate_attribution_prompt or prompt
     classname = row["classname"]
     seed = int(row["seed"])
     steps = int(row["num_inferece_steps"])
@@ -62,7 +64,7 @@ def generate_attention_sample(
         raise FileNotFoundError(f"No annotation for {row['image_id']}: {annotation_path}")
 
     tokenized = pipe.tokenizer(
-        prompt,
+        attribution_prompt,
         padding="max_length",
         max_length=pipe.tokenizer.model_max_length,
         truncation=True,
@@ -70,13 +72,29 @@ def generate_attention_sample(
     )
     class_ids = pipe.tokenizer(classname, add_special_tokens=False)["input_ids"]
     target_positions = find_token_subsequence(tokenized.input_ids[0].tolist(), class_ids)
-    short_tokens = pipe.tokenizer(prompt, padding=False, return_tensors="pt")
+    short_tokens = pipe.tokenizer(attribution_prompt, padding=False, return_tensors="pt")
     prompt_token_count = int(short_tokens.input_ids.shape[1])
+    attribution_hidden_states = None
+    if separate_attribution_prompt:
+        attribution_inputs = {
+            key: value.to(pipe.device) for key, value in short_tokens.items()
+        }
+        attribution_hidden_states = pipe.text_encoder(**attribution_inputs)[0]
+
+    # The released implementations use different indexing in these two cases:
+    # VOC selects len(prompt.split()), while COCO's separately encoded class
+    # selects -2 (the final token before EOT).
+    ovam_target_position = (
+        prompt_token_count - 2
+        if separate_attribution_prompt
+        else len(prompt.split())
+    )
 
     recorder = CompactAttentionRecorder(
         target_positions=target_positions,
         prompt_token_count=prompt_token_count,
-        ovam_target_position=len(prompt.split()),
+        ovam_target_position=ovam_target_position,
+        attribution_hidden_states=attribution_hidden_states,
         storage_dtype=storage_dtype,
     )
     _install(pipe, recorder)
@@ -120,7 +138,11 @@ def generate_attention_sample(
     )
     recorder.finalize()
     generated_image = np.asarray(result.images[0].convert("RGB")).copy()
-    del result, initial_noise, prompt_embeds, negative_prompt_embeds
+    # The recorder is retained by the installed attention processors. Drop the
+    # separate attribution encoding as soon as its final cross-attention map is
+    # captured so it cannot accumulate across streaming samples.
+    recorder.attribution_hidden_states = None
+    del result, initial_noise, prompt_embeds, negative_prompt_embeds, attribution_hidden_states
 
     cross: dict[int, list[str]] = {}
     self_attention: dict[int, list[str]] = {}

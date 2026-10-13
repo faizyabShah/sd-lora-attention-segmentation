@@ -22,6 +22,7 @@ class CompactAttentionRecorder:
         target_positions: Sequence[int],
         prompt_token_count: int,
         ovam_target_position: int,
+        attribution_hidden_states: torch.Tensor | None = None,
         storage_dtype: str = "float16",
     ) -> None:
         self.dtype = _storage_dtype(storage_dtype)
@@ -29,8 +30,7 @@ class CompactAttentionRecorder:
         self.target_positions = tuple(int(value) for value in target_positions)
         self.prompt_token_count = int(prompt_token_count)
         self.ovam_target_position = int(ovam_target_position)
-        if not self.target_positions:
-            raise ValueError("At least one target prompt position is required")
+        self.attribution_hidden_states = attribution_hidden_states
         if not 0 <= self.ovam_target_position < self.prompt_token_count:
             raise ValueError("OVAM target position is outside the unpadded prompt")
         self.step_tensors: dict[int, dict[str, torch.Tensor]] = {}
@@ -63,6 +63,7 @@ class CompactAttentionRecorder:
         value: torch.Tensor,
         attention_mask: torch.Tensor | None,
         scale: float,
+        attribution_key: torch.Tensor | None = None,
     ) -> None:
         del value
         step = self.call_counts[module_name]
@@ -107,16 +108,20 @@ class CompactAttentionRecorder:
             if attention_mask is not None:
                 scores = scores + attention_mask[conditional].float()
             probabilities = scores.softmax(dim=-1)
-            bucket[f"{module_name}.target_maps"] = self._cpu(
-                probabilities[:, :, list(self.target_positions)].mean(dim=-1)
-            )
+            if self.target_positions:
+                bucket[f"{module_name}.target_maps"] = self._cpu(
+                    probabilities[:, :, list(self.target_positions)].mean(dim=-1)
+                )
 
             # OVAM uses the unconditional query and an unpadded prompt. CLIP is
             # causal, so the corresponding prefix K is identical to encoding the
             # short prompt separately, including its final EOT token.
+            if attribution_key is None:
+                target_key = key[conditional, :, : self.prompt_token_count]
+            else:
+                target_key = attribution_key[0]
             ovam_scores = torch.matmul(
-                query[0].float(),
-                key[conditional, :, : self.prompt_token_count].float().transpose(-1, -2),
+                query[0].float(), target_key.float().transpose(-1, -2)
             ) * scale
             bucket[f"{module_name}.ovam_target_map"] = self._cpu(
                 ovam_scores.softmax(dim=-1)[:, :, self.ovam_target_position]

@@ -130,14 +130,21 @@ def apply_ovam_densecrf(
 def ovam_full_prediction(
     sample: Any,
     densecrf_site_packages: Path | None = None,
+    self_attention_minimum: float = OVAM_SA_MIN,
+    threshold: float = OVAM_THRESHOLD,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
     """Compute live CA, live SA, fused score, and post-CRF OVAM mask."""
     if sample.generated_image is None:
         raise ValueError("The sample has no generated image for DenseCRF")
     ca = ovam_cross_attention_map(sample)
     sa = ovam_self_attention_map(sample)
-    fused = fuse_ovam_maps(ca, sa, sample.generated_image.shape[:2])
-    thresholded = fused > OVAM_THRESHOLD
+    fused = fuse_ovam_maps(
+        ca,
+        sa,
+        sample.generated_image.shape[:2],
+        self_attention_minimum=self_attention_minimum,
+    )
+    thresholded = fused > threshold
     prediction = apply_ovam_densecrf(
         sample.generated_image,
         thresholded.cpu().numpy(),

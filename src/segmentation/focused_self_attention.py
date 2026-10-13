@@ -48,6 +48,7 @@ class PropagationSummary:
     per_head: dict[int, torch.Tensor] | None = None  # iteration -> [head, tokens]
     per_step: dict[int, torch.Tensor] | None = None  # iteration -> [step, tokens]
     per_step_head: dict[int, torch.Tensor] | None = None  # iteration -> [step, head, tokens]
+    per_step_head_columns: dict[int, torch.Tensor] | None = None  # iteration -> [step, head, tokens, seed]
 
 
 def _entropy(attention_map: torch.Tensor) -> float:
@@ -170,6 +171,7 @@ def propagate_selected_module(
     device: str,
     track_seed_column: int | None = None,
     track_step_heads: bool = False,
+    track_seed_columns: Sequence[int] | None = None,
 ) -> PropagationSummary:
     """Propagate seed columns through one SA module and retain compact aggregates."""
     compute_device = torch.device(device)
@@ -186,8 +188,12 @@ def propagate_selected_module(
     per_head: dict[int, torch.Tensor] | None = None
     per_step: dict[int, torch.Tensor] | None = None
     per_step_head: dict[int, torch.Tensor] | None = None
+    per_step_head_columns: dict[int, torch.Tensor] | None = None
     if track_step_heads and track_seed_column is None:
         raise ValueError("track_step_heads requires track_seed_column")
+    tracked_columns = tuple(int(value) for value in (track_seed_columns or ()))
+    if any(value < 0 or value >= seeds.shape[1] for value in tracked_columns):
+        raise ValueError("track_seed_columns contains an invalid seed-column index")
     observed_heads: int | None = None
     seeds_device = seeds.to(device=compute_device, dtype=torch.float32)
 
@@ -218,6 +224,19 @@ def propagate_selected_module(
                         )
                         for iteration in ITERATIONS
                     }
+            if tracked_columns:
+                per_step_head_columns = {
+                    iteration: torch.zeros(
+                        (
+                            len(sample.timesteps),
+                            head_count,
+                            token_count,
+                            len(tracked_columns),
+                        ),
+                        dtype=torch.float32,
+                    )
+                    for iteration in ITERATIONS
+                }
         elif head_count != observed_heads:
             raise RuntimeError("Self-attention head count changed between denoising steps")
 
@@ -238,6 +257,10 @@ def propagate_selected_module(
                     per_head[iteration][head] += tracked
                     if per_step_head is not None:
                         per_step_head[iteration][step_index, head] = tracked
+                if per_step_head_columns is not None:
+                    per_step_head_columns[iteration][step_index, head] = current[
+                        :, list(tracked_columns)
+                    ].cpu()
             del q, k, affinity, current
         for iteration in ITERATIONS:
             aggregate[iteration] += step_sums[iteration].cpu()
@@ -259,6 +282,7 @@ def propagate_selected_module(
         per_head=per_head,
         per_step=per_step,
         per_step_head=per_step_head,
+        per_step_head_columns=per_step_head_columns,
     )
 
 

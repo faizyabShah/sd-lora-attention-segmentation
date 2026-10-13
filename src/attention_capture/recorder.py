@@ -68,7 +68,9 @@ class AttentionRecorder:
         value: torch.Tensor,
         attention_mask: torch.Tensor | None,
         scale: float,
+        attribution_key: torch.Tensor | None = None,
     ) -> None:
+        del attribution_key
         step = self.call_counts[module_name]
         self.call_counts[module_name] += 1
         bucket = self.step_tensors.setdefault(step, {})
@@ -210,6 +212,22 @@ class RecordingAttnProcessor:
             if attn.norm_k is not None:
                 key = attn.norm_k(key)
 
+            attribution_key = None
+            attribution_hidden_states = getattr(
+                self.recorder, "attribution_hidden_states", None
+            )
+            if self.kind == "cross" and attribution_hidden_states is not None:
+                if attn.norm_cross:
+                    attribution_hidden_states = attn.norm_encoder_hidden_states(
+                        attribution_hidden_states
+                    )
+                attribution_key = attn.to_k(attribution_hidden_states)
+                attribution_key = attribution_key.view(
+                    attribution_key.shape[0], -1, attn.heads, head_dim
+                ).transpose(1, 2)
+                if attn.norm_k is not None:
+                    attribution_key = attn.norm_k(attribution_key)
+
             self.recorder.record(
                 self.module_name,
                 self.kind,
@@ -218,6 +236,7 @@ class RecordingAttnProcessor:
                 value,
                 prepared_mask,
                 float(attn.scale),
+                attribution_key=attribution_key,
             )
 
         return self.original(
