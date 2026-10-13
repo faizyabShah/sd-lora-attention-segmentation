@@ -1,0 +1,8 @@
+configuration,label,miou,change_from_full,impact_if_removed
+revised_full_system,"Revised full system: one SA pass, all CA layers",0.7824100095847129,0.0,0.0
+without_ca_head_filter,Without CA head filtering,0.7624702885247137,-0.019939721059999194,0.019939721059999194
+without_sa_propagation,Without SA propagation,0.6969247483714536,-0.08548526121325928,0.08548526121325928
+all_sa_calls,All SA calls instead of calls 15--30,0.7802089241010381,-0.002201085483674703,0.002201085483674703
+all_sa_heads,All SA heads,0.783692622716641,0.001282613131928123,-0.001282613131928123
+max_normalization,Max normalization instead of percentile 1--99,0.7803598498037154,-0.0020501597809974292,0.0020501597809974292
+without_component_cleanup,Without 1% component cleanup,0.7823555473323401,-5.4462252372711184e-05,5.4462252372711184e-05

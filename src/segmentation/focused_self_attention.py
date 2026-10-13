@@ -71,6 +71,7 @@ def _normalize_seed(attention_map: torch.Tensor, method: str) -> torch.Tensor:
 def build_cross_attention_layer_heads(
     sample: Any,
     tokenizer: Any,
+    step_indices: Sequence[int] | None = None,
 ) -> tuple[tuple[str, ...], dict[int, int], torch.Tensor]:
     """Return timestep-averaged CA maps as ``[layer, head, 64, 64]``.
 
@@ -91,7 +92,18 @@ def build_cross_attention_layer_heads(
     head_count = 8
     layer_heads = torch.zeros((len(modules), head_count, 64, 64), dtype=torch.float32)
     layer_counts = torch.zeros(len(modules), dtype=torch.float32)
-    for step_index in range(len(sample.timesteps)):
+    chosen_steps = (
+        tuple(range(len(sample.timesteps)))
+        if step_indices is None
+        else tuple(int(index) for index in step_indices)
+    )
+    if not chosen_steps:
+        raise ValueError("At least one CA timestep must be selected")
+    if min(chosen_steps) < 0 or max(chosen_steps) >= len(sample.timesteps):
+        raise ValueError(
+            f"CA timestep indices {chosen_steps} exceed 0--{len(sample.timesteps) - 1}"
+        )
+    for step_index in chosen_steps:
         step_maps = load_step_module_head_maps(sample, step_index, positions, modules, branch=1)
         for module_name, (heads, _) in step_maps.items():
             index = module_index[module_name]

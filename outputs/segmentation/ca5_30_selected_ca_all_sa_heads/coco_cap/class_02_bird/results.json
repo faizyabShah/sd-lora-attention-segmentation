@@ -1,0 +1,37 @@
+{
+  "results": {
+    "ca_steps_05_30_selected_ca_all_sa_heads": {
+      "background_iou": 0.9568653513061707,
+      "fn": 26640,
+      "fp": 456187,
+      "image_iou_sum": 37.36003226625066,
+      "images": 48,
+      "iou": 0.7421147226205832,
+      "mean_image_iou": 0.7783340055468888,
+      "tn": 10710657,
+      "tp": 1389428
+    }
+  },
+  "settings": {
+    "ca_steps": [
+      5,
+      30
+    ],
+    "class_shard": 2,
+    "classname": "bird",
+    "completed": 48,
+    "component_labels": {
+      "ca_steps_05_30_selected_ca_all_sa_heads": "CA calls 5--30, selected CA heads, and all SA heads"
+    },
+    "dataset": "coco_cap",
+    "expected": 48,
+    "fixed_settings": "all 16 CA layers; frozen CA head filtering; one final-64 SA pass; SA calls 15--30; percentile 1--99; threshold 0.45; 1% cleanup",
+    "fixed_stage1_results": "outputs/segmentation/voc_sim_100_stage1_suite/results.json",
+    "manifest": "datasets/ovam_experiment_with_dataset/evaluation/ovam/coco_captions/ovam_coco_cap.csv",
+    "model": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+    "model_dtype": "float32",
+    "sa_heads": "all",
+    "storage_dtype": "float16",
+    "suite": "revised_parameterized_candidate_v1"
+  }
+}

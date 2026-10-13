@@ -1,0 +1,37 @@
+{
+  "results": {
+    "ca_steps_10_30_all_sa_heads": {
+      "background_iou": 0.9305791375287814,
+      "fn": 85557,
+      "fp": 346161,
+      "image_iou_sum": 32.40745646734882,
+      "images": 37,
+      "iou": 0.8896481387047425,
+      "mean_image_iou": 0.8758772018202384,
+      "tn": 5787133,
+      "tp": 3480477
+    }
+  },
+  "settings": {
+    "ca_steps": [
+      10,
+      30
+    ],
+    "class_shard": 5,
+    "classname": "bus",
+    "completed": 37,
+    "component_labels": {
+      "ca_steps_10_30_all_sa_heads": "CA calls 10--30 and all SA heads"
+    },
+    "dataset": "coco_cap",
+    "expected": 37,
+    "fixed_settings": "all 16 CA layers; frozen CA head filtering; one final-64 SA pass; SA calls 15--30; percentile 1--99; threshold 0.45; 1% cleanup",
+    "fixed_stage1_results": "outputs/segmentation/voc_sim_100_stage1_suite/results.json",
+    "manifest": "datasets/ovam_experiment_with_dataset/evaluation/ovam/coco_captions/ovam_coco_cap.csv",
+    "model": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+    "model_dtype": "float32",
+    "sa_heads": "all",
+    "storage_dtype": "float16",
+    "suite": "revised_parameterized_candidate_v1"
+  }
+}

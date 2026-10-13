@@ -324,6 +324,159 @@ def frozen_one_pass_without_ca_layer_filter(
 
 
 @torch.inference_mode()
+def frozen_revised_stages(
+    sample: Any,
+    tokenizer: Any,
+    fixed_head_rankings: Mapping[str, Sequence[int]],
+    device: str = "cuda",
+) -> tuple[MethodStage, ...]:
+    """Return presentation stages ending at the revised final system.
+
+    The revised system keeps all 16 CA layers and performs one propagation
+    pass.  Fixed top-four head rankings are available for the 12 layers used
+    during development; the four restored layers retain their all-head mean.
+    """
+    target_shape = tuple(sample.load_target_mask().shape)
+    modules, _, layer_heads = build_cross_attention_layer_heads(sample, tokenizer)
+    selected = set(BEST_12_INDICES)
+    restored_layer_maps = []
+    for index in range(len(modules)):
+        if index in selected:
+            ranking = fixed_head_rankings.get(str(index))
+            if ranking is None or len(ranking) < 4:
+                raise ValueError(f"Missing fixed top-four head ranking for CA layer {index}")
+            restored_layer_maps.append(
+                layer_heads[index, [int(value) for value in ranking[:4]]].mean(dim=0)
+            )
+        else:
+            restored_layer_maps.append(layer_heads[index].mean(dim=0))
+
+    all_heads_seed = normalize_map(layer_heads.mean(dim=(0, 1)), BEST_NORMALIZATION)
+    revised_seed = normalize_map(
+        torch.stack(restored_layer_maps).mean(dim=0), BEST_NORMALIZATION
+    )
+    propagated = propagate_selected_module(
+        sample,
+        BEST_SA_MODULE,
+        revised_seed.flatten()[:, None],
+        device,
+        track_seed_column=0,
+        track_step_heads=True,
+    )
+    if propagated.per_step_head is None:
+        raise RuntimeError("Per-step/per-head propagation was not recorded")
+    step_count = len(sample.timesteps)
+    if step_count <= BEST_LATE_STEP_START:
+        raise ValueError(
+            f"Need more than {BEST_LATE_STEP_START} denoising calls; found {step_count}"
+        )
+    values = propagated.per_step_head[1].reshape(step_count, 8, 64, 64)
+    one_all = values.mean(dim=(0, 1))
+    one_late = values[BEST_LATE_STEP_START:].mean(dim=(0, 1))
+    final_score = values[BEST_LATE_STEP_START:, list(BEST_SA_HEADS)].mean(dim=(0, 1))
+    max_prediction = _configured_prediction(
+        final_score, target_shape, normalization="max"
+    )
+
+    return (
+        _stage("all_ca", "All 16 CA layers/all heads", all_heads_seed, target_shape),
+        _stage(
+            "selected_ca_heads",
+            "Filter CA heads; retain all 16 layers",
+            revised_seed,
+            target_shape,
+        ),
+        _stage("sa_one_pass", "+ final 64x64 SA (1 pass)", one_all, target_shape),
+        _stage("late_sa_steps", "+ SA denoising calls 15-end", one_late, target_shape),
+        MethodStage(
+            "max_normalization",
+            "Max-normalized alternative",
+            final_score.detach().cpu(),
+            max_prediction.bool(),
+        ),
+        _stage(
+            "selected_sa_heads",
+            "+ SA heads 0,1,2,4,5,6; percentile",
+            final_score,
+            target_shape,
+        ),
+        _stage(
+            "final_cleanup",
+            "+ remove components under 1%",
+            final_score,
+            target_shape,
+            BEST_POSTPROCESSING,
+        ),
+    )
+
+
+@torch.inference_mode()
+def frozen_revised_candidate(
+    sample: Any,
+    tokenizer: Any,
+    fixed_head_rankings: Mapping[str, Sequence[int]],
+    device: str = "cuda",
+    ca_step_start: int = 0,
+    sa_heads: Sequence[int] | None = BEST_SA_HEADS,
+) -> torch.Tensor:
+    """Evaluate a parameterized one-pass, all-CA-layer candidate.
+
+    ``ca_step_start`` selects a trailing inclusive CA window through the last
+    recorded call.  Passing ``sa_heads=None`` uses all SA heads.  All other
+    revised-system settings remain frozen.
+    """
+    step_count = len(sample.timesteps)
+    if not 0 <= ca_step_start < step_count:
+        raise ValueError(
+            f"ca_step_start must be in 0--{step_count - 1}, found {ca_step_start}"
+        )
+    target_shape = tuple(sample.load_target_mask().shape)
+    modules, _, layer_heads = build_cross_attention_layer_heads(
+        sample,
+        tokenizer,
+        step_indices=range(ca_step_start, step_count),
+    )
+    selected = set(BEST_12_INDICES)
+    restored_layer_maps = []
+    for index in range(len(modules)):
+        if index in selected:
+            ranking = fixed_head_rankings.get(str(index))
+            if ranking is None or len(ranking) < 4:
+                raise ValueError(f"Missing fixed top-four head ranking for CA layer {index}")
+            restored_layer_maps.append(
+                layer_heads[index, [int(value) for value in ranking[:4]]].mean(dim=0)
+            )
+        else:
+            restored_layer_maps.append(layer_heads[index].mean(dim=0))
+    seed = normalize_map(
+        torch.stack(restored_layer_maps).mean(dim=0), BEST_NORMALIZATION
+    )
+    propagated = propagate_selected_module(
+        sample,
+        BEST_SA_MODULE,
+        seed.flatten()[:, None],
+        device,
+        track_seed_column=0,
+        track_step_heads=True,
+    )
+    if propagated.per_step_head is None:
+        raise RuntimeError("Per-step/per-head propagation was not recorded")
+    if step_count <= BEST_LATE_STEP_START:
+        raise ValueError(
+            f"Need more than {BEST_LATE_STEP_START} denoising calls; found {step_count}"
+        )
+    values = propagated.per_step_head[1].reshape(step_count, 8, 64, 64)
+    late = values[BEST_LATE_STEP_START:]
+    if sa_heads is not None:
+        chosen_heads = tuple(int(index) for index in sa_heads)
+        if not chosen_heads or min(chosen_heads) < 0 or max(chosen_heads) >= 8:
+            raise ValueError(f"Invalid SA heads: {chosen_heads}")
+        late = late[:, list(chosen_heads)]
+    score = late.mean(dim=(0, 1))
+    return _configured_prediction(score, target_shape)
+
+
+@torch.inference_mode()
 def frozen_revised_component_ablations(
     sample: Any,
     tokenizer: Any,

@@ -1,0 +1,37 @@
+{
+  "results": {
+    "ca_steps_05_30_selected_ca_all_sa_heads": {
+      "background_iou": 0.8780868203328878,
+      "fn": 68788,
+      "fp": 994060,
+      "image_iou_sum": 26.332439425982134,
+      "images": 41,
+      "iou": 0.6563342008659806,
+      "mean_image_iou": 0.6422546201459057,
+      "tn": 7655225,
+      "tp": 2029831
+    }
+  },
+  "settings": {
+    "ca_steps": [
+      5,
+      30
+    ],
+    "class_shard": 13,
+    "classname": "motorbike",
+    "completed": 41,
+    "component_labels": {
+      "ca_steps_05_30_selected_ca_all_sa_heads": "CA calls 5--30, selected CA heads, and all SA heads"
+    },
+    "dataset": "coco_cap",
+    "expected": 41,
+    "fixed_settings": "all 16 CA layers; frozen CA head filtering; one final-64 SA pass; SA calls 15--30; percentile 1--99; threshold 0.45; 1% cleanup",
+    "fixed_stage1_results": "outputs/segmentation/voc_sim_100_stage1_suite/results.json",
+    "manifest": "datasets/ovam_experiment_with_dataset/evaluation/ovam/coco_captions/ovam_coco_cap.csv",
+    "model": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+    "model_dtype": "float32",
+    "sa_heads": "all",
+    "storage_dtype": "float16",
+    "suite": "revised_parameterized_candidate_v1"
+  }
+}

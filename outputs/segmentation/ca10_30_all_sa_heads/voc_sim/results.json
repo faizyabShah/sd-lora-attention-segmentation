@@ -1,0 +1,257 @@
+{
+  "results": {
+    "ca_steps_10_30_all_sa_heads": {
+      "change_from_all_sa_heads": -0.003349075756165276,
+      "change_from_revised_full": -0.002066462624237153,
+      "classes": 20,
+      "comparisons": {
+        "revised_all_sa_heads": 0.783692622716641,
+        "revised_full_system": 0.7824100095847129
+      },
+      "images": 490,
+      "mean_image_iou": 0.7831339669054181,
+      "miou": 0.7803435469604757,
+      "overall_pixel_iou": 0.7639875855556287,
+      "per_class": {
+        "aeroplane": {
+          "background_iou": 0.9383571634264569,
+          "fn": 6618,
+          "fp": 305695,
+          "image_iou_sum": 19.06537177058005,
+          "images": 24,
+          "iou": 0.79683999490007,
+          "mean_image_iou": 0.7943904904408354,
+          "tn": 4754180,
+          "tp": 1224963
+        },
+        "bicycle": {
+          "background_iou": 0.8490286345535938,
+          "fn": 47995,
+          "fp": 617560,
+          "image_iou_sum": 19.08955024632026,
+          "images": 25,
+          "iou": 0.7632041470539053,
+          "mean_image_iou": 0.7635820098528104,
+          "tn": 3742930,
+          "tp": 2145115
+        },
+        "bird": {
+          "background_iou": 0.9684746140130183,
+          "fn": 24625,
+          "fp": 146114,
+          "image_iou_sum": 21.243130853452882,
+          "images": 25,
+          "iou": 0.8695072981264397,
+          "mean_image_iou": 0.8497252341381153,
+          "tn": 5245182,
+          "tp": 1137679
+        },
+        "boat": {
+          "background_iou": 0.9534110976040462,
+          "fn": 32211,
+          "fp": 206552,
+          "image_iou_sum": 20.80805802425553,
+          "images": 25,
+          "iou": 0.8568114746085843,
+          "mean_image_iou": 0.8323223209702212,
+          "tn": 4886127,
+          "tp": 1428710
+        },
+        "bottle": {
+          "background_iou": 0.9684771601325722,
+          "fn": 40908,
+          "fp": 125908,
+          "image_iou_sum": 21.9581274039644,
+          "images": 25,
+          "iou": 0.8832235333813555,
+          "mean_image_iou": 0.878325096158576,
+          "tn": 5125093,
+          "tp": 1261691
+        },
+        "bus": {
+          "background_iou": 0.9518359227973106,
+          "fn": 16701,
+          "fp": 187273,
+          "image_iou_sum": 22.66420513908436,
+          "images": 25,
+          "iou": 0.9191411056564042,
+          "mean_image_iou": 0.9065682055633744,
+          "tn": 4031008,
+          "tp": 2318618
+        },
+        "car": {
+          "background_iou": 0.9021000751184872,
+          "fn": 138766,
+          "fp": 259775,
+          "image_iou_sum": 19.54067236017093,
+          "images": 23,
+          "iou": 0.8309082369552867,
+          "mean_image_iou": 0.8495944504422144,
+          "tn": 3672361,
+          "tp": 1958410
+        },
+        "cat": {
+          "background_iou": 0.6066359434020625,
+          "fn": 1254139,
+          "fp": 30304,
+          "image_iou_sum": 18.351016335303978,
+          "images": 25,
+          "iou": 0.7191102101245089,
+          "mean_image_iou": 0.7340406534121591,
+          "tn": 1980835,
+          "tp": 3288322
+        },
+        "chair": {
+          "background_iou": 0.8721822181617099,
+          "fn": 31493,
+          "fp": 606466,
+          "image_iou_sum": 15.856036570859429,
+          "images": 24,
+          "iou": 0.6708590974871728,
+          "mean_image_iou": 0.6606681904524762,
+          "tn": 4353201,
+          "tp": 1300296
+        },
+        "cow": {
+          "background_iou": 0.9291611840677758,
+          "fn": 138548,
+          "fp": 130794,
+          "image_iou_sum": 22.89173645202342,
+          "images": 25,
+          "iou": 0.9108363753372081,
+          "mean_image_iou": 0.9156694580809368,
+          "tn": 3532839,
+          "tp": 2751419
+        },
+        "dining-table": {
+          "background_iou": 0.6548608475460778,
+          "fn": 415226,
+          "fp": 1447178,
+          "image_iou_sum": 9.494432359279717,
+          "images": 25,
+          "iou": 0.3832911466177115,
+          "mean_image_iou": 0.3797772943711887,
+          "tn": 3533692,
+          "tp": 1157504
+        },
+        "dog": {
+          "background_iou": 0.9161111728304171,
+          "fn": 258268,
+          "fp": 89838,
+          "image_iou_sum": 22.03898988172946,
+          "images": 25,
+          "iou": 0.8735123605834828,
+          "mean_image_iou": 0.8815595952691784,
+          "tn": 3801505,
+          "tp": 2403989
+        },
+        "horse": {
+          "background_iou": 0.9264728325123606,
+          "fn": 169151,
+          "fp": 110772,
+          "image_iou_sum": 20.454586179859795,
+          "images": 23,
+          "iou": 0.888127726138074,
+          "mean_image_iou": 0.8893298339069476,
+          "tn": 3527146,
+          "tp": 2222243
+        },
+        "motorbike": {
+          "background_iou": 0.9175520978560654,
+          "fn": 36997,
+          "fp": 308068,
+          "image_iou_sum": 21.794159741957362,
+          "images": 25,
+          "iou": 0.8728300415417319,
+          "mean_image_iou": 0.8717663896782945,
+          "tn": 3840184,
+          "tp": 2368351
+        },
+        "person": {
+          "background_iou": 0.6191006067149378,
+          "fn": 1060444,
+          "fp": 562435,
+          "image_iou_sum": 13.869328972306102,
+          "images": 24,
+          "iou": 0.5558240516081709,
+          "mean_image_iou": 0.5778887071794209,
+          "tn": 2637771,
+          "tp": 2030806
+        },
+        "potted-plant": {
+          "background_iou": 0.610031669207502,
+          "fn": 1633885,
+          "fp": 214786,
+          "image_iou_sum": 13.314064515150505,
+          "images": 25,
+          "iou": 0.4951336863930017,
+          "mean_image_iou": 0.5325625806060202,
+          "tn": 2891896,
+          "tp": 1813033
+        },
+        "sheep": {
+          "background_iou": 0.8456738437736958,
+          "fn": 499287,
+          "fp": 86457,
+          "image_iou_sum": 21.620879598098398,
+          "images": 25,
+          "iou": 0.8248294630440959,
+          "mean_image_iou": 0.8648351839239359,
+          "tn": 3209750,
+          "tp": 2758106
+        },
+        "sofa": {
+          "background_iou": 0.9454200938908618,
+          "fn": 79132,
+          "fp": 103028,
+          "image_iou_sum": 23.60730963556015,
+          "images": 25,
+          "iou": 0.946396223017137,
+          "mean_image_iou": 0.944292385422406,
+          "tn": 3155332,
+          "tp": 3216108
+        },
+        "train": {
+          "background_iou": 0.9067928972742534,
+          "fn": 1964,
+          "fp": 459095,
+          "image_iou_sum": 18.70397304947405,
+          "images": 25,
+          "iou": 0.7770562718230837,
+          "mean_image_iou": 0.748158921978962,
+          "tn": 4485549,
+          "tp": 1606992
+        },
+        "tv": {
+          "background_iou": 0.7510851161488519,
+          "fn": 689248,
+          "fp": 94922,
+          "image_iou_sum": 17.37001469422408,
+          "images": 22,
+          "iou": 0.7694284948120896,
+          "mean_image_iou": 0.7895461224647309,
+          "tn": 2366184,
+          "tp": 2616814
+        }
+      }
+    }
+  },
+  "settings": {
+    "ca_steps": [
+      10,
+      30
+    ],
+    "dataset": "voc_sim",
+    "fixed_settings": "all 16 CA layers; frozen CA head filtering; one final-64 SA pass; SA calls 15--30; percentile 1--99; threshold 0.45; 1% cleanup",
+    "fixed_stage1_results": "outputs/segmentation/voc_sim_100_stage1_suite/results.json",
+    "manifest": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/ovam_voc_sim.csv",
+    "method_labels": {
+      "ca_steps_10_30_all_sa_heads": "CA calls 10--30 and all SA heads"
+    },
+    "model": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+    "model_dtype": "float32",
+    "sa_heads": "all",
+    "storage_dtype": "float16",
+    "suite": "revised_parameterized_candidate_v1"
+  }
+}

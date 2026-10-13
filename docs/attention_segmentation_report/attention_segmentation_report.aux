@@ -1,0 +1,29 @@
+\relax 
+\@writefile{toc}{\contentsline {section}{\numberline {1}Experimental protocol}{1}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Cross-attention ablations}{1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Denoising time}{1}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces CA-only time-window ablation on all 490 VOC-Sim images. Very early calls are poorly localized; calls 15--20 are strongest in this aggregation.\relax }}{1}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces CA time-window mIoU under the fixed configuration above.\relax }}{1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Resolution}{2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces CA-only resolution screening. Combining $8\times 8$ and $16\times 16$ maps is best in isolation. The end-to-end revised system retains all layers and therefore all four resolutions.\relax }}{2}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces CA resolution mIoU under the fixed configuration above.\relax }}{2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Individual layers}{2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Mean image IoU for individual CA modules. Individual quality varies substantially, with the middle $8\times 8$ block strongest.\relax }}{3}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Individual CA-module screening; every listed module is retained by the final system.\relax }}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}What CA head filtering contributes}{3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Both seeds retain all 16 CA layers. Head filtering improves the raw seed and its output after the revised one-pass SA pipeline.\relax }}{4}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Matched CA-head comparison for the revised all-layer system.\relax }}{4}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Self-attention ablations}{4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Which SA module?}{4}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Mean image IoU for every SA module under the fixed configuration above. The final $64\times 64$ upsampling module is best.\relax }}{5}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces SA-module screening under matched settings.\relax }}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Which denoising calls?}{5}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Matched timestep-window screening in the selected-SA-head predecessor. Calls 15--30 improve both datasets.\relax }}{6}}
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Leave-one-change comparison for SA timestep filtering.\relax }}{6}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Which SA heads?}{6}}
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Leave-one-change comparison of the SA-head sets on both datasets.\relax }}{6}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}What changes in the final mask?}{6}}
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Binary-mask diagnostics for the revised final system over 490 VOC-Sim images.\relax }}{6}}
+\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces Revised-system gain grouped by class-average foreground area.\relax }}{7}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Generalization to COCO-Cap}{7}}
+\@writefile{lot}{\contentsline {table}{\numberline {10}{\ignorespaces Primary comparison. VOC-Sim is the development dataset; COCO-Cap is the untuned generalization dataset.\relax }}{7}}

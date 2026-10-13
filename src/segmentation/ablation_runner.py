@@ -15,6 +15,7 @@ from .attention_aggregation import (
     combine_resolution_sums,
     find_token_subsequence,
     load_step_module_maps,
+    load_step_module_head_maps,
     load_step_resolution_sums,
     normalize_map,
     resize_map,
@@ -240,6 +241,62 @@ def run_cross_attention_layer_ablation(
         if progress is not None:
             progress("cross_attention_layer", sample_index, len(dataset))
         del sums, counts, resolutions, target
+
+    gc.collect()
+    return {name: accumulator.result() for name, accumulator in metrics.items()}
+
+
+def run_cross_attention_head_ablation(
+    dataset: CapturedAttentionDataset,
+    tokenizer: CLIPTokenizer,
+    configurations: dict[str, tuple[int, ...]],
+    settings: SegmentationSettings,
+) -> dict[str, dict]:
+    """Evaluate global CA-head subsets with all modules and calls fixed.
+
+    A configuration selects the same zero-based head indices in every CA
+    module. Modules, denoising calls, token pieces, normalization, and the
+    mask threshold remain identical across configurations.
+    """
+    metrics = {name: BinarySegmentationMetrics() for name in configurations}
+    needed_heads = sorted({head for values in configurations.values() for head in values})
+    if not needed_heads or needed_heads[0] < 0 or needed_heads[-1] >= 8:
+        raise ValueError("CA head indices must be in the range 0--7")
+
+    for sample in tqdm(dataset, desc="Cross-attention head ablation"):
+        positions = target_token_positions(sample, tokenizer)
+        modules = tuple(
+            sorted(name for names in sample.modules_by_resolution.values() for name in names)
+        )
+        head_sums = torch.zeros(
+            (8, settings.working_size, settings.working_size), dtype=torch.float32
+        )
+        observations = 0
+        for step_index in range(len(sample.timesteps)):
+            step_maps = load_step_module_head_maps(
+                sample, step_index, positions, modules, branch=settings.branch
+            )
+            for head_maps, _ in step_maps.values():
+                resized = torch.stack(
+                    [resize_map(head_map, settings.working_size) for head_map in head_maps]
+                )
+                head_sums += resized.float()
+                observations += 1
+        if observations == 0:
+            raise RuntimeError(f"No CA maps found for {sample.sample_id}")
+
+        target = sample.load_target_mask()
+        per_head = head_sums / observations
+        for name, heads in configurations.items():
+            attention_map = per_head[list(heads)].mean(dim=0)
+            prediction = attention_to_mask(
+                attention_map,
+                target.shape,
+                settings.threshold,
+                settings.normalization,
+            )
+            metrics[name].update(sample.classname, prediction, target)
+        del head_sums, per_head, target
 
     gc.collect()
     return {name: accumulator.result() for name, accumulator in metrics.items()}

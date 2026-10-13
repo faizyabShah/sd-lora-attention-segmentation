@@ -1,0 +1,37 @@
+{
+  "results": {
+    "ca_steps_05_30_selected_ca_all_sa_heads": {
+      "background_iou": 0.9013195205867897,
+      "fn": 1319,
+      "fp": 486751,
+      "image_iou_sum": 18.54736771606443,
+      "images": 25,
+      "iou": 0.7671096198084942,
+      "mean_image_iou": 0.7418947086425771,
+      "tn": 4457893,
+      "tp": 1607637
+    }
+  },
+  "settings": {
+    "ca_steps": [
+      5,
+      30
+    ],
+    "class_shard": 18,
+    "classname": "train",
+    "completed": 25,
+    "component_labels": {
+      "ca_steps_05_30_selected_ca_all_sa_heads": "CA calls 5--30, selected CA heads, and all SA heads"
+    },
+    "dataset": "voc_sim",
+    "expected": 25,
+    "fixed_settings": "all 16 CA layers; frozen CA head filtering; one final-64 SA pass; SA calls 15--30; percentile 1--99; threshold 0.45; 1% cleanup",
+    "fixed_stage1_results": "outputs/segmentation/voc_sim_100_stage1_suite/results.json",
+    "manifest": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/ovam_voc_sim.csv",
+    "model": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+    "model_dtype": "float32",
+    "sa_heads": "all",
+    "storage_dtype": "float16",
+    "suite": "revised_parameterized_candidate_v1"
+  }
+}

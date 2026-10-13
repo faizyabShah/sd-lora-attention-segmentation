@@ -1,0 +1,105 @@
+{
+  "results": {
+    "all_sa_calls": {
+      "background_iou": 0.8075810674371569,
+      "fn": 120631,
+      "fp": 408609,
+      "image_iou_sum": 9.039139890882549,
+      "images": 14,
+      "iou": 0.6347043309665454,
+      "mean_image_iou": 0.6456528493487534,
+      "tn": 2221217,
+      "tp": 919559
+    },
+    "all_sa_heads": {
+      "background_iou": 0.805746021698051,
+      "fn": 131528,
+      "fp": 404876,
+      "image_iou_sum": 8.991266022211594,
+      "images": 14,
+      "iou": 0.6288031134910101,
+      "mean_image_iou": 0.6422332873008282,
+      "tn": 2224950,
+      "tp": 908662
+    },
+    "max_normalization": {
+      "background_iou": 0.810196568501172,
+      "fn": 106879,
+      "fp": 412557,
+      "image_iou_sum": 9.080802329957342,
+      "images": 14,
+      "iou": 0.6424456564012867,
+      "mean_image_iou": 0.6486287378540958,
+      "tn": 2217269,
+      "tp": 933311
+    },
+    "revised_full_system": {
+      "background_iou": 0.8083492262861555,
+      "fn": 139221,
+      "fp": 391469,
+      "image_iou_sum": 8.975106774435819,
+      "images": 14,
+      "iou": 0.6293181546723068,
+      "mean_image_iou": 0.6410790553168442,
+      "tn": 2238357,
+      "tp": 900969
+    },
+    "without_ca_head_filter": {
+      "background_iou": 0.8142994252317374,
+      "fn": 118760,
+      "fp": 391654,
+      "image_iou_sum": 9.090762229419017,
+      "images": 14,
+      "iou": 0.6435268087864321,
+      "mean_image_iou": 0.6493401592442155,
+      "tn": 2238172,
+      "tp": 921430
+    },
+    "without_component_cleanup": {
+      "background_iou": 0.806843519834044,
+      "fn": 139100,
+      "fp": 395736,
+      "image_iou_sum": 8.94970946128757,
+      "images": 14,
+      "iou": 0.6275323380174187,
+      "mean_image_iou": 0.6392649615205407,
+      "tn": 2234090,
+      "tp": 901090
+    },
+    "without_sa_propagation": {
+      "background_iou": 0.7938320986501541,
+      "fn": 325993,
+      "fp": 283402,
+      "image_iou_sum": 7.4402255420488075,
+      "images": 14,
+      "iou": 0.5395899944998157,
+      "mean_image_iou": 0.5314446815749149,
+      "tn": 2346424,
+      "tp": 714197
+    }
+  },
+  "settings": {
+    "class_shard": 15,
+    "classname": "potted plant",
+    "completed": 14,
+    "component_labels": {
+      "all_sa_calls": "All SA calls instead of calls 15--30",
+      "all_sa_heads": "All SA heads",
+      "max_normalization": "Max normalization instead of percentile 1--99",
+      "revised_full_system": "Revised full system: one SA pass, all CA layers",
+      "without_ca_head_filter": "Without CA head filtering",
+      "without_component_cleanup": "Without 1% component cleanup",
+      "without_sa_propagation": "Without SA propagation"
+    },
+    "dataset": "coco_cap",
+    "expected": 14,
+    "fixed_stage1_results": "outputs/segmentation/voc_sim_100_stage1_suite/results.json",
+    "manifest": "datasets/ovam_experiment_with_dataset/evaluation/ovam/coco_captions/ovam_coco_cap.csv",
+    "model": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+    "model_dtype": "float32",
+    "revised_baseline": "one SA pass; all 16 CA layers; remaining choices unchanged",
+    "selection_source": "remaining choices frozen from VOC-Sim",
+    "storage_dtype": "float16",
+    "suite": "revised_system_component_leave_one_change_v1"
+  }
+}
