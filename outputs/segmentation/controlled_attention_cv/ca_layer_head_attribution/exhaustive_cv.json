@@ -1,0 +1,165 @@
+{
+  "note": "exploratory diagnostic (protocol Section 4 CA-L): the exhaustive maximum is not eligible for automatic selection; threshold 0.45 only",
+  "subsets": 65535,
+  "reference_mask": "0xffff",
+  "folds": [
+    {
+      "fold": 0,
+      "chosen_mask": "0x23f7",
+      "chosen_modules": [
+        "down_blocks.0.attentions.0.transformer_blocks.0.attn2",
+        "down_blocks.0.attentions.1.transformer_blocks.0.attn2",
+        "down_blocks.1.attentions.0.transformer_blocks.0.attn2",
+        "down_blocks.2.attentions.0.transformer_blocks.0.attn2",
+        "down_blocks.2.attentions.1.transformer_blocks.0.attn2",
+        "mid_block.attentions.0.transformer_blocks.0.attn2",
+        "up_blocks.1.attentions.0.transformer_blocks.0.attn2",
+        "up_blocks.1.attentions.1.transformer_blocks.0.attn2",
+        "up_blocks.1.attentions.2.transformer_blocks.0.attn2",
+        "up_blocks.3.attentions.0.transformer_blocks.0.attn2"
+      ],
+      "train_delta": 0.04438072250467789,
+      "heldout_miou_chosen": 0.7053092948636265,
+      "heldout_miou_reference": 0.6727765118771551
+    },
+    {
+      "fold": 1,
+      "chosen_mask": "0x23ff",
+      "chosen_modules": [
+        "down_blocks.0.attentions.0.transformer_blocks.0.attn2",
+        "down_blocks.0.attentions.1.transformer_blocks.0.attn2",
+        "down_blocks.1.attentions.0.transformer_blocks.0.attn2",
+        "down_blocks.1.attentions.1.transformer_blocks.0.attn2",
+        "down_blocks.2.attentions.0.transformer_blocks.0.attn2",
+        "down_blocks.2.attentions.1.transformer_blocks.0.attn2",
+        "mid_block.attentions.0.transformer_blocks.0.attn2",
+        "up_blocks.1.attentions.0.transformer_blocks.0.attn2",
+        "up_blocks.1.attentions.1.transformer_blocks.0.attn2",
+        "up_blocks.1.attentions.2.transformer_blocks.0.attn2",
+        "up_blocks.3.attentions.0.transformer_blocks.0.attn2"
+      ],
+      "train_delta": 0.040879027217000416,
+      "heldout_miou_chosen": 0.7221263020973006,
+      "heldout_miou_reference": 0.6831259340644519
+    },
+    {
+      "fold": 2,
+      "chosen_mask": "0x23ff",
+      "chosen_modules": [
+        "down_blocks.0.attentions.0.transformer_blocks.0.attn2",
+        "down_blocks.0.attentions.1.transformer_blocks.0.attn2",
+        "down_blocks.1.attentions.0.transformer_blocks.0.attn2",
+        "down_blocks.1.attentions.1.transformer_blocks.0.attn2",
+        "down_blocks.2.attentions.0.transformer_blocks.0.attn2",
+        "down_blocks.2.attentions.1.transformer_blocks.0.attn2",
+        "mid_block.attentions.0.transformer_blocks.0.attn2",
+        "up_blocks.1.attentions.0.transformer_blocks.0.attn2",
+        "up_blocks.1.attentions.1.transformer_blocks.0.attn2",
+        "up_blocks.1.attentions.2.transformer_blocks.0.attn2",
+        "up_blocks.3.attentions.0.transformer_blocks.0.attn2"
+      ],
+      "train_delta": 0.041063269202649307,
+      "heldout_miou_chosen": 0.7114474158588644,
+      "heldout_miou_reference": 0.6715309334230625
+    },
+    {
+      "fold": 3,
+      "chosen_mask": "0x23ff",
+      "chosen_modules": [
+        "down_blocks.0.attentions.0.transformer_blocks.0.attn2",
+        "down_blocks.0.attentions.1.transformer_blocks.0.attn2",
+        "down_blocks.1.attentions.0.transformer_blocks.0.attn2",
+        "down_blocks.1.attentions.1.transformer_blocks.0.attn2",
+        "down_blocks.2.attentions.0.transformer_blocks.0.attn2",
+        "down_blocks.2.attentions.1.transformer_blocks.0.attn2",
+        "mid_block.attentions.0.transformer_blocks.0.attn2",
+        "up_blocks.1.attentions.0.transformer_blocks.0.attn2",
+        "up_blocks.1.attentions.1.transformer_blocks.0.attn2",
+        "up_blocks.1.attentions.2.transformer_blocks.0.attn2",
+        "up_blocks.3.attentions.0.transformer_blocks.0.attn2"
+      ],
+      "train_delta": 0.04074267970203983,
+      "heldout_miou_chosen": 0.7074170448515209,
+      "heldout_miou_reference": 0.668601088256916
+    },
+    {
+      "fold": 4,
+      "chosen_mask": "0x23f7",
+      "chosen_modules": [
+        "down_blocks.0.attentions.0.transformer_blocks.0.attn2",
+        "down_blocks.0.attentions.1.transformer_blocks.0.attn2",
+        "down_blocks.1.attentions.0.transformer_blocks.0.attn2",
+        "down_blocks.2.attentions.0.transformer_blocks.0.attn2",
+        "down_blocks.2.attentions.1.transformer_blocks.0.attn2",
+        "mid_block.attentions.0.transformer_blocks.0.attn2",
+        "up_blocks.1.attentions.0.transformer_blocks.0.attn2",
+        "up_blocks.1.attentions.1.transformer_blocks.0.attn2",
+        "up_blocks.1.attentions.2.transformer_blocks.0.attn2",
+        "up_blocks.3.attentions.0.transformer_blocks.0.attn2"
+      ],
+      "train_delta": 0.04112965593200928,
+      "heldout_miou_chosen": 0.6874798555314843,
+      "heldout_miou_reference": 0.6429434009421268
+    }
+  ],
+  "selection_counts": {
+    "0x23f7": 2,
+    "0x23ff": 3
+  },
+  "out_of_fold_miou_selection": 0.7070318993122332,
+  "out_of_fold_miou_reference": 0.6660597542415536,
+  "oof_gain": 0.04097214507067959,
+  "in_sample_miou_reference": 0.6660597542415536,
+  "in_sample_top10": [
+    {
+      "mask": "0x23f7",
+      "modules": 10,
+      "miou": 0.7087368413183774
+    },
+    {
+      "mask": "0x21f7",
+      "modules": 9,
+      "miou": 0.7080930809224535
+    },
+    {
+      "mask": "0x23ff",
+      "modules": 11,
+      "miou": 0.7070101594838749
+    },
+    {
+      "mask": "0x23f6",
+      "modules": 9,
+      "miou": 0.706954633621159
+    },
+    {
+      "mask": "0x21ff",
+      "modules": 10,
+      "miou": 0.7063501580551127
+    },
+    {
+      "mask": "0x23f5",
+      "modules": 9,
+      "miou": 0.7063306441913622
+    },
+    {
+      "mask": "0x21f6",
+      "modules": 8,
+      "miou": 0.7061910563418835
+    },
+    {
+      "mask": "0x23f3",
+      "modules": 9,
+      "miou": 0.7059530292777012
+    },
+    {
+      "mask": "0x21f5",
+      "modules": 8,
+      "miou": 0.7058427868344064
+    },
+    {
+      "mask": "0x23fd",
+      "modules": 10,
+      "miou": 0.7057970596184332
+    }
+  ]
+}

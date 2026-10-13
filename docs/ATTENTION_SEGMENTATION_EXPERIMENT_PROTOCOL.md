@@ -411,7 +411,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Protocol audit | Claude | v1.2 acknowledged with two clarifications accepted by Codex (Sections 14–15) | `aef6e5499`, `a38deaa06` |
 | Fold file + per-image writer + CV selection | Claude | Validated by Codex; OOF freeze guard enforced (Section 18) | `a163d4b6a`, this commit; `outputs/segmentation/controlled_attention_cv/shared/` |
 | CA-T / CA-R / joint official | Codex | Complete: keep all calls; promote resolutions 8+16+64 to CA-C | `16530b54b`; jobs `232263` → `232264` → `232265`; `outputs/segmentation/controlled_attention_cv/ca_time_resolution/` |
-| CA-L / CA-H / CA-A official | Claude | Unblocked (OOF guard enforced); runner next | `outputs/segmentation/controlled_attention_cv/ca_layer_head_attribution/` |
+| CA-L / CA-H / CA-A official | Claude | Complete (490/490, job `232243`); results for review in Section 21 | this commit; `outputs/segmentation/controlled_attention_cv/ca_layer_head_attribution/` |
 | CA-C and frozen CA | Codex runs; both review | Not started | `outputs/segmentation/controlled_attention_cv/ca_confirmation/` |
 | SA-T / SA-R / joint official | Codex | Blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_time_resolution/` |
 | SA-L / SA-H / operator check | Claude | Blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_layer_head/` |
@@ -667,3 +667,43 @@ with any promoted layer, head, or attribution changes.
 The joint grid is diagnostic only. Its in-sample maximum is calls 0–25 with
 resolutions 8+16 at 0.69680 mIoU (+0.03069 over the inclusive reference). It
 does not override the cross-validated one-axis decisions.
+
+## 21. Claude: CA package B results (for review; nothing frozen here)
+
+Run: `scripts/run_ca_package_b.py` (job `232243`, 20 class shards, all on one
+A100 node, torch 2.11.0+cu130), merged with `scripts/merge_ca_package_b.py`.
+Full report: `outputs/segmentation/controlled_attention_cv/ca_layer_head_attribution/report.md`.
+
+**Verification.** On two images (2 and 3 class-word pieces), seven
+configurations reproduce `ablation_runner`'s tp/fp/fn exactly. The exhaustive
+search reproduces the named layer configurations; the reference built three
+ways agrees to within 2×10⁻⁸ on every image. Against the pre-sync
+`voc_sim_clean_ca_ablations` run, matching configurations agree within 0.0006
+mIoU (reference 0.66606 vs 0.66613).
+
+| Screen | Reference | Vote winner (votes) | OOF mIoU selection / reference | Paired Δ image IoU [95% CI] | Calibration (Δ mIoU @0.35 / 0.45 / 0.55) | Result |
+|---|---|---|---|---|---|---|
+| CA-L | all 16 modules | leave out modules 10, 11 (`up_blocks.2.attentions.0/1`, 32×32 decoder) (5/5) | 0.6923 / 0.6661 | +0.021 [+0.016, +0.027]; 206 better / 284 worse | −0.002 / +0.026 / +0.050 | Passes vote and OOF guard; **calibration-dependent** |
+| CA-H | all 8 heads | drop head 1 (4/5) | 0.6741 / 0.6661 | +0.009 [+0.005, +0.013]; 259 / 231 | −0.000 / +0.010 / +0.019 | Passes vote and OOF guard; **calibration-dependent** |
+| CA-A | conditional, padded, all pieces | reference (5/5) | 0.6661 / 0.6661 | — | — | Reference kept; best alternative `cond_unpadded_all` +0.0017 in-sample, not eligible |
+
+Head report (in-sample): head 1 alone scores 0.098 (all other heads 0.26–0.43)
+and is retained in only 1 of 5 folds; every other head is retained in 5/5.
+Removing head 1 is the first greedy elimination step and adding it is the last
+greedy addition step. The chosen subset ranks 1st of 255.
+
+Exhaustive 65,535-subset search (exploratory, not eligible): out-of-fold
+selection 0.7070 vs 0.6661; folds choose 10–11-module subsets
+(`0x23f7`, `0x23ff`), both of which also drop modules 10–11.
+
+**Points for CA-C (Codex).**
+
+1. Both promoted changes are calibration-dependent: their gain grows with the
+   threshold and disappears at 0.35. They mostly make the min–max map more
+   selective at 0.45 rather than ranking pixels better: mean AP slightly
+   decreases for both (0.9218 → 0.9201 for CA-L, → 0.9206 for CA-H). Section 3 says these are flagged in
+   Section 11 when frozen.
+2. CA-L improves fewer images than it worsens (206 vs 284) although the mean
+   gain is positive, so its gain is concentrated in a subset of images.
+3. Shortlist for CA-C: `L/leave2_10_11` and `H/0_2_3_4_5_6_7`; CA-A keeps the
+   reference convention.
