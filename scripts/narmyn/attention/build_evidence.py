@@ -39,6 +39,7 @@ from src.segmentation import controlled_cv as cv  # noqa: E402
 SEG = ROOT / "outputs" / "segmentation"
 OUT = ROOT / "docs" / "narmyn" / "attention" / "evidence"
 PKG_B = SEG / "controlled_attention_cv" / "ca_layer_head_attribution"
+PKG_A = SEG / "controlled_attention_cv" / "ca_time_resolution"
 
 # Reference palette (dataviz skill, light mode; static figures for print).
 SURFACE, INK, INK2, MUTED, GRID, AXIS = "#fcfcfb", "#0b0b0b", "#52514e", "#898781", "#e1e0d9", "#c3c2b7"
@@ -138,9 +139,10 @@ EXPERIMENTS = [
      "159 layer sets, 255 head subsets, 12 attribution conventions; 65,535 exhaustive (exploratory)",
      "protocol v1.2 Section 3", "controlled_attention_cv/ca_layer_head_attribution", None,
      "CA-L drop modules 10-11; CA-H drop head 1; CA-A keep reference (CA-C pending)"),
-    ("A2", "Controlled CA package A: CA-T, CA-R", VOC, "controlled, 5-fold cross-validated (Codex)",
-     "calls, resolutions, joint", "protocol v1.2 Section 3", "controlled_attention_cv/ca_time_resolution", None,
-     "pending"),
+    ("A2", "Controlled CA package A: CA-T, CA-R (Codex)", VOC, "controlled, 5-fold cross-validated",
+     "79 call windows, 15 resolution subsets, 1,185 joint (diagnostic)", "protocol v1.2 Section 3",
+     "controlled_attention_cv/ca_time_resolution", None,
+     "CA-T keep all calls; CA-R keep 8+16+64 (drop 32x32) (CA-C pending)"),
 ]
 
 
@@ -344,7 +346,7 @@ def package_b(plt, figures: list) -> dict:
     by = {r["configuration"]: r for r in rows}
     ref = by["L/all_16"]["miou@0.45"]
 
-    out = {"reference": ref, "screens": folds, "heads": heads}
+    out = {"reference": ref, "screens": folds, "heads": heads, "by": by}
 
     # CV summary table.
     summary = []
@@ -529,38 +531,6 @@ def package_b(plt, figures: list) -> dict:
     save(fig, "a1_ca_a_grid", figures)
     plt.close(fig)
 
-    # F-A6: calibration of the promoted changes.
-    fig, ax = plt.subplots(figsize=(5.2, 3.3))
-    for n, colour, label in (("L/all_16", INK2, "reference (all 16, all heads)"),
-                             (folds["CA-L"]["frozen"], BLUE, "CA-L: without modules 10, 11"),
-                             (folds["CA-H"]["frozen"], ORANGE, "CA-H: without head 1")):
-        ys = [by[n][f"miou@{t:.2f}"] for t in cv.THRESHOLDS]
-        ax.plot(cv.THRESHOLDS, ys, color=colour, marker="o", markersize=5, label=label)
-    ax.axvline(cv.SELECTION_THRESHOLD, color=AXIS, linewidth=1)
-    ax.text(cv.SELECTION_THRESHOLD, ax.get_ylim()[0], " selection threshold", color=MUTED, fontsize=7, va="bottom")
-    ax.set_xticks(cv.THRESHOLDS)
-    ax.set_xlabel("Mask threshold")
-    ax.set_ylabel("mIoU")
-    ax.set_title("Calibration check: gains appear only at ≥ 0.45")
-    ax.legend(loc="lower left", fontsize=7)
-    fig.tight_layout()
-    save(fig, "a1_calibration", figures)
-    plt.close(fig)
-
-    # F-A7: held-out folds.
-    fig, axes = plt.subplots(1, 3, figsize=(11, 3), sharey=True)
-    for ax, (screen, s) in zip(axes, folds.items()):
-        xs = [f["fold"] for f in s["folds"]]
-        ax.plot(xs, [f["heldout_miou_reference"] for f in s["folds"]], color=ORANGE, marker="o", markersize=5, label="reference")
-        ax.plot(xs, [f["heldout_miou_chosen"] for f in s["folds"]], color=BLUE, marker="o", markersize=5, label="chosen on other 4 folds")
-        ax.set_xticks(xs, [f"fold {x}" for x in xs])
-        ax.set_title(f"{screen}: OOF gain {s['oof_gain']:+.4f}")
-    axes[0].set_ylabel("Held-out mIoU at 0.45")
-    axes[0].legend(loc="lower left", fontsize=7)
-    fig.tight_layout()
-    save(fig, "a1_heldout_folds", figures)
-    plt.close(fig)
-
     # F-A8: exhaustive distribution.
     if ex_scores is not None:
         popcount = np.array([bin(m).count("1") for m in range(1, 65536)])
@@ -587,6 +557,164 @@ def package_b(plt, figures: list) -> dict:
         shutil.copy(png, OUT / "figures" / png.name)
         figures.append(png.stem)
     return out
+
+
+# --------------------------------------------------------------------------- #
+# Controlled package A (Codex): CA-T, CA-R, joint diagnostic
+# --------------------------------------------------------------------------- #
+def package_a(plt, figures: list) -> dict | None:
+    if not (PKG_A / "shards").exists():
+        return None
+    results = cv.load_results(sorted((PKG_A / "shards").glob("*.npz")))
+    folds = load_json(PKG_A / "fold_results.json")["screens"]
+    names = results.configurations
+    fold_ids = sorted(set(results.folds.tolist()))
+    rows = []
+    for c, name in enumerate(names):
+        row = cv.summary_row(results, c)
+        per_fold = [cv.miou(results, c, mask=results.folds == k) for k in fold_ids]
+        rows.append({"configuration": name, "screen": {"time": "CA-T", "resolution": "CA-R", "time_resolution": "joint (diagnostic)"}[name.split("/")[0]],
+                     "miou@0.35": row["miou@0.35"], "miou@0.45": row["miou@0.45"], "miou@0.55": row["miou@0.55"],
+                     "mean_image_iou@0.45": row["mean_image_iou@0.45"], "mean_ap": row["mean_ap"],
+                     **{f"fold{k}_miou": v for k, v in zip(fold_ids, per_fold)}, "fold_std": float(np.std(per_fold))})
+    with (OUT / "controlled_ca_package_a.csv").open("w", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+    by = {r["configuration"]: r for r in rows}
+    ref = by["time/all_00_30"]["miou@0.45"]
+    out = {"screens": folds, "by": by, "reference": ref, "rows": rows}
+
+    def row(name, label):
+        r = by[name]
+        return [label, r["miou@0.45"], r["miou@0.45"] - ref, r["miou@0.35"], r["miou@0.55"], r["mean_ap"], r["fold_std"]]
+
+    headers = ["Configuration", "mIoU@0.45", "Δ vs reference", "mIoU@0.35", "mIoU@0.55", "Mean AP", "SD across folds"]
+    windows = [n for n in names if n.startswith("time/") and not n.startswith(("time/step_", "time/leave_step"))]
+    out["t_table"] = write_table("a2_ca_t", headers, [row(n, n[5:].replace("_", " ")) for n in windows],
+                                 "CA-T: call windows (in-sample; all 79 configurations, including every single call and leave-one-call-out, in controlled_ca_package_a.csv)")
+    resolutions = sorted((n for n in names if n.startswith("resolution/")), key=lambda n: -by[n]["miou@0.45"])
+    out["r_table"] = write_table("a2_ca_r", headers, [row(n, n[11:].replace("_", "+").replace("r", "")) for n in resolutions],
+                                 "CA-R: all 15 resolution subsets (in-sample; reference 8+16+32+64)")
+
+    # Figure: per-call profile and leave-one-call-out.
+    calls = list(range(31))
+    fig, axes = plt.subplots(1, 2, figsize=(11, 3.3))
+    axes[0].plot(calls, [by[f"time/step_{k:02d}"]["miou@0.45"] for k in calls], color=BLUE, marker="o", markersize=4)
+    axes[0].axhline(ref, color=INK2, linewidth=1)
+    axes[0].text(30, ref + 0.006, f"all calls = {ref:.3f}", ha="right", color=INK2, fontsize=8)
+    axes[0].set_xlabel("UNet call (0 = noisiest)")
+    axes[0].set_ylabel("mIoU at 0.45")
+    axes[0].set_title("CA from one call only")
+    delta = [by[f"time/leave_step_{k:02d}"]["miou@0.45"] - ref for k in calls]
+    axes[1].bar(calls, delta, width=0.6, color=[BLUE if d > 0 else ORANGE for d in delta])
+    axes[1].axhline(0, color=AXIS, linewidth=1)
+    axes[1].set_xlabel("UNet call left out")
+    axes[1].set_ylabel("Δ mIoU vs all calls")
+    axes[1].set_title("All calls except one (blue = leaving it out helps)")
+    fig.tight_layout()
+    save(fig, "a2_ca_t_calls", figures)
+    plt.close(fig)
+
+    # Figure: resolution subsets.
+    fig, ax = plt.subplots(figsize=(7.5, 3.6))
+    order = sorted((n for n in names if n.startswith("resolution/")),
+                   key=lambda n: (len(n.split("_")), [int(part[1:]) for part in n[11:].split("_")]))
+    xs = np.arange(len(order))
+    vals = [by[n]["miou@0.45"] for n in order]
+    chosen = folds["CA-R"]["frozen"]
+    colours = [BLUE if n == chosen else ORANGE if n == folds["CA-R"]["reference"] else MUTED for n in order]
+    ax.scatter(xs, vals, s=52, color=colours, edgecolors=SURFACE, linewidths=1.5, zorder=3)
+    for x, n, v in zip(xs, order, vals):
+        if n in (chosen, folds["CA-R"]["reference"]):
+            ax.annotate("chosen" if n == chosen else "reference", (x, v), textcoords="offset points", xytext=(0, 8), ha="center", fontsize=7, color=INK2)
+    ax.set_xticks(xs, [n[11:].replace("_", "+").replace("r", "") for n in order], rotation=40, ha="right", fontsize=7)
+    ax.set_ylabel("mIoU at 0.45")
+    ax.set_title("CA-R: every subset of CA resolutions")
+    fig.tight_layout()
+    save(fig, "a2_ca_r_subsets", figures)
+    plt.close(fig)
+
+    # Figure: joint diagnostic (structured windows x resolutions).
+    from matplotlib.colors import LinearSegmentedColormap
+    res_order = [n[11:] for n in order]
+    matrix = np.array([[by[f"time_resolution/{w[5:]}__{r}"]["miou@0.45"] for r in res_order] for w in windows])
+    fig, ax = plt.subplots(figsize=(10, 5.6))
+    im = ax.imshow(matrix, cmap=LinearSegmentedColormap.from_list("seq", SEQ_BLUE), aspect="auto")
+    ax.grid(False)
+    for (i, j), v in np.ndenumerate(matrix):
+        level = (v - matrix.min()) / max(matrix.max() - matrix.min(), 1e-9)
+        ax.text(j, i, f"{v:.3f}", ha="center", va="center", fontsize=6, color=SURFACE if level > 0.55 else INK)
+    ax.set_xticks(range(len(res_order)), [r.replace("_", "+").replace("r", "") for r in res_order], rotation=40, ha="right", fontsize=7)
+    ax.set_yticks(range(len(windows)), [w[5:].replace("_", " ") for w in windows], fontsize=7)
+    fig.colorbar(im, ax=ax, fraction=0.03).set_label("mIoU at 0.45")
+    ax.set_title("Joint grid (diagnostic only, in-sample): call windows × resolutions")
+    fig.tight_layout()
+    save(fig, "a2_joint_grid", figures)
+    plt.close(fig)
+    return out
+
+
+def controlled_overview(plt, a: dict | None, b: dict | None, figures: list) -> dict:
+    """CV summary and calibration across both controlled packages."""
+    screens = {}
+    if a is not None:
+        screens.update(a["screens"])
+    if b is not None:
+        screens.update(b["screens"])
+    rows = []
+    for name in ("CA-T", "CA-R", "CA-L", "CA-H", "CA-A"):
+        if name not in screens:
+            continue
+        s = screens[name]
+        bs = s["paired_bootstrap_frozen_vs_reference"]
+        cal = s["calibration"]
+        rows.append([name, "A (Codex)" if name in ("CA-T", "CA-R") else "B (Claude)", s["reference"], f"{s['vote_winner']} ({s['vote_winner_votes']}/5)",
+                     s["out_of_fold_miou_reference"], s["out_of_fold_miou_selection"], s["oof_gain"],
+                     f"{bs['mean']:+.4f} [{bs['ci_low']:+.4f}, {bs['ci_high']:+.4f}]",
+                     f"{cal['delta_miou@0.35']:+.4f} / {cal['delta_miou@0.45']:+.4f} / {cal['delta_miou@0.55']:+.4f}",
+                     s["freeze_reason"]])
+    table = write_table("a_cv_summary", ["Screen", "Package", "Reference", "Vote winner (votes)", "OOF mIoU reference", "OOF mIoU choice",
+                                         "OOF gain", "Paired Δ image IoU [95% CI]", "Δ mIoU @0.35 / 0.45 / 0.55", "Outcome"],
+                        rows, "Controlled CA screens (VOC-Sim, 5 folds, selection at threshold 0.45). Nothing is frozen until the combined CA confirmation (CA-C).")
+
+    fig, axes = plt.subplots(1, len(rows), figsize=(3.1 * len(rows), 3), sharey=True)
+    for ax, name in zip(np.atleast_1d(axes), [r[0] for r in rows]):
+        s = screens[name]
+        xs = [f["fold"] for f in s["folds"]]
+        ax.plot(xs, [f["heldout_miou_reference"] for f in s["folds"]], color=ORANGE, marker="o", markersize=4, label="reference")
+        ax.plot(xs, [f["heldout_miou_chosen"] for f in s["folds"]], color=BLUE, marker="o", markersize=4, label="chosen on other 4 folds")
+        ax.set_xticks(xs, [str(x) for x in xs])
+        ax.set_xlabel("held-out fold")
+        ax.set_title(f"{name}: OOF {s['oof_gain']:+.4f}", fontsize=9)
+    np.atleast_1d(axes)[0].set_ylabel("Held-out mIoU at 0.45")
+    np.atleast_1d(axes)[0].legend(loc="lower left", fontsize=7)
+    fig.tight_layout()
+    save(fig, "a_heldout_folds", figures)
+    plt.close(fig)
+
+    fig, ax = plt.subplots(figsize=(5.6, 3.5))
+    lines = [("reference (all calls, resolutions, layers, heads)", INK2, None)]
+    promoted = [(n, screens[n]) for n in ("CA-R", "CA-L", "CA-H") if n in screens and screens[n]["frozen"] != screens[n]["reference"]]
+    colours = [BLUE, ORANGE, AQUA]
+    ref_by = (a or b)["by"] if a is not None else None
+    for k, (name, s) in enumerate(promoted):
+        source = a["by"] if name in ("CA-T", "CA-R") else b["by"]
+        ax.plot(cv.THRESHOLDS, [source[s["frozen"]][f"miou@{t:.2f}"] for t in cv.THRESHOLDS], color=colours[k], marker="o", markersize=5,
+                label=f"{name}: {s['frozen'].split('/', 1)[1]}")
+    source = a["by"] if a is not None else b["by"]
+    key = "time/all_00_30" if a is not None else "L/all_16"
+    ax.plot(cv.THRESHOLDS, [source[key][f"miou@{t:.2f}"] for t in cv.THRESHOLDS], color=INK2, marker="o", markersize=5, label="reference")
+    ax.axvline(cv.SELECTION_THRESHOLD, color=AXIS, linewidth=1)
+    ax.set_xticks(cv.THRESHOLDS)
+    ax.set_xlabel("Mask threshold")
+    ax.set_ylabel("mIoU")
+    ax.set_title("Calibration of the promoted CA changes")
+    ax.legend(loc="lower left", fontsize=7)
+    fig.tight_layout()
+    save(fig, "a_calibration", figures)
+    plt.close(fig)
+    return {"table": table, "screens": screens}
 
 
 # --------------------------------------------------------------------------- #
@@ -760,7 +888,9 @@ DECISIONS = [
      "A1 CA-H (CV): drop head 1 in every module; awaiting CA-C"),
     ("CA attribution", "OVAM: unconditional query, unpadded softmax, first piece", "inherited from OVAM", "—", "Table a1_ca_a",
      "A1 CA-A (CV): reference (conditional, padded, all pieces) kept; OVAM's cell is −0.0156 CA-only"),
-    ("CA calls", "all 31 (0–30)", "B1/B8 windows; B14", "99 dev / 490", "ledger B1, B8, B14", "A2 CA-T (Codex), pending"),
+    ("CA calls", "all 31 (0–30)", "B1/B8 windows; B14", "99 dev / 490", "ledger B1, B8, B14; Fig. a2_ca_t_calls", "A2 CA-T (CV): keep all calls 0–30"),
+    ("CA resolutions", "all four (8, 16, 32, 64)", "B1/B8 resolution screens", "99 dev / 490", "Table a2_ca_r; Fig. a2_ca_r_subsets",
+     "A2 CA-R (CV): keep 8+16+64, drop the 32×32 modules; awaiting CA-C"),
     ("CA normalization, threshold", "percentile 1–99, ≥ 0.45", "B5", "99 dev images", "ledger B5", "protocol fixes min–max, 0.45 for the CA phase"),
     ("SA module", "U3.2 (up_blocks.3.attentions.2 attn1, 64×64)", "B8 SA screens", "490 (in-sample)", "ledger B8", "SA-L (Claude) after CA freeze"),
     ("SA passes", "4 (revised: 1)", "B10; revised from B11/B13", "490; 1-pass informed by COCO-Cap", "Fig. b_joint_passes_time", "after SA freeze"),
@@ -773,7 +903,7 @@ DECISIONS = [
 ]
 
 
-def compose_report(b: dict | None, tb: dict) -> None:
+def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: dict | None = None) -> None:
     def fig(name, caption):
         return f"![{caption}](figures/{name}.png)\n\n*{caption}*\n"
 
@@ -793,10 +923,11 @@ def compose_report(b: dict | None, tb: dict) -> None:
         "(the 99 dev images are part of the 490). These numbers show how the method was found, not how well it generalizes.",
         "- **Tier A (A1, A2), controlled.** Protocol v1.2: one axis at a time from a fixed reference, settings chosen on "
         "four folds and scored on the fifth, frozen only with 4 of 5 fold votes and an out-of-fold gain. "
-        "Only A1 (CA layers, heads, attribution) is complete; nothing is frozen until the combined CA confirmation.",
+        "Both CA packages are complete (A2 by Codex: calls and resolutions; A1 by Claude: layers, heads, attribution); "
+        "nothing is frozen until the combined CA confirmation (CA-C).",
         "",
         "Full data: `all_configurations.csv.gz` (one row per configuration, all experiments), "
-        "`controlled_ca_package_b.csv` (the 426 controlled configurations with per-fold held-out mIoU, thresholds 0.35/0.45/0.55 and AP), "
+        "`controlled_ca_package_a.csv` and `controlled_ca_package_b.csv` (the 1,279 + 426 controlled configurations with per-fold held-out mIoU, thresholds 0.35/0.45/0.55 and AP), "
         "`ledger.csv`, `tables/*.md|tex`, `figures/*.png|pdf`.",
         "",
         "## 1. Every experiment",
@@ -820,13 +951,28 @@ def compose_report(b: dict | None, tb: dict) -> None:
             "mean over all class-word pieces; every module-call weighted equally; min–max at 64×64; bilinear resize; "
             "foreground at ≥ 0.45. One axis varies at a time.",
             "",
-            "### 4.1 Selection result",
+            "### 4.1 Selection result (all five controlled CA screens)",
             "",
-            b["cv_table"],
+            overview["table"] if overview else b["cv_table"],
             "",
-            fig("a1_heldout_folds", "Fig. 2. Held-out mIoU of the setting chosen on the other four folds, against the reference, per fold."),
-            fig("a1_calibration", "Fig. 3. Calibration check. Both promoted changes help at 0.45 and 0.55 but not at 0.35, and slightly lower AP: they make the map more selective rather than ranking pixels better."),
-            "### 4.2 CA layers (CA-L, 159 configurations)",
+            fig("a_heldout_folds", "Fig. 2. Held-out mIoU of the setting chosen on the other four folds, against the reference, per fold and screen."),
+            fig("a_calibration", "Fig. 3. Calibration of the promoted changes. CA-R helps at every threshold but mostly at 0.45 and above; CA-L and CA-H do not help at 0.35. All three slightly lower AP, so they make the map more selective rather than ranking pixels better."),
+            "The two packages ran in different environments on the same node. Their identical reference configuration differs by "
+            "a mean of 0.0005 image IoU (max 0.018; mIoU 0.66610 vs 0.66606), so values are compared within a package; "
+            "CA-C re-scores every combination in one run.",
+            "",
+            "### 4.2 CA denoising calls (CA-T, 79 configurations; package A, Codex)",
+            "",
+            fig("a2_ca_t_calls", "Fig. 4a. CA from a single UNet call, and all calls except one."),
+            a["t_table"] if a else "",
+            "",
+            "### 4.3 CA resolutions (CA-R, 15 configurations; package A, Codex)",
+            "",
+            fig("a2_ca_r_subsets", "Fig. 4b. Every subset of CA resolutions."),
+            a["r_table"] if a else "",
+            "",
+            fig("a2_joint_grid", "Fig. 4c. Joint grid of call windows and resolutions (diagnostic only; cannot freeze a setting)."),
+            "### 4.4 CA layers (CA-L, 159 configurations)",
             "",
             fig("a1_ca_l_single_leave1", "Fig. 4. Each CA module alone (left) and all modules except one (right)."),
             fig("a1_ca_l_leave2_heatmap", "Fig. 5. All 120 leave-two-out configurations; the diagonal is leave-one-out."),
@@ -835,7 +981,7 @@ def compose_report(b: dict | None, tb: dict) -> None:
             "The single-module and leave-one-out values for all 16 modules are in `tables/a1_ca_l.md`.",
             "",
             fig("a1_exhaustive", "Fig. 6. All 65,535 module subsets (exploratory; the maximum is not eligible for selection)."),
-            "### 4.3 CA heads (CA-H, 255 subsets)",
+            "### 4.5 CA heads (CA-H, 255 subsets)",
             "",
             b["head_table"],
             "",
@@ -845,12 +991,12 @@ def compose_report(b: dict | None, tb: dict) -> None:
             "",
             b["top_heads_table"],
             "",
-            "### 4.4 CA attribution convention (CA-A, 12 configurations)",
+            "### 4.6 CA attribution convention (CA-A, 12 configurations)",
             "",
             b["attr_table"],
             "",
             fig("a1_ca_a_grid", "Fig. 9. Δ mIoU of every convention against the reference. The earlier final method used OVAM's cell (unconditional, unpadded, first piece)."),
-            "### 4.5 What the cross-attention maps look like",
+            "### 4.7 What the cross-attention maps look like",
             "",
             "Head-averaged CA of every module, calls 0–30, upsampled to 64×64 on a common colour scale, one row per resolution. "
             "The four images were fixed by index before any result was seen.",
@@ -874,8 +1020,8 @@ def compose_report(b: dict | None, tb: dict) -> None:
         "## 7. Limits of this evidence",
         "",
         "- Tier B settings were chosen on the reported images; only COCO-Cap is untouched by the earlier final method, and the revised one-pass system was informed by COCO-Cap.",
-        "- Tier A is complete only for CA layers, heads and attribution. CA calls and resolutions (A2), the combined CA confirmation, and all SA screens are still to run under the protocol.",
-        "- Both promoted CA changes are calibration-dependent (Fig. 3).",
+        "- Tier A is complete for the CA screens only. The combined CA confirmation (CA-C) and all SA screens are still to run under the protocol.",
+        "- The promoted CA changes help mainly at the 0.45 selection threshold and above, and slightly lower AP (Fig. 3); CA-L and CA-H change sign at 0.35.",
         "- Released OVAM masks were made on the authors' renders; all other rows use regenerated images scored on the same annotations.",
         "",
     ]
@@ -887,8 +1033,11 @@ def compose_report(b: dict | None, tb: dict) -> None:
            r"\input{evidence/tables/ledger.tex}", r"\input{evidence/tables/decision_trail.tex}"]
     captions = {
         "b_progression": ("Each step of the method and the baselines. VOC-Sim values are in-sample; COCO-Cap was never used to choose the earlier final method.", 1.0),
-        "a1_heldout_folds": ("Controlled CA screens: held-out mIoU of the setting chosen on the other four folds, against the reference, per fold.", 1.0),
-        "a1_calibration": ("Calibration check: both promoted CA changes help at thresholds 0.45 and 0.55 but not at 0.35.", 0.6),
+        "a_heldout_folds": ("Controlled CA screens: held-out mIoU of the setting chosen on the other four folds, against the reference, per fold.", 1.0),
+        "a_calibration": ("Calibration of the promoted CA changes at thresholds 0.35, 0.45 and 0.55.", 0.6),
+        "a2_ca_t_calls": ("CA-T: CA from a single UNet call, and all calls except one.", 1.0),
+        "a2_ca_r_subsets": ("CA-R: every subset of CA resolutions.", 0.75),
+        "a2_joint_grid": ("Joint grid of call windows and resolutions (diagnostic only).", 0.95),
         "a1_ca_l_single_leave1": ("CA-L: each CA module alone (left) and all modules except one (right).", 1.0),
         "a1_ca_l_leave2_heatmap": ("CA-L: all 120 leave-two-out configurations; the diagonal is leave-one-out.", 0.7),
         "a1_exhaustive": ("All 65,535 CA module subsets (exploratory; the maximum is not eligible for selection).", 1.0),
@@ -901,8 +1050,11 @@ def compose_report(b: dict | None, tb: dict) -> None:
     }
     figs = ["b_progression"]
     if b is not None:
-        tex += [r"\input{evidence/tables/a1_cv_summary.tex}"]
-        figs += ["a1_heldout_folds", "a1_calibration", "a1_ca_l_single_leave1", "a1_ca_l_leave2_heatmap", "a1_exhaustive",
+        tex += [r"\input{evidence/tables/a_cv_summary.tex}"]
+        if a is not None:
+            tex += [r"\input{evidence/tables/a2_ca_t.tex}", r"\input{evidence/tables/a2_ca_r.tex}"]
+            figs += ["a2_ca_t_calls", "a2_ca_r_subsets", "a2_joint_grid"]
+        figs += ["a_heldout_folds", "a_calibration", "a1_ca_l_single_leave1", "a1_ca_l_leave2_heatmap", "a1_exhaustive",
                  "a1_ca_h_single_leave1", "a1_ca_h_subsets_greedy", "a1_ca_a_grid"]
         tex += [rf"\input{{evidence/tables/{t}.tex}}" for t in ("a1_ca_l_leave2", "a1_ca_h_heads", "a1_ca_h_greedy", "a1_ca_h_top", "a1_ca_a")]
     figs += ["b_joint_passes_time", "b_joint_heads_threshold", "b_component_ablation"]
@@ -923,8 +1075,10 @@ def compose_report(b: dict | None, tb: dict) -> None:
 # Main
 # --------------------------------------------------------------------------- #
 def main() -> None:
-    (OUT / "figures").mkdir(parents=True, exist_ok=True)
-    (OUT / "tables").mkdir(parents=True, exist_ok=True)
+    for sub in ("figures", "tables"):
+        if (OUT / sub).exists():
+            shutil.rmtree(OUT / sub)
+        (OUT / sub).mkdir(parents=True)
     plt = style()
     figures: list[str] = []
     rows, ledger = collect_rows()
@@ -943,6 +1097,16 @@ def main() -> None:
                       "best_miou": round(max(r["miou"] for r in a_rows), 4)})
     else:
         b = None
+    a = package_a(plt, figures)
+    if a is not None:
+        for r in a["rows"]:
+            a_rows.append({"experiment_id": "A2", "dataset": VOC, "family": r["screen"], "configuration": r["configuration"],
+                           "images": 490, "miou": r["miou@0.45"], "mean_image_iou": r["mean_image_iou@0.45"],
+                           "note": "controlled; per-fold and calibration columns in controlled_ca_package_a.csv"})
+        entry = next(e for e in ledger if e["id"] == "A2")
+        entry.update({"configurations": len(a["rows"]), "best_configuration": "see CV summary (CA-C pending)",
+                      "best_miou": round(max(r["miou@0.45"] for r in a["rows"] if r["screen"] != "joint (diagnostic)"), 4)})
+    overview = controlled_overview(plt, a, b, figures)
     all_rows = rows + a_rows
     with gzip.open(OUT / "all_configurations.csv.gz", "wt", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=["experiment_id", "dataset", "family", "configuration", "images",
@@ -960,7 +1124,7 @@ def main() -> None:
     write_table("ledger", ["ID", "Experiment", "Dataset", "Status", "Configurations", "Best mIoU", "Decision / role"],
                 ledger_rows, "Every experiment run so far", long=True)
     tb = tier_b(plt, rows, figures)
-    compose_report(b, tb)
+    compose_report(b, tb, a, overview)
     json.dump({"figures": figures, "configurations": len(all_rows), "experiments": len(ledger)},
               open(OUT / "build_summary.json", "w"), indent=2)
     print(f"{len(ledger)} experiments, {len(all_rows)} configuration rows (+65,535 exhaustive subsets), {len(figures)} figures")

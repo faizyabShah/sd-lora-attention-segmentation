@@ -27,6 +27,6 @@ B15 & Clean CA-only screens (pre-sync) & VOC-Sim (490 images, 20 classes) & expl
 B16 & OVAM released masks & VOC-Sim (490 images, 20 classes) & reference (authors' masks) & 3 & 0.8247 & 0.7036 /\allowbreak{} 0.8247 /\allowbreak{} 0.6616 \\
 B17 & OVAM optimized token and DenseCRF on the final method & VOC-Sim (490 images, 20 classes); COCO-Cap (707 images, 20 classes) & exploratory; nothing selected & 32 & 0.8553 & token + DenseCRF: VOC 0.8525, COCO 0.6612 \\
 A1 & Controlled CA package B: CA-L, CA-H, CA-A & VOC-Sim (490 images, 20 classes) & controlled, 5-fold cross-validated & 65961 & 0.6923 & CA-L drop modules 10-11; CA-H drop head 1; CA-A keep reference (CA-C pending) \\
-A2 & Controlled CA package A: CA-T, CA-R & VOC-Sim (490 images, 20 classes) & controlled, 5-fold cross-validated (Codex) & --- & --- & pending \\
+A2 & Controlled CA package A: CA-T, CA-R (Codex) & VOC-Sim (490 images, 20 classes) & controlled, 5-fold cross-validated & 1279 & 0.6957 & CA-T keep all calls; CA-R keep 8+16+64 (drop 32x32) (CA-C pending) \\
 \bottomrule
 \end{longtable}}

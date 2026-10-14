@@ -412,6 +412,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Fold file + per-image writer + CV selection | Claude | Validated by Codex; OOF freeze guard enforced (Section 18) | `a163d4b6a`, this commit; `outputs/segmentation/controlled_attention_cv/shared/` |
 | CA-T / CA-R / joint official | Codex | Complete: keep all calls; promote resolutions 8+16+64 to CA-C | `16530b54b`; jobs `232263` → `232264` → `232265`; `outputs/segmentation/controlled_attention_cv/ca_time_resolution/` |
 | CA-L / CA-H / CA-A official | Claude | Complete (490/490, job `232243`); results for review in Section 21 | this commit; `outputs/segmentation/controlled_attention_cv/ca_layer_head_attribution/` |
+| Evidence package (all experiments, tables, figures) | Claude | Built from committed results; rebuild after every package (Section 22) | this commit; `docs/narmyn/attention/evidence/` |
 | CA-C and frozen CA | Codex runs; both review | Not started | `outputs/segmentation/controlled_attention_cv/ca_confirmation/` |
 | SA-T / SA-R / joint official | Codex | Blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_time_resolution/` |
 | SA-L / SA-H / operator check | Claude | Blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_layer_head/` |
@@ -707,3 +708,46 @@ selection 0.7070 vs 0.6661; folds choose 10–11-module subsets
    gain is positive, so its gain is concentrated in a subset of images.
 3. Shortlist for CA-C: `L/leave2_10_11` and `H/0_2_3_4_5_6_7`; CA-A keeps the
    reference convention.
+
+## 22. Claude: package A cross-check and shared evidence package
+
+**Package A cross-check.** Claude reloaded the 20 package A shards with the
+shared loader: 490 unique images, 1,279 configurations, folds equal to
+`configs/voc_sim_folds.csv`. Re-running `cross_validate` with
+`configs/controlled_ca_time_resolution_screens.json` reproduces the published
+CA-T and CA-R results exactly (same choices, votes and OOF mIoU). The two
+reference configurations inside package A are identical.
+
+**Cross-package reference.** Package A's reference (`time/all_00_30`) and
+package B's reference (`L/all_16`) are the same configuration but were produced
+in different environments on the same node. They are not pixel-identical:
+mean per-image IoU difference 0.0005 (median 0.0001, max 0.018; 2 of 490
+images differ by more than 0.01), mIoU 0.66610 vs 0.66606, identical mean AP.
+Consequences: compare values within a package; CA-C re-scores every
+combination in one run. Neither package records the torch/CUDA version in its
+settings; from now on each runner should store `torch.__version__`,
+`torch.version.cuda`, the GPU name and the node in `settings.json`.
+
+**Overlap for CA-C.** CA-R (drop every 32×32 module: 2, 3, 10, 11, 12) and CA-L
+(drop modules 10, 11, both 32×32 decoder) point in the same direction, so their
+gains are not expected to add. Suggested CA-C candidates, all against the
+inclusive reference: CA-R alone; CA-L alone; CA-H alone; CA-R + CA-H; CA-L +
+CA-H; and the leave-one-out variants of the combined candidate, as Section 4
+requires. Every promoted change helps mainly at 0.45 and above and slightly
+lowers AP; CA-L and CA-H change sign at 0.35.
+
+**Shared evidence package.** `docs/narmyn/attention/evidence/` collects every
+experiment run so far: a ledger of all 19 experiments (17 exploratory, 2
+controlled), the decision trail for every setting, one row per evaluated
+configuration (`all_configurations.csv.gz`, 22,064 rows plus the 65,535
+exhaustive subsets), the per-fold and calibration tables of both controlled
+packages, Markdown and LaTeX tables, 19 figures, `EVIDENCE.md` and
+`evidence_section.tex`. It is built only from committed result files:
+
+```bash
+python scripts/narmyn/attention/build_evidence.py
+```
+
+Both agents should rebuild it after a package's results are committed, so the
+supervisor-facing evidence stays current. A new package is added by giving it
+an entry in `EXPERIMENTS` and a loader in the builder.

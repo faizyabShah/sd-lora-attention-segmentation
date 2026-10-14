@@ -3,7 +3,9 @@
 
 \input{evidence/tables/ledger.tex}
 \input{evidence/tables/decision_trail.tex}
-\input{evidence/tables/a1_cv_summary.tex}
+\input{evidence/tables/a_cv_summary.tex}
+\input{evidence/tables/a2_ca_t.tex}
+\input{evidence/tables/a2_ca_r.tex}
 \input{evidence/tables/a1_ca_l_leave2.tex}
 \input{evidence/tables/a1_ca_h_heads.tex}
 \input{evidence/tables/a1_ca_h_greedy.tex}
@@ -14,12 +16,24 @@
 \caption{Each step of the method and the baselines. VOC-Sim values are in-sample; COCO-Cap was never used to choose the earlier final method.}\label{fig:b_progression}
 \end{figure}
 \begin{figure}[H]\centering
-\includegraphics[width=1.0\linewidth]{evidence/figures/a1_heldout_folds.pdf}
-\caption{Controlled CA screens: held-out mIoU of the setting chosen on the other four folds, against the reference, per fold.}\label{fig:a1_heldout_folds}
+\includegraphics[width=1.0\linewidth]{evidence/figures/a2_ca_t_calls.pdf}
+\caption{CA-T: CA from a single UNet call, and all calls except one.}\label{fig:a2_ca_t_calls}
 \end{figure}
 \begin{figure}[H]\centering
-\includegraphics[width=0.6\linewidth]{evidence/figures/a1_calibration.pdf}
-\caption{Calibration check: both promoted CA changes help at thresholds 0.45 and 0.55 but not at 0.35.}\label{fig:a1_calibration}
+\includegraphics[width=0.75\linewidth]{evidence/figures/a2_ca_r_subsets.pdf}
+\caption{CA-R: every subset of CA resolutions.}\label{fig:a2_ca_r_subsets}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=0.95\linewidth]{evidence/figures/a2_joint_grid.pdf}
+\caption{Joint grid of call windows and resolutions (diagnostic only).}\label{fig:a2_joint_grid}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=1.0\linewidth]{evidence/figures/a_heldout_folds.pdf}
+\caption{Controlled CA screens: held-out mIoU of the setting chosen on the other four folds, against the reference, per fold.}\label{fig:a_heldout_folds}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=0.6\linewidth]{evidence/figures/a_calibration.pdf}
+\caption{Calibration of the promoted CA changes at thresholds 0.35, 0.45 and 0.55.}\label{fig:a_calibration}
 \end{figure}
 \begin{figure}[H]\centering
 \includegraphics[width=1.0\linewidth]{evidence/figures/a1_ca_l_single_leave1.pdf}

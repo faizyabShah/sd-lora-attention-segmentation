@@ -1,0 +1,26 @@
+\begin{table}[H]\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{3.22cm}rrrrrr}
+\toprule
+Configuration & mIoU@0.45 & $\Delta$ vs reference & mIoU@0.35 & mIoU@0.55 & Mean AP & SD across folds \\
+\midrule
+all 00 30 & 0.6661 & 0.0000 & 0.7059 & 0.5434 & 0.9218 & 0.0133 \\
+window 00 04 & 0.5622 & -0.1039 & 0.5373 & 0.5393 & 0.8041 & 0.0168 \\
+window 05 09 & 0.6469 & -0.0192 & 0.6742 & 0.5465 & 0.8976 & 0.0131 \\
+window 10 14 & 0.6224 & -0.0437 & 0.6943 & 0.4670 & 0.9086 & 0.0122 \\
+window 15 20 & 0.5796 & -0.0865 & 0.6887 & 0.4031 & 0.9048 & 0.0096 \\
+window 21 25 & 0.5224 & -0.1437 & 0.6623 & 0.3409 & 0.8979 & 0.0122 \\
+window 26 30 & 0.4524 & -0.2137 & 0.6159 & 0.2789 & 0.8955 & 0.0081 \\
+trailing 05 30 & 0.6320 & -0.0341 & 0.7077 & 0.4803 & 0.9206 & 0.0106 \\
+trailing 10 30 & 0.5893 & -0.0768 & 0.6941 & 0.4209 & 0.9132 & 0.0097 \\
+trailing 15 30 & 0.5491 & -0.1170 & 0.6767 & 0.3730 & 0.9064 & 0.0114 \\
+trailing 21 30 & 0.4998 & -0.1663 & 0.6509 & 0.3215 & 0.8997 & 0.0108 \\
+trailing 26 30 & 0.4524 & -0.2137 & 0.6159 & 0.2789 & 0.8955 & 0.0081 \\
+cumulative 00 04 & 0.5622 & -0.1039 & 0.5373 & 0.5393 & 0.8041 & 0.0168 \\
+cumulative 00 09 & 0.6387 & -0.0274 & 0.6137 & 0.5860 & 0.8755 & 0.0153 \\
+cumulative 00 14 & 0.6668 & 0.0007 & 0.6617 & 0.5899 & 0.9034 & 0.0134 \\
+cumulative 00 20 & 0.6752 & 0.0091 & 0.6886 & 0.5763 & 0.9157 & 0.0136 \\
+cumulative 00 25 & 0.6727 & 0.0066 & 0.7001 & 0.5601 & 0.9198 & 0.0138 \\
+\bottomrule
+\end{tabular}
+\caption{CA-T: call windows (in-sample; all 79 configurations, including every single call and leave-one-call-out, in controlled\_\allowbreak{}ca\_\allowbreak{}package\_\allowbreak{}a.csv)}\label{tab:a2_ca_t}
+\end{table}
