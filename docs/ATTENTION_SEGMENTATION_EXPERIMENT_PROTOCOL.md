@@ -415,7 +415,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Evidence package (all experiments, tables, figures) | Claude | Built from committed results; rebuild after every package (Section 22) | this commit; `docs/narmyn/attention/evidence/` |
 | CA-C and frozen CA | Codex runs; both review | Not started | `outputs/segmentation/controlled_attention_cv/ca_confirmation/` |
 | SA-T / SA-R / joint official | Codex | Blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_time_resolution/` |
-| SA-L / SA-H / operator check | Claude | Blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_layer_head/` |
+| SA-L / SA-H / operator check | Claude | Runner and merge ready and verified (Section 24); blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_layer_head/` |
 | SA-C and frozen SA | Claude runs; both review | Not started | `outputs/segmentation/controlled_attention_cv/sa_confirmation/` |
 
 ### Pre-sync exploratory run
@@ -767,3 +767,36 @@ earlier load unchanged with an empty list, and the published CA-T, CA-R, CA-L,
 CA-H and CA-A selections are reproduced exactly with the updated loader.
 Tests: `tests/test_controlled_cv.py` (21, all pass) plus the existing suites
 (`test_controlled_ca`, `test_attention_sources`, `test_focused_self_attention`).
+
+## 24. Claude: SA package B runner ready (waits for the frozen CA)
+
+`scripts/run_sa_package_b.py` implements Section 6 and the SA-L, SA-H and
+operator-check parts of Section 7; `scripts/merge_sa_package_b.py` applies the
+Section 5a selection; `jobs/run_sa_package_b.slurm` runs the 20 class shards.
+Per image it scores 416 configurations (CA seed alone; 159 SA-L module sets
+with the CA-L families over the 16 `attn1` modules; 255 SA-H head subsets;
+`y = Aᵀx` for the SA reference) and writes the exploratory 65,535-subset SA
+module search locally. One live generation per image; conditional SA Q/K are
+kept on the device until scoring and then released.
+
+**Seed.** The runner reads the CA choice from a JSON seed spec (`calls`,
+`modules`, `heads`, `attribution`, `frozen`). It refuses a spec with
+`"frozen": false` unless `--allow-provisional` is given, and the merge refuses
+provisional shards. `configs/controlled_sa_seed_provisional.json` (the
+inclusive CA reference) is for development only. After CA-C, Codex records the
+frozen CA in Section 11; Claude then writes `configs/controlled_sa_seed_frozen.json`
+from it, and both SA packages use that same file.
+
+**Verification (development seed, 4 images, V100).** On two images (2 and 3
+class-word pieces), the CA seed and SA modules 15 (64×64), 10 (32×32, area
+downsampling) and 6 (8×8) reproduce `build_cross_attention_layer_heads` +
+`propagate_selected_module` tp/fp/fn exactly (8/8). The SA reference built
+from module means and from head means agrees within 1.2×10⁻⁷. The exhaustive
+search reproduces the named module sets except one leave-one-out subset on one
+image (4 of 262,144 pixels: summation order at the threshold). The merge,
+given package B's CA shards relabelled to the SA layout, reproduces the CA-L
+and CA-H selections exactly. About 8 s per image on a V100.
+
+**Suggestion for SA package A (Codex).** The same seed spec and Section 6
+operator should be shared; the per-call SA maps for SA-T can be accumulated by
+the same `propagate` routine without storing affinities.

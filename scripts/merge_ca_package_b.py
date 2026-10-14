@@ -28,13 +28,13 @@ HEADS = 8
 FULL_MASK = (1 << 16) - 1
 
 
-def head_name(subset) -> str:
-    return "H/" + "_".join(str(h) for h in sorted(subset))
+def head_name(subset, prefix: str = "H") -> str:
+    return f"{prefix}/" + "_".join(str(h) for h in sorted(subset))
 
 
-def head_report(results: cv.Results, cv_heads: dict) -> dict:
-    """Section 4 required head report (in-sample unless stated)."""
-    score = lambda subset: cv.miou(results, results.index(head_name(subset)))  # noqa: E731
+def head_report(results: cv.Results, cv_heads: dict, prefix: str = "H") -> dict:
+    """Section 4 required head report (in-sample unless stated); also used for SA-H (prefix "SH")."""
+    score = lambda subset: cv.miou(results, results.index(head_name(subset, prefix)))  # noqa: E731
     full = tuple(range(HEADS))
     singles = {h: score((h,)) for h in full}
     leave_one = {h: score(tuple(x for x in full if x != h)) for h in full}
@@ -55,7 +55,7 @@ def head_report(results: cv.Results, cv_heads: dict) -> dict:
         forward.append({"heads": sorted(current), "added": add, "miou": options[add]})
 
     ranking = sorted(
-        (c for c in results.configurations if c.startswith("H/")),
+        (c for c in results.configurations if c.startswith(f"{prefix}/")),
         key=lambda c: -cv.miou(results, results.index(c)),
     )
     retained = {h: 0 for h in full}
@@ -78,7 +78,7 @@ def head_report(results: cv.Results, cv_heads: dict) -> dict:
     }
 
 
-def exhaustive_cv(results: cv.Results, raw_dir: Path) -> dict:
+def exhaustive_cv(results: cv.Results, raw_dir: Path, modules_key: str = "modules") -> dict:
     """Section 5a on all 65,535 module subsets (exploratory; not eligible for freezing)."""
     ids, classes, folds = results.image_ids, np.array(results.classes), results.folds
     names = sorted(set(classes))
@@ -121,7 +121,7 @@ def exhaustive_cv(results: cv.Results, raw_dir: Path) -> dict:
         held = class_iou(sums[k])
         per_fold.append({
             "fold": k, "chosen_mask": hex(chosen + 1),
-            "chosen_modules": [results.settings["modules"][b] for b in range(16) if (chosen + 1) >> b & 1],
+            "chosen_modules": [results.settings[modules_key][b] for b in range(16) if (chosen + 1) >> b & 1],
             "train_delta": float(delta[chosen]), "heldout_miou_chosen": float(held[:, chosen].mean()),
             "heldout_miou_reference": float(held[:, ref].mean()),
         })
