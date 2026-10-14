@@ -164,6 +164,43 @@ class StorageTests(unittest.TestCase):
             self.assertEqual(set(records[0]), {"image_id", "class", "fold", "configuration", "threshold",
                                                "tp", "fp", "fn", "tn", "image_iou", "ap"})
 
+    def test_environment_is_recorded_per_session_and_merged(self):
+        folds = {f"img-{i}": 0 for i in range(4)}
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "shard.npz"
+            writer = cv.ShardWriter(path, ("x",), folds, {})
+            writer.add("img-0", "cat", np.ones((1, 3, 4)))
+            env = cv.load_results([path]).environments
+            self.assertEqual(len(env), 1)
+            for key in ("torch", "torch_cuda", "gpu", "node", "commit", "diffusers", "python"):
+                self.assertIn(key, env[0])
+            self.assertEqual(env[0]["torch"], torch.__version__)
+            # Same environment on resume: no new entry.
+            cv.ShardWriter(path, ("x",), folds, {}).add("img-1", "cat", np.ones((1, 3, 4)))
+            self.assertEqual(len(cv.load_results([path]).environments), 1)
+            # Different environment on resume: a second entry, settings check unaffected.
+            original = cv.runtime_environment
+            cv.runtime_environment = lambda: {**original(), "torch": "0.0.0-test"}
+            try:
+                cv.ShardWriter(path, ("x",), folds, {}).add("img-2", "cat", np.ones((1, 3, 4)))
+            finally:
+                cv.runtime_environment = original
+            envs = cv.load_results([path]).environments
+            self.assertEqual([e["torch"] for e in envs], [torch.__version__, "0.0.0-test"])
+
+    def test_shards_without_environment_still_load(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "old.npz"
+            np.savez_compressed(
+                path, configurations=np.array(["x"]), image_ids=np.array(["img-0"]), classes=np.array(["cat"]),
+                folds=np.array([0], dtype=np.int8), thresholds=np.array(cv.THRESHOLDS),
+                counts=np.ones((1, 1, 3, 4), dtype=np.int32), ap=np.zeros((1, 1), dtype=np.float32),
+                settings=np.array("{}"), commits=np.array(["abc"]), complete=np.array(True),
+            )
+            loaded = cv.load_results([path])
+            self.assertEqual(loaded.environments, ())
+            self.assertEqual(loaded.commits, ("abc",))
+
     def test_load_rejects_mismatched_or_duplicate_shards(self):
         folds = {f"img-{i}": 0 for i in range(3)}
         with tempfile.TemporaryDirectory() as tmp:

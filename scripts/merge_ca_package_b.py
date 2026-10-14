@@ -222,6 +222,7 @@ def main() -> None:
     exhaustive = exhaustive_cv(results, package / "exhaustive_raw") if (package / "exhaustive_raw").exists() else None
     figures = render_figures(package)
     meta_out = {"merge_commit": cv.git_commit(), "shard_commits": list(results.commits),
+                "shard_environments": list(results.environments),
                 "images": len(results.image_ids), "configurations": len(results.configurations)}
     (package / "fold_results.json").write_text(json.dumps({**meta_out, "screens": screens}, indent=2) + "\n")
     (package / "summary.json").write_text(json.dumps({**meta_out, "configurations": rows}, indent=2) + "\n")

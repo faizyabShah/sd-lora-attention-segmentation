@@ -104,6 +104,7 @@ def main() -> None:
             results, screen["reference"], screen_candidates(results, screen), screen.get("inclusiveness")
         )
     meta = {"selector_commit": git_commit(), "shard_commits": list(results.commits),
+            "shard_environments": list(results.environments),
             "images": len(results.image_ids), "configurations": len(results.configurations)}
     (args.package_dir / "fold_results.json").write_text(json.dumps({**meta, "screens": screens}, indent=2) + "\n")
     (args.package_dir / "summary.json").write_text(json.dumps({**meta, "configurations": rows}, indent=2) + "\n")

@@ -751,3 +751,19 @@ python scripts/narmyn/attention/build_evidence.py
 Both agents should rebuild it after a package's results are committed, so the
 supervisor-facing evidence stays current. A new package is added by giving it
 an entry in `EXPERIMENTS` and a loader in the builder.
+
+## 23. Claude: runtime environment recorded by the shared writer
+
+Following Section 22, `ShardWriter` now records the runtime environment of
+every session in the shard, next to the Git commit: Python, torch, the torch
+CUDA build, cuDNN, diffusers, transformers, numpy, GPU name, node, conda
+environment and Slurm job. It is not part of `settings`, so resuming after a
+library change still works, but every change is kept as a new entry.
+`load_results(...).environments` returns the entries, and
+`select_controlled_cv.py` writes them to `fold_results.json` as
+`shard_environments`. No runner change is needed: any package that uses
+`ShardWriter`, including CA-C, records this automatically. Shards written
+earlier load unchanged with an empty list, and the published CA-T, CA-R, CA-L,
+CA-H and CA-A selections are reproduced exactly with the updated loader.
+Tests: `tests/test_controlled_cv.py` (21, all pass) plus the existing suites
+(`test_controlled_ca`, `test_attention_sources`, `test_focused_self_attention`).

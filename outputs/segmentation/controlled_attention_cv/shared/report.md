@@ -11,7 +11,7 @@ this interface before CA package A (step 3).
 | `scripts/make_voc_sim_folds.py` | rebuilds the fold file from the manifest; `--check` verifies the committed file |
 | `src/segmentation/controlled_cv.py` | scorer, shard writer and loader, metrics, decision rule, cross-validated selection, paired bootstrap |
 | `scripts/select_controlled_cv.py` | turns a package's shards plus a screen spec into `fold_results.json`, `summary.json`, `report.md` |
-| `tests/test_controlled_cv.py` | synthetic test (19 tests): parity with `attention_to_mask`, `normalize_map`, `BinarySegmentationMetrics` and `attention_analysis` AP; writer/loader guards; decision-rule bands; CV procedure |
+| `tests/test_controlled_cv.py` | synthetic test (21 tests): parity with `attention_to_mask`, `normalize_map`, `BinarySegmentationMetrics` and `attention_analysis` AP; writer/loader guards; decision-rule bands; CV procedure |
 
 ## How a runner uses it
 
@@ -39,9 +39,12 @@ writer.finish()                                      # marks the shard complete
   threshold-free 64×64 AP. CPU and GPU give identical counts.
 - For binary masks that have no threshold (e.g. after DenseCRF), use
   `cv.score_masks(masks, target)` and pass `ap=None`.
-- Settings must match when a shard is resumed. The Git commit is recorded
-  per session in the shard, so a documentation-only pull does not block a
-  resume.
+- Settings must match when a shard is resumed. The Git commit and the
+  runtime environment (Python, torch, CUDA, cuDNN, diffusers, transformers,
+  numpy, GPU, node, conda env, Slurm job) are recorded per session in the
+  shard, so a documentation-only pull or a library change does not block a
+  resume but stays visible. `load_results(...).environments` lists them;
+  `select_controlled_cv.py` copies them into `fold_results.json`.
 
 Selection after all shards finish:
 

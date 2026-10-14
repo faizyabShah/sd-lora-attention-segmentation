@@ -205,9 +205,10 @@ class ShardWriter:
     The configuration list is fixed when the shard is created; every image
     must provide counts for every configuration, in that order. Each ``add``
     rewrites the shard atomically, so a killed job loses at most one image.
-    ``settings`` must match on resume; the Git commit is recorded separately
-    (one entry per session) so that a documentation-only pull does not block
-    resuming.
+    ``settings`` must match on resume; the Git commit and the runtime
+    environment (``runtime_environment``) are recorded separately, one entry
+    per session, so that a documentation-only pull or a library update does
+    not block resuming but is still visible in the shard.
     """
 
     def __init__(
@@ -226,6 +227,7 @@ class ShardWriter:
         self.folds = dict(folds)
         self.settings = dict(settings)
         self.commits: list[str] = []
+        self.environments: list[dict] = []
         self.image_ids: list[str] = []
         self.classes: list[str] = []
         self.counts: list[np.ndarray] = []
@@ -235,6 +237,9 @@ class ShardWriter:
         commit = git_commit()
         if not self.commits or self.commits[-1] != commit:
             self.commits.append(commit)
+        environment = {"commit": commit, **runtime_environment()}
+        if not self.environments or _without_job(self.environments[-1]) != _without_job(environment):
+            self.environments.append(environment)
 
     def _resume(self) -> None:
         loaded = load_results([self.path])
@@ -245,6 +250,7 @@ class ShardWriter:
         if loaded.settings != _jsonable(self.settings):
             raise ValueError(f"{self.path}: settings differ from this run")
         self.commits = list(loaded.commits)
+        self.environments = [dict(e) for e in loaded.environments]
         self.image_ids = list(loaded.image_ids)
         self.classes = list(loaded.classes)
         self.counts = [loaded.counts[:, i] for i in range(loaded.counts.shape[1])]
@@ -292,6 +298,7 @@ class ShardWriter:
             ap=ap.astype(np.float32),
             settings=np.array(json.dumps(_jsonable(self.settings), sort_keys=True)),
             commits=np.array(self.commits, dtype=str),
+            environments=np.array(json.dumps(_jsonable(self.environments), sort_keys=True)),
             complete=np.array(bool(complete)),
         )
         os.replace(temporary, self.path)
@@ -314,6 +321,7 @@ class Results:
     settings: dict
     complete: tuple[bool, ...] = field(default=())
     commits: tuple[str, ...] = field(default=())
+    environments: tuple[dict, ...] = field(default=())
 
     def index(self, name: str) -> int:
         return self.configurations.index(name)
@@ -324,7 +332,7 @@ class Results:
             self.configurations, self.thresholds,
             tuple(np.array(self.image_ids)[mask]), tuple(np.array(self.classes)[mask]),
             self.folds[mask], self.counts[:, mask], self.ap[:, mask], self.settings, self.complete,
-            self.commits,
+            self.commits, self.environments,
         )
 
     def records(self, threshold: float = SELECTION_THRESHOLD) -> Iterable[dict]:
@@ -375,6 +383,7 @@ def load_results(paths: Iterable[Path]) -> Results:
         settings=settings,
         complete=tuple(bool(p["complete"]) for p in parts),
         commits=tuple(dict.fromkeys(str(c) for p in parts for c in p.get("commits", []))),
+        environments=_unique_environments(p.get("environments") for p in parts),
     )
 
 
@@ -563,6 +572,56 @@ def cross_validate(results: Results, reference: str, candidates: Sequence[str],
 # --------------------------------------------------------------------------- #
 # Settings helpers
 # --------------------------------------------------------------------------- #
+def runtime_environment() -> dict:
+    """Versions and hardware of the current process (protocol Section 22)."""
+    import platform
+    import socket
+    from importlib import metadata
+
+    def version(package: str) -> str:
+        try:
+            return metadata.version(package)
+        except metadata.PackageNotFoundError:
+            return "not installed"
+
+    gpu = "none"
+    if torch.cuda.is_available():
+        try:
+            gpu = torch.cuda.get_device_name(torch.cuda.current_device())
+        except RuntimeError:
+            gpu = "unavailable"
+    job = os.environ.get("SLURM_JOB_ID", "")
+    if os.environ.get("SLURM_ARRAY_JOB_ID"):
+        job = f"{os.environ['SLURM_ARRAY_JOB_ID']}_{os.environ.get('SLURM_ARRAY_TASK_ID', '')}"
+    return {
+        "python": platform.python_version(),
+        "torch": torch.__version__,
+        "torch_cuda": str(torch.version.cuda),
+        "cudnn": str(torch.backends.cudnn.version()),
+        "diffusers": version("diffusers"),
+        "transformers": version("transformers"),
+        "numpy": np.__version__,
+        "gpu": gpu,
+        "node": socket.gethostname().split(".")[0],
+        "conda_env": os.environ.get("CONDA_DEFAULT_ENV", ""),
+        "slurm_job": job,
+    }
+
+
+def _without_job(environment: Mapping) -> dict:
+    return {k: v for k, v in environment.items() if k != "slurm_job"}
+
+
+def _unique_environments(values) -> tuple[dict, ...]:
+    seen: dict[str, dict] = {}
+    for value in values:
+        if value is None:
+            continue  # shards written before environments were recorded
+        for environment in json.loads(str(value)):
+            seen.setdefault(json.dumps(_without_job(environment), sort_keys=True), environment)
+    return tuple(seen.values())
+
+
 def git_commit(root: Path | None = None) -> str:
     try:
         return subprocess.check_output(
