@@ -424,7 +424,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | SA-L / SA-H / operator check | Claude | Complete and reviewed by Codex (490/490, job `232497`): SA-L only module 15, SA-H heads {1, 4, 6}, `A x` kept (Sections 30–31) | `97046d7c1`; `outputs/segmentation/controlled_attention_cv/sa_layer_head/` |
 | SA-C and frozen SA | Codex runs; both review | Complete (490/490): module 15 alone selected 5/5; Codex reviewed, Claude review requested (Section 33) | jobs `232561` → `232562` → `232563`; `outputs/segmentation/controlled_attention_cv/sa_confirmation/` |
 | SA-C second review | Claude | Accepted: every Section 33 value reproduced independently (Section 35); SA recorded in Section 11 | this commit |
-| Joint CA×SA interaction audit | Codex runs; Claude reviews | Runner submitted on Renyi; full 6×(12+no-SA) Cartesian grid with fold-wise 5-fold selection (Section 34) | jobs recorded in Section 34; `outputs/segmentation/controlled_attention_cv/joint_ca_sa_cartesian/` |
+| Joint CA×SA interaction audit | Codex runs; Claude reviews | Complete (490/490): sequential `CA=C/R|SA=C/L` retained 5/5; Claude result review requested (Section 36) | jobs `232590` → `232591` → `232592`; `outputs/segmentation/controlled_attention_cv/joint_ca_sa_cartesian/` |
 
 ### Pre-sync exploratory run
 
@@ -1310,3 +1310,39 @@ Claude will audit the committed result as requested.
 The evidence package now includes SA package A (A5) and SA-C (A6), with tables
 `a5_*`, `a6_*` and figures `a5_sa_t_calls`, `a5_sa_r_subsets`, `a5_joint_grid`
 and `a6_sa_c_thresholds`.
+
+## 36. Codex: joint CA×SA interaction results (Claude review requested)
+
+All jobs completed successfully: the independent-reference smoke `232590`,
+20-class production array `232591`, and dependent selector/finalizer `232592`.
+The smoke's inclusive SA map matched the independent package-B path within
+`7.153e-07`. Production contains 20/20 complete shards, 490/490 unique images,
+20 classes, and all 78 registered configurations, run on Renyi from commit
+`c0918f369`.
+
+**Cross-validated decision.** The sequential reference
+`CA=C/R|SA=C/L` was retained in all five folds because no alternative reached
+the Section 5 conditional threshold on any four-fold training split. Its pooled
+out-of-fold and full-490 mIoU are both 0.7887. Thus the joint audit confirms the
+sequential CA and SA choices; neither row in Section 11 changes.
+
+The closest full-490 alternative is `CA=C/R+H|SA=C/L`: remove CA head 1 in
+addition to the frozen CA resolution choice, then propagate through SA module
+15. It scores 0.7904 versus 0.7887 (+0.0017 mIoU), which is marginal under the
+registered +0.0050 conditional boundary. Its training-fold gains range only
+from +0.0010 to +0.0023. Paired mean image-IoU changes by +0.00035 with 95% CI
+[-0.00164, +0.00240] (269 images better, 221 worse). Its mIoU changes at
+thresholds 0.35/0.45/0.55 are -0.00010/+0.00172/+0.00069. Twelve classes
+improve, but `person` falls 0.0198 and `train` 0.0188; the largest gain is
+`sheep` +0.0583. This is diagnostic evidence only and does not justify adding
+CA head selection.
+
+The interaction matrix is stable in the SA direction: SA module 15 alone
+(`C/L`, all calls and all heads) is the best SA partner for every one of the
+six CA configurations. On the CA side, `C/R` and `C/R+H` are consistently the
+strongest seeds; the marginal head-removal difference above is the only change
+near the current pair.
+
+Claude: independently audit shard completeness, the 78-cell arithmetic, the
+fold decisions, the closest-alternative statistics, and the conclusion that
+the Section 11 CA/SA pair remains unchanged.

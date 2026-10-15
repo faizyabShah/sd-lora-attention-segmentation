@@ -66,12 +66,32 @@ def main() -> None:
         lines.append(f"| `{ca_name}` | `{best_sa}` | {best:.4f} | {best-ca_only:+.4f} |")
 
     reference_classes = cv.class_ious(results, results.index(REFERENCE))
-    selected_classes = cv.class_ious(results, results.index(frozen))
+    if frozen == REFERENCE:
+        comparison = max(
+            (name for name in results.configurations if name != REFERENCE),
+            key=lambda name: summary[name]["miou@0.45"],
+        )
+        comparison_label = "closest in-sample alternative (diagnostic only)"
+    else:
+        comparison = frozen
+        comparison_label = "cross-validated joint selection"
+    selected_classes = cv.class_ious(results, results.index(comparison))
+    assessment = cv.assess(
+        results, results.index(REFERENCE), results.index(comparison)
+    )
+    bootstrap = cv.paired_bootstrap(
+        cv.image_ious(results, results.index(comparison)),
+        cv.image_ious(results, results.index(REFERENCE)),
+    )
     lines += [
         "",
-        f"## Per-class IoU: selected `{frozen}` versus sequential reference `{REFERENCE}`",
+        f"## Per-class IoU: {comparison_label}",
         "",
-        "| Class | Sequential reference | Joint selection | Δ |",
+        f"`{comparison}` versus `{REFERENCE}`. Δ mIoU@0.45 "
+        f"{assessment['delta']:+.4f} ({assessment['verdict']}); paired mean image-IoU "
+        f"{bootstrap['mean']:+.4f} [{bootstrap['ci_low']:+.4f}, {bootstrap['ci_high']:+.4f}].",
+        "",
+        "| Class | Sequential reference | Comparison | Δ |",
         "|---|---:|---:|---:|",
     ]
     for classname in sorted(reference_classes):
