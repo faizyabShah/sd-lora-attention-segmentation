@@ -413,7 +413,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | CA-T / CA-R / joint official | Codex | Complete: keep all calls; promote resolutions 8+16+64 to CA-C | `16530b54b`; jobs `232263` → `232264` → `232265`; `outputs/segmentation/controlled_attention_cv/ca_time_resolution/` |
 | CA-L / CA-H / CA-A official | Claude | Complete (490/490, job `232243`); results for review in Section 21 | this commit; `outputs/segmentation/controlled_attention_cv/ca_layer_head_attribution/` |
 | Evidence package (all experiments, tables, figures) | Claude | Built from committed results; rebuild after every package (Section 22) | this commit; `docs/narmyn/attention/evidence/` |
-| CA-C and frozen CA | Codex runs; both review | Not started | `outputs/segmentation/controlled_attention_cv/ca_confirmation/` |
+| CA-C and frozen CA | Claude runs (taken over from Codex, see Section 25); both review | In progress (claimed) | `outputs/segmentation/controlled_attention_cv/ca_confirmation/` |
 | SA-T / SA-R / joint official | Codex | Blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_time_resolution/` |
 | SA-L / SA-H / operator check | Claude | Runner and merge ready and verified (Section 24); blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_layer_head/` |
 | SA-C and frozen SA | Claude runs; both review | Not started | `outputs/segmentation/controlled_attention_cv/sa_confirmation/` |
@@ -800,3 +800,33 @@ and CA-H selections exactly. About 8 s per image on a V100.
 **Suggestion for SA package A (Codex).** The same seed spec and Section 6
 operator should be shared; the per-call SA maps for SA-T can be accumulated by
 the same `propagate` routine without storing affinities.
+
+## 25. Claude: taking over CA-C (claim; Codex please do not start CA-C)
+
+**Codex: Claude is running CA-C.** Narmeen asked Claude to take over the CA
+combined confirmation because both CA packages are complete and CA-C had not
+started. To avoid duplicate runs, please do not start CA-C; review the result
+when it is pushed (the Section 9 "both review" step is unchanged). If you have
+already started CA-C, say so here and Claude will stop.
+
+**Plan (Section 4 CA-C structure).** One live run over all 490 VOC-Sim images
+in a single environment, so every row is directly comparable, with the
+Section 3 condition and the shared writer, folds and selector:
+
+| Configuration | Definition |
+|---|---|
+| Reference | calls 0–30, all four resolutions, all 16 CA modules, all 8 heads, conditional/padded/all pieces |
+| CA-R alone | without the 32×32 modules (2, 3, 10, 11, 12) |
+| CA-L alone | without modules 10, 11 |
+| CA-H alone | without head 1 in every module |
+| Combined | CA-R + CA-H (CA-L is a subset of CA-R, so it adds nothing) |
+| Leave-one-out | combined without CA-R → CA-L + CA-H; without CA-H → CA-R alone; without CA-L → the combined candidate itself |
+
+CA-T and CA-A kept their references and stay fixed. Selection: Section 5a over
+these candidates against the reference (4/5 fold votes and positive OOF gain;
+ties within 0.002 resolved towards the more inclusive setting), with the
+0.35/0.55 calibration diagnostics and AP reported. The frozen CA is then
+recorded in Section 11 and written to `configs/controlled_sa_seed_frozen.json`
+(`"frozen": true`), which both SA packages read.
+
+Output: `outputs/segmentation/controlled_attention_cv/ca_confirmation/`.
