@@ -423,6 +423,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | SA-T / SA-R / joint official | Codex | Complete (490/490, jobs `232502` → `232503` → `232504`): SA-T call 30, SA-R resolutions 8+64 (Section 31) | `outputs/segmentation/controlled_attention_cv/sa_time_resolution/` |
 | SA-L / SA-H / operator check | Claude | Complete and reviewed by Codex (490/490, job `232497`): SA-L only module 15, SA-H heads {1, 4, 6}, `A x` kept (Sections 30–31) | `97046d7c1`; `outputs/segmentation/controlled_attention_cv/sa_layer_head/` |
 | SA-C and frozen SA | Codex runs; both review | Complete (490/490): module 15 alone selected 5/5; Codex reviewed, Claude review requested (Section 33) | jobs `232561` → `232562` → `232563`; `outputs/segmentation/controlled_attention_cv/sa_confirmation/` |
+| SA-C second review | Claude | Accepted: every Section 33 value reproduced independently (Section 35); SA recorded in Section 11 | this commit |
 | Joint CA×SA interaction audit | Codex runs; Claude reviews | Runner submitted on Renyi; full 6×(12+no-SA) Cartesian grid with fold-wise 5-fold selection (Section 34) | jobs recorded in Section 34; `outputs/segmentation/controlled_attention_cv/joint_ca_sa_cartesian/` |
 
 ### Pre-sync exploratory run
@@ -442,13 +443,15 @@ totals. Re-run with the per-image writer before any CA choice is frozen.
 
 ## 11. Frozen choices and results
 
-CA is frozen by CA-C (Section 27); SA is not frozen yet. Add selections here
-only after the relevant combined confirmation.
+CA is frozen by CA-C (Section 27) and SA by SA-C (Sections 33 and 35), both
+reviewed by the two agents. The joint CA×SA audit (Section 34) can still revise
+this pair before phase 3. Add selections here only after the relevant combined
+confirmation.
 
 | Stage | Frozen setting | Evidence | Commit |
 |---|---|---|---|
 | CA | Calls 0–30; resolutions 8, 16, 64 (the 32×32 modules 2, 3, 10, 11, 12 removed; 11 modules); all 8 heads; conditional query and key, padded 77-token softmax, all class-word pieces. Seed file `configs/controlled_sa_seed_frozen.json` | CA-C, Section 27: 4/5 fold votes, OOF mIoU 0.6653 → 0.6914 (+0.0260); `outputs/segmentation/controlled_attention_cv/ca_confirmation/` | this commit |
-| SA | Pending | — | — |
+| SA | One non-residual `y = A x` pass through SA module 15 only (`up_blocks.3.attentions.2`, 64×64), all calls 0–30, all 8 heads; conditional QK affinity, area-downsampled seed, equal observation weights, min–max, ≥ 0.45 | SA-C, Sections 33 and 35: 5/5 fold votes, OOF mIoU 0.7556 → 0.7887 (+0.0330); not calibration-dependent; `outputs/segmentation/controlled_attention_cv/sa_confirmation/` | `05ed804`; this commit |
 
 
 ## 12. Claude audit of v1.0 **[v1.1]**
@@ -1236,3 +1239,74 @@ result appears, independently audit the 78-cell definition, reference cell,
 fold-wise selection, matrix, and class effects. The earlier SA-C review remains
 requested; this interaction audit does not silently freeze SA before that
 review.
+
+## 35. Claude: review of SA package A and SA-C (accepted)
+
+**Accepted.** Claude reviewed SA package A (Section 31), the SA-C runner
+(`scripts/run_sa_confirmation.py`, Section 32) and the committed SA-C results
+(Section 33). Everything below was recomputed from the committed shards, not
+read from the reports.
+
+**SA package A.**
+
+- 490/490 images, all 20 shards complete, one environment (A100, torch
+  2.6.0+cu118), commit `ae9d93d`, seed `frozen_ca_r_8_16_64`
+  (`"frozen": true`).
+- Re-running the Section 5a selection with
+  `configs/controlled_sa_time_resolution_screens.json` reproduces both
+  committed screens exactly: SA-T call 30 (5/5, OOF +0.01535) and SA-R 8+64
+  (5/5, OOF +0.01193), both calibration-dependent.
+- The inclusive reference is 0.75564, against 0.75534 for package B's `SL/all_16`
+  on V100 (mean image-IoU difference 0.0007).
+
+**SA-C runner.**
+
+- Each configuration averages the same propagated observations (module ×
+  call × head) with equal weights. T, R, L and H select call 30, resolutions
+  8+64, module 15 and heads {1, 4, 6} as registered.
+- The 12 cells are exactly the unique subsets of {T, R, L, H}: R is redundant
+  whenever L is active.
+- The inclusiveness weights are observation counts (reference 16 × 31 × 8 =
+  3968; L 248; L+H 93; and so on).
+- The seed is the frozen CA.
+
+**SA-C results.**
+
+- Re-running the selection with `configs/controlled_sa_confirmation_screens.json`
+  reproduces the committed result exactly: `C/L` in all 5 folds, OOF 0.7556 →
+  0.7887 (+0.03301), paired Δ +0.0417 [+0.0365, +0.0468], 403 better / 87 worse,
+  not calibration-dependent.
+- In every fold the runner-up on the training folds was `C/L+H`, 0.0009–0.0026
+  below `C/L`.
+- The Section 33 component effects reproduce: +H on L −0.0016, +T on L+H
+  −0.0046, +R on T+H −0.0040. So do the class effects: 18/20 classes improve;
+  `person` −0.055, `tv` −0.018.
+- Cross-package consistency: SA-C `C/reference`, `C/T` and `C/R` equal package
+  A's `time/all_00_30`, `time/step_30` and `resolution/r8_r64` exactly.
+  `C/L`, `C/H` and the seed match package B's `SL/single_15`, `SH/1_4_6` and
+  `SEED/ca_seed` within 0.0003 mIoU across A100/V100.
+
+**Frozen SA (recorded in Section 11):** one `y = A x` pass through SA module 15
+only, all calls, all heads. Every other restriction that passed its one-axis
+screen (SA-T, SA-R, SA-H) fails to survive the combination, the same pattern as
+CA-H in CA-C.
+
+**Caveats to carry into the paper.**
+
+- `L+H` has the best mean AP (0.9587 vs 0.9560) and the best mIoU at 0.55;
+  `L` wins at 0.35 and 0.45.
+- `person` is the one class that loses more than 0.05.
+- The frozen CA + SA pipeline reaches 0.7887 in-sample on VOC-Sim. The earlier
+  exploratory final method reached 0.7997, but with settings chosen on the same
+  images and four passes; the deferred phase (Section 8) tests repeated passes
+  under the folds.
+
+**Joint CA×SA audit (Section 34).** Noted; Claude will not launch a duplicate.
+Claude agrees that it is a check on the sequential design and that its fold-wise
+selection keeps it out-of-fold. If it selects a cell other than
+`CA=C/R|SA=C/L`, both the CA and SA rows of Section 11 are revised together.
+Claude will audit the committed result as requested.
+
+The evidence package now includes SA package A (A5) and SA-C (A6), with tables
+`a5_*`, `a6_*` and figures `a5_sa_t_calls`, `a5_sa_r_subsets`, `a5_joint_grid`
+and `a6_sa_c_thresholds`.

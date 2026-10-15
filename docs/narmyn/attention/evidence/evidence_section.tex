@@ -14,6 +14,12 @@
 \input{evidence/tables/a1_ca_h_greedy.tex}
 \input{evidence/tables/a1_ca_h_top.tex}
 \input{evidence/tables/a1_ca_a.tex}
+\input{evidence/tables/a6_sa_c.tex}
+\input{evidence/tables/a6_sa_c_components.tex}
+\input{evidence/tables/a6_sa_c_folds.tex}
+\input{evidence/tables/a6_sa_c_classes.tex}
+\input{evidence/tables/a5_sa_t.tex}
+\input{evidence/tables/a5_sa_r.tex}
 \input{evidence/tables/a4_cv_summary.tex}
 \input{evidence/tables/a4_checks.tex}
 \input{evidence/tables/a4_sa_h_heads.tex}
@@ -69,6 +75,22 @@
 \begin{figure}[H]\centering
 \includegraphics[width=0.65\linewidth]{evidence/figures/a1_ca_a_grid.pdf}
 \caption{CA-A: change in mIoU of each attribution convention against the reference.}\label{fig:a1_ca_a_grid}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=1.0\linewidth]{evidence/figures/a6_sa_c_thresholds.pdf}
+\caption{SA-C: change in mIoU of every combination against the SA reference at thresholds 0.35, 0.45 and 0.55 (blue = frozen).}\label{fig:a6_sa_c_thresholds}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=1.0\linewidth]{evidence/figures/a5_sa_t_calls.pdf}
+\caption{SA-T: SA from a single UNet call, and all calls except one.}\label{fig:a5_sa_t_calls}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=0.75\linewidth]{evidence/figures/a5_sa_r_subsets.pdf}
+\caption{SA-R: every subset of SA resolutions.}\label{fig:a5_sa_r_subsets}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=0.95\linewidth]{evidence/figures/a5_joint_grid.pdf}
+\caption{SA joint grid of call windows and resolutions (diagnostic only).}\label{fig:a5_joint_grid}
 \end{figure}
 \begin{figure}[H]\centering
 \includegraphics[width=1.0\linewidth]{evidence/figures/a4_sa_l_single_leave1.pdf}

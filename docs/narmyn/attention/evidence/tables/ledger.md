@@ -22,4 +22,6 @@
 | A1 | Controlled CA package B: CA-L, CA-H, CA-A | VOC-Sim (490 images, 20 classes) | controlled, 5-fold cross-validated | 65961 | 0.6923 | CA-L drop modules 10-11; CA-H drop head 1; CA-A keep reference (combined in A3) |
 | A2 | Controlled CA package A: CA-T, CA-R (Codex) | VOC-Sim (490 images, 20 classes) | controlled, 5-fold cross-validated | 1279 | 0.6957 | CA-T keep all calls; CA-R keep 8+16+64 (drop 32x32) (combined in A3) |
 | A3 | Controlled CA confirmation (CA-C) and the frozen CA | VOC-Sim (490 images, 20 classes) | controlled, 5-fold cross-validated | 6 | 0.6956 | frozen CA: CA-R alone (drop the 32x32 modules), all heads |
-| A4 | Controlled SA package B: SA-L, SA-H, operator check | VOC-Sim (490 images, 20 classes) | controlled, 5-fold cross-validated | 65951 | 0.7884 | SA-L only module 15 (U3.2, 64x64); SA-H heads {1, 4, 6}; A x kept (SA-C pending) |
+| A4 | Controlled SA package B: SA-L, SA-H, operator check | VOC-Sim (490 images, 20 classes) | controlled, 5-fold cross-validated | 65951 | 0.7884 | SA-L only module 15 (U3.2, 64x64); SA-H heads {1, 4, 6}; A x kept (combined in A6) |
+| A5 | Controlled SA package A: SA-T, SA-R (Codex) | VOC-Sim (490 images, 20 classes) | controlled, 5-fold cross-validated | 1279 | 0.7710 | SA-T call 30 only; SA-R resolutions 8+64; both calibration-dependent (combined in A6) |
+| A6 | Controlled SA confirmation (SA-C, Codex) and the frozen SA | VOC-Sim (490 images, 20 classes) | controlled, 5-fold cross-validated | 13 | 0.7887 | frozen SA: module 15 (U3.2) only, all calls, all heads |
