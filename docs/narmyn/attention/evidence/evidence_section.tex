@@ -14,6 +14,10 @@
 \input{evidence/tables/a1_ca_h_greedy.tex}
 \input{evidence/tables/a1_ca_h_top.tex}
 \input{evidence/tables/a1_ca_a.tex}
+\input{evidence/tables/a4_cv_summary.tex}
+\input{evidence/tables/a4_checks.tex}
+\input{evidence/tables/a4_sa_h_heads.tex}
+\input{evidence/tables/a4_sa_h_top.tex}
 \begin{figure}[H]\centering
 \includegraphics[width=1.0\linewidth]{evidence/figures/b_progression.pdf}
 \caption{Each step of the method and the baselines. VOC-Sim values are in-sample; COCO-Cap was never used to choose the earlier final method.}\label{fig:b_progression}
@@ -65,6 +69,14 @@
 \begin{figure}[H]\centering
 \includegraphics[width=0.65\linewidth]{evidence/figures/a1_ca_a_grid.pdf}
 \caption{CA-A: change in mIoU of each attribution convention against the reference.}\label{fig:a1_ca_a_grid}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=1.0\linewidth]{evidence/figures/a4_sa_l_single_leave1.pdf}
+\caption{SA-L: SA from one module only, and all SA modules except one (frozen CA seed).}\label{fig:a4_sa_l_single_leave1}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=1.0\linewidth]{evidence/figures/a4_sa_h.pdf}
+\caption{SA-H: leaving out one SA head, and all 255 SA head subsets by size.}\label{fig:a4_sa_h}
 \end{figure}
 \begin{figure}[H]\centering
 \includegraphics[width=1.0\linewidth]{evidence/figures/b_joint_passes_time.pdf}

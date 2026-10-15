@@ -415,7 +415,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Evidence package (all experiments, tables, figures) | Claude | Built from committed results; rebuild after every package (Section 22) | this commit; `docs/narmyn/attention/evidence/` |
 | CA-C and frozen CA | Claude runs (taken over from Codex, see Section 25); both review | Complete (490/490, job `232469`): CA-R alone frozen (Section 27); Codex review requested | this commit; `outputs/segmentation/controlled_attention_cv/ca_confirmation/`; `configs/controlled_sa_seed_frozen.json` |
 | SA-T / SA-R / joint official | Codex | Runner validated against shared tests; submission pending (Section 28) | `outputs/segmentation/controlled_attention_cv/sa_time_resolution/` |
-| SA-L / SA-H / operator check | Claude | Runner and merge ready and verified (Section 24); blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_layer_head/` |
+| SA-L / SA-H / operator check | Claude | Complete (490/490, job `232497`): SA-L only module 15, SA-H heads {1, 4, 6}, `A x` kept (Section 30); Codex review requested | this commit; `outputs/segmentation/controlled_attention_cv/sa_layer_head/` |
 | SA-C and frozen SA | Claude runs; both review | Not started | `outputs/segmentation/controlled_attention_cv/sa_confirmation/` |
 
 ### Pre-sync exploratory run
@@ -1035,3 +1035,48 @@ submission.
 **Timing.** CVPR's submission deadline is usually in November; both agents
 should confirm the official dates for the target year. The skeleton can start
 now. SA result text waits for SA packages A and B and SA-C.
+
+## 30. Claude: SA package B results (for review; nothing frozen here)
+
+All 20 shards completed (490/490 images, job `232497`; V100 nodes erdos and
+neumann, torch 2.4.1+cu121, the same environment as CA-C), seeded by
+`configs/controlled_sa_seed_frozen.json`. Merged with
+`scripts/merge_sa_package_b.py`.
+
+| Screen | Reference | Vote winner (votes) | OOF mIoU reference → choice | Paired Δ image IoU [95% CI] | Δ mIoU @0.35 / 0.45 / 0.55 | Result |
+|---|---|---|---|---|---|---|
+| SA-L | all 16 SA modules | `SL/single_15`: only `up_blocks.3.attentions.2` (U3.2, 64×64) (5/5) | 0.7553 → 0.7884 (+0.0331) | +0.042 [+0.037, +0.047] | +0.048 / +0.033 / +0.007 | Promote to SA-C |
+| SA-H | all 8 SA heads | `SH/1_4_6` (5/5) | 0.7553 → 0.7610 (+0.0057) | +0.007 [+0.006, +0.007] | +0.008 / +0.006 / +0.000 | Promote to SA-C (conditional band: 18/20 classes improve, largest class loss 0.003) |
+
+| Check (in-sample, 0.45) | mIoU | Δ vs SA reference |
+|---|---:|---:|
+| Frozen CA seed alone | 0.6956 | −0.0597 |
+| SA reference: all modules, heads and calls, `y = A x` | 0.7553 | — |
+| Operator check `y = Aᵀx` | 0.4741 | −0.2813 |
+
+- **SA-L.** Not calibration-dependent. The exploratory 65,535-subset search
+  chooses the same single module in 5/5 folds (not eligible for freezing; it
+  agrees). U3.2 is also the module the exploratory B8 screen chose. One class
+  loses more than 0.05 (`person`, −0.055); SA-L is in the promote band, where the
+  class-loss criterion does not apply, but SA-C should report it.
+- **SA-H.** Head 4 alone is 0.0015 higher in-sample (0.7625), inside the 0.002
+  tie band, so the more inclusive `{1, 4, 6}` is kept. Rank 3 of 255 in-sample.
+- **Operator.** `Aᵀx` is far worse at every threshold, confirming `y = A x`.
+
+**Verification.**
+
+- An independent recomputation of the pooled class IoU from the shard counts
+  reproduces every value above.
+- The seed-alone row reproduces CA-C's `C/R` (mIoU 0.69559 in both; at most 2
+  pixels differ on any image, from summation order).
+- The SA reference built from module means and from head means agrees within
+  1.2×10⁻⁷ on every image (`checks/`).
+- Shards record commits `ae9d93d` and `f6fcb11`; neither changed the runner.
+
+**For SA-C.** SA-L and SA-H were each screened with the other axis at its
+inclusive reference. SA-C has to test them together with the SA-T and SA-R
+winners from package A. If SA-R keeps 64×64 only, SA-L's single 64×64 module
+overlaps it, as CA-L overlapped CA-R.
+
+The evidence package now includes this as experiment A4 (tables `a4_*`,
+figures `a4_sa_l_single_leave1`, `a4_sa_h`).

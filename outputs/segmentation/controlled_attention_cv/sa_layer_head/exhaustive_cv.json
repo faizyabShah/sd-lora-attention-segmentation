@@ -1,0 +1,116 @@
+{
+  "note": "exploratory diagnostic (protocol Section 4 CA-L): the exhaustive maximum is not eligible for automatic selection; threshold 0.45 only",
+  "subsets": 65535,
+  "reference_mask": "0xffff",
+  "folds": [
+    {
+      "fold": 0,
+      "chosen_mask": "0x8000",
+      "chosen_modules": [
+        "up_blocks.3.attentions.2.transformer_blocks.0.attn1"
+      ],
+      "train_delta": 0.031318935466959505,
+      "heldout_miou_chosen": 0.7890547198548712,
+      "heldout_miou_reference": 0.7464002460922781
+    },
+    {
+      "fold": 1,
+      "chosen_mask": "0x8000",
+      "chosen_modules": [
+        "up_blocks.3.attentions.2.transformer_blocks.0.attn1"
+      ],
+      "train_delta": 0.03370958216890598,
+      "heldout_miou_chosen": 0.8116431551898182,
+      "heldout_miou_reference": 0.7781974629765951
+    },
+    {
+      "fold": 2,
+      "chosen_mask": "0x8000",
+      "chosen_modules": [
+        "up_blocks.3.attentions.2.transformer_blocks.0.attn1"
+      ],
+      "train_delta": 0.03286123898535857,
+      "heldout_miou_chosen": 0.7869022837703299,
+      "heldout_miou_reference": 0.7516879142215892
+    },
+    {
+      "fold": 3,
+      "chosen_mask": "0x8000",
+      "chosen_modules": [
+        "up_blocks.3.attentions.2.transformer_blocks.0.attn1"
+      ],
+      "train_delta": 0.03303363528219293,
+      "heldout_miou_chosen": 0.7822923369348623,
+      "heldout_miou_reference": 0.7452073165214084
+    },
+    {
+      "fold": 4,
+      "chosen_mask": "0x8000",
+      "chosen_modules": [
+        "up_blocks.3.attentions.2.transformer_blocks.0.attn1"
+      ],
+      "train_delta": 0.035229597176595726,
+      "heldout_miou_chosen": 0.7751603370312765,
+      "heldout_miou_reference": 0.7479131646272004
+    }
+  ],
+  "selection_counts": {
+    "0x8000": 5
+  },
+  "out_of_fold_miou_selection": 0.7884390198387103,
+  "out_of_fold_miou_reference": 0.7553350577122553,
+  "oof_gain": 0.033103962126455055,
+  "in_sample_miou_reference": 0.7553350577122554,
+  "in_sample_top10": [
+    {
+      "mask": "0x8000",
+      "modules": 1,
+      "miou": 0.7884390198387103
+    },
+    {
+      "mask": "0x9000",
+      "modules": 2,
+      "miou": 0.7825303051198409
+    },
+    {
+      "mask": "0x9001",
+      "modules": 3,
+      "miou": 0.7801646581233503
+    },
+    {
+      "mask": "0x8001",
+      "modules": 2,
+      "miou": 0.7785408030663301
+    },
+    {
+      "mask": "0x9002",
+      "modules": 3,
+      "miou": 0.7780817527868258
+    },
+    {
+      "mask": "0x8081",
+      "modules": 3,
+      "miou": 0.7766287789367049
+    },
+    {
+      "mask": "0x9081",
+      "modules": 4,
+      "miou": 0.7762404090933848
+    },
+    {
+      "mask": "0x8002",
+      "modules": 2,
+      "miou": 0.7761085831310923
+    },
+    {
+      "mask": "0x9082",
+      "modules": 4,
+      "miou": 0.7753301444471408
+    },
+    {
+      "mask": "0x9041",
+      "modules": 4,
+      "miou": 0.7750771915232079
+    }
+  ]
+}

@@ -9,9 +9,9 @@ CA attribution & OVAM: unconditional query, unpadded softmax, first piece & inhe
 CA calls & all 31 (0--30) & B1/\allowbreak{}B8 windows; B14 & 99 dev /\allowbreak{} 490 & ledger B1, B8, B14; Fig. a2\_\allowbreak{}ca\_\allowbreak{}t\_\allowbreak{}calls & A2 CA-T (CV): keep all calls 0--30 \\
 CA resolutions & all four (8, 16, 32, 64) & B1/\allowbreak{}B8 resolution screens & 99 dev /\allowbreak{} 490 & Table a2\_\allowbreak{}ca\_\allowbreak{}r; Fig. a2\_\allowbreak{}ca\_\allowbreak{}r\_\allowbreak{}subsets & A2 CA-R (CV): keep 8+16+64; A3 CA-C: frozen (4/\allowbreak{}5 votes, OOF +0.026) \\
 CA normalization, threshold & percentile 1--99, $\geq$ 0.45 & B5 & 99 dev images & ledger B5 & protocol fixes min--max, 0.45 for the CA phase \\
-SA module & U3.2 (up\_\allowbreak{}blocks.3.attentions.2 attn1, 64$\times$64) & B8 SA screens & 490 (in-sample) & ledger B8 & SA-L (Claude), seeded by the frozen CA \\
+SA module & U3.2 (up\_\allowbreak{}blocks.3.attentions.2 attn1, 64$\times$64) & B8 SA screens & 490 (in-sample) & ledger B8 & A4 SA-L (CV): only module 15 (U3.2), as before; awaiting SA-C \\
 SA passes & 4 (revised: 1) & B10; revised from B11/\allowbreak{}B13 & 490; 1-pass informed by COCO-Cap & Fig. b\_\allowbreak{}joint\_\allowbreak{}passes\_\allowbreak{}time & after SA freeze \\
-SA heads & \{0,1,2,4,5,6\} & B10 & 490 (in-sample) & Fig. b\_\allowbreak{}joint\_\allowbreak{}heads\_\allowbreak{}threshold & SA-H (Claude), seeded by the frozen CA \\
+SA heads & \{0,1,2,4,5,6\} & B10 & 490 (in-sample) & Fig. b\_\allowbreak{}joint\_\allowbreak{}heads\_\allowbreak{}threshold & A4 SA-H (CV): heads \{1, 4, 6\}; awaiting SA-C \\
 SA calls & 15--30 & B10 & 490 (in-sample) & Fig. b\_\allowbreak{}joint\_\allowbreak{}passes\_\allowbreak{}time & SA-T (Codex), seeded by the frozen CA \\
 Mask threshold & 0.45 & B5, B9, B10 & 99 dev /\allowbreak{} 490 & Fig. b\_\allowbreak{}joint\_\allowbreak{}heads\_\allowbreak{}threshold & fixed at 0.45; 0.35/\allowbreak{}0.55 as diagnostics \\
 Cleanup & remove components < 1\% & B10 & 490 (in-sample) & Table b\_\allowbreak{}component\_\allowbreak{}ablations & deferred phase \\

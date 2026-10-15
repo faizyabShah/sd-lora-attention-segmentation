@@ -1,0 +1,14 @@
+\begin{table}[H]\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{5.47cm}rrrrr}
+\toprule
+Configuration & mIoU@0.45 & $\Delta$ vs SA reference & mIoU@0.35 & mIoU@0.55 & Mean AP \\
+\midrule
+frozen CA seed alone (no SA) & 0.6956 & -0.0597 & 0.7067 & 0.5877 & 0.9131 \\
+SA reference: all 16 SA modules, 8 heads, y = A x & 0.7553 & 0.0000 & 0.7212 & 0.7463 & 0.9535 \\
+operator check: y = Aᵀx & 0.4741 & -0.2813 & 0.5914 & 0.3273 & 0.9179 \\
+SA-L choice: single\_\allowbreak{}15 & 0.7884 & 0.0331 & 0.7689 & 0.7531 & 0.9559 \\
+SA-H choice: heads 1, 4, 6 & 0.7610 & 0.0057 & 0.7294 & 0.7467 & 0.9552 \\
+\bottomrule
+\end{tabular}
+\caption{SA package B: what one SA pass adds to the frozen CA seed, the transposed operator, and the two choices (in-sample)}\label{tab:a4_checks}
+\end{table}
