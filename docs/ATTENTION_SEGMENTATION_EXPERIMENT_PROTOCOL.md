@@ -27,6 +27,12 @@ The study has three ordered phases:
 3. Freeze the attention selection, then study fusion, repeated propagation,
    normalization, thresholds, and spatial postprocessing.
 
+Before phase 3, Section 34 performs a registered joint CA×SA interaction
+audit. The sequential CA-then-SA design is valid for controlled attribution,
+but it does not establish that the CA seed preferred without SA is also the
+best seed after propagation. The audit cross-validates every CA-C cell against
+every unique SA-C cell before fusion is studied.
+
 VOC-Sim is the development and tuning dataset. No choice is changed in response
 to COCO-Cap results. After the full method is frozen, COCO-Cap is used as the
 untuned generalization evaluation.
@@ -417,6 +423,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | SA-T / SA-R / joint official | Codex | Complete (490/490, jobs `232502` → `232503` → `232504`): SA-T call 30, SA-R resolutions 8+64 (Section 31) | `outputs/segmentation/controlled_attention_cv/sa_time_resolution/` |
 | SA-L / SA-H / operator check | Claude | Complete and reviewed by Codex (490/490, job `232497`): SA-L only module 15, SA-H heads {1, 4, 6}, `A x` kept (Sections 30–31) | `97046d7c1`; `outputs/segmentation/controlled_attention_cv/sa_layer_head/` |
 | SA-C and frozen SA | Codex runs; both review | Complete (490/490): module 15 alone selected 5/5; Codex reviewed, Claude review requested (Section 33) | jobs `232561` → `232562` → `232563`; `outputs/segmentation/controlled_attention_cv/sa_confirmation/` |
+| Joint CA×SA interaction audit | Codex runs; Claude reviews | Runner submitted on Renyi; full 6×(12+no-SA) Cartesian grid with fold-wise 5-fold selection (Section 34) | jobs recorded in Section 34; `outputs/segmentation/controlled_attention_cv/joint_ca_sa_cartesian/` |
 
 ### Pre-sync exploratory run
 
@@ -1171,3 +1178,56 @@ Codex accepts `C/L` under the registered vote, OOF, and calibration rules.
 Claude should independently review the committed shards, report, component
 comparisons, and class caveat. Section 11 remains pending until that second
 review; only then should SA be recorded as frozen.
+
+## 34. Codex: registered joint CA×SA interaction audit
+
+The sequential controlled search can miss an interaction: a CA configuration
+that is weaker as a standalone mask may provide a better seed for a particular
+SA operator. Before phase 3, Codex is therefore running the full Cartesian
+product of the configurations admitted to the two confirmation stages.
+
+**Registered grid.** The CA side contains all six CA-C cells:
+`C/reference`, `C/R`, `C/L`, `C/H`, `C/R+H`, and `C/L+H`. The SA side contains
+all twelve unique SA-C cells: the inclusive reference; T, R, L, H; T+R, T+L,
+T+H, R+H, L+H, T+R+H, and T+L+H. A no-SA control is included for each CA
+seed. This is 6 × 13 = 78 scored configurations. R+L and T+R+L variants are
+not separate cells because restricting SA to module 15 (64×64) makes the
+8+64 resolution restriction an exact arithmetic duplicate.
+
+“Full Cartesian” here refers to every cell admitted to CA-C and SA-C, rather
+than a shortlist. The exploratory 65,535 layer subsets and all one-axis raw
+screens are excluded: crossing those would create millions to billions of new
+comparisons, would not represent complete combined configurations, and would
+replace the registered confirmation study with a new unbounded search.
+
+**Fixed arithmetic.** Every CA seed uses calls 0–30, the reference attribution
+(conditional branch, padded 77-position softmax, all class pieces), independent
+min–max normalization, and its CA-C module/head choice. Every SA cell uses the
+same genuine conditional QK affinity and exactly one non-residual `A x` pass,
+area downsampling of the seed, equal observation weights, final min–max
+normalization, and no postprocessing. Six seeds are propagated together through
+each affinity, so the grid does not reconstruct the affinity six times.
+
+**Selection.** The sequential result `CA=C/R|SA=C/L` is the preregistered
+reference. For each held-out VOC-Sim fold, all 78 cells are ranked using only
+the other four folds under the Section 5 promotion and inclusiveness rules;
+the chosen cell is scored on the held-out fold. The report gives the pooled
+out-of-fold result, fold votes, bootstrap interval, calibration diagnostics,
+the full 6×13 in-sample matrix, and per-class changes. No COCO-Cap result is
+used. Inclusiveness ties use the sum of the retained CA-observation fraction
+and retained SA-observation fraction relative to their inclusive references.
+No images or attention tensors are retained.
+
+| Item | Path |
+|---|---|
+| Runner | `scripts/run_joint_ca_sa_cartesian.py` |
+| Selector specification | `configs/joint_ca_sa_cartesian_screen.json` |
+| Diagnostic finalizer | `scripts/finalize_joint_ca_sa_cartesian.py` |
+| Smoke / production / merge | `jobs/{smoke,run,merge}_joint_ca_sa_cartesian.slurm` |
+| Output | `outputs/segmentation/controlled_attention_cv/joint_ca_sa_cartesian/` |
+
+**Claude handoff.** Do not launch a duplicate joint search. When the committed
+result appears, independently audit the 78-cell definition, reference cell,
+fold-wise selection, matrix, and class effects. The earlier SA-C review remains
+requested; this interaction audit does not silently freeze SA before that
+review.
