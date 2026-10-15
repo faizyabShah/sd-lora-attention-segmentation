@@ -416,7 +416,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | CA-C and frozen CA | Claude runs (taken over from Codex, see Section 25); both review | Complete (490/490, job `232469`): CA-R alone frozen (Section 27); Codex review requested | this commit; `outputs/segmentation/controlled_attention_cv/ca_confirmation/`; `configs/controlled_sa_seed_frozen.json` |
 | SA-T / SA-R / joint official | Codex | Complete (490/490, jobs `232502` → `232503` → `232504`): SA-T call 30, SA-R resolutions 8+64 (Section 31) | `outputs/segmentation/controlled_attention_cv/sa_time_resolution/` |
 | SA-L / SA-H / operator check | Claude | Complete and reviewed by Codex (490/490, job `232497`): SA-L only module 15, SA-H heads {1, 4, 6}, `A x` kept (Sections 30–31) | `97046d7c1`; `outputs/segmentation/controlled_attention_cv/sa_layer_head/` |
-| SA-C and frozen SA | Codex runs; both review | Running: smoke `232561` → Renyi array `232562` → merge `232563` (Section 32) | `fb3b5057d`; `outputs/segmentation/controlled_attention_cv/sa_confirmation/` |
+| SA-C and frozen SA | Codex runs; both review | Complete (490/490): module 15 alone selected 5/5; Codex reviewed, Claude review requested (Section 33) | jobs `232561` → `232562` → `232563`; `outputs/segmentation/controlled_attention_cv/sa_confirmation/` |
 
 ### Pre-sync exploratory run
 
@@ -1134,3 +1134,40 @@ guard and reports calibration, AP, per-class IoU, and component removal effects.
 Submitted from commit `fb3b5057d`: one-image independent-reference smoke job
 `232561`; production array `232562` on Renyi, dependent on the smoke; merge and
 cross-validated selector job `232563`, dependent on the full array.
+
+## 33. Codex: SA-C results (Claude review requested)
+
+All jobs completed successfully. The smoke matched the independent package-B
+inclusive reference to `5.960e-07`; production contains 20/20 complete shards
+and 490/490 images, all run on Renyi (A100, torch 2.6.0+cu118).
+
+| Configuration | mIoU@0.35 | mIoU@0.45 | mIoU@0.55 | Mean AP |
+|---|---:|---:|---:|---:|
+| Inclusive SA reference | 0.7213 | 0.7556 | 0.7466 | 0.9536 |
+| T: call 30 | 0.7465 | 0.7710 | 0.7457 | 0.9551 |
+| R: resolutions 8+64 | 0.7414 | 0.7676 | 0.7399 | 0.9542 |
+| L: module 15 only | **0.7691** | **0.7887** | 0.7532 | 0.9560 |
+| H: heads {1,4,6} | 0.7295 | 0.7613 | 0.7470 | 0.9552 |
+| L+H | 0.7637 | 0.7871 | **0.7554** | **0.9587** |
+| T+L | 0.7704 | 0.7820 | 0.7260 | 0.9474 |
+| T+L+H | 0.7658 | 0.7825 | 0.7330 | 0.9514 |
+
+**Selection:** `C/L`, module 15 alone, wins 5/5 folds. OOF mIoU is 0.7556 →
+0.7887 (+0.0330); paired mean image-IoU gain +0.0417, bootstrap 95% CI
+[+0.0365,+0.0468], with 403 images better and 87 worse. It is not
+calibration-dependent: Δ mIoU is +0.0478 / +0.0330 / +0.0066 at thresholds
+0.35 / 0.45 / 0.55; mean AP increases 0.9536 → 0.9560.
+
+The other independently promoted restrictions do not survive combination.
+Adding H to L changes mIoU by −0.0016; adding T to L+H changes it by −0.0046;
+adding R to T+H changes it by −0.0040. T+L+H is 0.7825, below L alone.
+
+Per class, 18/20 improve. The largest gains are `chair` +0.121, `aeroplane`
++0.114, `bicycle` +0.068, `boat` +0.068, and `bird` +0.067. `person` falls
+−0.055 and `tv` −0.018. The complete class table is in `report.md` and
+`diagnostics.json`.
+
+Codex accepts `C/L` under the registered vote, OOF, and calibration rules.
+Claude should independently review the committed shards, report, component
+comparisons, and class caveat. Section 11 remains pending until that second
+review; only then should SA be recorded as frozen.

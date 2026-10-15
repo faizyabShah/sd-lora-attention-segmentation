@@ -1,0 +1,120 @@
+{
+  "selector_commit": "99963ef5f9305b26fce30566089889c54980ea1f",
+  "shard_commits": [
+    "99963ef5f9305b26fce30566089889c54980ea1f"
+  ],
+  "shard_environments": [
+    {
+      "commit": "99963ef5f9305b26fce30566089889c54980ea1f",
+      "conda_env": "trdp",
+      "cudnn": "90100",
+      "diffusers": "0.36.0",
+      "gpu": "NVIDIA A100-PCIE-40GB",
+      "node": "renyi",
+      "numpy": "1.26.4",
+      "python": "3.10.20",
+      "slurm_job": "232562_0",
+      "torch": "2.6.0+cu118",
+      "torch_cuda": "11.8",
+      "transformers": "4.44.2"
+    }
+  ],
+  "images": 490,
+  "configurations": 13,
+  "screens": {
+    "SA-C": {
+      "reference": "C/reference",
+      "candidates": [
+        "C/T",
+        "C/R",
+        "C/L",
+        "C/H",
+        "C/T+R",
+        "C/T+L",
+        "C/T+H",
+        "C/R+H",
+        "C/L+H",
+        "C/T+R+H",
+        "C/T+L+H"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "C/L",
+          "reason": "promote",
+          "train_miou_chosen": 0.7891807051097783,
+          "train_miou_reference": 0.7579970607259361,
+          "heldout_miou_chosen": 0.7892162845757265,
+          "heldout_miou_reference": 0.7464967736633457
+        },
+        {
+          "fold": 1,
+          "chosen": "C/L",
+          "reason": "promote",
+          "train_miou_chosen": 0.7825233931955464,
+          "train_miou_reference": 0.7489501990305895,
+          "heldout_miou_chosen": 0.8116117309609685,
+          "heldout_miou_reference": 0.7780254989258214
+        },
+        {
+          "fold": 2,
+          "chosen": "C/L",
+          "reason": "promote",
+          "train_miou_chosen": 0.7898832887703303,
+          "train_miou_reference": 0.7570876715619165,
+          "heldout_miou_chosen": 0.7868874535009438,
+          "heldout_miou_reference": 0.7518466751041545
+        },
+        {
+          "fold": 3,
+          "chosen": "C/L",
+          "reason": "promote",
+          "train_miou_chosen": 0.7908031022903683,
+          "train_miou_reference": 0.7577562177290953,
+          "heldout_miou_chosen": 0.7825287703345707,
+          "heldout_miou_reference": 0.7459609027586912
+        },
+        {
+          "fold": 4,
+          "chosen": "C/L",
+          "reason": "promote",
+          "train_miou_chosen": 0.790970026678861,
+          "train_miou_reference": 0.755871414929871,
+          "heldout_miou_chosen": 0.7756694376872799,
+          "heldout_miou_reference": 0.7483566763749364
+        }
+      ],
+      "selection_counts": {
+        "C/L": 5
+      },
+      "vote_winner": "C/L",
+      "vote_winner_votes": 5,
+      "vote_passed": true,
+      "oof_guard_passed": true,
+      "frozen": "C/L",
+      "frozen_votes": 5,
+      "freeze_reason": "fold vote and OOF guard passed",
+      "out_of_fold_miou_selection": 0.7886558382302244,
+      "out_of_fold_miou_reference": 0.7556433948306014,
+      "oof_gain": 0.03301244339962306,
+      "in_sample_miou_frozen": 0.7886558382302244,
+      "in_sample_miou_reference": 0.7556433948306014,
+      "paired_bootstrap_frozen_vs_reference": {
+        "mean": 0.0416680456078007,
+        "ci_low": 0.03651292184069346,
+        "ci_high": 0.04684644178722525,
+        "better": 403,
+        "worse": 87,
+        "ties": 0
+      },
+      "calibration": {
+        "delta_miou@0.35": 0.047803751900567515,
+        "delta_miou@0.45": 0.03301244339962306,
+        "delta_miou@0.55": 0.0066017158028816025
+      },
+      "calibration_dependent": false,
+      "mean_ap_frozen": 0.9560115336155405,
+      "mean_ap_reference": 0.9535870272286084
+    }
+  }
+}
