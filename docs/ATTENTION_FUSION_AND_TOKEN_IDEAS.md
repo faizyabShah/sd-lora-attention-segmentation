@@ -141,4 +141,4 @@ per-image counts: `docs/narmyn/attention/TOKEN_CRF_EXPERIMENT.md`.
 | Date | ID | Owner | Output | Commit | Note |
 |---|---|---|---|---|---|
 | 2026-10-13 | T-ovam, R2 | Claude | `outputs/segmentation/narmyn_token_crf/` | this branch | exploratory, pre-protocol |
-| 2026-10-16 | P1, P2, P6, W3 | Codex | `outputs/segmentation/controlled_attention_cv/propagation_package/` | pending submission commit | official controlled package, protocol Section 37 |
+| 2026-10-16 | P1, P2, P6, W3 | Codex | `outputs/segmentation/controlled_attention_cv/propagation_package/` | `8f2f73acc`; jobs `232662` → `232663` → `232664` | official controlled package, protocol Section 37 |

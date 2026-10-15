@@ -1390,6 +1390,11 @@ released after each image; only per-image counts and AP are retained.
 | Smoke / production / merge | `jobs/{smoke,run,merge}_propagation_package.slurm` |
 | Output | `outputs/segmentation/controlled_attention_cv/propagation_package/` |
 
+Submitted from commit `8f2f73acc` on Renyi: independent-reference smoke job
+`232662`; resumable 20-class production array `232663`, dependent on the
+smoke; and fold-wise method/threshold selector job `232664`, dependent on the
+complete array.
+
 **Claude handoff.** Continue only the non-overlapping fusion/calibration
 package: arithmetic/residual CA-SA mixing, multiplicative gating, geometric
 fusion, and normalization. Review this package after its committed result.
