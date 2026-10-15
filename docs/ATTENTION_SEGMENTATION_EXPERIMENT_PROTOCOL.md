@@ -333,7 +333,7 @@ result report for that package.
 | CA confirmation | Codex runs; both review | Evaluate the combined shortlist under the folds and freeze CA | `outputs/segmentation/controlled_attention_cv/ca_confirmation/` |
 | SA package A | Codex | SA-T, SA-R, and the joint SA time-resolution screen using the frozen CA configuration | `outputs/segmentation/controlled_attention_cv/sa_time_resolution/` |
 | SA package B | Claude | SA-L, SA-H, the required head report, and the `A^T x` operator check using the same frozen CA configuration | `outputs/segmentation/controlled_attention_cv/sa_layer_head/` |
-| SA confirmation | Claude runs; both review | Evaluate the combined shortlist under the folds and freeze SA | `outputs/segmentation/controlled_attention_cv/sa_confirmation/` |
+| SA confirmation | Codex runs; both review | Evaluate the combined shortlist under the folds and freeze SA | `outputs/segmentation/controlled_attention_cv/sa_confirmation/` |
 
 ### Execution order **[v1.2]**
 
@@ -416,7 +416,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | CA-C and frozen CA | Claude runs (taken over from Codex, see Section 25); both review | Complete (490/490, job `232469`): CA-R alone frozen (Section 27); Codex review requested | this commit; `outputs/segmentation/controlled_attention_cv/ca_confirmation/`; `configs/controlled_sa_seed_frozen.json` |
 | SA-T / SA-R / joint official | Codex | Complete (490/490, jobs `232502` → `232503` → `232504`): SA-T call 30, SA-R resolutions 8+64 (Section 31) | `outputs/segmentation/controlled_attention_cv/sa_time_resolution/` |
 | SA-L / SA-H / operator check | Claude | Complete and reviewed by Codex (490/490, job `232497`): SA-L only module 15, SA-H heads {1, 4, 6}, `A x` kept (Sections 30–31) | `97046d7c1`; `outputs/segmentation/controlled_attention_cv/sa_layer_head/` |
-| SA-C and frozen SA | Claude runs; both review | Not started | `outputs/segmentation/controlled_attention_cv/sa_confirmation/` |
+| SA-C and frozen SA | Codex runs; both review | Codex took over at Narmeen's request; runner ready, submission pending (Section 32) | `outputs/segmentation/controlled_attention_cv/sa_confirmation/` |
 
 ### Pre-sync exploratory run
 
@@ -1117,3 +1117,16 @@ T+R, T+L, T+H, R+H, L+H, T+R+H, and T+L+H. Here T is call 30, R is resolutions
 four-way combination duplicates T+L+H. Report fold selection, paired bootstrap,
 calibration, AP, per-class changes, and leave-one-component-out effects. Freeze
 SA only after this combined run.
+
+## 32. Codex: taking over SA-C at Narmeen's request
+
+Narmeen reassigned the combined SA confirmation from Claude to Codex. Claude
+should not launch a duplicate SA-C job; both agents still review the completed
+package before Section 11 records a frozen SA configuration.
+
+The runner evaluates all unique combinations from the Section 31 handoff in a
+single live generation per image and one environment: inclusive SA reference;
+T, R, L, H alone; T+R, T+L, T+H, R+H, L+H, T+R+H, and T+L+H. R+L duplicates L
+because module 15 is 64×64, and the four-way combination duplicates T+L+H, so
+neither duplicate is scored. The merge applies the shared fold vote and OOF
+guard and reports calibration, AP, per-class IoU, and component removal effects.
