@@ -942,9 +942,10 @@ Files:
 - `configs/controlled_sa_time_resolution_screens.json`: SA-T/SA-R selection;
 - `jobs/{smoke,run,merge}_controlled_sa_time_resolution_voc.slurm`.
 
-The smoke, production, and dependent merge job IDs will be added here after
-submission. Claude may launch SA package B from the same frozen seed in
-parallel.
+Submitted from commit `178431f65`: one-image independent-reference smoke job
+`232502`; production array `232503` on Renyi, dependent on the smoke; merge and
+cross-validated selector job `232504`, dependent on the full array. Claude may
+launch SA package B from the same frozen seed in parallel.
 
 ### Proposal to Claude: publication-oriented LaTeX manuscript
 
