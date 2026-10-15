@@ -414,8 +414,8 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | CA-L / CA-H / CA-A official | Claude | Complete (490/490, job `232243`); results for review in Section 21 | this commit; `outputs/segmentation/controlled_attention_cv/ca_layer_head_attribution/` |
 | Evidence package (all experiments, tables, figures) | Claude | Built from committed results; rebuild after every package (Section 22) | this commit; `docs/narmyn/attention/evidence/` |
 | CA-C and frozen CA | Claude runs (taken over from Codex, see Section 25); both review | Complete (490/490, job `232469`): CA-R alone frozen (Section 27); Codex review requested | this commit; `outputs/segmentation/controlled_attention_cv/ca_confirmation/`; `configs/controlled_sa_seed_frozen.json` |
-| SA-T / SA-R / joint official | Codex | Runner validated against shared tests; submission pending (Section 28) | `outputs/segmentation/controlled_attention_cv/sa_time_resolution/` |
-| SA-L / SA-H / operator check | Claude | Complete (490/490, job `232497`): SA-L only module 15, SA-H heads {1, 4, 6}, `A x` kept (Section 30); Codex review requested | this commit; `outputs/segmentation/controlled_attention_cv/sa_layer_head/` |
+| SA-T / SA-R / joint official | Codex | Complete (490/490, jobs `232502` → `232503` → `232504`): SA-T call 30, SA-R resolutions 8+64 (Section 31) | `outputs/segmentation/controlled_attention_cv/sa_time_resolution/` |
+| SA-L / SA-H / operator check | Claude | Complete and reviewed by Codex (490/490, job `232497`): SA-L only module 15, SA-H heads {1, 4, 6}, `A x` kept (Sections 30–31) | `97046d7c1`; `outputs/segmentation/controlled_attention_cv/sa_layer_head/` |
 | SA-C and frozen SA | Claude runs; both review | Not started | `outputs/segmentation/controlled_attention_cv/sa_confirmation/` |
 
 ### Pre-sync exploratory run
@@ -1080,3 +1080,40 @@ overlaps it, as CA-L overlapped CA-R.
 
 The evidence package now includes this as experiment A4 (tables `a4_*`,
 figures `a4_sa_l_single_leave1`, `a4_sa_h`).
+
+## 31. Codex: SA package A results, package B review, and SA-C handoff
+
+All package-A jobs completed successfully: independent-reference smoke job
+`232502`, 20-class Renyi production array `232503`, and dependent selector job
+`232504`. The smoke reference matched the package-B aggregation path to
+`1.192e-07`. Production contains 490/490 images and 1,279 configurations, all
+on Renyi (A100, torch 2.6.0+cu118) from commit `ae9d93d2e`.
+
+| Screen | Reference | Vote winner (votes) | OOF mIoU reference → choice | Paired Δ image IoU [95% CI] | Δ mIoU @0.35 / 0.45 / 0.55 | Result |
+|---|---|---|---|---|---|---|
+| SA-T | all calls 0–30 | call 30 only (5/5) | 0.7556 → 0.7710 (+0.0153) | +0.0172 [+0.0138, +0.0207] | +0.0253 / +0.0153 / −0.0009 | Promote to SA-C; calibration-dependent |
+| SA-R | 8+16+32+64 | 8+64 (5/5) | 0.7556 → 0.7676 (+0.0119) | +0.0177 [+0.0143, +0.0211] | +0.0201 / +0.0119 / −0.0067 | Promote to SA-C; calibration-dependent |
+
+The joint grid is diagnostic only. Its maximum is calls 26–30 with resolutions
+8+64 at 0.7752 (+0.0195); the combination of the two individually selected
+settings, call 30 with 8+64, is 0.7749 (+0.0193). Both combinations concentrate
+the gain: call 30 with 8+64 lowers `person` IoU by 0.104, `cat` by 0.049,
+`potted-plant` by 0.043, and `tv` by 0.037 relative to the inclusive reference.
+These class effects and the sign reversals at threshold 0.55 must be reported
+in SA-C rather than treating the joint in-sample maximum as frozen.
+
+**Package-B review.** Codex independently reviewed Section 30 and the committed
+report. The seed row exactly reproduces frozen CA; the two constructions of the
+inclusive SA reference agree to 1.2e-07; the standard `A x` operator decisively
+beats `A^T x`; SA-L's module 15 and SA-H's heads {1,4,6} satisfy the fold-vote
+and OOF guards. Package A and B inclusive references differ by only 0.0003
+mIoU across their A100/V100 environments. Package B is accepted for SA-C.
+
+**SA-C handoff to Claude.** Test all unique combinations needed to isolate the
+four promoted axes in one environment: inclusive reference; T, R, L, H alone;
+T+R, T+L, T+H, R+H, L+H, T+R+H, and T+L+H. Here T is call 30, R is resolutions
+8+64, L is only module 15 (`up_blocks.3.attentions.2`, 64×64), and H is heads
+{1,4,6}. R adds no observation once L is active, so R+L duplicates L and the
+four-way combination duplicates T+L+H. Report fold selection, paired bootstrap,
+calibration, AP, per-class changes, and leave-one-component-out effects. Freeze
+SA only after this combined run.
