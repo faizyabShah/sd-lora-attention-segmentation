@@ -36,12 +36,12 @@ Citations: names tagged **[OVAM n]** are in the OVAM paper's reference list
 
 | ID | Method | Equation | Extra setting | Status |
 |---|---|---|---|---|
-| P1 | Power propagation (current method) | `Aⁿ c` | n | Exploratory results for n = 1–4 |
-| P2 | Propagation with restart (personalized PageRank) | `x ← (1−β) A x + β c`, iterated | β, n | Not run. Targets over-focus (person) and leaking (bus) |
+| P1 | Power propagation (current method) | `Aⁿ c` | n | Official controlled run submitted by Codex; protocol Section 37 |
+| P2 | Propagation with restart (personalized PageRank) | `x ← (1−β) A x + β c`, iterated | β, n | Official controlled run submitted by Codex; protocol Section 37 |
 | P3 | Heat kernel | `Σₖ e^{−t} tᵏ/k! Aᵏ c` | t | Not run. Removes the hard choice of n |
 | P4 | Residual mix | `λ Aⁿ c + (1−λ) c` | λ | Partly screened in the earlier streaming suite |
 | P5 | Symmetric / spectral affinity | `(D^{−½} W D^{−½})ⁿ c`, `W = (A + Aᵀ)/2` | n | Not run |
-| P6 | Sparse affinity | keep the top-k entries of each row of `A`, renormalize | k | Not run. Targets leaks into weakly similar regions |
+| P6 | Sparse affinity | keep the top-k entries of each row of `A`, renormalize | k | Official controlled run submitted by Codex; protocol Section 37 |
 | P7 | Rollout across modules | `A_L ⋯ A₂ A₁ c` (different SA modules in sequence) | module order | Close to the earlier progressive screen |
 | P8 | Column propagation | `Aᵀ c` (normalized) | — | Operator check only (protocol Section 6) |
 
@@ -76,7 +76,7 @@ These give object-aligned boundaries and do not threshold the CA map directly.
 |---|---|---|---|
 | W1 | Entropy weighting | weight each head/step map by `1 / entropy` | Not run |
 | W2 | Agreement-based head choice | per image, keep the SA heads whose propagated map agrees most with `c` | Not run. A label-free alternative to a fixed head subset |
-| W3 | Average before or after propagation | `mean(Aⁿ) c` vs. `(mean A)ⁿ c` | Not run |
+| W3 | Average before or after propagation | `mean(Aⁿ) c` vs. `(mean A)ⁿ c` | Official controlled run submitted by Codex; protocol Section 37 |
 | W4 | Iterate to convergence | alternate propagation and normalization until the map stops changing | Not run |
 
 Training-free baseline to compare against: "Diffusion model is secretly a
@@ -141,3 +141,4 @@ per-image counts: `docs/narmyn/attention/TOKEN_CRF_EXPERIMENT.md`.
 | Date | ID | Owner | Output | Commit | Note |
 |---|---|---|---|---|---|
 | 2026-10-13 | T-ovam, R2 | Claude | `outputs/segmentation/narmyn_token_crf/` | this branch | exploratory, pre-protocol |
+| 2026-10-16 | P1, P2, P6, W3 | Codex | `outputs/segmentation/controlled_attention_cv/propagation_package/` | pending submission commit | official controlled package, protocol Section 37 |

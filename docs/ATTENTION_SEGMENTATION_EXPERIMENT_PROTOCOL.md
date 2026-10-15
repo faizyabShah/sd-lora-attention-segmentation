@@ -425,6 +425,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | SA-C and frozen SA | Codex runs; both review | Complete (490/490): module 15 alone selected 5/5; Codex reviewed, Claude review requested (Section 33) | jobs `232561` → `232562` → `232563`; `outputs/segmentation/controlled_attention_cv/sa_confirmation/` |
 | SA-C second review | Claude | Accepted: every Section 33 value reproduced independently (Section 35); SA recorded in Section 11 | this commit |
 | Joint CA×SA interaction audit | Codex runs; Claude reviews | Complete (490/490): sequential `CA=C/R|SA=C/L` retained 5/5; Claude result review requested (Section 36) | jobs `232590` → `232591` → `232592`; `outputs/segmentation/controlled_attention_cv/joint_ca_sa_cartesian/` |
+| Deferred propagation package | Codex runs; Claude reviews | Runner ready: P1 powers, P2 restart, P6 sparsity, W3 aggregation order on frozen joint pair (Section 37) | `outputs/segmentation/controlled_attention_cv/propagation_package/` |
 
 ### Pre-sync exploratory run
 
@@ -1346,3 +1347,49 @@ near the current pair.
 Claude: independently audit shard completeness, the 78-cell arithmetic, the
 fold decisions, the closest-alternative statistics, and the conclusion that
 the Section 11 CA/SA pair remains unchanged.
+
+## 37. Codex: deferred propagation package
+
+At Narmeen's request, Codex owns the first deferred-phase package while Claude
+owns the separate fusion/calibration package. This package keeps the jointly
+confirmed CA seed and SA module fixed and changes only the propagation
+operator. Claude should not launch a duplicate propagation run.
+
+**Fixed input.** CA is `C/R`; SA is module 15 (64×64), all calls 0–30 and all
+eight heads, conditional QK affinities. The reference is the confirmed one-pass
+observation average `mean_i(A_i c)` at mIoU 0.7887. There is no image-aware
+postprocessing, token optimization, morphology, or class-specific choice.
+
+**Registered screens.** All parameters below are scored from the same live
+generation and compact counts.
+
+1. P1 observation-wise power: `mean_i(A_i^n c)`, n = 1, 2, 3, 4.
+2. W3 average-before power: `(mean_i A_i)^n c`, n = 1, 2, 3, 4. The two n=1
+   constructions are required to agree numerically.
+3. P2 restart under both aggregation orders:
+   `x <- (1-beta) A x + beta c`, beta = 0.10, 0.25, 0.50, 0.75 and iterations
+   = 2, 4, 8.
+4. P6 sparse observation-wise affinity: retain and row-renormalize the top
+   k = 16, 32, 64, 128, 256, 512, or 1024 entries. The dense 4096-entry
+   one-pass reference is already stored.
+
+**Fold and calibration rule.** Each screen is independent. For each outer
+fold, every method parameter and its threshold are selected using only the
+other four folds; the selected pair is scored on the held-out fold. Thresholds
+are 0.30–0.70 in increments of 0.025. The report also gives fixed-threshold
+0.45 results for continuity. Section 5 promotion, inclusiveness tie, four-fold
+vote, and out-of-fold guard remain required. Maps and generated images are
+released after each image; only per-image counts and AP are retained.
+
+| Item | Path |
+|---|---|
+| Reusable operators | `src/segmentation/propagation_variants.py` |
+| Runner | `scripts/run_propagation_package.py` |
+| Fold selector | `scripts/select_propagation_cv.py` |
+| Screen specification | `configs/controlled_propagation_screens.json` |
+| Smoke / production / merge | `jobs/{smoke,run,merge}_propagation_package.slurm` |
+| Output | `outputs/segmentation/controlled_attention_cv/propagation_package/` |
+
+**Claude handoff.** Continue only the non-overlapping fusion/calibration
+package: arithmetic/residual CA-SA mixing, multiplicative gating, geometric
+fusion, and normalization. Review this package after its committed result.

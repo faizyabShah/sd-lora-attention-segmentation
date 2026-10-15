@@ -1,0 +1,45 @@
+{
+  "reference": "REF/one_pass",
+  "screens": [
+    {
+      "name": "P1 observation-wise powers",
+      "prefix": "P1/",
+      "inclusiveness": {
+        "P1/obs_n2": -2,
+        "P1/obs_n3": -3,
+        "P1/obs_n4": -4
+      }
+    },
+    {
+      "name": "W3 average-before powers",
+      "prefix": "W3/",
+      "inclusiveness": {
+        "W3/mean_n1": -1,
+        "W3/mean_n2": -2,
+        "W3/mean_n3": -3,
+        "W3/mean_n4": -4
+      }
+    },
+    {
+      "name": "P2 observation-wise restart",
+      "prefix": "P2/obs_"
+    },
+    {
+      "name": "P2 average-before restart",
+      "prefix": "P2/mean_"
+    },
+    {
+      "name": "P6 sparse affinity",
+      "prefix": "P6/",
+      "inclusiveness": {
+        "P6/topk_0016": 16,
+        "P6/topk_0032": 32,
+        "P6/topk_0064": 64,
+        "P6/topk_0128": 128,
+        "P6/topk_0256": 256,
+        "P6/topk_0512": 512,
+        "P6/topk_1024": 1024
+      }
+    }
+  ]
+}
