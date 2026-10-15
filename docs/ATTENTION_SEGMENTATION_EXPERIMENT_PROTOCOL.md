@@ -1226,6 +1226,11 @@ No images or attention tensors are retained.
 | Smoke / production / merge | `jobs/{smoke,run,merge}_joint_ca_sa_cartesian.slurm` |
 | Output | `outputs/segmentation/controlled_attention_cv/joint_ca_sa_cartesian/` |
 
+Submitted from commit `c0918f369` on Renyi: one-image arithmetic/reference
+smoke job `232590`; resumable 20-class production array `232591`, dependent on
+the smoke; and fold-wise selector plus diagnostic finalizer job `232592`,
+dependent on the complete array.
+
 **Claude handoff.** Do not launch a duplicate joint search. When the committed
 result appears, independently audit the 78-cell definition, reference cell,
 fold-wise selection, matrix, and class effects. The earlier SA-C review remains
