@@ -8,6 +8,7 @@ docs/narmyn/attention/evidence/:
   ledger.csv                    one row per experiment
   all_configurations.csv.gz     one row per evaluated configuration, all experiments
   controlled_ca_package_b.csv   the 426 controlled configurations with folds and calibration
+  controlled_ca_confirmation.csv  the 6 CA-C configurations with folds and calibration
   tables/*.md, tables/*.tex     the tables used in EVIDENCE.md and the report
   figures/*.png, figures/*.pdf  the figures used in EVIDENCE.md and the report
 
@@ -40,6 +41,7 @@ SEG = ROOT / "outputs" / "segmentation"
 OUT = ROOT / "docs" / "narmyn" / "attention" / "evidence"
 PKG_B = SEG / "controlled_attention_cv" / "ca_layer_head_attribution"
 PKG_A = SEG / "controlled_attention_cv" / "ca_time_resolution"
+PKG_C = SEG / "controlled_attention_cv" / "ca_confirmation"
 
 # Reference palette (dataviz skill, light mode; static figures for print).
 SURFACE, INK, INK2, MUTED, GRID, AXIS = "#fcfcfb", "#0b0b0b", "#52514e", "#898781", "#e1e0d9", "#c3c2b7"
@@ -93,7 +95,7 @@ EXPERIMENTS = [
      "voc_sim_100_joint_time_resolution/results.json", 1, "interaction check"),
     ("B4", "Exhaustive CA layer subsets", DEV, "exploratory, in-sample", "all 65,535 subsets of 16 CA layers",
      "as B1", "voc_sim_100_exhaustive_layer_subsets/summary.json", None,
-     "chose BEST_12 = layers {0,2,5,6,7,9,10,11,12,13,14,15}"),
+     "chose BEST_12 = layers {0, 2, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15}"),
     ("B5", "Threshold x normalization", DEV, "exploratory, in-sample",
      "threshold 0.10-0.90; max / min-max / percentile", "BEST_12, all-16, OVAM-15 layers",
      "voc_sim_100_threshold_normalization/results.json", 1, "chose percentile 1-99 and threshold 0.45"),
@@ -138,11 +140,14 @@ EXPERIMENTS = [
     ("A1", "Controlled CA package B: CA-L, CA-H, CA-A", VOC, "controlled, 5-fold cross-validated",
      "159 layer sets, 255 head subsets, 12 attribution conventions; 65,535 exhaustive (exploratory)",
      "protocol v1.2 Section 3", "controlled_attention_cv/ca_layer_head_attribution", None,
-     "CA-L drop modules 10-11; CA-H drop head 1; CA-A keep reference (CA-C pending)"),
+     "CA-L drop modules 10-11; CA-H drop head 1; CA-A keep reference (combined in A3)"),
     ("A2", "Controlled CA package A: CA-T, CA-R (Codex)", VOC, "controlled, 5-fold cross-validated",
      "79 call windows, 15 resolution subsets, 1,185 joint (diagnostic)", "protocol v1.2 Section 3",
      "controlled_attention_cv/ca_time_resolution", None,
-     "CA-T keep all calls; CA-R keep 8+16+64 (drop 32x32) (CA-C pending)"),
+     "CA-T keep all calls; CA-R keep 8+16+64 (drop 32x32) (combined in A3)"),
+    ("A3", "Controlled CA confirmation (CA-C) and the frozen CA", VOC, "controlled, 5-fold cross-validated",
+     "reference, CA-R, CA-L, CA-H alone; CA-R+CA-H; CA-L+CA-H", "protocol v1.2 Section 3; calls 0-30; CA-A reference",
+     "controlled_attention_cv/ca_confirmation", None, "frozen CA: CA-R alone (drop the 32x32 modules), all heads"),
 ]
 
 
@@ -655,28 +660,111 @@ def package_a(plt, figures: list) -> dict | None:
     return out
 
 
-def controlled_overview(plt, a: dict | None, b: dict | None, figures: list) -> dict:
+C_LABELS = {
+    "C/reference": "reference (16 modules, 8 heads)",
+    "C/R": "CA-R: without 32×32 (11 modules)",
+    "C/L": "CA-L: without modules 10, 11",
+    "C/H": "CA-H: without head 1",
+    "C/R+H": "CA-R + CA-H",
+    "C/L+H": "CA-L + CA-H",
+}
+
+
+def package_c(plt, figures: list) -> dict | None:
+    """CA-C: the combined confirmation that froze the CA configuration."""
+    if not (PKG_C / "shards").exists():
+        return None
+    results = cv.load_results(sorted((PKG_C / "shards").glob("*.npz")))
+    screen = load_json(PKG_C / "fold_results.json")["screens"]["CA-C"]
+    fold_ids = sorted(set(results.folds.tolist()))
+    rows = []
+    for c, name in enumerate(results.configurations):
+        row = cv.summary_row(results, c)
+        per_fold = [cv.miou(results, c, mask=results.folds == k) for k in fold_ids]
+        rows.append({"configuration": name, "screen": "CA-C",
+                     "miou@0.35": row["miou@0.35"], "miou@0.45": row["miou@0.45"], "miou@0.55": row["miou@0.55"],
+                     "mean_image_iou@0.45": row["mean_image_iou@0.45"], "mean_ap": row["mean_ap"],
+                     **{f"fold{k}_miou": v for k, v in zip(fold_ids, per_fold)}, "fold_std": float(np.std(per_fold)),
+                     "fold_votes": screen["selection_counts"].get(name, 0)})
+    with (OUT / "controlled_ca_confirmation.csv").open("w", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+    by = {r["configuration"]: r for r in rows}
+    ref = by["C/reference"]["miou@0.45"]
+    headers = ["Configuration", "mIoU@0.45", "Δ vs reference", "mIoU@0.35", "mIoU@0.55", "Mean AP", "Fold votes"]
+    table = write_table("a3_ca_c", headers,
+                        [[C_LABELS[n], by[n]["miou@0.45"], by[n]["miou@0.45"] - ref, by[n]["miou@0.35"], by[n]["miou@0.55"],
+                          by[n]["mean_ap"], f"{by[n]['fold_votes']}/5"] for n in C_LABELS],
+                        "CA-C: the combined confirmation (one run, in-sample values; fold votes from the 5-fold selection)")
+    combined = by["C/R+H"]["miou@0.45"]
+    loo = [["combined CA-R + CA-H", combined, 0.0, "—"],
+           ["without CA-R (= CA-L + CA-H)", by["C/L+H"]["miou@0.45"], by["C/L+H"]["miou@0.45"] - combined, "CA-R contributes"],
+           ["without CA-H (= CA-R alone)", by["C/R"]["miou@0.45"], by["C/R"]["miou@0.45"] - combined,
+            "within the 0.002 tie: CA-H is not kept"],
+           ["without CA-L", combined, 0.0, "CA-L is contained in CA-R"]]
+    loo_table = write_table("a3_ca_c_loo", ["Combined candidate", "mIoU@0.45", "Δ vs combined", "Reading"], loo,
+                            "CA-C leave-one-out of the combined candidate (in-sample)")
+    fold_rows = [[f["fold"], C_LABELS[f["chosen"]], f["train_miou_chosen"], f["train_miou_reference"],
+                  f["heldout_miou_chosen"], f["heldout_miou_reference"]] for f in screen["folds"]]
+    fold_table = write_table("a3_ca_c_folds", ["Held-out fold", "Chosen on the other four", "Train mIoU chosen", "Train mIoU reference",
+                                               "Held-out mIoU chosen", "Held-out mIoU reference"], fold_rows,
+                             "CA-C: the choice made on each set of four folds and its held-out score")
+
+    # Figure: change against the reference at each threshold, one panel per threshold.
+    candidates = [n for n in C_LABELS if n != "C/reference"][::-1]
+    fig, axes = plt.subplots(1, 3, figsize=(10.5, 3.0), sharey=True)
+    for ax, t in zip(axes, cv.THRESHOLDS):
+        key = f"miou@{t:.2f}"
+        deltas = [by[n][key] - by["C/reference"][key] for n in candidates]
+        ys = np.arange(len(candidates))
+        ax.hlines(ys, 0, deltas, color=GRID, linewidth=2)
+        ax.scatter(deltas, ys, s=48, zorder=3, edgecolors=SURFACE, linewidths=1.5,
+                   color=[BLUE if n == screen["frozen"] else MUTED for n in candidates])
+        for y, d in zip(ys, deltas):
+            ax.annotate(f"{d:+.3f}", (d, y), textcoords="offset points", xytext=(6 if d >= 0 else -6, 0),
+                        ha="left" if d >= 0 else "right", va="center", fontsize=7, color=INK2)
+        ax.axvline(0, color=AXIS, linewidth=1)
+        lo, hi = min(0, *deltas), max(0, *deltas)
+        ax.set_xlim(lo - 0.25 * (hi - lo) - 0.004, hi + 0.3 * (hi - lo) + 0.004)
+        ax.set_title(f"threshold {t:.2f}" + ("  (selection)" if t == cv.SELECTION_THRESHOLD else ""), fontsize=9)
+        ax.set_xlabel("Δ mIoU vs reference")
+        ax.grid(axis="y", visible=False)
+    axes[0].set_yticks(np.arange(len(candidates)), [C_LABELS[n] + (" (frozen)" if n == screen["frozen"] else "") for n in candidates], fontsize=8)
+    fig.suptitle("CA-C: every combination against the reference, in one run", fontsize=10)
+    fig.tight_layout()
+    save(fig, "a3_ca_c_thresholds", figures)
+    plt.close(fig)
+    return {"screen": screen, "by": by, "rows": rows, "table": table, "loo_table": loo_table, "fold_table": fold_table,
+            "environments": sorted({e.get("gpu", "") for e in results.environments if isinstance(e, dict)}),
+            "torch": sorted({e.get("torch", "") for e in results.environments if isinstance(e, dict)})}
+
+
+def controlled_overview(plt, a: dict | None, b: dict | None, figures: list, c: dict | None = None) -> dict:
     """CV summary and calibration across both controlled packages."""
     screens = {}
     if a is not None:
         screens.update(a["screens"])
     if b is not None:
         screens.update(b["screens"])
+    if c is not None:
+        screens["CA-C"] = c["screen"]
+    package = {"CA-T": "A (Codex)", "CA-R": "A (Codex)", "CA-C": "C (Claude)"}
     rows = []
-    for name in ("CA-T", "CA-R", "CA-L", "CA-H", "CA-A"):
+    for name in ("CA-T", "CA-R", "CA-L", "CA-H", "CA-A", "CA-C"):
         if name not in screens:
             continue
         s = screens[name]
         bs = s["paired_bootstrap_frozen_vs_reference"]
         cal = s["calibration"]
-        rows.append([name, "A (Codex)" if name in ("CA-T", "CA-R") else "B (Claude)", s["reference"], f"{s['vote_winner']} ({s['vote_winner_votes']}/5)",
+        rows.append([name, package.get(name, "B (Claude)"), s["reference"], f"{s['vote_winner']} ({s['vote_winner_votes']}/5)",
                      s["out_of_fold_miou_reference"], s["out_of_fold_miou_selection"], s["oof_gain"],
                      f"{bs['mean']:+.4f} [{bs['ci_low']:+.4f}, {bs['ci_high']:+.4f}]",
                      f"{cal['delta_miou@0.35']:+.4f} / {cal['delta_miou@0.45']:+.4f} / {cal['delta_miou@0.55']:+.4f}",
                      s["freeze_reason"]])
     table = write_table("a_cv_summary", ["Screen", "Package", "Reference", "Vote winner (votes)", "OOF mIoU reference", "OOF mIoU choice",
                                          "OOF gain", "Paired Δ image IoU [95% CI]", "Δ mIoU @0.35 / 0.45 / 0.55", "Outcome"],
-                        rows, "Controlled CA screens (VOC-Sim, 5 folds, selection at threshold 0.45). Nothing is frozen until the combined CA confirmation (CA-C).")
+                        rows, "Controlled CA screens (VOC-Sim, 5 folds, selection at threshold 0.45). The single-axis screens promote candidates; only the combined confirmation (CA-C) freezes the CA.")
 
     fig, axes = plt.subplots(1, len(rows), figsize=(3.1 * len(rows), 3), sharey=True)
     for ax, name in zip(np.atleast_1d(axes), [r[0] for r in rows]):
@@ -883,19 +971,19 @@ def tier_b(plt, rows: list[dict], figures: list) -> dict:
 DECISIONS = [
     # setting, value in the earlier final method, where chosen, images used to choose, evidence, controlled status
     ("CA layers", "12 of 16 (drop 1, 3, 4, 8)", "B4 exhaustive search", "99 dev images", "ledger B4; Fig. a1_exhaustive",
-     "A1 CA-L (CV): keep all but modules 10, 11 instead; awaiting CA-C"),
+     "A1 CA-L (CV): drop modules 10, 11; A3 CA-C: subsumed by CA-R (frozen: 11 modules at 8, 16, 64)"),
     ("CA heads", "fixed top-4 per layer", "B6 stage-1 suite", "99 dev images", "ledger B6",
-     "A1 CA-H (CV): drop head 1 in every module; awaiting CA-C"),
+     "A1 CA-H (CV): drop head 1; A3 CA-C: adds nothing on top of CA-R (tie), so all 8 heads frozen"),
     ("CA attribution", "OVAM: unconditional query, unpadded softmax, first piece", "inherited from OVAM", "—", "Table a1_ca_a",
      "A1 CA-A (CV): reference (conditional, padded, all pieces) kept; OVAM's cell is −0.0156 CA-only"),
     ("CA calls", "all 31 (0–30)", "B1/B8 windows; B14", "99 dev / 490", "ledger B1, B8, B14; Fig. a2_ca_t_calls", "A2 CA-T (CV): keep all calls 0–30"),
     ("CA resolutions", "all four (8, 16, 32, 64)", "B1/B8 resolution screens", "99 dev / 490", "Table a2_ca_r; Fig. a2_ca_r_subsets",
-     "A2 CA-R (CV): keep 8+16+64, drop the 32×32 modules; awaiting CA-C"),
+     "A2 CA-R (CV): keep 8+16+64; A3 CA-C: frozen (4/5 votes, OOF +0.026)"),
     ("CA normalization, threshold", "percentile 1–99, ≥ 0.45", "B5", "99 dev images", "ledger B5", "protocol fixes min–max, 0.45 for the CA phase"),
-    ("SA module", "U3.2 (up_blocks.3.attentions.2 attn1, 64×64)", "B8 SA screens", "490 (in-sample)", "ledger B8", "SA-L (Claude) after CA freeze"),
+    ("SA module", "U3.2 (up_blocks.3.attentions.2 attn1, 64×64)", "B8 SA screens", "490 (in-sample)", "ledger B8", "SA-L (Claude), seeded by the frozen CA"),
     ("SA passes", "4 (revised: 1)", "B10; revised from B11/B13", "490; 1-pass informed by COCO-Cap", "Fig. b_joint_passes_time", "after SA freeze"),
-    ("SA heads", "{0,1,2,4,5,6}", "B10", "490 (in-sample)", "Fig. b_joint_heads_threshold", "SA-H (Claude) after CA freeze"),
-    ("SA calls", "15–30", "B10", "490 (in-sample)", "Fig. b_joint_passes_time", "SA-T (Codex) after CA freeze"),
+    ("SA heads", "{0,1,2,4,5,6}", "B10", "490 (in-sample)", "Fig. b_joint_heads_threshold", "SA-H (Claude), seeded by the frozen CA"),
+    ("SA calls", "15–30", "B10", "490 (in-sample)", "Fig. b_joint_passes_time", "SA-T (Codex), seeded by the frozen CA"),
     ("Mask threshold", "0.45", "B5, B9, B10", "99 dev / 490", "Fig. b_joint_heads_threshold", "fixed at 0.45; 0.35/0.55 as diagnostics"),
     ("Cleanup", "remove components < 1%", "B10", "490 (in-sample)", "Table b_component_ablations", "deferred phase"),
     ("DenseCRF", "not in the final method", "B17 (nothing selected)", "—", "Table b_token_crf", "deferred phase"),
@@ -903,7 +991,7 @@ DECISIONS = [
 ]
 
 
-def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: dict | None = None) -> None:
+def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: dict | None = None, c: dict | None = None) -> None:
     def fig(name, caption):
         return f"![{caption}](figures/{name}.png)\n\n*{caption}*\n"
 
@@ -921,13 +1009,14 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
         "",
         "- **Tier B (B1–B17), exploratory.** Settings were chosen on the same images they are reported on "
         "(the 99 dev images are part of the 490). These numbers show how the method was found, not how well it generalizes.",
-        "- **Tier A (A1, A2), controlled.** Protocol v1.2: one axis at a time from a fixed reference, settings chosen on "
+        "- **Tier A (A1–A3), controlled.** Protocol v1.2: one axis at a time from a fixed reference, settings chosen on "
         "four folds and scored on the fifth, frozen only with 4 of 5 fold votes and an out-of-fold gain. "
-        "Both CA packages are complete (A2 by Codex: calls and resolutions; A1 by Claude: layers, heads, attribution); "
-        "nothing is frozen until the combined CA confirmation (CA-C).",
+        "Both CA packages are complete (A2 by Codex: calls and resolutions; A1 by Claude: layers, heads, attribution), "
+        "and the combined confirmation (A3, CA-C) has frozen the CA configuration: calls 0–30, resolutions 8, 16 and 64 "
+        "(the 32×32 modules removed), all 8 heads, conditional query, padded softmax, all class-word pieces.",
         "",
         "Full data: `all_configurations.csv.gz` (one row per configuration, all experiments), "
-        "`controlled_ca_package_a.csv` and `controlled_ca_package_b.csv` (the 1,279 + 426 controlled configurations with per-fold held-out mIoU, thresholds 0.35/0.45/0.55 and AP), "
+        "`controlled_ca_package_a.csv`, `controlled_ca_package_b.csv` and `controlled_ca_confirmation.csv` (the 1,279 + 426 + 6 controlled configurations with per-fold held-out mIoU, thresholds 0.35/0.45/0.55 and AP), "
         "`ledger.csv`, `tables/*.md|tex`, `figures/*.png|pdf`.",
         "",
         "## 1. Every experiment",
@@ -961,18 +1050,44 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
             "a mean of 0.0005 image IoU (max 0.018; mIoU 0.66610 vs 0.66606), so values are compared within a package; "
             "CA-C re-scores every combination in one run.",
             "",
-            "### 4.2 CA denoising calls (CA-T, 79 configurations; package A, Codex)",
+        ]
+        if c is not None:
+            s = c["screen"]
+            lines += [
+                "### 4.2 Combined confirmation and the frozen CA (CA-C)",
+                "",
+                "The promoted single-axis changes (CA-R, CA-L, CA-H) and their combinations were scored together in one run "
+                f"over all 490 images ({', '.join(c['environments'])}; torch {', '.join(c['torch'])}), so every row is directly comparable. "
+                f"Fold vote: {', '.join(f'{k[2:]} {v}/5' for k, v in s['selection_counts'].items())}. "
+                f"Out-of-fold mIoU {s['out_of_fold_miou_reference']:.4f} → {s['out_of_fold_miou_selection']:.4f} "
+                f"(gain {s['oof_gain']:+.4f}); paired Δ image IoU {s['paired_bootstrap_frozen_vs_reference']['mean']:+.4f} "
+                f"[{s['paired_bootstrap_frozen_vs_reference']['ci_low']:+.4f}, {s['paired_bootstrap_frozen_vs_reference']['ci_high']:+.4f}]. "
+                "**Frozen: CA-R alone** (calls 0–30; the 11 modules at 8, 16 and 64; all 8 heads). Adding CA-H on top changes mIoU by "
+                f"{c['by']['C/R+H']['miou@0.45'] - c['by']['C/R']['miou@0.45']:+.4f}, inside the 0.002 tie band, so the more inclusive "
+                "setting (all heads) is kept. The frozen change helps at all three thresholds (it is not calibration-dependent) "
+                f"but lowers mean AP from {s['mean_ap_reference']:.4f} to {s['mean_ap_frozen']:.4f}.",
+                "",
+                c["table"],
+                "",
+                c["loo_table"],
+                "",
+                c["fold_table"],
+                "",
+                fig("a3_ca_c_thresholds", "Fig. 3b. CA-C: change in mIoU of every combination against the reference at thresholds 0.35, 0.45 and 0.55 (blue = frozen)."),
+            ]
+        lines += [
+            "### 4.3 CA denoising calls (CA-T, 79 configurations; package A, Codex)",
             "",
             fig("a2_ca_t_calls", "Fig. 4a. CA from a single UNet call, and all calls except one."),
             a["t_table"] if a else "",
             "",
-            "### 4.3 CA resolutions (CA-R, 15 configurations; package A, Codex)",
+            "### 4.4 CA resolutions (CA-R, 15 configurations; package A, Codex)",
             "",
             fig("a2_ca_r_subsets", "Fig. 4b. Every subset of CA resolutions."),
             a["r_table"] if a else "",
             "",
             fig("a2_joint_grid", "Fig. 4c. Joint grid of call windows and resolutions (diagnostic only; cannot freeze a setting)."),
-            "### 4.4 CA layers (CA-L, 159 configurations)",
+            "### 4.5 CA layers (CA-L, 159 configurations)",
             "",
             fig("a1_ca_l_single_leave1", "Fig. 4. Each CA module alone (left) and all modules except one (right)."),
             fig("a1_ca_l_leave2_heatmap", "Fig. 5. All 120 leave-two-out configurations; the diagonal is leave-one-out."),
@@ -981,7 +1096,7 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
             "The single-module and leave-one-out values for all 16 modules are in `tables/a1_ca_l.md`.",
             "",
             fig("a1_exhaustive", "Fig. 6. All 65,535 module subsets (exploratory; the maximum is not eligible for selection)."),
-            "### 4.5 CA heads (CA-H, 255 subsets)",
+            "### 4.6 CA heads (CA-H, 255 subsets)",
             "",
             b["head_table"],
             "",
@@ -991,12 +1106,12 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
             "",
             b["top_heads_table"],
             "",
-            "### 4.6 CA attribution convention (CA-A, 12 configurations)",
+            "### 4.7 CA attribution convention (CA-A, 12 configurations)",
             "",
             b["attr_table"],
             "",
             fig("a1_ca_a_grid", "Fig. 9. Δ mIoU of every convention against the reference. The earlier final method used OVAM's cell (unconditional, unpadded, first piece)."),
-            "### 4.7 What the cross-attention maps look like",
+            "### 4.8 What the cross-attention maps look like",
             "",
             "Head-averaged CA of every module, calls 0–30, upsampled to 64×64 on a common colour scale, one row per resolution. "
             "The four images were fixed by index before any result was seen.",
@@ -1020,8 +1135,9 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
         "## 7. Limits of this evidence",
         "",
         "- Tier B settings were chosen on the reported images; only COCO-Cap is untouched by the earlier final method, and the revised one-pass system was informed by COCO-Cap.",
-        "- Tier A is complete for the CA screens only. The combined CA confirmation (CA-C) and all SA screens are still to run under the protocol.",
-        "- The promoted CA changes help mainly at the 0.45 selection threshold and above, and slightly lower AP (Fig. 3); CA-L and CA-H change sign at 0.35.",
+        "- Tier A is complete for CA (screens and CA-C). All SA screens are still to run under the protocol, seeded by the frozen CA.",
+        "- The frozen CA change (CA-R) helps mainly at the 0.45 selection threshold and above and slightly lowers AP; CA-L and CA-H change sign at 0.35 (Fig. 3).",
+        "- CA-C ran on V100 GPUs, packages A and B on an A100; the identical reference differs by 0.0007 mIoU across them, so CA-C rows are compared only with each other.",
         "- Released OVAM masks were made on the authors' renders; all other rows use regenerated images scored on the same annotations.",
         "",
     ]
@@ -1035,6 +1151,7 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
         "b_progression": ("Each step of the method and the baselines. VOC-Sim values are in-sample; COCO-Cap was never used to choose the earlier final method.", 1.0),
         "a_heldout_folds": ("Controlled CA screens: held-out mIoU of the setting chosen on the other four folds, against the reference, per fold.", 1.0),
         "a_calibration": ("Calibration of the promoted CA changes at thresholds 0.35, 0.45 and 0.55.", 0.6),
+        "a3_ca_c_thresholds": ("CA-C: change in mIoU of every combination against the reference at thresholds 0.35, 0.45 and 0.55 (blue = frozen).", 1.0),
         "a2_ca_t_calls": ("CA-T: CA from a single UNet call, and all calls except one.", 1.0),
         "a2_ca_r_subsets": ("CA-R: every subset of CA resolutions.", 0.75),
         "a2_joint_grid": ("Joint grid of call windows and resolutions (diagnostic only).", 0.95),
@@ -1051,6 +1168,9 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
     figs = ["b_progression"]
     if b is not None:
         tex += [r"\input{evidence/tables/a_cv_summary.tex}"]
+        if c is not None:
+            tex += [r"\input{evidence/tables/a3_ca_c.tex}", r"\input{evidence/tables/a3_ca_c_loo.tex}", r"\input{evidence/tables/a3_ca_c_folds.tex}"]
+            figs += ["a3_ca_c_thresholds"]
         if a is not None:
             tex += [r"\input{evidence/tables/a2_ca_t.tex}", r"\input{evidence/tables/a2_ca_r.tex}"]
             figs += ["a2_ca_t_calls", "a2_ca_r_subsets", "a2_joint_grid"]
@@ -1093,7 +1213,7 @@ def main() -> None:
                                "images": 490, "miou": float(r["miou@0.45"]), "mean_image_iou": float(r["mean_image_iou@0.45"]),
                                "note": "controlled; per-fold and calibration columns in controlled_ca_package_b.csv"})
         entry = next(e for e in ledger if e["id"] == "A1")
-        entry.update({"configurations": len(a_rows) + 65535, "best_configuration": "see CV summary (CA-C pending)",
+        entry.update({"configurations": len(a_rows) + 65535, "best_configuration": "see CV summary; combined in A3",
                       "best_miou": round(max(r["miou"] for r in a_rows), 4)})
     else:
         b = None
@@ -1104,9 +1224,18 @@ def main() -> None:
                            "images": 490, "miou": r["miou@0.45"], "mean_image_iou": r["mean_image_iou@0.45"],
                            "note": "controlled; per-fold and calibration columns in controlled_ca_package_a.csv"})
         entry = next(e for e in ledger if e["id"] == "A2")
-        entry.update({"configurations": len(a["rows"]), "best_configuration": "see CV summary (CA-C pending)",
+        entry.update({"configurations": len(a["rows"]), "best_configuration": "see CV summary; combined in A3",
                       "best_miou": round(max(r["miou@0.45"] for r in a["rows"] if r["screen"] != "joint (diagnostic)"), 4)})
-    overview = controlled_overview(plt, a, b, figures)
+    c = package_c(plt, figures)
+    if c is not None:
+        for r in c["rows"]:
+            a_rows.append({"experiment_id": "A3", "dataset": VOC, "family": "CA-C", "configuration": r["configuration"],
+                           "images": 490, "miou": r["miou@0.45"], "mean_image_iou": r["mean_image_iou@0.45"],
+                           "note": "controlled; per-fold and calibration columns in controlled_ca_confirmation.csv"})
+        entry = next(e for e in ledger if e["id"] == "A3")
+        entry.update({"configurations": len(c["rows"]), "best_configuration": f"frozen: {c['screen']['frozen']}",
+                      "best_miou": round(c["by"][c["screen"]["frozen"]]["miou@0.45"], 4)})
+    overview = controlled_overview(plt, a, b, figures, c)
     all_rows = rows + a_rows
     with gzip.open(OUT / "all_configurations.csv.gz", "wt", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=["experiment_id", "dataset", "family", "configuration", "images",
@@ -1124,7 +1253,7 @@ def main() -> None:
     write_table("ledger", ["ID", "Experiment", "Dataset", "Status", "Configurations", "Best mIoU", "Decision / role"],
                 ledger_rows, "Every experiment run so far", long=True)
     tb = tier_b(plt, rows, figures)
-    compose_report(b, tb, a, overview)
+    compose_report(b, tb, a, overview, c)
     json.dump({"figures": figures, "configurations": len(all_rows), "experiments": len(ledger)},
               open(OUT / "build_summary.json", "w"), indent=2)
     print(f"{len(ledger)} experiments, {len(all_rows)} configuration rows (+65,535 exhaustive subsets), {len(figures)} figures")

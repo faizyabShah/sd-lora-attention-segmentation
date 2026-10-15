@@ -1,0 +1,13 @@
+\begin{table}[H]\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{4.83cm}rr>{\raggedright\arraybackslash}p{5.99cm}}
+\toprule
+Combined candidate & mIoU@0.45 & $\Delta$ vs combined & Reading \\
+\midrule
+combined CA-R + CA-H & 0.6960 & 0.0000 & --- \\
+without CA-R (= CA-L + CA-H) & 0.6924 & -0.0036 & CA-R contributes \\
+without CA-H (= CA-R alone) & 0.6956 & -0.0004 & within the 0.002 tie: CA-H is not kept \\
+without CA-L & 0.6960 & 0.0000 & CA-L is contained in CA-R \\
+\bottomrule
+\end{tabular}
+\caption{CA-C leave-one-out of the combined candidate (in-sample)}\label{tab:a3_ca_c_loo}
+\end{table}

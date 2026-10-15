@@ -5,7 +5,7 @@
 | B1 | CA time windows and resolutions | VOC-Sim dev subset (99 images, 4 classes; inside the 490) | exploratory, in-sample | 11 | 0.7095 | first look at time and resolution |
 | B2 | Single and leave-out CA layers | VOC-Sim dev subset (99 images, 4 classes; inside the 490) | exploratory, in-sample | 24 | 0.7232 | layer screening |
 | B3 | Joint time x resolution | VOC-Sim dev subset (99 images, 4 classes; inside the 490) | exploratory, in-sample | 21 | 0.7095 | interaction check |
-| B4 | Exhaustive CA layer subsets | VOC-Sim dev subset (99 images, 4 classes; inside the 490) | exploratory, in-sample | 17 | 0.7409 | chose BEST_12 = layers {0,2,5,6,7,9,10,11,12,13,14,15} |
+| B4 | Exhaustive CA layer subsets | VOC-Sim dev subset (99 images, 4 classes; inside the 490) | exploratory, in-sample | 17 | 0.7409 | chose BEST_12 = layers {0, 2, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15} |
 | B5 | Threshold x normalization | VOC-Sim dev subset (99 images, 4 classes; inside the 490) | exploratory, in-sample | 153 | 0.7439 | chose percentile 1-99 and threshold 0.45 |
 | B6 | Stage-1 suite (heads, time-layer, fusion, cleanup) | VOC-Sim dev subset (99 images, 4 classes; inside the 490) | exploratory, in-sample | 590 | 0.7691 | chose the fixed top-4 CA heads per layer |
 | B7 | Self-attention screens and progressive SA | VOC-Sim dev subset (99 images, 4 classes; inside the 490) | exploratory, in-sample | 5320 | 0.8355 | first evidence that SA propagation helps |
@@ -19,5 +19,6 @@
 | B15 | Clean CA-only screens (pre-sync) | VOC-Sim (490 images, 20 classes) | exploratory, in-sample; audited, superseded by A1 | 1573 | 0.6968 | ratified as correct; re-run with folds as A1 |
 | B16 | OVAM released masks | VOC-Sim (490 images, 20 classes) | reference (authors' masks) | 3 | 0.8247 | 0.7036 / 0.8247 / 0.6616 |
 | B17 | OVAM optimized token and DenseCRF on the final method | VOC-Sim (490 images, 20 classes); COCO-Cap (707 images, 20 classes) | exploratory; nothing selected | 32 | 0.8553 | token + DenseCRF: VOC 0.8525, COCO 0.6612 |
-| A1 | Controlled CA package B: CA-L, CA-H, CA-A | VOC-Sim (490 images, 20 classes) | controlled, 5-fold cross-validated | 65961 | 0.6923 | CA-L drop modules 10-11; CA-H drop head 1; CA-A keep reference (CA-C pending) |
-| A2 | Controlled CA package A: CA-T, CA-R (Codex) | VOC-Sim (490 images, 20 classes) | controlled, 5-fold cross-validated | 1279 | 0.6957 | CA-T keep all calls; CA-R keep 8+16+64 (drop 32x32) (CA-C pending) |
+| A1 | Controlled CA package B: CA-L, CA-H, CA-A | VOC-Sim (490 images, 20 classes) | controlled, 5-fold cross-validated | 65961 | 0.6923 | CA-L drop modules 10-11; CA-H drop head 1; CA-A keep reference (combined in A3) |
+| A2 | Controlled CA package A: CA-T, CA-R (Codex) | VOC-Sim (490 images, 20 classes) | controlled, 5-fold cross-validated | 1279 | 0.6957 | CA-T keep all calls; CA-R keep 8+16+64 (drop 32x32) (combined in A3) |
+| A3 | Controlled CA confirmation (CA-C) and the frozen CA | VOC-Sim (490 images, 20 classes) | controlled, 5-fold cross-validated | 6 | 0.6956 | frozen CA: CA-R alone (drop the 32x32 modules), all heads |

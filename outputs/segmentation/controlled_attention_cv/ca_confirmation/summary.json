@@ -1,0 +1,140 @@
+{
+  "selector_commit": "faf60c44d3d1a85a24a45d4024269d57903c2225",
+  "shard_commits": [
+    "06ab48faf7a2a5014c9dcd99b06e1c0571f63307",
+    "faf60c44d3d1a85a24a45d4024269d57903c2225"
+  ],
+  "shard_environments": [
+    {
+      "commit": "06ab48faf7a2a5014c9dcd99b06e1c0571f63307",
+      "conda_env": "gen",
+      "cudnn": "90100",
+      "diffusers": "0.36.0",
+      "gpu": "Tesla V100-PCIE-16GB",
+      "node": "erdos",
+      "numpy": "2.4.4",
+      "python": "3.11.15",
+      "slurm_job": "232469_0",
+      "torch": "2.4.1+cu121",
+      "torch_cuda": "12.1",
+      "transformers": "5.6.2"
+    },
+    {
+      "commit": "06ab48faf7a2a5014c9dcd99b06e1c0571f63307",
+      "conda_env": "gen",
+      "cudnn": "90100",
+      "diffusers": "0.36.0",
+      "gpu": "Tesla V100S-PCIE-32GB",
+      "node": "neumann",
+      "numpy": "2.4.4",
+      "python": "3.11.15",
+      "slurm_job": "232469_1",
+      "torch": "2.4.1+cu121",
+      "torch_cuda": "12.1",
+      "transformers": "5.6.2"
+    },
+    {
+      "commit": "faf60c44d3d1a85a24a45d4024269d57903c2225",
+      "conda_env": "gen",
+      "cudnn": "90100",
+      "diffusers": "0.36.0",
+      "gpu": "Tesla V100-PCIE-16GB",
+      "node": "erdos",
+      "numpy": "2.4.4",
+      "python": "3.11.15",
+      "slurm_job": "232469_6",
+      "torch": "2.4.1+cu121",
+      "torch_cuda": "12.1",
+      "transformers": "5.6.2"
+    },
+    {
+      "commit": "faf60c44d3d1a85a24a45d4024269d57903c2225",
+      "conda_env": "gen",
+      "cudnn": "90100",
+      "diffusers": "0.36.0",
+      "gpu": "Tesla V100S-PCIE-32GB",
+      "node": "neumann",
+      "numpy": "2.4.4",
+      "python": "3.11.15",
+      "slurm_job": "232469_7",
+      "torch": "2.4.1+cu121",
+      "torch_cuda": "12.1",
+      "transformers": "5.6.2"
+    }
+  ],
+  "images": 490,
+  "configurations": {
+    "C/reference": {
+      "configuration": "C/reference",
+      "images": 490,
+      "miou@0.35": 0.7056991272492699,
+      "pixel_iou@0.35": 0.6971606964733663,
+      "miou@0.45": 0.6653371113082167,
+      "pixel_iou@0.45": 0.6449549024195222,
+      "miou@0.55": 0.543043154710882,
+      "pixel_iou@0.55": 0.5114167773473828,
+      "mean_image_iou@0.45": 0.6706009858213781,
+      "mean_ap": 0.9217731627274532
+    },
+    "C/R": {
+      "configuration": "C/R",
+      "images": 490,
+      "miou@0.35": 0.7067109243360548,
+      "pixel_iou@0.35": 0.70811559882699,
+      "miou@0.45": 0.695592312187985,
+      "pixel_iou@0.45": 0.6823802444424605,
+      "miou@0.55": 0.5876966635344886,
+      "pixel_iou@0.55": 0.5575397415723918,
+      "mean_image_iou@0.45": 0.6923288452326899,
+      "mean_ap": 0.9131122983840048
+    },
+    "C/L": {
+      "configuration": "C/L",
+      "images": 490,
+      "miou@0.35": 0.7034732681919685,
+      "pixel_iou@0.35": 0.6989620248783356,
+      "miou@0.45": 0.6920757595414485,
+      "pixel_iou@0.45": 0.6753152286230854,
+      "miou@0.55": 0.5938315197350705,
+      "pixel_iou@0.55": 0.564963659257701,
+      "mean_image_iou@0.45": 0.6920573455529843,
+      "mean_ap": 0.9200754144362041
+    },
+    "C/H": {
+      "configuration": "C/H",
+      "images": 490,
+      "miou@0.35": 0.705550613621061,
+      "pixel_iou@0.35": 0.6970089184895828,
+      "miou@0.45": 0.676122747746943,
+      "pixel_iou@0.45": 0.6571237243045538,
+      "miou@0.55": 0.5623183939838067,
+      "pixel_iou@0.55": 0.5331292278221877,
+      "mean_image_iou@0.45": 0.6798402910714225,
+      "mean_ap": 0.9204713001543162
+    },
+    "C/R+H": {
+      "configuration": "C/R+H",
+      "images": 490,
+      "miou@0.35": 0.705832418386068,
+      "pixel_iou@0.35": 0.7069137085126153,
+      "miou@0.45": 0.6959995415094389,
+      "pixel_iou@0.45": 0.6843066657520772,
+      "miou@0.55": 0.5879475139167619,
+      "pixel_iou@0.55": 0.5613705845917639,
+      "mean_image_iou@0.45": 0.6916233023516306,
+      "mean_ap": 0.9126688508354888
+    },
+    "C/L+H": {
+      "configuration": "C/L+H",
+      "images": 490,
+      "miou@0.35": 0.7020382190563907,
+      "pixel_iou@0.35": 0.6969371622250344,
+      "miou@0.45": 0.6923692118781155,
+      "pixel_iou@0.45": 0.6760693506105042,
+      "miou@0.55": 0.5947717799359988,
+      "pixel_iou@0.55": 0.5677000423178332,
+      "mean_image_iou@0.45": 0.6913924918937805,
+      "mean_ap": 0.9189737012799906
+    }
+  }
+}

@@ -413,7 +413,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | CA-T / CA-R / joint official | Codex | Complete: keep all calls; promote resolutions 8+16+64 to CA-C | `16530b54b`; jobs `232263` → `232264` → `232265`; `outputs/segmentation/controlled_attention_cv/ca_time_resolution/` |
 | CA-L / CA-H / CA-A official | Claude | Complete (490/490, job `232243`); results for review in Section 21 | this commit; `outputs/segmentation/controlled_attention_cv/ca_layer_head_attribution/` |
 | Evidence package (all experiments, tables, figures) | Claude | Built from committed results; rebuild after every package (Section 22) | this commit; `docs/narmyn/attention/evidence/` |
-| CA-C and frozen CA | Claude runs (taken over from Codex, see Section 25); both review | Running (job `232469`, Section 26) | `outputs/segmentation/controlled_attention_cv/ca_confirmation/` |
+| CA-C and frozen CA | Claude runs (taken over from Codex, see Section 25); both review | Complete (490/490, job `232469`): CA-R alone frozen (Section 27); Codex review requested | this commit; `outputs/segmentation/controlled_attention_cv/ca_confirmation/`; `configs/controlled_sa_seed_frozen.json` |
 | SA-T / SA-R / joint official | Codex | Blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_time_resolution/` |
 | SA-L / SA-H / operator check | Claude | Runner and merge ready and verified (Section 24); blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_layer_head/` |
 | SA-C and frozen SA | Claude runs; both review | Not started | `outputs/segmentation/controlled_attention_cv/sa_confirmation/` |
@@ -435,12 +435,12 @@ totals. Re-run with the per-image writer before any CA choice is frozen.
 
 ## 11. Frozen choices and results
 
-No CA or SA choice is frozen yet. Add selections here only after the relevant
-combined confirmation.
+CA is frozen by CA-C (Section 27); SA is not frozen yet. Add selections here
+only after the relevant combined confirmation.
 
 | Stage | Frozen setting | Evidence | Commit |
 |---|---|---|---|
-| CA | Pending | — | — |
+| CA | Calls 0–30; resolutions 8, 16, 64 (the 32×32 modules 2, 3, 10, 11, 12 removed; 11 modules); all 8 heads; conditional query and key, padded 77-token softmax, all class-word pieces. Seed file `configs/controlled_sa_seed_frozen.json` | CA-C, Section 27: 4/5 fold votes, OOF mIoU 0.6653 → 0.6914 (+0.0260); `outputs/segmentation/controlled_attention_cv/ca_confirmation/` | this commit |
 | SA | Pending | — | — |
 
 
@@ -865,3 +865,59 @@ the frozen CA *values*, not for the code:
    Section 9 "both review" step.
 4. When `configs/controlled_sa_seed_frozen.json` is pushed, launch SA package A
    with it. Claude launches SA package B with the same file.
+
+## 27. Claude: CA-C results and the frozen CA (Codex review requested)
+
+All 20 shards completed (490/490 images, job `232469`; V100 nodes erdos and
+neumann, torch 2.4.1+cu121). Selection with `scripts/select_controlled_cv.py`
+and `configs/controlled_ca_confirmation_screens.json`.
+
+| Configuration | mIoU@0.35 | mIoU@0.45 | mIoU@0.55 | Mean AP | Fold votes |
+|---|---:|---:|---:|---:|---:|
+| `C/reference` | 0.7057 | 0.6653 | 0.5430 | 0.9218 | 0/5 |
+| `C/R` (CA-R alone) | 0.7067 | 0.6956 | 0.5877 | 0.9131 | **4/5** |
+| `C/L` (CA-L alone) | 0.7035 | 0.6921 | 0.5938 | 0.9201 | 1/5 |
+| `C/H` (CA-H alone) | 0.7056 | 0.6761 | 0.5623 | 0.9205 | 0/5 |
+| `C/R+H` (combined) | 0.7058 | 0.6960 | 0.5879 | 0.9127 | 0/5 |
+| `C/L+H` | 0.7020 | 0.6924 | 0.5948 | 0.9190 | 0/5 |
+
+**Decision (Section 5a): freeze `C/R`.** 4/5 fold votes (fold 4 chose `C/L`);
+OOF mIoU 0.6653 → 0.6914 (gain +0.0260, guard passed); paired Δ image IoU
++0.0217 [+0.0145, +0.0293], 266 images better / 224 worse. Not
+calibration-dependent (Δ mIoU +0.0010 / +0.0303 / +0.0447 at 0.35 / 0.45 /
+0.55). Mean AP falls 0.9218 → 0.9131, as in the single-axis screens.
+
+**Leave-one-out of the combined candidate (in-sample, 0.45).** Combined
+0.6960; without CA-R (= `C/L+H`) 0.6924 (−0.0036); without CA-H (= `C/R`)
+0.6956 (−0.0004, inside the 0.002 tie, so the more inclusive all-heads setting
+is kept); without CA-L, unchanged (CA-L is contained in CA-R). CA-H does not
+survive the combination.
+
+**Frozen CA (Section 11):** calls 0–30; the 11 CA modules at 8, 16 and 64
+(indices 0, 1, 4, 5, 6, 7, 8, 9, 13, 14, 15 of the sorted `attn2` names); all 8
+heads; conditional query and key, padded softmax, all class-word pieces
+(CA-A reference). Written to `configs/controlled_sa_seed_frozen.json`
+(`"frozen": true`) for both SA packages.
+
+**Verification.**
+
+- An independent recomputation of the pooled class IoU from the shard counts
+  reproduces every mIoU above exactly.
+- Against the A100 packages on all 490 images: the reference is 0.66534 vs
+  0.66606 (package B), CA-R 0.69559 vs 0.69571 (package A), CA-L 0.69208 vs
+  0.69226, CA-H 0.67612 vs 0.67647; mean image-IoU difference ≤ 0.0013.
+- Four images differ by more than 0.02 at 0.45; the largest is
+  `ovam-voc-sim-162` (car), 0.642 vs 0.798, a generation-level difference
+  between GPU types. CA-C rows are therefore compared only with each other,
+  which is why every combination was run together.
+- Shards record two commits (`06ab48f`, `faf60c4`). The runner was first
+  committed in `faf60c4`, and the file was not changed between job submission
+  and that commit.
+
+**Codex: please review** the selection (`ca_confirmation/fold_results.json`,
+`report.md`) and the seed file. SA package A can launch with
+`configs/controlled_sa_seed_frozen.json`; Claude will launch SA package B with
+the same file once Narmeen approves.
+
+The evidence package (`docs/narmyn/attention/evidence/`) now includes CA-C as
+experiment A3 (tables `a3_ca_c*`, figure `a3_ca_c_thresholds`).

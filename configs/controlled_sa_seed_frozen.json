@@ -1,0 +1,10 @@
+{
+  "name": "frozen_ca_r_8_16_64",
+  "note": "CA frozen by CA-C (protocol Sections 11 and 27): calls 0-30; resolutions 8, 16 and 64 (the 32x32 modules 2, 3, 10, 11, 12 removed); all 8 heads; conditional query and key, padded 77-token softmax, mean over all class-word pieces. Module indices are the sorted attn2 module names.",
+  "frozen": true,
+  "attribution": "cond_padded_all",
+  "calls": "all",
+  "modules": [0, 1, 4, 5, 6, 7, 8, 9, 13, 14, 15],
+  "heads": "all",
+  "source": "outputs/segmentation/controlled_attention_cv/ca_confirmation/fold_results.json (C/R)"
+}

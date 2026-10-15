@@ -4,6 +4,9 @@
 \input{evidence/tables/ledger.tex}
 \input{evidence/tables/decision_trail.tex}
 \input{evidence/tables/a_cv_summary.tex}
+\input{evidence/tables/a3_ca_c.tex}
+\input{evidence/tables/a3_ca_c_loo.tex}
+\input{evidence/tables/a3_ca_c_folds.tex}
 \input{evidence/tables/a2_ca_t.tex}
 \input{evidence/tables/a2_ca_r.tex}
 \input{evidence/tables/a1_ca_l_leave2.tex}
@@ -14,6 +17,10 @@
 \begin{figure}[H]\centering
 \includegraphics[width=1.0\linewidth]{evidence/figures/b_progression.pdf}
 \caption{Each step of the method and the baselines. VOC-Sim values are in-sample; COCO-Cap was never used to choose the earlier final method.}\label{fig:b_progression}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=1.0\linewidth]{evidence/figures/a3_ca_c_thresholds.pdf}
+\caption{CA-C: change in mIoU of every combination against the reference at thresholds 0.35, 0.45 and 0.55 (blue = frozen).}\label{fig:a3_ca_c_thresholds}
 \end{figure}
 \begin{figure}[H]\centering
 \includegraphics[width=1.0\linewidth]{evidence/figures/a2_ca_t_calls.pdf}

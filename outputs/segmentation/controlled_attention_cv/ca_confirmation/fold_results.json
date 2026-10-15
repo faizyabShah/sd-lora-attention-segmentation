@@ -1,0 +1,158 @@
+{
+  "selector_commit": "faf60c44d3d1a85a24a45d4024269d57903c2225",
+  "shard_commits": [
+    "06ab48faf7a2a5014c9dcd99b06e1c0571f63307",
+    "faf60c44d3d1a85a24a45d4024269d57903c2225"
+  ],
+  "shard_environments": [
+    {
+      "commit": "06ab48faf7a2a5014c9dcd99b06e1c0571f63307",
+      "conda_env": "gen",
+      "cudnn": "90100",
+      "diffusers": "0.36.0",
+      "gpu": "Tesla V100-PCIE-16GB",
+      "node": "erdos",
+      "numpy": "2.4.4",
+      "python": "3.11.15",
+      "slurm_job": "232469_0",
+      "torch": "2.4.1+cu121",
+      "torch_cuda": "12.1",
+      "transformers": "5.6.2"
+    },
+    {
+      "commit": "06ab48faf7a2a5014c9dcd99b06e1c0571f63307",
+      "conda_env": "gen",
+      "cudnn": "90100",
+      "diffusers": "0.36.0",
+      "gpu": "Tesla V100S-PCIE-32GB",
+      "node": "neumann",
+      "numpy": "2.4.4",
+      "python": "3.11.15",
+      "slurm_job": "232469_1",
+      "torch": "2.4.1+cu121",
+      "torch_cuda": "12.1",
+      "transformers": "5.6.2"
+    },
+    {
+      "commit": "faf60c44d3d1a85a24a45d4024269d57903c2225",
+      "conda_env": "gen",
+      "cudnn": "90100",
+      "diffusers": "0.36.0",
+      "gpu": "Tesla V100-PCIE-16GB",
+      "node": "erdos",
+      "numpy": "2.4.4",
+      "python": "3.11.15",
+      "slurm_job": "232469_6",
+      "torch": "2.4.1+cu121",
+      "torch_cuda": "12.1",
+      "transformers": "5.6.2"
+    },
+    {
+      "commit": "faf60c44d3d1a85a24a45d4024269d57903c2225",
+      "conda_env": "gen",
+      "cudnn": "90100",
+      "diffusers": "0.36.0",
+      "gpu": "Tesla V100S-PCIE-32GB",
+      "node": "neumann",
+      "numpy": "2.4.4",
+      "python": "3.11.15",
+      "slurm_job": "232469_7",
+      "torch": "2.4.1+cu121",
+      "torch_cuda": "12.1",
+      "transformers": "5.6.2"
+    }
+  ],
+  "images": 490,
+  "configurations": 6,
+  "screens": {
+    "CA-C": {
+      "reference": "C/reference",
+      "candidates": [
+        "C/R",
+        "C/L",
+        "C/H",
+        "C/R+H",
+        "C/L+H"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "C/R",
+          "reason": "promote",
+          "train_miou_chosen": 0.696688586525273,
+          "train_miou_reference": 0.6644280551701256,
+          "heldout_miou_chosen": 0.690461982302153,
+          "heldout_miou_reference": 0.670809811645039
+        },
+        {
+          "fold": 1,
+          "chosen": "C/R",
+          "reason": "promote",
+          "train_miou_chosen": 0.6912430933970718,
+          "train_miou_reference": 0.6610067848403578,
+          "heldout_miou_chosen": 0.7115713130067169,
+          "heldout_miou_reference": 0.6826586543410039
+        },
+        {
+          "fold": 2,
+          "chosen": "C/R",
+          "reason": "promote",
+          "train_miou_chosen": 0.6957316043954243,
+          "train_miou_reference": 0.6641457176347214,
+          "heldout_miou_chosen": 0.6972727839202607,
+          "heldout_miou_reference": 0.6713514541315221
+        },
+        {
+          "fold": 3,
+          "chosen": "C/R",
+          "reason": "promote",
+          "train_miou_chosen": 0.6975102366791471,
+          "train_miou_reference": 0.6660821705360644,
+          "heldout_miou_chosen": 0.686752397320459,
+          "heldout_miou_reference": 0.6676160723974894
+        },
+        {
+          "fold": 4,
+          "chosen": "C/L",
+          "reason": "promote",
+          "train_miou_chosen": 0.6977106856382929,
+          "train_miou_reference": 0.6715328911923027,
+          "heldout_miou_chosen": 0.67018634115353,
+          "heldout_miou_reference": 0.6429159153830757
+        }
+      ],
+      "selection_counts": {
+        "C/R": 4,
+        "C/L": 1
+      },
+      "vote_winner": "C/R",
+      "vote_winner_votes": 4,
+      "vote_passed": true,
+      "oof_guard_passed": true,
+      "frozen": "C/R",
+      "frozen_votes": 4,
+      "freeze_reason": "fold vote and OOF guard passed",
+      "out_of_fold_miou_selection": 0.6913759542772735,
+      "out_of_fold_miou_reference": 0.6653371113082167,
+      "oof_gain": 0.026038842969056786,
+      "in_sample_miou_frozen": 0.695592312187985,
+      "in_sample_miou_reference": 0.6653371113082167,
+      "paired_bootstrap_frozen_vs_reference": {
+        "mean": 0.021727859411311973,
+        "ci_low": 0.014494474258716547,
+        "ci_high": 0.029307038812704193,
+        "better": 266,
+        "worse": 224,
+        "ties": 0
+      },
+      "calibration": {
+        "delta_miou@0.35": 0.0010117970867848936,
+        "delta_miou@0.45": 0.030255200879768296,
+        "delta_miou@0.55": 0.044653508823606525
+      },
+      "calibration_dependent": false,
+      "mean_ap_frozen": 0.9131122983840048,
+      "mean_ap_reference": 0.9217731627274532
+    }
+  }
+}
