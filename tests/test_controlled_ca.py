@@ -12,6 +12,7 @@ from src.segmentation.controlled_ca import (
     resolution_configurations,
     time_windows,
 )
+from src.segmentation.controlled_sa import compose_time_resolution_maps
 from src.segmentation.in_memory_dataset import InMemoryAttentionSample
 
 
@@ -69,6 +70,24 @@ class ControlledCAConfigurationTests(unittest.TestCase):
         torch.testing.assert_close(
             by_name["time_resolution/step_00__r2_r4"], (r2_0 + r4_0) / 2
         )
+
+    def test_sa_composition_preserves_equal_observation_weighting(self):
+        sums = torch.zeros(2, 2, 2, 2)
+        counts = torch.tensor([[1, 2], [1, 2]])
+        sums[0, 0] = 2
+        sums[1, 0] = 4
+        sums[0, 1] = 12  # two observations with mean 6
+        sums[1, 1] = 16  # two observations with mean 8
+        windows = {"all_00_30": (0, 1), "step_00": (0,)}
+        resolutions = {"r2": (2,), "r4": (4,), "r2_r4": (2, 4)}
+        names, maps = compose_time_resolution_maps(
+            sums, counts, (2, 4), windows, resolutions
+        )
+        by_name = dict(zip(names, maps))
+        torch.testing.assert_close(by_name["time/all_00_30"], torch.full((2, 2), 34 / 6))
+        torch.testing.assert_close(by_name["time/step_00"], torch.full((2, 2), 14 / 3))
+        torch.testing.assert_close(by_name["resolution/r2"], torch.full((2, 2), 3.0))
+        torch.testing.assert_close(by_name["resolution/r4"], torch.full((2, 2), 7.0))
 
 
 if __name__ == "__main__":

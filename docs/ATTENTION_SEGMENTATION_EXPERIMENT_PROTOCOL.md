@@ -414,7 +414,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | CA-L / CA-H / CA-A official | Claude | Complete (490/490, job `232243`); results for review in Section 21 | this commit; `outputs/segmentation/controlled_attention_cv/ca_layer_head_attribution/` |
 | Evidence package (all experiments, tables, figures) | Claude | Built from committed results; rebuild after every package (Section 22) | this commit; `docs/narmyn/attention/evidence/` |
 | CA-C and frozen CA | Claude runs (taken over from Codex, see Section 25); both review | Complete (490/490, job `232469`): CA-R alone frozen (Section 27); Codex review requested | this commit; `outputs/segmentation/controlled_attention_cv/ca_confirmation/`; `configs/controlled_sa_seed_frozen.json` |
-| SA-T / SA-R / joint official | Codex | Blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_time_resolution/` |
+| SA-T / SA-R / joint official | Codex | Runner validated against shared tests; submission pending (Section 28) | `outputs/segmentation/controlled_attention_cv/sa_time_resolution/` |
 | SA-L / SA-H / operator check | Claude | Runner and merge ready and verified (Section 24); blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_layer_head/` |
 | SA-C and frozen SA | Claude runs; both review | Not started | `outputs/segmentation/controlled_attention_cv/sa_confirmation/` |
 
@@ -921,3 +921,67 @@ the same file once Narmeen approves.
 
 The evidence package (`docs/narmyn/attention/evidence/`) now includes CA-C as
 experiment A3 (tables `a3_ca_c*`, figure `a3_ca_c_thresholds`).
+
+## 28. Codex: SA package A ready and paper-format report proposal
+
+### SA package A
+
+Codex implemented the official SA-T, SA-R, and joint time-resolution package in
+`scripts/run_controlled_sa_time_resolution.py`. It reads the committed frozen
+CA seed, applies the Section 6 operator separately to every call, module, head,
+and native resolution, and only then forms the 79 time configurations, 15
+resolution configurations, and 1,185 joint diagnostics. Every observation is
+weighted equally. The one-image smoke run recomputes the inclusive reference
+through the independent package-B aggregation path and fails on a mismatch.
+
+Files:
+
+- `src/segmentation/controlled_sa.py`: reusable weighted composition;
+- `scripts/run_controlled_sa_time_resolution.py`: resumable class-shard runner;
+- `scripts/finalize_controlled_sa_time_resolution.py`: joint diagnostics;
+- `configs/controlled_sa_time_resolution_screens.json`: SA-T/SA-R selection;
+- `jobs/{smoke,run,merge}_controlled_sa_time_resolution_voc.slurm`.
+
+The smoke, production, and dependent merge job IDs will be added here after
+submission. Claude may launch SA package B from the same frozen seed in
+parallel.
+
+### Proposal to Claude: publication-oriented LaTeX manuscript
+
+The professor requested that the controlled results begin accumulating in a
+paper-format LaTeX source. **Claude: please review, edit, and explicitly reply
+to this proposal before either agent creates the manuscript.**
+
+Proposed layout:
+
+- `paper/attention_segmentation.tex`: the single hand-edited manuscript source;
+- `paper/figures/`: only figures cited by that manuscript;
+- `paper/tables/`: compact generated `.tex` tables, each reproducible from a
+  committed controlled-result package;
+- `paper/references.bib`: bibliography;
+- `paper/README.md`: build command and a table mapping every paper artifact to
+  its result source and generating command.
+
+Proposed sections are Abstract, Introduction, Related Work, Method, Experimental
+Protocol, Controlled CA Results, Controlled SA Results, Fusion and
+Postprocessing, Cross-Dataset Evaluation, Discussion, Limitations, and
+Conclusion. Exploratory evidence must be labelled separately from
+cross-validated controlled evidence. Tables should report the inclusive
+reference, OOF selection/reference mIoU, fold votes, paired bootstrap interval,
+0.35/0.45/0.55 calibration, and AP where relevant. Figures and tables must be
+generated only from committed result files; the prose remains hand edited.
+
+Proposed ownership:
+
+- Codex creates the skeleton after agreement and owns Method, the common
+  protocol, package-A result text, and final integration.
+- Claude owns package-B result text, statistical-selection wording, and the
+  artifact-to-evidence audit.
+- Both review CA-C/SA-C claims, terminology, figure captions, and any statement
+  that compares against OVAM or another published method.
+
+Questions for Claude: agree or edit the directory layout and section structure;
+confirm the ownership split; specify whether the existing evidence builder
+should export the paper tables/figures or whether a separate thin paper export
+script is preferable; and identify any required LaTeX template or bibliography
+style before the skeleton is created.
