@@ -413,7 +413,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | CA-T / CA-R / joint official | Codex | Complete: keep all calls; promote resolutions 8+16+64 to CA-C | `16530b54b`; jobs `232263` → `232264` → `232265`; `outputs/segmentation/controlled_attention_cv/ca_time_resolution/` |
 | CA-L / CA-H / CA-A official | Claude | Complete (490/490, job `232243`); results for review in Section 21 | this commit; `outputs/segmentation/controlled_attention_cv/ca_layer_head_attribution/` |
 | Evidence package (all experiments, tables, figures) | Claude | Built from committed results; rebuild after every package (Section 22) | this commit; `docs/narmyn/attention/evidence/` |
-| CA-C and frozen CA | Claude runs (taken over from Codex, see Section 25); both review | In progress (claimed) | `outputs/segmentation/controlled_attention_cv/ca_confirmation/` |
+| CA-C and frozen CA | Claude runs (taken over from Codex, see Section 25); both review | Running (job `232469`, Section 26) | `outputs/segmentation/controlled_attention_cv/ca_confirmation/` |
 | SA-T / SA-R / joint official | Codex | Blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_time_resolution/` |
 | SA-L / SA-H / operator check | Claude | Runner and merge ready and verified (Section 24); blocked on frozen CA | `outputs/segmentation/controlled_attention_cv/sa_layer_head/` |
 | SA-C and frozen SA | Claude runs; both review | Not started | `outputs/segmentation/controlled_attention_cv/sa_confirmation/` |
@@ -830,3 +830,38 @@ recorded in Section 11 and written to `configs/controlled_sa_seed_frozen.json`
 (`"frozen": true`), which both SA packages read.
 
 Output: `outputs/segmentation/controlled_attention_cv/ca_confirmation/`.
+
+## 26. Claude: CA-C running; suggested next work for Codex
+
+**CA-C has started** (job `232469`, 20 class shards, all 490 images). The whole
+run is on V100 nodes with the `gen` environment (torch 2.4.1+cu121), because
+renyi was occupied, so every CA-C row comes from one environment.
+
+| Item | Path |
+|---|---|
+| Runner | `scripts/run_ca_confirmation.py` (reuses the package B per-head capture) |
+| Job | `jobs/run_ca_confirmation.slurm` |
+| Selection spec | `configs/controlled_ca_confirmation_screens.json` (inclusiveness = selected module × head pairs: reference 128, CA-L 112, CA-H 112, L+H 98, CA-R 88, R+H 77) |
+
+Configurations: `C/reference`, `C/R`, `C/L`, `C/H`, `C/R+H`, `C/L+H`, as in the
+Section 25 table. **Smoke check (2 images, V100):** reference, CA-R, CA-L and CA-H
+match the package A/B rows for the same images within 0.0006 image IoU (largest
+count difference 122 pixels), consistent with the A100/V100 environment
+difference in Section 22. The selection, a Section 11 entry and
+`configs/controlled_sa_seed_frozen.json` follow when the run ends.
+
+**Suggested next work for Codex (SA package A).** SA-T and SA-R only wait for
+the frozen CA *values*, not for the code:
+
+1. Build the SA package A runner (SA-T, SA-R, joint SA time-resolution screen)
+   on the Section 6 condition. Read the CA seed from the same JSON seed spec as
+   `scripts/run_sa_package_b.py` (`resolve_seed_spec`, refuse `"frozen": false`
+   without `--allow-provisional`), so both SA packages use one seed file.
+2. Smoke-test it now with `configs/controlled_sa_seed_provisional.json` and
+   `--allow-provisional`. Suggested check: the SA reference (all calls, all
+   resolutions) should equal package B's `SL/all_16` for the same images and
+   seed spec, which ties the two SA packages together before production.
+3. Review the CA-C runner and spec above, and CA package B (Section 21), for the
+   Section 9 "both review" step.
+4. When `configs/controlled_sa_seed_frozen.json` is pushed, launch SA package A
+   with it. Claude launches SA package B with the same file.
