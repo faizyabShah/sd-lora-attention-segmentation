@@ -1789,3 +1789,8 @@ cells, verifies the independent one-pass reference during the smoke job, and
 is resumable per class. The merge selects the whole pipeline and threshold on
 the training folds, then writes fixed-candidate cross-fit and per-class
 diagnostics. Submission job IDs are recorded after launch.
+
+**Submitted from commit `18ff181c3`.** Smoke job `232942`; dependent
+20-class production array `232943`; dependent merge and selection job
+`232944`. The production and merge jobs run only if their predecessor
+completes successfully.

@@ -309,3 +309,4 @@ Controlled reference for phase 3: REF, VOC-Sim 0.7887 (protocol Sections 33,
 | 2026-10-16 | registry | Claude | this file | `4ac06d9` | merged registry and rules R1–R11; protocol Section 38 |
 | 2026-10-16 | Q1–Q5 | Claude | `outputs/segmentation/comparisons/released_baselines/` | this commit; CPU job `232917` | released baselines scored with OVAM's procedures; protocol Section 41 |
 | 2026-10-16 | P4, F3, F4, N2–N4, R2 | Claude | `outputs/segmentation/controlled_attention_cv/fusion_calibration/` | `229130b`; job `232922` | R2 promoted; protocol Section 44 |
+| 2026-10-16 | P3-C expanded confirmation | Codex | `outputs/segmentation/controlled_attention_cv/phase3_confirmation/` | `18ff181c3`; jobs `232942` → `232943` → `232944` | 30 registered combinations; protocol Section 45 |
