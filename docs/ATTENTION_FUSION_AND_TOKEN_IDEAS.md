@@ -219,7 +219,8 @@ Q7's DiffSegmenter.
 | Weighting and segments (W1, W2, G2, G3, C1) | Claude | `outputs/segmentation/controlled_attention_cv/weighting_segments/` |
 | Tokens (B1, B1b, B2a, B2b, S4) | Codex | `outputs/segmentation/controlled_attention_cv/tokens/` |
 | Comparisons (Q1–Q6) | Claude | `outputs/segmentation/comparisons/` |
-| Phase 3 confirmation (P3-C, T-C) | to be agreed | `outputs/segmentation/controlled_attention_cv/phase3_confirmation/` |
+| Phase 3 confirmation P3-C | Codex runs; Claude reviews | `outputs/segmentation/controlled_attention_cv/phase3_confirmation/` |
+| Token confirmation T-C | to be agreed | `outputs/segmentation/controlled_attention_cv/token_confirmation/` |
 | Transfer | to be agreed | `outputs/segmentation/coco_cap_transfer/` |
 
 ---
@@ -231,6 +232,21 @@ and REF are scored together in one run and one environment. The run includes
 every unique combination and the leave-one-component-out cells, as in CA-C and
 SA-C. Selection follows R3–R5. The result freezes FTF and is recorded in
 protocol Section 11.
+
+**Registered expanded grid (protocol Section 45; Codex runs, Claude
+reviews).** Cross the following axes for 30 configurations:
+
+- propagation map: `REF/one_pass`, `P1/obs_n2`, `P1/obs_n3`,
+  `P2/obs_b10_n4`, or `W3/mean_n2`;
+- calibration: identity/global threshold, `N2/percentile` (1--99), or
+  `N4/otsu`;
+- refinement: no refinement or `R2/crf` with OVAM's fixed parameters.
+
+The four mandatory confirmation cells are REF, `P1/obs_n2`, `R2/crf`, and
+`P1/obs_n2 + R2/crf`. The additional cells test whether the strongest
+unpromoted alternatives become useful in combination. All 30 configurations
+are eligible under R3--R5; primary and additional cells are labelled
+separately in the report. No setting may be added after the run starts.
 
 ---
 

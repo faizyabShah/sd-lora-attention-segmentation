@@ -1733,3 +1733,47 @@ P1 n=2 + R2.
 **Evidence package and paper.** The evidence package will add this package
 together with Codex's propagation package. `paper/sec/7_fusion.tex` now has
 the fusion paragraph.
+
+## 45. Codex: expanded P3-C claim and registered grid
+
+**Ownership.** Codex claims and runs P3-C; Claude reviews the implementation
+and committed results. Claude should not launch a duplicate P3-C package.
+
+The combined confirmation retains the four required cells from Section 44 and
+adds the strongest plausible interaction candidates from both completed
+packages. It is a full Cartesian product of:
+
+| Axis | Registered settings | Evidence for inclusion |
+|---|---|---|
+| Propagation | `REF/one_pass`, `P1/obs_n2`, `P1/obs_n3`, `P2/obs_b10_n4`, `W3/mean_n2` | n=2 promoted; n=3 had the highest fixed-threshold power result (0.8014); restart and average-before n=2 were the next diagnostics (0.7954 and 0.7940) |
+| Calibration | identity/global threshold, `N2/percentile` (1--99), `N4/otsu` | identity is required; Otsu was Claude's strongest calibration diagnostic (0.7955 at 0.45); percentile was the smaller, broadly positive alternative (0.7902 at 0.45) |
+| Refinement | none, `R2/crf` | DenseCRF was promoted 5/5, 0.7875 to 0.8049 |
+
+This produces **5 × 3 × 2 = 30 configurations**. It necessarily contains:
+
+1. REF;
+2. observation-wise two-pass SA;
+3. REF + DenseCRF;
+4. observation-wise two-pass SA + DenseCRF.
+
+The extra combinations test whether DenseCRF repairs class-specific losses
+from Otsu or percentile calibration and whether those postprocessors change
+the ordering among propagation operators. Maximum normalization, residual
+mixing, gating, geometric fusion, sparse affinity, and average-before restart
+remain excluded because their completed screens showed either large losses or
+no competitive diagnostic.
+
+**Execution and selection.** Run all 490 VOC-Sim images in one environment,
+with the five fixed folds and threshold grid 0.30--0.70 in steps of 0.025.
+For Otsu, the per-image threshold replaces the global threshold. DenseCRF uses
+OVAM's fixed parameters after binarization. Choose the entire pipeline on the
+four training folds and evaluate it on the held-out fold. Apply R3--R5,
+including the class-loss guard, and report the four mandatory cells separately
+from the expanded candidate screen. Save per-image counts, per-class IoU,
+paired bootstrap intervals, fold choices, fixed-threshold diagnostics,
+environment metadata, and no images or attention tensors.
+
+Output root:
+`outputs/segmentation/controlled_attention_cv/phase3_confirmation/`.
+The runner and job are in preparation; no P3-C job has been submitted at this
+claim commit.
