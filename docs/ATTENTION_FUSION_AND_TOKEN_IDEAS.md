@@ -1,12 +1,14 @@
-# Attention fusion and token ideas (deferred phase)
+# Phase 3 experiment registry: propagation, fusion, refinement, tokens and comparisons
 
-**Status:** shared backlog, Claude draft 1  
-**Starts:** only after the CA and SA configurations are frozen in
-`ATTENTION_SEGMENTATION_EXPERIMENT_PROTOCOL.md` (its Section 8).  
-**How to use:** each idea has an ID. When an idea is run, set its status and
-link the output folder and commit. Every idea is evaluated on the frozen seed,
-inside the 5 folds of protocol Section 5a, with its own threshold chosen on
-the training folds, and with per-image counts saved.
+**Status:** registered plan, Claude draft 2 (merges Claude's backlog, Codex's
+propagation package of protocol Section 37, and Faiz's `plan.tex`). Codex
+review requested in protocol Section 38.
+**Starts:** after the CA and SA freeze of protocol Section 11, confirmed by the
+joint CA×SA audit (Sections 34, 36, 38).
+**How to use:** every experiment has an ID. Its grid is registered here before
+it runs. When it runs, set its status and link the output folder, jobs and
+commit in the log (Section 9). A result enters the paper only through an ID in
+this file.
 
 **OVAM clarification:** the all-ones-value self-attention hook is an artifact
 of the upstream OVAM repository/reference-fidelity baseline. It is not the
@@ -14,117 +16,244 @@ QK-derived operator used by our controlled SA experiments, and repairing or
 replacing that upstream hook is not planned work. Ideas below that use genuine
 SA affinities are independent fusion proposals rather than fixes to OVAM.
 
-Notation: `c` is the frozen CA seed (64×64, min–max normalized), `A` is the
-row-stochastic SA affinity `softmax(Q Kᵀ / √d)` of the frozen SA selection,
-`n` is a number of propagation passes.
+**Notation.**
+
+- `c` is the frozen CA seed (`C/R`, 64×64, min–max normalized).
+- `A_i` is the row-stochastic conditional SA affinity `softmax(Q Kᵀ / √d)` of
+  SA module 15 (64×64) for observation `i` (one call × head; 31 × 8 = 248
+  observations). `Ā = mean_i A_i`.
+- **REF** is the frozen method, `y = mean_i(A_i c)`: VOC-Sim mIoU 0.7887 at
+  0.45.
+- `n` is a number of propagation passes.
 
 Citations: names tagged **[OVAM n]** are in the OVAM paper's reference list
-(arXiv:2403.14291). Everything else must be checked before it is cited.
+(arXiv:2403.14291). Every other method name is marked *(to verify)* and must be
+checked before it is cited.
 
-## 1. Ways to combine self- and cross-attention
+---
 
-### 1.1 Multiply or gate
+## 0. Registered rules for every phase 3 experiment
 
-| ID | Method | Equation | Extra setting | Status |
-|---|---|---|---|---|
-| F1 | Upstream OVAM fusion reference | `c ⊙ norm_[α,1](S₁)`, where the released hook uses an all-ones value tensor | α | Reference-fidelity baseline, reproduced in `ovam_full.py`; no repair planned |
-| F2 | Column-mass gate | `c ⊙ norm_[α,1](Σᵢ Aᵢⱼ)` | α | Deferred optional fusion proposal; not an OVAM repair |
-| F3 | Gating | `c ⊙ (A c)` | — | Not run |
-| F4 | Geometric mean | `√(c ⊙ A c)` | — | Not run |
+These make each conclusion reportable with the same evidence as CA-C and SA-C.
 
-### 1.2 Propagate ("spread")
+| Rule | Content |
+|---|---|
+| R1 Data | Selection uses only the 490 VOC-Sim images. COCO-Cap (707) is never used to choose anything; it is scored once per frozen pipeline (Section 7). |
+| R2 Input | The frozen pair of protocol Section 11 (CA `C/R`, SA module 15, all calls and heads). REF is the reference of every Track A screen. |
+| R3 Folds and thresholds | The 5 folds of protocol Section 5a. In each outer fold, the method parameter **and** the mask threshold are chosen on the other four folds and scored on the held-out fold. Threshold grid 0.30–0.70 in steps of 0.025 (the Section 37 grid). REF is treated the same way (REF@cv) and is the comparison point; REF@0.45 and fixed 0.35/0.45/0.55 results are also reported for continuity. |
+| R4 Decision | Protocol Section 5 bands (promote ≥ +0.010; conditional +0.005–0.0099 with ≥ 12/20 classes improved and no class loss > 0.05), ≥ 4/5 fold votes, positive pooled OOF gain. Each family is screened independently against REF; family winners go to the combined confirmation P3-C (Section 6). |
+| R5 Ties | Within 0.002, the simpler setting wins: REF, then fewer added operations, then fewer free parameters. |
+| R6 Records | Per-image tp/fp/fn at every threshold of the grid, AP, image and class IDs, fold IDs, settings, commit and environment, via the shared `ShardWriter`. Images and attention tensors are released after scoring. |
+| R7 Environment | Each package runs in one environment; packages compare against their own REF row. |
+| R8 Registration | Grids are committed here before the run. Any change after a run starts is logged with its reason and labelled post hoc. |
+| R9 Reporting | Each package produces `report.md` and `fold_results.json` with: fold choices, OOF reference/selection mIoU, paired bootstrap 95% CI and better/worse counts, Δ mIoU at 0.35/0.45/0.55 and at the fold-chosen threshold, AP, per-class Δ, and **the number of configurations searched**. It is then added to the evidence package (`scripts/narmyn/attention/build_evidence.py`) as a ledger row, a CSV, tables and figures. |
+| R10 Tracks | **Training-free** (no annotated images, no externally trained segmenter) and **few-shot** (any annotated image) are reported separately. Methods that use an external segmentation model (e.g. SAM) form a third, labelled group. |
+| R11 Token leakage | No token is trained on an evaluation image of the fold it is scored on, and no token training image may be a VOC-Sim evaluation image unless the fold rule of B2b applies. |
 
-| ID | Method | Equation | Extra setting | Status |
-|---|---|---|---|---|
-| P1 | Power propagation (current method) | `Aⁿ c` | n | Official controlled run submitted by Codex; protocol Section 37 |
-| P2 | Propagation with restart (personalized PageRank) | `x ← (1−β) A x + β c`, iterated | β, n | Official controlled run submitted by Codex; protocol Section 37 |
-| P3 | Heat kernel | `Σₖ e^{−t} tᵏ/k! Aᵏ c` | t | Not run. Removes the hard choice of n |
-| P4 | Residual mix | `λ Aⁿ c + (1−λ) c` | λ | Partly screened in the earlier streaming suite |
-| P5 | Symmetric / spectral affinity | `(D^{−½} W D^{−½})ⁿ c`, `W = (A + Aᵀ)/2` | n | Not run |
-| P6 | Sparse affinity | keep the top-k entries of each row of `A`, renormalize | k | Official controlled run submitted by Codex; protocol Section 37 |
-| P7 | Rollout across modules | `A_L ⋯ A₂ A₁ c` (different SA modules in sequence) | module order | Close to the earlier progressive screen |
-| P8 | Column propagation | `Aᵀ c` (normalized) | — | Operator check only (protocol Section 6) |
+---
 
-### 1.3 Group pixels with SA, label groups with CA
+## 1. Track A: training-free operators on the frozen pair
 
-| ID | Method | Idea | Status |
-|---|---|---|---|
-| G1 | Attention-map merging | cluster pixels whose SA rows are similar (KL merging as in "Diffuse, attend, and segment" **[OVAM 48]**), label each segment by its mean CA | Not run |
-| G2 | Spectral clustering | eigenvectors of the SA graph give segments; choose segments whose mean CA exceeds a threshold | Not run |
-| G3 | k-means on SA rows | simplest form of G1/G2 | Not run |
-| G4 | Seeded region growing | start at CA peaks, grow while SA similarity stays high | Not run |
+**Tier:** 1 = needed for the paper's main claims; 2 = should run if time allows;
+3 = could run later or appear as future work.
 
-These give object-aligned boundaries and do not threshold the CA map directly.
+### 1.1 Propagation operators (Codex package, protocol Section 37)
 
-### 1.4 SA as the pairwise term of a CRF
+| ID | Method | Definition | Registered grid | Targets | Owner | Tier | Status |
+|---|---|---|---|---|---|---|---|
+| P1 | Observation-wise power | `mean_i(A_iⁿ c)` | n = 1–4 | over-focus | Codex | 1 | Submitted, Section 37 |
+| W3 | Average-before power | `Āⁿ c` | n = 1–4 (n = 1 must equal REF) | — | Codex | 1 | Submitted, Section 37 |
+| P2 | Restart (personalized PageRank) | `x ← (1−β) A x + β c` from `x₀ = c`, both aggregation orders | β ∈ {0.10, 0.25, 0.50, 0.75}; iterations ∈ {2, 4, 8} | over-focus and leaking | Codex | 1 | Submitted, Section 37 |
+| P6 | Sparse affinity | row-wise top-k of `A_i`, renormalized, one pass | k ∈ {16, 32, 64, 128, 256, 512, 1024} | leaking | Codex | 1 | Submitted, Section 37 |
+| P3 | Heat kernel | `Σ_{k=0}^{8} e^{−t} tᵏ/k! Āᵏ c` (truncated at 8 terms) | t ∈ {0.5, 1, 2, 4} | removes the hard choice of n | Codex (proposed) | 2 | Not run |
+| P5 | Symmetric affinity | `(D^{−½} W D^{−½})ⁿ c`, `W = (Ā + Āᵀ)/2` | n = 1–4 | — | Codex (proposed) | 2 | Not run |
+| P9 | Seeded progressive expansion (SeeDiff-style *(to verify)*) | threshold `c` into confident seeds, expand through SA from coarse to fine modules, then a background expansion stage | seed threshold ∈ {0.5, 0.7, 0.9}; module path; background stage on/off | over-focus and leaking | unassigned | 3 | Not run. Reopens SA module choice: report as a separate method |
+| P7 | Rollout across modules | `A_L ⋯ A₁ c` | module order | — | — | — | Superseded: SA-C froze a single module |
+| P8 | Column propagation | `Aᵀ c` | — | — | — | — | Done (SA package B): far worse |
 
-| ID | Method | Idea | Status |
-|---|---|---|---|
-| R1 | Graph cut / CRF with SA edges | CA gives the unary score, SA replaces RGB similarity in the pairwise term | Not run |
-| R2 | DenseCRF on RGB (OVAM's) | SimpleCRF, OVAM's parameters, on the regenerated image | Exploratory results exist (see Section 3) |
+### 1.2 Fusion and calibration (Claude package)
 
-### 1.5 Prototype matching
+All take the min–max normalized `c` and `y = REF` as inputs.
 
-| ID | Method | Equation | Status |
-|---|---|---|---|
-| M1 | CA-weighted prototype | `p = Σⱼ cⱼ fⱼ / Σⱼ cⱼ`, mask from `cos(fᵢ, p)`, `f` = SA queries or keys | Not run |
-| M2 | Multiple prototypes | k-means inside high-CA pixels; max similarity over prototypes | Not run. For multi-part objects (person, bicycle) |
+| ID | Method | Definition | Registered grid | Targets | Owner | Tier | Status |
+|---|---|---|---|---|---|---|---|
+| P4 | Residual mix | `λ y + (1−λ) c` | λ ∈ {0.25, 0.50, 0.75, 0.90} (λ = 1 is REF) | leaking | Claude | 1 | Not run |
+| F3 | Gating | `c ⊙ y` | — | leaking | Claude | 1 | Not run |
+| F4 | Geometric mean | `√(c ⊙ y)` | — | leaking | Claude | 1 | Not run |
+| F2 | Column-mass gate | `y ⊙ norm_[α,1](Σ_i A_{ij})` | α ∈ {0, 0.25, 0.50, 0.75} | background suppression | Claude | 2 | Not run |
+| N2 | Percentile normalization | percentile 1–99 clip, then rescale, before thresholding | — | calibration | Claude | 1 | Not run (used in tier-B exploration) |
+| N3 | Max normalization (OVAM) | `y / max(y)` | — | calibration | Claude | 1 | Not run |
+| N4 | Per-image adaptive threshold | Otsu threshold per image instead of a global one | — | calibration; per-image scale | Claude | 1 | Not run |
+| BG1 | Background map | propagate the start-token CA map the same way; foreground where `y > γ · bg` | γ ∈ {0.50, 0.75, 1.0, 1.25, 1.5} | background handling (Faiz's plan) | Claude | 2 | Not run |
+| F1 | Upstream OVAM fusion | `c ⊙ norm_[α,1](S₁)` with the all-ones value tensor | α | — | — | — | Reference-fidelity baseline only (`ovam_full.py`) |
 
-### 1.6 Label-free averaging over heads and steps
+### 1.3 Label-free weighting of observations
 
-| ID | Method | Idea | Status |
-|---|---|---|---|
-| W1 | Entropy weighting | weight each head/step map by `1 / entropy` | Not run |
-| W2 | Agreement-based head choice | per image, keep the SA heads whose propagated map agrees most with `c` | Not run. A label-free alternative to a fixed head subset |
-| W3 | Average before or after propagation | `mean(Aⁿ) c` vs. `(mean A)ⁿ c` | Official controlled run submitted by Codex; protocol Section 37 |
-| W4 | Iterate to convergence | alternate propagation and normalization until the map stops changing | Not run |
+| ID | Method | Definition | Registered grid | Owner | Tier | Status |
+|---|---|---|---|---|---|---|
+| W1 | Entropy weighting (NERVE-style *(to verify)*) | weight each `A_i c` by `1 / entropy(A_i c)` | temperature ∈ {0.5, 1, 2} | Claude | 2 | Not run |
+| W2 | Agreement-based heads | per image, keep the heads whose `A_i c` correlates most with `c` | keep ∈ {2, 4, 6} heads | Claude | 2 | Not run |
+| W4 | Iterate to convergence | alternate `Ā` and min–max until the change is < 10⁻⁴ | max iterations 50 | Codex (proposed) | 3 | Not run |
+| H1 | Hierarchical multi-resolution CA/SA fusion (FA-Seg-style *(to verify)*) | learned-free weighted sum over resolutions | weights by resolution | unassigned | 3 | Not run. Reopens CA/SA choices: separate method |
 
-Training-free baseline to compare against: "Diffusion model is secretly a
-training-free open vocabulary semantic segmenter" **[OVAM 52]**.
+### 1.4 Segment then label (object-aligned boundaries)
 
-**Suggested first batch:** F3, P2, P6, G1. They are cheap, label-free, and
-each targets a failure already observed.
+| ID | Method | Definition | Registered grid | Owner | Tier | Status |
+|---|---|---|---|---|---|---|
+| G3 | k-means on SA rows | cluster the 4096 rows of `Ā`; a segment is foreground if its mean `y` ≥ threshold | K ∈ {4, 8, 16} | Claude | 2 | Not run |
+| G2 | Spectral clustering | eigenvectors of the symmetric `Ā` graph, then as G3 | K ∈ {4, 8, 16} | Claude | 2 | Not run |
+| G1 | Attention-map merging (DiffSeg **[OVAM 48]**) | KL-based merging of SA rows, label by mean `y` | DiffSeg's merge threshold and anchors | Claude | 3 | Not run |
+| G4 | Seeded region growing | grow from the peaks of `c` while SA similarity stays high | similarity ∈ {0.5, 0.7, 0.9} | unassigned | 3 | Not run |
+| M1 | CA-weighted prototype | `p = Σⱼ cⱼ fⱼ / Σⱼ cⱼ`, mask from `cos(fᵢ, p)`, `f` = SA queries | — | unassigned | 3 | Not run |
+| M2 | Multiple prototypes | k-means inside high-`c` pixels, max similarity | k ∈ {2, 3, 4} | unassigned | 3 | Not run |
 
-## 2. Token methods beyond OVAM's
+### 1.5 Refinement
 
-OVAM learns one token per class in the text-encoder output space, trained with
-binary cross-entropy on one annotated image per class (OVAM Sec. 4.1, Supp.
-A.1). Alternatives:
+| ID | Method | Definition | Registered grid | Track | Owner | Tier | Status |
+|---|---|---|---|---|---|---|---|
+| R2 | DenseCRF on RGB (OVAM's) | SimpleCRF with OVAM's parameters on the regenerated image, unary from the map | OVAM's parameters fixed | training-free | Claude | 1 | Exploratory only (Section 8); controlled run not done |
+| R1 | CRF with SA edges | `y` as unary, `Ā` as pairwise affinity | pairwise weight ∈ {1, 3, 10} | training-free | unassigned | 3 | Not run |
+| X1 | SAM refinement (Faiz's plan) | prompts from `y`: top points, box, coarse mask | prompt type × number of points | external segmenter (R10) | unassigned | 3 | Not run |
 
-### 2.1 What is learned
+### 1.6 Class-adaptive choices (protocol Section 8; Faiz's plan)
+
+| ID | Method | Definition | Owner | Tier | Status |
+|---|---|---|---|---|---|
+| C1 | Per-class threshold | each class picks its own threshold on the training folds | Claude | 2 | Not run. About 25 images per class: report as a diagnostic unless it passes R4 |
+| C2 | Per-class operator | each class picks its operator from the P3-C finalists | unassigned | 3 | Not run |
+
+---
+
+## 2. Track B: few-shot tokens (Codex, protocol Section 38)
+
+A token replaces the class word in the attribution prompt. The CA seed then
+uses the frozen CA configuration with that single position, and the frozen SA
+propagates it. Tokens are 768-dimensional text-encoder outputs, as in OVAM.
+
+**OVAM's released training set** is in the public archive under
+`evaluation/ovam/voc_sim_train/`:
+
+- 63 generated images ("A photograph of a ⟨class⟩"; 3 per class, 2 for `cat`,
+  `horse` and `tv`), 59 hand-drawn masks, and 57 per-image tokens with loss
+  curves.
+- None of its seeds appears in the 490 VOC-Sim evaluation images.
+- **The released `configs/ovam/tokens_VOC.npy` equals, for every class, the
+  mean of that class's 2–3 per-image tokens** (row 1 of each `(2, 768)` file;
+  maximum difference below 10⁻⁶). The released tokens are therefore 2–3-shot,
+  not 1-shot. The OVAM paper's wording must be checked before the paper states
+  the number of shots.
+
+| ID | Method | Training images | Shots | Owner | Tier | Status |
+|---|---|---|---|---|---|---|
+| B1 | OVAM released tokens | OVAM training set | 2–3 (mean) | Codex | 1 | Not run under the protocol (exploratory: Section 8) |
+| B1b | OVAM per-image tokens | OVAM training set, each image alone | 1 (every choice; report mean ± range) | Codex | 1 | Not run |
+| B2a | Our tokens on OVAM's training images | OVAM training set, OVAM's recipe (S1) | 1 and 3 | Codex | 2 | Not run |
+| B2b | Our tokens from the training folds | 1 image per class from the 4 training folds, seeded choice registered before the run; 5 token sets | 1 | Codex | 2 | Not run |
+| S4 | Shot scaling | from B1b/B2a: 1, 2, 3 shots | 1–3 | Codex | 2 | Not run |
+| S3 | Train through our pipeline | loss on the SA-propagated map instead of raw CA | 1 | Codex | 3 | Not run |
+| S6 | Test-time self-consistency | per image, make `c` agree with `A c`; no labels (training-free track) | 0 | unassigned | 3 | Not run |
+| T1–T7, S2, S5, S7, S8 | Token variants | see Section 2.1 | — | unassigned | 3 | Not run |
+
+### 2.1 Further token variants (Tier 3)
 
 | ID | Method | Idea | Example |
 |---|---|---|---|
-| T1 | Input-space token | learn the word embedding before the CLIP encoder, so it stays context-aware | Textual Inversion **[OVAM 10]** |
+| T1 | Input-space token | learn the word embedding before the CLIP encoder | Textual Inversion **[OVAM 10]** |
 | T2 | Several tokens per class | k vectors per class | — |
-| T3 | Per-layer / per-step tokens | a separate token for each UNet layer or denoising step; matches our layer/step axes | P+ and NeTI (to verify) |
-| T4 | Shared context + class name | learnable context shared by all classes | CoOp-style prompt learning (to verify) |
-| T5 | Learned background tokens | replace `<SoT>` as background | — |
-| T6 | Key projections instead of tokens | small update of `to_k` | Key-locked editing **[OVAM 47]**, Custom Diffusion (to verify) |
-| T7 | Unconditional embedding | per-step optimized null embedding | Null-text inversion (to verify) |
-
-### 2.2 Training signal
-
-| ID | Method | Idea | Example |
-|---|---|---|---|
-| S1 | Mask BCE (OVAM) | current OVAM tokens | OVAM |
-| S2 | Better segmentation loss | Dice, Lovász, focal | — |
-| S3 | Train through our pipeline | loss on the SA-propagated output, not raw CA | New. Directly targets the COCO-Cap gap |
-| S4 | Few-shot scaling | 1, 5, 10 annotated images per class | SLiMe (to verify) |
-| S5 | Reconstruction loss | standard denoising loss, no masks | Textual Inversion **[OVAM 10]** |
-| S6 | Self-consistency at test time | per image, make `c` agree with `A c`, or minimize map entropy; no labels | New |
+| T3 | Per-layer / per-step tokens | one token per UNet layer or call | P+ and NeTI *(to verify)* |
+| T4 | Shared context + class name | learnable context shared by all classes | CoOp *(to verify)* |
+| T5 | Learned background token | replaces `<SoT>` as background | — |
+| T6 | Key projections | small update of `to_k` | Key-locked editing **[OVAM 47]**, Custom Diffusion *(to verify)* |
+| T7 | Unconditional embedding | per-call optimized null embedding | Null-text inversion *(to verify)* |
+| S2 | Segmentation losses | Dice, Lovász, focal | — |
+| S5 | Reconstruction loss | denoising loss, no masks | Textual Inversion **[OVAM 10]** |
 | S7 | Classifier guidance | discriminative class tokens | **[OVAM 43]** |
 | S8 | Discrete search | best real words | "Hard prompts made easy" **[OVAM 53]** |
 
-**Suggested first batch:** S3 and S4 (closest to the open COCO-Cap question),
-then S6 (keeps the method training-free), then T3.
+---
 
-## 3. Results already available
+## 3. Comparisons with other methods
 
-Exploratory, run before the protocol, on the earlier final method (12 CA
-layers with fixed top-4 heads, U3.2, heads {0,1,2,4,5,6}, calls 15–30,
-percentile 1–99, threshold 0.45, 1% cleanup). Details, reproduction and
-per-image counts: `docs/narmyn/attention/TOKEN_CRF_EXPERIMENT.md`.
+All are scored with our metric on the same annotations. Released masks were
+made on the authors' renders; our methods use regenerated images. The paper
+states this.
+
+| ID | Method | Source | VOC-Sim | COCO-Cap | Owner | Tier | Status |
+|---|---|---|---|---|---|---|---|
+| Q1 | OVAM (released masks: training-free and token-optimized) | OVAM archive | yes | training-free only | Claude | 1 | Scored (tier B16) |
+| Q2 | DAAM (compared in the OVAM paper) | OVAM archive: heatmaps | yes | yes | Claude | 1 | Not scored. Heatmaps: threshold chosen on the training folds (R3) |
+| Q3 | Attn2Mask | OVAM archive: masks / heatmaps | yes | yes | Claude | 1 | Not scored |
+| Q4 | Grounded Diffusion | OVAM archive: masks and optimized masks | yes | yes | Claude | 1 | Not scored |
+| Q5 | DatasetDM | OVAM archive: masks and optimized masks | yes | yes | Claude | 1 | Not scored |
+| Q6 | OVAM with SA (released) | OVAM archive: `ovam_sa` masks | yes | yes | Claude | 2 | Not scored |
+| Q7 | DiffSeg, DiffSegmenter, SeeDiff, FA-Seg, DiffuMask, FreeSeg-Diff *(to verify)* | reproduction on our regenerated images | if feasible | if feasible | unassigned | 3 | Not run |
+
+The training-free baseline named in the OVAM paper, "Diffusion model is
+secretly a training-free open vocabulary semantic segmenter" **[OVAM 52]**, is
+Q7's DiffSegmenter.
+
+---
+
+## 4. Order of work
+
+1. **Tier 1, in parallel:**
+   - Codex: propagation (P1, W3, P2, P6), then tokens B1 and B1b.
+   - Claude: fusion and calibration (P4, F3, F4, N2–N4) and R2 in one package,
+     then comparisons Q2–Q5 (no GPU).
+2. Each agent reviews the other's committed package before its result is used.
+3. **P3-C** (Section 6) on the Tier 1 winners. This freezes the final
+   training-free method (FTF).
+4. **Token confirmation T-C:** the best token variant on REF and on FTF.
+5. **Transfer** (Section 7) on COCO-Cap.
+6. Tier 2, then Tier 3, as time allows; each may reopen P3-C only through a new
+   registered confirmation.
+
+---
+
+## 5. Package outputs
+
+| Package | Owner | Output |
+|---|---|---|
+| Propagation (P1, W3, P2, P6) | Codex | `outputs/segmentation/controlled_attention_cv/propagation_package/` |
+| Fusion and calibration (P4, F2–F4, N2–N4, BG1, R2) | Claude | `outputs/segmentation/controlled_attention_cv/fusion_calibration/` |
+| Weighting and segments (W1, W2, G2, G3, C1) | Claude | `outputs/segmentation/controlled_attention_cv/weighting_segments/` |
+| Tokens (B1, B1b, B2a, B2b, S4) | Codex | `outputs/segmentation/controlled_attention_cv/tokens/` |
+| Comparisons (Q1–Q6) | Claude | `outputs/segmentation/comparisons/` |
+| Phase 3 confirmation (P3-C, T-C) | to be agreed | `outputs/segmentation/controlled_attention_cv/phase3_confirmation/` |
+| Transfer | to be agreed | `outputs/segmentation/coco_cap_transfer/` |
+
+---
+
+## 6. Phase 3 combined confirmation (P3-C)
+
+The winner of each Tier 1 family (propagation; fusion/calibration; refinement)
+and REF are scored together in one run and one environment. The run includes
+every unique combination and the leave-one-component-out cells, as in CA-C and
+SA-C. Selection follows R3–R5. The result freezes FTF and is recorded in
+protocol Section 11.
+
+---
+
+## 7. Transfer to COCO-Cap
+
+COCO-Cap is scored once for each frozen pipeline, with no choice made on it:
+
+- CA only (frozen CA);
+- CA + SA (frozen pair, REF);
+- FTF;
+- the final few-shot pipeline (VOC tokens; OVAM released no COCO tokens);
+- Q1–Q6 where released.
+
+The mask threshold is the one frozen on VOC-Sim.
+
+---
+
+## 8. Results already available (exploratory, before the protocol)
+
+Earlier final method (12 CA layers with fixed top-4 heads, U3.2, heads
+{0,1,2,4,5,6}, calls 15–30, percentile 1–99, threshold 0.45, 1% cleanup).
+Details, reproduction and per-image counts:
+`docs/narmyn/attention/TOKEN_CRF_EXPERIMENT.md`.
 
 | Dataset | Configuration | mIoU |
 |---|---|---:|
@@ -136,9 +265,28 @@ per-image counts: `docs/narmyn/attention/TOKEN_CRF_EXPERIMENT.md`.
 | COCO-Cap | OVAM token, 1 pass, + DenseCRF | 0.6612 |
 | COCO-Cap | token-optimized OVAM (paper Table 1) | 0.692 |
 
-## 4. Log
+Controlled reference for phase 3: REF, VOC-Sim 0.7887 (protocol Sections 33,
+36).
+
+---
+
+## 9. Paper mapping
+
+| Paper element | Content | Source IDs |
+|---|---|---|
+| Main Table 1 | Comparison on VOC-Sim and COCO-Cap, training-free and few-shot tracks separated | Q1–Q6, FTF, T-C, Section 7 |
+| Main Table 2 | Controlled path: CA reference → CA-C → SA-C → P3-C, with OOF mIoU, votes, CI | protocol Sections 27, 33, 36; P3-C |
+| Main figure | Calibration across thresholds for each frozen stage | CA-C, SA-C, P3-C |
+| Main figure | Qualitative masks: CA, CA+SA, FTF, few-shot, OVAM | fixed image IDs chosen before results |
+| Main Table 3 | Shots: 0 (FTF), 1, 2–3 | B1, B1b, B2a, S4 |
+| Supplementary | Protocol summary; every package's CV report; per-class tables; every configuration (CSV); environments and commits; negative results (e.g. `Aᵀx`, CA head 1, SA-T/SA-R not surviving); tier-B exploratory record, labelled | evidence package |
+
+---
+
+## 10. Log
 
 | Date | ID | Owner | Output | Commit | Note |
 |---|---|---|---|---|---|
 | 2026-10-13 | T-ovam, R2 | Claude | `outputs/segmentation/narmyn_token_crf/` | this branch | exploratory, pre-protocol |
 | 2026-10-16 | P1, P2, P6, W3 | Codex | `outputs/segmentation/controlled_attention_cv/propagation_package/` | `8f2f73acc`; jobs `232662` → `232663` → `232664` | official controlled package, protocol Section 37 |
+| 2026-10-16 | registry | Claude | this file | this commit | merged registry and rules R1–R11; protocol Section 38 |

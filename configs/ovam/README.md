@@ -6,8 +6,14 @@
 768-dimensional text-encoder-output vector per VOC class, keyed by class name
 (`aeroplane` … `tv`; multi-word classes use a hyphen, e.g. `dining-table`).
 
-Per the OVAM paper (Sec. 4.1, Supp. A.1), each token was optimized on one
-hand-annotated 512×512 image per class, generated with "A photograph of a
-⟨classname⟩" and seeds that are not in the evaluation sets.
+OVAM's public archive (`evaluation/ovam/voc_sim_train/`) holds the training
+set: 63 images generated with "A photograph of a ⟨classname⟩" (3 per class; 2
+for `cat`, `horse` and `tv`), 59 hand-drawn masks, and 57 per-image tokens.
+None of its seeds is a VOC-Sim evaluation seed. **Each released token equals
+the mean of that class's 2–3 per-image tokens** (row 1 of each `(2, 768)`
+per-image file; maximum difference below 10⁻⁶), so the released tokens are
+2–3-shot. Earlier versions of this note said one image per class, from a
+summary of the OVAM paper (Sec. 4.1, Supp. A.1); the paper's wording is to be
+checked.
 
 OVAM is released under the MIT license; its notice is in `LICENSE_OVAM`.

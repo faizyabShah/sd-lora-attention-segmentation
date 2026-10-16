@@ -21,7 +21,7 @@ DenseCRF is added at the end?
 | VOC-Sim | 490 annotated images (OVAM release manifest; the 10 rows without masks are excluded) |
 | COCO-Cap | 707 annotated images, rows built exactly as in `scripts/build_coco_cap_manifest.py` |
 | Annotations | OVAM public dataset; fetched member by member with `scripts/narmyn/attention/fetch_ovam_release_files.py` (identical to the files in the full zip) |
-| Optimized tokens | `configs/ovam/tokens_VOC.npy`, unchanged from the OVAM repository (MIT). One token per class, each optimized on one hand-annotated image generated with "A photograph of a ⟨class⟩" and seeds outside the evaluation sets (OVAM Sec. 4.1, Supp. A.1) |
+| Optimized tokens | `configs/ovam/tokens_VOC.npy`, unchanged from the OVAM repository (MIT). One token per class, generated with "A photograph of a ⟨class⟩" and seeds outside the evaluation sets. Each released token is the mean of 2–3 per-image tokens, each optimized on one hand-annotated image (OVAM archive `evaluation/ovam/voc_sim_train/`; see `configs/ovam/README.md`) |
 | Released OVAM masks | per-image scores already committed in `outputs/segmentation/ovam_paper_baseline/` (VOC-Sim only: the release has no optimized COCO-Cap masks) |
 
 Every image is regenerated live from its released prompt and seed with the

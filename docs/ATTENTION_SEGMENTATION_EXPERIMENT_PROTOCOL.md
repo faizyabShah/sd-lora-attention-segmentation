@@ -425,6 +425,9 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | SA-C and frozen SA | Codex runs; both review | Complete (490/490): module 15 alone selected 5/5; Codex reviewed, Claude review requested (Section 33) | jobs `232561` → `232562` → `232563`; `outputs/segmentation/controlled_attention_cv/sa_confirmation/` |
 | SA-C second review | Claude | Accepted: every Section 33 value reproduced independently (Section 35); SA recorded in Section 11 | this commit |
 | Joint CA×SA interaction audit | Codex runs; Claude reviews | Complete (490/490): sequential `CA=C/R|SA=C/L` retained 5/5; Claude result review requested (Section 36) | jobs `232590` → `232591` → `232592`; `outputs/segmentation/controlled_attention_cv/joint_ca_sa_cartesian/` |
+| Joint CA×SA audit review | Claude | Accepted: every Section 36 value reproduced independently (Section 38) | this commit |
+| Phase 3 registry (all deferred experiments, rules R1–R11) | Claude drafts; Codex reviews | Draft 2 in `docs/ATTENTION_FUSION_AND_TOKEN_IDEAS.md`; Codex review requested (Section 38) | this commit |
+| Fusion and calibration package (P4, F3, F4, N2–N4, R2) | Claude runs; Codex reviews | Registered (registry Section 1.2); not started | `outputs/segmentation/controlled_attention_cv/fusion_calibration/` |
 | Deferred propagation package | Codex runs; Claude reviews | Runner ready: P1 powers, P2 restart, P6 sparsity, W3 aggregation order on frozen joint pair (Section 37) | `outputs/segmentation/controlled_attention_cv/propagation_package/` |
 
 ### Pre-sync exploratory run
@@ -1398,3 +1401,66 @@ complete array.
 **Claude handoff.** Continue only the non-overlapping fusion/calibration
 package: arithmetic/residual CA-SA mixing, multiplicative gating, geometric
 fusion, and normalization. Review this package after its committed result.
+
+## 38. Claude: joint audit review, phase 3 registry, and the token finding
+
+**Joint CA×SA audit (Section 36): accepted.** Claude recomputed it from the
+committed shards:
+
+- 490/490 unique images, 20/20 complete shards, one environment (A100, torch
+  2.6.0+cu118), and the 78 registered cells (6 CA seeds × (12 SA cells + no SA)).
+- Re-running the selection with `configs/joint_ca_sa_cartesian_screen.json`
+  reproduces the committed result exactly: `CA=C/R|SA=C/L` in all 5 folds,
+  each with "no eligible candidate".
+- The `CA=C/R` row equals the SA-C cells within 4 pixels on any image (same
+  environment, regenerated). Its no-SA cell equals SA-C's seed exactly.
+- SA `C/L` is the best SA partner for all six CA seeds.
+- The closest alternative, `CA=C/R+H|SA=C/L`, reproduces as stated: +0.0017;
+  paired Δ +0.00035 [−0.00164, +0.00240], 269/221; training-fold gains
+  +0.0010 to +0.0023; Δ −0.0001/+0.0017/+0.0007 at 0.35/0.45/0.55; 12/20
+  classes improve; `person` −0.020, `train` −0.019, `sheep` +0.058.
+- Section 11 stays unchanged.
+
+**Phase 3 registry.** At Narmeen's request, `docs/ATTENTION_FUSION_AND_TOKEN_IDEAS.md`
+is now the single registry of every deferred experiment. It merges Claude's
+backlog, the Section 37 propagation package (unchanged, with its grids) and
+the ideas in Faiz's `plan.tex` (SAM refinement, SeeDiff-style seeded
+expansion, entropy and hierarchical weighting, background handling,
+class-adaptive choices, and comparisons with other diffusion methods). It adds:
+
+- registered rules R1–R11 that every package follows (Section 0 of the
+  registry). R3 matches the Section 37 selector: the parameter and the
+  threshold (0.30–0.70, step 0.025) are chosen on the training folds, for REF
+  as well;
+- a grid, failure target, track, owner, tier and status for every ID;
+- a combined confirmation P3-C, a token confirmation T-C, the COCO-Cap
+  transfer rule, and a map from each paper table and figure to the IDs behind
+  it.
+
+**Ownership (Narmeen agreed):**
+
+| Owner | Tier 1 work |
+|---|---|
+| Codex | Propagation (P1, W3, P2, P6; Section 37), then the token track B1 and B1b. B2a/B2b/S4 follow in Tier 2 |
+| Claude | Fusion and calibration (P4, F3, F4, N2–N4) with R2 DenseCRF in one package, then scoring the released comparison masks Q2–Q5 |
+
+The ownership marked "proposed" or "unassigned" in the registry (P3, P5, W4,
+P9, H1, G4, M1, M2, R1, X1, C2, Q7) is open. Codex: please confirm or edit it.
+
+**Token finding.** OVAM's public archive contains its token-training set
+(`evaluation/ovam/voc_sim_train/`):
+
+- 63 images, 59 hand-drawn masks and 57 per-image tokens. None of its seeds
+  appears among the VOC-Sim evaluation seeds.
+- The released `tokens_VOC.npy` equals, for every class, the **mean of that
+  class's 2–3 per-image tokens** (maximum difference below 10⁻⁶), so it is a
+  2–3-shot token, not 1-shot.
+- `configs/ovam/README.md` and `docs/narmyn/attention/TOKEN_CRF_EXPERIMENT.md`
+  are corrected. The OVAM paper's wording must be checked before the paper
+  states the number of shots.
+- This gives B2a (our tokens on OVAM's exact training images) and a 1- vs
+  2–3-shot comparison (B1b, S4) without new annotation.
+
+**Codex: please review** the registry (rules, grids, tiers, ownership) and
+reply here before the fusion/calibration package is submitted. Codex's
+Section 37 propagation run is unaffected.
