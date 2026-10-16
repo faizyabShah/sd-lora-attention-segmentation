@@ -1,0 +1,97 @@
+{
+  "source_commits": [
+    "326f17360fea8c9355e05cff5eca5b0cd3f50adf"
+  ],
+  "images": 490,
+  "spec": "configs/controlled_token_confirmation.json",
+  "screens": {
+    "T-C mandatory confirmation (token on REF, P1, R2, P1+R2)": {
+      "reference": "TC/REF",
+      "candidates": [
+        "TC/P1",
+        "TC/R2",
+        "TC/P1+R2"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "TC/R2",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.475,
+          "reason": "promote",
+          "train_miou_chosen": 0.8679414136025736,
+          "train_miou_reference": 0.8538062601800267,
+          "heldout_miou_chosen": 0.8520703045040797,
+          "heldout_miou_reference": 0.8365927555401251
+        },
+        {
+          "fold": 1,
+          "chosen": "TC/R2",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.475,
+          "reason": "promote",
+          "train_miou_chosen": 0.8590744697912465,
+          "train_miou_reference": 0.8448351713560616,
+          "heldout_miou_chosen": 0.8855691142641954,
+          "heldout_miou_reference": 0.8695032348199782
+        },
+        {
+          "fold": 2,
+          "chosen": "TC/R2",
+          "chosen_threshold": 0.475,
+          "reference_threshold": 0.475,
+          "reason": "promote",
+          "train_miou_chosen": 0.8650963358153874,
+          "train_miou_reference": 0.8500110302397077,
+          "heldout_miou_chosen": 0.8650767511704908,
+          "heldout_miou_reference": 0.8530775341202332
+        },
+        {
+          "fold": 3,
+          "chosen": "TC/P1+R2",
+          "chosen_threshold": 0.475,
+          "reference_threshold": 0.475,
+          "reason": "promote",
+          "train_miou_chosen": 0.8710583042366915,
+          "train_miou_reference": 0.8525925363047099,
+          "heldout_miou_chosen": 0.8509004363736461,
+          "heldout_miou_reference": 0.8426461404998561
+        },
+        {
+          "fold": 4,
+          "chosen": "TC/R2",
+          "chosen_threshold": 0.475,
+          "reference_threshold": 0.475,
+          "reason": "promote",
+          "train_miou_chosen": 0.8658909647005805,
+          "train_miou_reference": 0.8514761467817757,
+          "heldout_miou_chosen": 0.8571412785889938,
+          "heldout_miou_reference": 0.8419972286714428
+        }
+      ],
+      "selection_counts": {
+        "TC/R2": 4,
+        "TC/P1+R2": 1
+      },
+      "vote_winner": "TC/R2",
+      "vote_winner_votes": 4,
+      "frozen": "TC/R2",
+      "freeze_reason": "fold vote and OOF guard passed",
+      "oof_miou_selection": 0.8635030925844907,
+      "oof_miou_reference": 0.8506757047933926,
+      "oof_gain": 0.012827387791098044,
+      "full_threshold_frozen": 0.475,
+      "full_threshold_reference": 0.475,
+      "full_miou_frozen": 0.8651625234741782,
+      "full_miou_reference": 0.8506757047933926,
+      "paired_oof": {
+        "mean": 0.01582939643056105,
+        "ci_low": 0.01164686031800278,
+        "ci_high": 0.019945813904973478,
+        "better": 348,
+        "worse": 142,
+        "ties": 0
+      }
+    }
+  }
+}

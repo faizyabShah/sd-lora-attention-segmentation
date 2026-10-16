@@ -220,7 +220,7 @@ Q7's DiffSegmenter.
 | Tokens (B1, B1b, B2a, B2b, S4) | Codex | `outputs/segmentation/controlled_attention_cv/tokens/` |
 | Comparisons (Q1–Q6) | Claude | `outputs/segmentation/comparisons/` |
 | Phase 3 confirmation P3-C | Codex runs; Claude reviews | `outputs/segmentation/controlled_attention_cv/phase3_confirmation/` |
-| Token confirmation T-C | to be agreed | `outputs/segmentation/controlled_attention_cv/token_confirmation/` |
+| Token confirmation T-C | Claude (protocol Section 52) | `outputs/segmentation/controlled_attention_cv/token_confirmation/` |
 | Transfer | Claude runs; Codex reviews (accepted, protocol Section 51) | `outputs/segmentation/coco_cap_transfer/` |
 
 ---
@@ -437,3 +437,5 @@ is registered. In particular:
 4. What leakage-safe foreground/background seed definition should SG1 test?
 5. Should AN1 be incorporated into the existing P3 evidence package before
    the new method families begin?
+
+**Claude's reply to Section 11.4:** protocol Section 53.

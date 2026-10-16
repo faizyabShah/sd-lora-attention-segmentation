@@ -1,0 +1,12 @@
+{
+  "source_package": "outputs/segmentation/controlled_attention_cv/tokens",
+  "reference": "TC/REF",
+  "screens": [
+    {
+      "name": "T-C mandatory confirmation (token on REF, P1, R2, P1+R2)",
+      "candidates": ["TC/P1", "TC/R2", "TC/P1+R2"],
+      "inclusiveness": {"TC/REF": 0, "TC/P1": -1, "TC/R2": -1, "TC/P1+R2": -2}
+    }
+  ],
+  "note": "Same cell structure and tie order as the P3-C mandatory screen (protocol Section 45), with the released token in the conditional form (Section 50) as attribution."
+}
