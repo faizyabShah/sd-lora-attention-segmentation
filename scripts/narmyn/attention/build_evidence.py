@@ -48,6 +48,10 @@ PKG_C = SEG / "controlled_attention_cv" / "ca_confirmation"
 PKG_SB = SEG / "controlled_attention_cv" / "sa_layer_head"
 PKG_SA = SEG / "controlled_attention_cv" / "sa_time_resolution"
 PKG_SC = SEG / "controlled_attention_cv" / "sa_confirmation"
+PKG_JOINT = SEG / "controlled_attention_cv" / "joint_ca_sa_cartesian"
+PKG_PROP = SEG / "controlled_attention_cv" / "propagation_package"
+PKG_FUSION = SEG / "controlled_attention_cv" / "fusion_calibration"
+BASELINES = SEG / "comparisons" / "released_baselines" / "summary.json"
 
 # Reference palette (dataviz skill, light mode; static figures for print).
 SURFACE, INK, INK2, MUTED, GRID, AXIS = "#fcfcfb", "#0b0b0b", "#52514e", "#898781", "#e1e0d9", "#c3c2b7"
@@ -165,6 +169,19 @@ EXPERIMENTS = [
     ("A6", "Controlled SA confirmation (SA-C, Codex) and the frozen SA", VOC, "controlled, 5-fold cross-validated",
      "reference; T, R, L, H alone; every unique combination (12 configurations)", "protocol v1.2 Section 6; frozen CA seed (A3)",
      "controlled_attention_cv/sa_confirmation", None, "frozen SA: module 15 (U3.2) only, all calls, all heads"),
+    ("A7", "Joint CA x SA interaction audit (Codex)", VOC, "controlled, 5-fold cross-validated",
+     "6 CA-C seeds x (12 SA-C cells + no SA)", "sequential pair CA=C/R|SA=C/L as reference",
+     "controlled_attention_cv/joint_ca_sa_cartesian", None, "sequential pair kept 5/5; Section 11 unchanged"),
+    ("A8", "Phase 3 propagation package (Codex): P1, W3, P2, P6", VOC, "controlled, 5-fold cross-validated; threshold chosen in the folds",
+     "passes 1-4 (two aggregation orders), restart, top-k sparsity", "frozen pair; REF = one pass",
+     "controlled_attention_cv/propagation_package", None, "two passes mean_i(A_i² c) promoted to P3-C"),
+    ("A9", "Phase 3 fusion and calibration package: P4, F3, F4, N2-N4, R2", VOC,
+     "controlled, 5-fold cross-validated; threshold chosen in the folds",
+     "seed mixing, gating, normalization, per-image Otsu, DenseCRF", "frozen pair; REF = one pass",
+     "controlled_attention_cv/fusion_calibration", None, "DenseCRF promoted to P3-C; the rest kept at REF"),
+    ("A10", "Released baselines scored with OVAM's procedures", f"{VOC}; {COCO} (each method's own images)",
+     "reproduction of published values", "OVAM, DAAM, Attn2Mask, Grounded Diffusion, DatasetDM; class word and token",
+     "OVAM evaluation notebooks", "comparisons/released_baselines", None, "every printed OVAM-notebook value reproduced"),
 ]
 
 
@@ -938,6 +955,185 @@ def package_sa_b(plt, figures: list) -> dict | None:
     return out
 
 
+# --------------------------------------------------------------------------- #
+# Phase 3 packages (fold-chosen thresholds; scripts/select_propagation_cv.py)
+# --------------------------------------------------------------------------- #
+def _oof_counts(results, screen: dict) -> tuple[np.ndarray, np.ndarray]:
+    thresholds = list(results.thresholds)
+    sel = np.zeros((len(results.image_ids), 4), np.int64)
+    ref = np.zeros_like(sel)
+    for row in screen["folds"]:
+        held = results.folds == row["fold"]
+        sel[held] = results.counts[results.index(row["chosen"]), held, thresholds.index(row["chosen_threshold"])]
+        ref[held] = results.counts[results.index(screen["reference"]), held, thresholds.index(row["reference_threshold"])]
+    return sel, ref
+
+
+def _pooled(counts: np.ndarray, classes: np.ndarray) -> float:
+    return float(np.mean([counts[classes == c, 0].sum() / counts[classes == c, :3].sum() for c in sorted(set(classes))]))
+
+
+def selected_package(plt, figures: list, pkg: Path, tag: str, title: str, csv_name: str) -> dict | None:
+    """A phase 3 package selected with fold-chosen thresholds: CSV of every configuration and the screen table."""
+    if not (pkg / "fold_results.json").exists():
+        return None
+    results = cv.load_results(sorted((pkg / "shards").glob("*.npz")))
+    committed = load_json(pkg / "fold_results.json")
+    thresholds = list(results.thresholds)
+    classes = np.asarray(results.classes)
+    rows = []
+    for c, name in enumerate(results.configurations):
+        fixed = {f"miou@{t:.2f}": _pooled(results.counts[c, :, thresholds.index(t)], classes) for t in (0.35, 0.45, 0.55)}
+        best_t = max(range(len(thresholds)), key=lambda t: _pooled(results.counts[c, :, t], classes))
+        rows.append({"configuration": name, "screen": tag, **fixed,
+                     "best_threshold_in_sample": thresholds[best_t],
+                     "miou_at_best_threshold_in_sample": _pooled(results.counts[c, :, best_t], classes),
+                     "mean_ap": float(np.nanmean(results.ap[c])) if np.isfinite(results.ap[c]).any() else float("nan")})
+    with (OUT / csv_name).open("w", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+    by = {r["configuration"]: r for r in rows}
+    table = []
+    for name, screen in committed["screens"].items():
+        sel, ref = _oof_counts(results, screen)
+        iou = lambda k: k[:, 0] / np.maximum(k[:, :3].sum(axis=1), 1)  # noqa: E731
+        b = cv.paired_bootstrap(iou(sel), iou(ref))
+        frozen = screen["frozen"]
+        moved = frozen != screen["reference"]
+        delta = " / ".join(f"{by[frozen][f'miou@{t:.2f}'] - by[screen['reference']][f'miou@{t:.2f}']:+.4f}" for t in (0.35, 0.45, 0.55))
+        table.append([name, f"{screen['vote_winner']} ({screen['vote_winner_votes']}/5)", screen["oof_miou_reference"],
+                      screen["oof_miou_selection"], screen["oof_gain"],
+                      f"{b['mean']:+.4f} [{b['ci_low']:+.4f}, {b['ci_high']:+.4f}]; {b['better']}/{b['worse']}" if moved else "—",
+                      delta if moved else "—", len(screen["candidates"]), screen["freeze_reason"]])
+    out = {"by": by, "rows": rows, "screens": committed["screens"], "thresholds": thresholds,
+           "table": write_table(f"{tag.lower()}_cv_summary",
+                                ["Screen", "Fold choice (votes)", "OOF mIoU REF", "OOF mIoU choice", "OOF gain",
+                                 "Paired Δ image IoU [95% CI]; better/worse", "Δ mIoU @0.35 / 0.45 / 0.55", "Candidates", "Outcome"],
+                                table, f"{title} (VOC-Sim, 5 folds; method parameter and threshold chosen on the training folds)")}
+    return out
+
+
+def propagation_figure(plt, figures: list, prop: dict) -> None:
+    by = prop["by"]
+    key = "miou@0.45"
+    ref = by["REF/one_pass"][key]
+    fig, axes = plt.subplots(1, 3, figsize=(12, 3.3))
+    ns = [1, 2, 3, 4]
+    obs = [ref] + [by[f"P1/obs_n{n}"][key] for n in ns[1:]]
+    mean = [by[f"W3/mean_n{n}"][key] for n in ns]
+    axes[0].plot(ns, obs, color=BLUE, marker="o", markersize=5, label="mean_i(A_iⁿ c) (P1)")
+    axes[0].plot(ns, mean, color=ORANGE, marker="o", markersize=5, label="(mean_i A_i)ⁿ c (W3)")
+    axes[0].set_xticks(ns)
+    axes[0].set_xlabel("Propagation passes n")
+    axes[0].set_ylabel("mIoU at 0.45 (in-sample)")
+    axes[0].set_title("Powers: aggregate after vs before")
+    axes[0].legend(loc="center left", fontsize=7)
+    from matplotlib.colors import LinearSegmentedColormap
+    betas, steps = ["b10", "b25", "b50", "b75"], [2, 4, 8]
+    grid = np.array([[by[f"P2/obs_{b}_n{n}"][key] for n in steps] for b in betas])
+    im = axes[1].imshow(grid, cmap=LinearSegmentedColormap.from_list("seq", SEQ_BLUE), aspect="auto")
+    axes[1].grid(False)
+    for (i, j), v in np.ndenumerate(grid):
+        axes[1].text(j, i, f"{v:.3f}", ha="center", va="center", fontsize=7,
+                     color=SURFACE if (v - grid.min()) / max(grid.max() - grid.min(), 1e-9) > 0.55 else INK)
+    axes[1].set_xticks(range(3), [str(n) for n in steps])
+    axes[1].set_yticks(range(4), ["0.10", "0.25", "0.50", "0.75"])
+    axes[1].set_xlabel("Restart iterations")
+    axes[1].set_ylabel("β (pull back to the seed)")
+    axes[1].set_title(f"Restart, observation-wise (REF {ref:.3f})")
+    fig.colorbar(im, ax=axes[1], fraction=0.046)
+    ks = [16, 32, 64, 128, 256, 512, 1024]
+    axes[2].plot(ks, [by[f"P6/topk_{k:04d}"][key] for k in ks], color=BLUE, marker="o", markersize=4)
+    axes[2].axhline(ref, color=INK2, linewidth=1)
+    axes[2].text(16, ref - 0.002, f"dense (4096) = {ref:.3f}", color=INK2, fontsize=7, va="top")
+    axes[2].set_xscale("log", base=2)
+    axes[2].set_xlabel("Affinities kept per row (k)")
+    axes[2].set_ylabel("mIoU at 0.45")
+    axes[2].set_title("Top-k sparsity")
+    fig.tight_layout()
+    save(fig, "a8_propagation", figures)
+    plt.close(fig)
+
+
+FUSION_LABELS = {"P4/lam90": "mix λ=0.90", "P4/lam75": "mix λ=0.75", "P4/lam50": "mix λ=0.50", "P4/lam25": "mix λ=0.25",
+                 "F4/geomean": "geometric mean", "F3/gate": "gate c·y", "N2/percentile": "percentile norm.",
+                 "N3/max": "max norm.", "N4/otsu": "per-image Otsu", "R2/crf": "DenseCRF"}
+
+
+def fusion_figure(plt, figures: list, fus: dict) -> None:
+    by = fus["by"]
+    names = list(FUSION_LABELS)[::-1]
+    ref = by["REF/one_pass"]["miou_at_best_threshold_in_sample"]
+    deltas = [by[n]["miou_at_best_threshold_in_sample"] - ref for n in names]
+    fig, ax = plt.subplots(figsize=(6.6, 3.6))
+    ys = np.arange(len(names))
+    ax.hlines(ys, 0, deltas, color=GRID, linewidth=2)
+    ax.scatter(deltas, ys, s=46, zorder=3, edgecolors=SURFACE, linewidths=1.5,
+               color=[BLUE if n == "R2/crf" else MUTED for n in names])
+    for y, d in zip(ys, deltas):
+        ax.annotate(f"{d:+.3f}", (d, y), textcoords="offset points", xytext=(6 if d >= 0 else -6, 0),
+                    ha="left" if d >= 0 else "right", va="center", fontsize=7, color=INK2)
+    ax.axvline(0, color=AXIS, linewidth=1)
+    lo, hi = min(deltas), max(deltas)
+    ax.set_xlim(lo - 0.25 * (hi - lo), hi + 0.3 * (hi - lo))
+    ax.set_yticks(ys, [FUSION_LABELS[n] for n in names], fontsize=8)
+    ax.grid(axis="y", visible=False)
+    ax.set_xlabel("Δ mIoU vs REF, each at its best threshold (in-sample)")
+    ax.set_title("Fusion and calibration (blue = promoted under the folds)")
+    fig.tight_layout()
+    save(fig, "a9_fusion", figures)
+    plt.close(fig)
+
+
+def joint_audit(plt, figures: list) -> dict | None:
+    if not (PKG_JOINT / "fold_results.json").exists():
+        return None
+    results = cv.load_results(sorted((PKG_JOINT / "shards").glob("*.npz")))
+    screen = load_json(PKG_JOINT / "fold_results.json")["screens"]["Joint CA-SA"]
+    m = {c: cv.miou(results, results.index(c), 1) for c in results.configurations}
+    cas = ["C/reference", "C/R", "C/L", "C/H", "C/R+H", "C/L+H"]
+    sas = ["none", "C/reference", "C/T", "C/R", "C/L", "C/H", "C/T+R", "C/T+L", "C/T+H", "C/R+H", "C/L+H", "C/T+R+H", "C/T+L+H"]
+    grid = np.array([[m[f"CA={a}|SA={b}"] for b in sas] for a in cas])
+    from matplotlib.colors import LinearSegmentedColormap
+    fig, ax = plt.subplots(figsize=(10, 3.6))
+    im = ax.imshow(grid, cmap=LinearSegmentedColormap.from_list("seq", SEQ_BLUE), aspect="auto")
+    ax.grid(False)
+    for (i, j), v in np.ndenumerate(grid):
+        ax.text(j, i, f"{v:.3f}", ha="center", va="center", fontsize=6.5,
+                color=SURFACE if (v - grid.min()) / max(grid.max() - grid.min(), 1e-9) > 0.55 else INK)
+    i, j = cas.index("C/R"), sas.index("C/L")
+    ax.add_patch(plt.Rectangle((j - 0.5, i - 0.5), 1, 1, fill=False, edgecolor=ORANGE, linewidth=2))
+    ax.set_xticks(range(len(sas)), ["no SA" if b == "none" else b[2:] for b in sas], rotation=40, ha="right", fontsize=7)
+    ax.set_yticks(range(len(cas)), [a[2:] for a in cas], fontsize=7)
+    ax.set_xlabel("SA-C cell (T call 30, R 8+64, L module 15, H heads 1,4,6)")
+    ax.set_ylabel("CA-C seed")
+    ax.set_title("Joint CA×SA audit: mIoU at 0.45 (in-sample); box = sequential pair, kept in 5/5 folds")
+    fig.colorbar(im, ax=ax, fraction=0.03)
+    fig.tight_layout()
+    save(fig, "a7_joint_audit", figures)
+    plt.close(fig)
+    return {"screen": screen, "grid": grid, "best_partner_is_L": all(sas[int(np.argmax(row))] == "C/L" for row in grid),
+            "configurations": len(results.configurations)}
+
+
+def released_baselines() -> dict | None:
+    if not BASELINES.exists():
+        return None
+    res = load_json(BASELINES)["results"]
+    names = {"ovam": "OVAM", "daam": "DAAM", "attn2mask": "Attn2Mask", "grounded_diffusion": "Grounded Diffusion (trains a module)",
+             "datasetdm": "DatasetDM (trains a decoder)"}
+
+    def cell(ds, m, v):
+        e = res.get(ds, {}).get(m, {}).get(v)
+        return f"{e['all']['miou']:.4f} ({e['all']['images']})" if e else "—"
+    rows = [[label, cell("voc_sim", m, "training_free"), cell("voc_sim", m, "token_optimized"),
+             cell("coco_cap", m, "training_free"), cell("coco_cap", m, "token_optimized")] for m, label in names.items()]
+    return {"table": write_table("a10_released_baselines",
+                                 ["Method", "VOC-Sim word (images)", "VOC-Sim token", "COCO-Cap word (images)", "COCO-Cap token"], rows,
+                                 "Released baseline masks scored with OVAM's evaluation-notebook procedures on each method's own released images and annotations")}
+
+
 def controlled_overview(plt, a: dict | None, b: dict | None, figures: list, c: dict | None = None) -> dict:
     """CV summary and calibration across both controlled packages."""
     screens = {}
@@ -1179,18 +1375,18 @@ DECISIONS = [
      "A2 CA-R (CV): keep 8+16+64; A3 CA-C: frozen (4/5 votes, OOF +0.026)"),
     ("CA normalization, threshold", "percentile 1–99, ≥ 0.45", "B5", "99 dev images", "ledger B5", "protocol fixes min–max, 0.45 for the CA phase"),
     ("SA module", "U3.2 (up_blocks.3.attentions.2 attn1, 64×64)", "B8 SA screens", "490 (in-sample)", "ledger B8", "A4 SA-L (CV): only module 15 (U3.2); A6 SA-C: frozen (5/5, OOF +0.033)"),
-    ("SA passes", "4 (revised: 1)", "B10; revised from B11/B13", "490; 1-pass informed by COCO-Cap", "Fig. b_joint_passes_time", "controlled phase fixes 1 pass; repeated passes deferred (Section 8)"),
+    ("SA passes", "4 (revised: 1)", "B10; revised from B11/B13", "490; 1-pass informed by COCO-Cap", "Fig. b_joint_passes_time", "A8 P1 (CV): two passes promoted (OOF +0.012); P3-C pending"),
     ("SA heads", "{0,1,2,4,5,6}", "B10", "490 (in-sample)", "Fig. b_joint_heads_threshold", "A4 SA-H (CV): heads {1, 4, 6}; A6 SA-C: does not survive, all 8 heads frozen"),
     ("SA calls", "15–30", "B10", "490 (in-sample)", "Fig. b_joint_passes_time", "A5 SA-T (CV): call 30 only; A6 SA-C: does not survive, all calls 0–30 frozen"),
-    ("Mask threshold", "0.45", "B5, B9, B10", "99 dev / 490", "Fig. b_joint_heads_threshold", "fixed at 0.45; 0.35/0.55 as diagnostics"),
+    ("Mask threshold", "0.45", "B5, B9, B10", "99 dev / 490", "Fig. b_joint_heads_threshold", "CA/SA phases: fixed at 0.45; phase 3: chosen in the folds (0.30-0.70), REF picks 0.425-0.45"),
     ("Cleanup", "remove components < 1%", "B10", "490 (in-sample)", "Table b_component_ablations", "deferred phase"),
-    ("DenseCRF", "not in the final method", "B17 (nothing selected)", "—", "Table b_token_crf", "deferred phase"),
+    ("DenseCRF", "not in the final method", "B17 (nothing selected)", "—", "Table b_token_crf", "A9 R2 (CV): promoted (OOF +0.017, 20/20 classes); P3-C pending"),
     ("Optimized token", "not in the final method", "B17 (nothing selected; tokens trained by OVAM on separate images)", "—", "Table b_token_crf", "deferred phase"),
 ]
 
 
 def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: dict | None = None, c: dict | None = None,
-                   sb: dict | None = None, sa: dict | None = None, sc: dict | None = None) -> None:
+                   sb: dict | None = None, sa: dict | None = None, sc: dict | None = None, p3: dict | None = None) -> None:
     def fig(name, caption):
         return f"![{caption}](figures/{name}.png)\n\n*{caption}*\n"
 
@@ -1208,7 +1404,7 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
         "",
         "- **Tier B (B1–B17), exploratory.** Settings were chosen on the same images they are reported on "
         "(the 99 dev images are part of the 490). These numbers show how the method was found, not how well it generalizes.",
-        "- **Tier A (A1–A6), controlled.** Protocol v1.2: one axis at a time from a fixed reference, settings chosen on "
+        "- **Tier A (A1–A10), controlled.** Protocol v1.2: one axis at a time from a fixed reference, settings chosen on "
         "four folds and scored on the fifth, frozen only with 4 of 5 fold votes and an out-of-fold gain. "
         "Both CA packages are complete (A2 by Codex: calls and resolutions; A1 by Claude: layers, heads, attribution), "
         "and the combined confirmation (A3, CA-C) has frozen the CA configuration: calls 0–30, resolutions 8, 16 and 64 "
@@ -1399,8 +1595,46 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
             "Single-module and leave-one-out values for all 16 SA modules: `tables/a4_sa_l.md`.",
             "",
         ]
+    p3 = p3 or {}
+    if p3.get("joint"):
+        j = p3["joint"]
+        lines += [
+            "### 5.4 Joint CA×SA interaction audit (A7, run by Codex)",
+            "",
+            f"Every CA-C seed crossed with every SA-C cell and a no-SA control ({j['configurations']} configurations), "
+            "selected with the sequential pair as the reference. "
+            f"The sequential pair is kept in {j['screen']['vote_winner_votes']}/5 folds, and SA module 15 alone (L) is the best SA partner "
+            f"for {'every' if j['best_partner_is_L'] else 'not every'} CA seed. The closest alternative (also removing CA head 1) is +0.0017 in-sample, "
+            "with a paired interval that includes zero (protocol Sections 36, 38).",
+            "",
+            fig("a7_joint_audit", "Fig. 15. Joint CA×SA audit: mIoU of all 78 cells (in-sample); the box is the frozen pair."),
+        ]
+    if p3.get("prop") or p3.get("fusion"):
+        lines += [
+            "## 6. Phase 3 controlled packages (tiers A8–A10)",
+            "",
+            "Same folds and decision rule as the CA and SA phases, with one change: each method parameter **and** the mask threshold "
+            "(0.30–0.70, step 0.025) are chosen on the training folds, for the reference (REF, one pass) as well (registry R3). "
+            "Winners go to the combined confirmation P3-C, which Codex is running (protocol Section 45).",
+            "",
+        ]
+        if p3.get("prop"):
+            lines += ["### 6.1 Propagation operators (A8, run by Codex)", "", p3["prop"]["table"], "",
+                      fig("a8_propagation", "Fig. 16. Propagation: passes under both aggregation orders, restart, and top-k sparsity (mIoU at 0.45, in-sample)."),
+                      "All 40 configurations: `controlled_propagation_package.csv`.", ""]
+        if p3.get("fusion"):
+            lines += ["### 6.2 Fusion and calibration (A9)", "", p3["fusion"]["table"], "",
+                      "Per-image Otsu and maximum normalization gain +0.002 to +0.009 on the training folds, in the conditional band, but fail its "
+                      "class checks in every fold: a class loses more than 0.05 (`sheep` −0.07; `chair` up to −0.08) or fewer than 12 classes improve (protocol Section 44).",
+                      "",
+                      fig("a9_fusion", "Fig. 17. Fusion and calibration: change against REF, each at its best threshold (in-sample)."),
+                      "All 12 configurations: `controlled_fusion_calibration.csv`.", ""]
+        if p3.get("baselines"):
+            lines += ["### 6.3 Released baselines (A10)", "", p3["baselines"]["table"], "",
+                      "Every value printed in OVAM's evaluation notebooks is reproduced (protocol Section 41). Only DAAM and OVAM share our "
+                      "images and annotations; the other methods are scored on their own released sets, as in OVAM's comparison.", ""]
     lines += [
-        "## 6. Exploratory SA experiments (tier B)",
+        "## 7. Exploratory SA experiments (tier B)",
         "",
         fig("b_joint_passes_time", "Fig. 10. B10: SA passes × denoising-call weighting (in-sample)."),
         fig("b_joint_heads_threshold", "Fig. 11. B10: SA head subsets and the mask threshold (in-sample)."),
@@ -1408,14 +1642,15 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
         "Best configuration of every family in the large VOC-Sim experiments: `tables/b_family_winners.md`. "
         "Component ablations of the final and revised systems: `tables/b_component_ablations.md`.",
         "",
-        "## 7. Optimized token and DenseCRF (exploratory, nothing selected)",
+        "## 8. Optimized token and DenseCRF (exploratory, nothing selected)",
         "",
         tb["token_table"],
         "",
-        "## 8. Limits of this evidence",
+        "## 9. Limits of this evidence",
         "",
         "- Tier B settings were chosen on the reported images; only COCO-Cap is untouched by the earlier final method, and the revised one-pass system was informed by COCO-Cap.",
-        "- Tier A is complete for CA and SA (screens and both combined confirmations). The deferred phase (Section 8: repeated passes, fusion, calibration, cleanup, DenseCRF, tokens) and the COCO-Cap transfer of the frozen method are still to run.",
+        "- Tier A is complete for CA and SA and for the Tier 1 phase 3 screens (propagation, fusion and calibration). The combined confirmation P3-C is running; tokens and the COCO-Cap transfer of the frozen method are still to run.",
+        "- The phase 3 packages run in two environments on the same GPU type (torch 2.6 and 2.11); their REF rows agree within 0.00003 mIoU, and every package compares only with its own REF.",
         "- The frozen SA (module 15 only) lowers `person` IoU by 0.055; SA-T and SA-R were calibration-dependent and do not survive SA-C.",
         "- The frozen CA change (CA-R) helps mainly at the 0.45 selection threshold and above and slightly lowers AP; CA-L and CA-H change sign at 0.35 (Fig. 3).",
         "- CA-C ran on V100 GPUs, packages A and B on an A100; the identical reference differs by 0.0007 mIoU across them, so CA-C rows are compared only with each other.",
@@ -1432,6 +1667,9 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
         "b_progression": ("Each step of the method and the baselines. VOC-Sim values are in-sample; COCO-Cap was never used to choose the earlier final method.", 1.0),
         "a_heldout_folds": ("Controlled CA screens: held-out mIoU of the setting chosen on the other four folds, against the reference, per fold.", 1.0),
         "a_calibration": ("Calibration of the promoted CA changes at thresholds 0.35, 0.45 and 0.55.", 0.6),
+        "a7_joint_audit": ("Joint CA×SA audit: mIoU of all 78 cells (in-sample); the box is the frozen pair.", 1.0),
+        "a8_propagation": ("Propagation: passes under both aggregation orders, restart, and top-k sparsity (in-sample).", 1.0),
+        "a9_fusion": ("Fusion and calibration: change against REF, each at its best threshold (in-sample).", 0.7),
         "a6_sa_c_thresholds": ("SA-C: change in mIoU of every combination against the SA reference at thresholds 0.35, 0.45 and 0.55 (blue = frozen).", 1.0),
         "a5_sa_t_calls": ("SA-T: SA from a single UNet call, and all calls except one.", 1.0),
         "a5_sa_r_subsets": ("SA-R: every subset of SA resolutions.", 0.75),
@@ -1472,6 +1710,16 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
         figs += ["a5_sa_t_calls", "a5_sa_r_subsets", "a5_joint_grid"]
     if sb is not None:
         tex += [rf"\input{{evidence/tables/{t}.tex}}" for t in ("a4_cv_summary", "a4_checks", "a4_sa_h_heads", "a4_sa_h_top")]
+    if p3.get("joint"):
+        figs += ["a7_joint_audit"]
+    if p3.get("prop"):
+        tex += [r"\input{evidence/tables/a8_cv_summary.tex}"]
+        figs += ["a8_propagation"]
+    if p3.get("fusion"):
+        tex += [r"\input{evidence/tables/a9_cv_summary.tex}"]
+        figs += ["a9_fusion"]
+    if p3.get("baselines"):
+        tex += [r"\input{evidence/tables/a10_released_baselines.tex}"]
         figs += ["a4_sa_l_single_leave1", "a4_sa_h"]
     figs += ["b_joint_passes_time", "b_joint_heads_threshold", "b_component_ablation"]
     for name in figs:
@@ -1559,6 +1807,31 @@ def main() -> None:
         entry = next(e for e in ledger if e["id"] == "A6")
         entry.update({"configurations": len(sc["rows"]), "best_configuration": f"frozen: {sc['screen']['frozen']}",
                       "best_miou": round(sc["by"][sc["screen"]["frozen"]]["miou@0.45"], 4)})
+    p3 = {"joint": joint_audit(plt, figures),
+          "prop": selected_package(plt, figures, PKG_PROP, "A8", "Phase 3 propagation package (Codex)", "controlled_propagation_package.csv"),
+          "fusion": selected_package(plt, figures, PKG_FUSION, "A9", "Phase 3 fusion and calibration package", "controlled_fusion_calibration.csv"),
+          "baselines": released_baselines()}
+    if p3["prop"]:
+        propagation_figure(plt, figures, p3["prop"])
+    if p3["fusion"]:
+        fusion_figure(plt, figures, p3["fusion"])
+    for eid, key in (("A8", "prop"), ("A9", "fusion")):
+        if p3[key]:
+            for r in p3[key]["rows"]:
+                a_rows.append({"experiment_id": eid, "dataset": VOC, "family": r["configuration"].split("/")[0],
+                               "configuration": r["configuration"], "images": 490, "miou": r["miou@0.45"], "mean_image_iou": "",
+                               "note": "controlled phase 3; fold-chosen thresholds; see the package CSV"})
+            winners = [s["frozen"] for s in p3[key]["screens"].values() if s["frozen"] != s["reference"]]
+            entry = next(e for e in ledger if e["id"] == eid)
+            entry.update({"configurations": len(p3[key]["rows"]), "best_configuration": ", ".join(winners) or "REF",
+                          "best_miou": round(max(s["oof_miou_selection"] for s in p3[key]["screens"].values()), 4)})
+    if p3["joint"]:
+        entry = next(e for e in ledger if e["id"] == "A7")
+        entry.update({"configurations": p3["joint"]["configurations"], "best_configuration": p3["joint"]["screen"]["frozen"],
+                      "best_miou": round(p3["joint"]["screen"]["out_of_fold_miou_selection"], 4)})
+    if p3["baselines"]:
+        entry = next(e for e in ledger if e["id"] == "A10")
+        entry.update({"configurations": 19, "best_configuration": "see Table a10", "best_miou": "—"})
     all_rows = rows + a_rows
     with gzip.open(OUT / "all_configurations.csv.gz", "wt", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=["experiment_id", "dataset", "family", "configuration", "images",
@@ -1576,7 +1849,7 @@ def main() -> None:
     write_table("ledger", ["ID", "Experiment", "Dataset", "Status", "Configurations", "Best mIoU", "Decision / role"],
                 ledger_rows, "Every experiment run so far", long=True)
     tb = tier_b(plt, rows, figures)
-    compose_report(b, tb, a, overview, c, sb, sa, sc)
+    compose_report(b, tb, a, overview, c, sb, sa, sc, p3)
     json.dump({"figures": figures, "configurations": len(all_rows), "experiments": len(ledger)},
               open(OUT / "build_summary.json", "w"), indent=2)
     print(f"{len(ledger)} experiments, {len(all_rows)} configuration rows (+65,535 exhaustive subsets), {len(figures)} figures")

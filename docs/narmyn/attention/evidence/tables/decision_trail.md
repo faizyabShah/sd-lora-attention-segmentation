@@ -9,10 +9,10 @@
 | CA resolutions | all four (8, 16, 32, 64) | B1/B8 resolution screens | 99 dev / 490 | Table a2_ca_r; Fig. a2_ca_r_subsets | A2 CA-R (CV): keep 8+16+64; A3 CA-C: frozen (4/5 votes, OOF +0.026) |
 | CA normalization, threshold | percentile 1–99, ≥ 0.45 | B5 | 99 dev images | ledger B5 | protocol fixes min–max, 0.45 for the CA phase |
 | SA module | U3.2 (up_blocks.3.attentions.2 attn1, 64×64) | B8 SA screens | 490 (in-sample) | ledger B8 | A4 SA-L (CV): only module 15 (U3.2); A6 SA-C: frozen (5/5, OOF +0.033) |
-| SA passes | 4 (revised: 1) | B10; revised from B11/B13 | 490; 1-pass informed by COCO-Cap | Fig. b_joint_passes_time | controlled phase fixes 1 pass; repeated passes deferred (Section 8) |
+| SA passes | 4 (revised: 1) | B10; revised from B11/B13 | 490; 1-pass informed by COCO-Cap | Fig. b_joint_passes_time | A8 P1 (CV): two passes promoted (OOF +0.012); P3-C pending |
 | SA heads | {0,1,2,4,5,6} | B10 | 490 (in-sample) | Fig. b_joint_heads_threshold | A4 SA-H (CV): heads {1, 4, 6}; A6 SA-C: does not survive, all 8 heads frozen |
 | SA calls | 15–30 | B10 | 490 (in-sample) | Fig. b_joint_passes_time | A5 SA-T (CV): call 30 only; A6 SA-C: does not survive, all calls 0–30 frozen |
-| Mask threshold | 0.45 | B5, B9, B10 | 99 dev / 490 | Fig. b_joint_heads_threshold | fixed at 0.45; 0.35/0.55 as diagnostics |
+| Mask threshold | 0.45 | B5, B9, B10 | 99 dev / 490 | Fig. b_joint_heads_threshold | CA/SA phases: fixed at 0.45; phase 3: chosen in the folds (0.30-0.70), REF picks 0.425-0.45 |
 | Cleanup | remove components < 1% | B10 | 490 (in-sample) | Table b_component_ablations | deferred phase |
-| DenseCRF | not in the final method | B17 (nothing selected) | — | Table b_token_crf | deferred phase |
+| DenseCRF | not in the final method | B17 (nothing selected) | — | Table b_token_crf | A9 R2 (CV): promoted (OOF +0.017, 20/20 classes); P3-C pending |
 | Optimized token | not in the final method | B17 (nothing selected; tokens trained by OVAM on separate images) | — | Table b_token_crf | deferred phase |

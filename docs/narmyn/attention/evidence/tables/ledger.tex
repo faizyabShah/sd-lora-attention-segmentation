@@ -1,5 +1,5 @@
 {\scriptsize\setlength{\tabcolsep}{3pt}
-\begin{longtable}{>{\raggedright\arraybackslash}p{1.40cm}>{\raggedright\arraybackslash}p{2.22cm}>{\raggedright\arraybackslash}p{2.45cm}>{\raggedright\arraybackslash}p{2.00cm}rr>{\raggedright\arraybackslash}p{2.90cm}}
+\begin{longtable}{>{\raggedright\arraybackslash}p{1.40cm}>{\raggedright\arraybackslash}p{2.06cm}>{\raggedright\arraybackslash}p{2.79cm}>{\raggedright\arraybackslash}p{2.16cm}rr>{\raggedright\arraybackslash}p{2.60cm}}
 \caption{Every experiment run so far}\label{tab:ledger}\\
 \toprule
 ID & Experiment & Dataset & Status & Configurations & Best mIoU & Decision /\allowbreak{} role \\
@@ -32,5 +32,9 @@ A3 & Controlled CA confirmation (CA-C) and the frozen CA & VOC-Sim (490 images, 
 A4 & Controlled SA package B: SA-L, SA-H, operator check & VOC-Sim (490 images, 20 classes) & controlled, 5-fold cross-validated & 65951 & 0.7884 & SA-L only module 15 (U3.2, 64x64); SA-H heads \{1, 4, 6\}; A x kept (combined in A6) \\
 A5 & Controlled SA package A: SA-T, SA-R (Codex) & VOC-Sim (490 images, 20 classes) & controlled, 5-fold cross-validated & 1279 & 0.7710 & SA-T call 30 only; SA-R resolutions 8+64; both calibration-dependent (combined in A6) \\
 A6 & Controlled SA confirmation (SA-C, Codex) and the frozen SA & VOC-Sim (490 images, 20 classes) & controlled, 5-fold cross-validated & 13 & 0.7887 & frozen SA: module 15 (U3.2) only, all calls, all heads \\
+A7 & Joint CA x SA interaction audit (Codex) & VOC-Sim (490 images, 20 classes) & controlled, 5-fold cross-validated & 78 & 0.7887 & sequential pair kept 5/\allowbreak{}5; Section 11 unchanged \\
+A8 & Phase 3 propagation package (Codex): P1, W3, P2, P6 & VOC-Sim (490 images, 20 classes) & controlled, 5-fold cross-validated; threshold chosen in the folds & 40 & 0.7991 & two passes mean\_\allowbreak{}i(A\_\allowbreak{}i$^2$ c) promoted to P3-C \\
+A9 & Phase 3 fusion and calibration package: P4, F3, F4, N2-N4, R2 & VOC-Sim (490 images, 20 classes) & controlled, 5-fold cross-validated; threshold chosen in the folds & 12 & 0.8049 & DenseCRF promoted to P3-C; the rest kept at REF \\
+A10 & Released baselines scored with OVAM's procedures & VOC-Sim (490 images, 20 classes); COCO-Cap (707 images, 20 classes) (each method's own images) & reproduction of published values & 19 & --- & every printed OVAM-notebook value reproduced \\
 \bottomrule
 \end{longtable}}

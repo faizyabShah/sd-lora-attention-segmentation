@@ -28,9 +28,9 @@ geometric mean, three normalizations (percentile, maximum, per-image Otsu
 threshold), and OVAM's DenseCRF on the thresholded map. Each method chooses its
 parameter and mask threshold on the training folds, as does the reference.
 None of the mixing, gating or normalization variants is chosen in any fold:
-per-image Otsu and maximum normalization raise mIoU slightly but lose more
-than 0.05 IoU on some classes (\eg \emph{sheep} $-0.07$), which the promotion
-rule forbids. DenseCRF is chosen in all five folds and raises OOF mIoU from
+per-image Otsu and maximum normalization raise mIoU slightly, but in every
+fold they either lose more than 0.05 IoU on a class (\eg \emph{sheep}
+$-0.07$) or improve fewer than 12 classes, which the promotion rule forbids. DenseCRF is chosen in all five folds and raises OOF mIoU from
 0.788 to 0.805 (paired $\Delta$ $+0.022$, $[+0.019, +0.026]$; 361 images
 better, 129 worse). It helps at every threshold and improves all twenty
 classes.

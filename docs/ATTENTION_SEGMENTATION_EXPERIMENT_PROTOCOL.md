@@ -1714,9 +1714,11 @@ The commits differ only in the protocol text.
   AP is undefined for a binary mask. It uses the generated RGB image and no
   labels, so it is training-free (R10).
 - **N4 (per-image Otsu) and N3 (max normalization)** gain +0.002 to +0.009 on
-  the training folds, in the conditional band. In every fold they fail the
-  class-loss rule: N4 loses `sheep` −0.07 in four folds, and N3 loses `chair`
-  or `dining-table` −0.05 to −0.08. N2 gains only +0.001 to +0.002.
+  the training folds, in the conditional band. In every fold they fail its
+  class checks. N4 loses `sheep` −0.07 in three folds and `cat` −0.07 in one;
+  in fold 4 its worst loss is `bird` −0.025, but only 11 classes improve. N3
+  loses `chair` or `dining-table` −0.05 to −0.08 in four folds; in fold 2 only
+  11 classes improve. N2 gains only +0.001 to +0.002.
 - **REF's fold-chosen threshold** is 0.425 in four folds and 0.45 in one. Its
   OOF mIoU (0.7875) is slightly below the fixed-0.45 value (0.7887): choosing
   the threshold in the folds does not by itself raise the reference.

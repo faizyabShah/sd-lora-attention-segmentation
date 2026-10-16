@@ -24,6 +24,9 @@
 \input{evidence/tables/a4_checks.tex}
 \input{evidence/tables/a4_sa_h_heads.tex}
 \input{evidence/tables/a4_sa_h_top.tex}
+\input{evidence/tables/a8_cv_summary.tex}
+\input{evidence/tables/a9_cv_summary.tex}
+\input{evidence/tables/a10_released_baselines.tex}
 \begin{figure}[H]\centering
 \includegraphics[width=1.0\linewidth]{evidence/figures/b_progression.pdf}
 \caption{Each step of the method and the baselines. VOC-Sim values are in-sample; COCO-Cap was never used to choose the earlier final method.}\label{fig:b_progression}
@@ -91,6 +94,18 @@
 \begin{figure}[H]\centering
 \includegraphics[width=0.95\linewidth]{evidence/figures/a5_joint_grid.pdf}
 \caption{SA joint grid of call windows and resolutions (diagnostic only).}\label{fig:a5_joint_grid}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=1.0\linewidth]{evidence/figures/a7_joint_audit.pdf}
+\caption{Joint CA$\times$SA audit: mIoU of all 78 cells (in-sample); the box is the frozen pair.}\label{fig:a7_joint_audit}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=1.0\linewidth]{evidence/figures/a8_propagation.pdf}
+\caption{Propagation: passes under both aggregation orders, restart, and top-k sparsity (in-sample).}\label{fig:a8_propagation}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=0.7\linewidth]{evidence/figures/a9_fusion.pdf}
+\caption{Fusion and calibration: change against REF, each at its best threshold (in-sample).}\label{fig:a9_fusion}
 \end{figure}
 \begin{figure}[H]\centering
 \includegraphics[width=1.0\linewidth]{evidence/figures/a4_sa_l_single_leave1.pdf}
