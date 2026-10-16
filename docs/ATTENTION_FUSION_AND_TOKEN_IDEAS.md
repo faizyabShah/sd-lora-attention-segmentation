@@ -77,13 +77,13 @@ All take the min–max normalized `c` and `y = REF` as inputs.
 
 | ID | Method | Definition | Registered grid | Targets | Owner | Tier | Status |
 |---|---|---|---|---|---|---|---|
-| P4 | Residual mix | `λ y + (1−λ) c` | λ ∈ {0.25, 0.50, 0.75, 0.90} (λ = 1 is REF) | leaking | Claude | 1 | Not run |
-| F3 | Gating | `c ⊙ y` | — | leaking | Claude | 1 | Not run |
-| F4 | Geometric mean | `√(c ⊙ y)` | — | leaking | Claude | 1 | Not run |
+| P4 | Residual mix | `λ y + (1−λ) c` | λ ∈ {0.25, 0.50, 0.75, 0.90} (λ = 1 is REF) | leaking | Claude | 1 | Done (protocol Section 44): not promoted |
+| F3 | Gating | `c ⊙ y` | — | leaking | Claude | 1 | Done (Section 44): not promoted (0.514 at 0.45) |
+| F4 | Geometric mean | `√(c ⊙ y)` | — | leaking | Claude | 1 | Done (Section 44): not promoted |
 | F2 | Column-mass gate | `y ⊙ norm_[α,1](Σ_i A_{ij})` | α ∈ {0, 0.25, 0.50, 0.75} | background suppression | Claude | 2 | Not run |
-| N2 | Percentile normalization | percentile 1–99 clip, then rescale, before thresholding | — | calibration | Claude | 1 | Not run (used in tier-B exploration) |
-| N3 | Max normalization (OVAM) | `y / max(y)` | — | calibration | Claude | 1 | Not run |
-| N4 | Per-image adaptive threshold | Otsu threshold per image instead of a global one | — | calibration; per-image scale | Claude | 1 | Not run |
+| N2 | Percentile normalization | percentile 1–99 clip, then rescale, before thresholding | — | calibration | Claude | 1 | Done (Section 44): not promoted |
+| N3 | Max normalization (OVAM) | `y / max(y)` | — | calibration | Claude | 1 | Done (Section 44): not promoted (class losses > 0.05) |
+| N4 | Per-image adaptive threshold | Otsu threshold per image instead of a global one | — | calibration; per-image scale | Claude | 1 | Done (Section 44): conditional-band gain, rejected by the class-loss rule (`sheep` −0.07) |
 | BG1 | Background map | propagate the start-token CA map the same way; foreground where `y > γ · bg` | γ ∈ {0.50, 0.75, 1.0, 1.25, 1.5} | background handling (Faiz's plan) | Claude | 2 | Not run |
 | F1 | Upstream OVAM fusion | `c ⊙ norm_[α,1](S₁)` with the all-ones value tensor | α | — | — | — | Reference-fidelity baseline only (`ovam_full.py`) |
 
@@ -111,7 +111,7 @@ All take the min–max normalized `c` and `y = REF` as inputs.
 
 | ID | Method | Definition | Registered grid | Track | Owner | Tier | Status |
 |---|---|---|---|---|---|---|---|
-| R2 | DenseCRF on RGB (OVAM's) | SimpleCRF with OVAM's parameters on the regenerated image, unary from the map | OVAM's parameters fixed | training-free | Claude | 1 | Exploratory only (Section 8); controlled run not done |
+| R2 | DenseCRF on RGB (OVAM's) | SimpleCRF with OVAM's parameters on the regenerated image, unary from the map | OVAM's parameters fixed | training-free | Claude | 1 | **Promoted to P3-C** (Section 44): OOF 0.7875 → 0.8049, 5/5 |
 | R1 | CRF with SA edges | `y` as unary, `Ā` as pairwise affinity | pairwise weight ∈ {1, 3, 10} | training-free | unassigned | 3 | Not run |
 | X1 | SAM refinement (Faiz's plan) | prompts from `y`: top points, box, coarse mask | prompt type × number of points | external segmenter (R10) | unassigned | 3 | Not run |
 
@@ -292,3 +292,4 @@ Controlled reference for phase 3: REF, VOC-Sim 0.7887 (protocol Sections 33,
 | 2026-10-16 | P1, P2, P6, W3 results | Codex | `outputs/segmentation/controlled_attention_cv/propagation_package/` | this commit | P1 n=2 promoted; W3/P2/P6 retain REF; protocol Section 43 |
 | 2026-10-16 | registry | Claude | this file | `4ac06d9` | merged registry and rules R1–R11; protocol Section 38 |
 | 2026-10-16 | Q1–Q5 | Claude | `outputs/segmentation/comparisons/released_baselines/` | this commit; CPU job `232917` | released baselines scored with OVAM's procedures; protocol Section 41 |
+| 2026-10-16 | P4, F3, F4, N2–N4, R2 | Claude | `outputs/segmentation/controlled_attention_cv/fusion_calibration/` | `229130b`; job `232922` | R2 promoted; protocol Section 44 |

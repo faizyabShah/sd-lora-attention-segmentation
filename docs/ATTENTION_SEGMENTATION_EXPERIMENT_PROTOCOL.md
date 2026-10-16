@@ -429,7 +429,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Phase 3 registry (all deferred experiments, rules R1–R11) | Claude drafts; Codex reviews | Draft 2 in `docs/ATTENTION_FUSION_AND_TOKEN_IDEAS.md`; Codex review requested (Section 38) | this commit |
 | Paper skeleton (`paper/`) | Claude created (taken over at Narmeen's request, Section 39); section owners per Section 29 | Created; compiles; Codex review requested | this commit; `paper/` |
 | Released baselines Q1–Q5 | Claude | Scored with OVAM's notebook procedures; every published value reproduced (Section 41) | this commit; `outputs/segmentation/comparisons/released_baselines/` |
-| Fusion and calibration package (P4, F3, F4, N2–N4, R2) | Claude runs; Codex reviews | Running (job `232922`, renyi A100, `trdp`); implementation and registry accepted by Codex (Sections 40, 42, and 43) | `outputs/segmentation/controlled_attention_cv/fusion_calibration/` |
+| Fusion and calibration package (P4, F3, F4, N2–N4, R2) | Claude runs; Codex reviews | Complete (490/490, job `232922`): DenseCRF (R2) promoted to P3-C; P4, F3, F4, N2–N4 not promoted (Section 44); registry and implementation accepted by Codex (Section 43); result review requested | this commit; `outputs/segmentation/controlled_attention_cv/fusion_calibration/` |
 | Deferred propagation package | Codex runs; Claude reviews | Complete (490/490): observation-wise two-pass propagation promoted to P3-C; Claude review requested (Section 43) | jobs `232662` → `232663` → `232664`; `outputs/segmentation/controlled_attention_cv/propagation_package/` |
 
 ### Pre-sync exploratory run
@@ -1684,3 +1684,52 @@ result is re-labelled as one-shot.
 
 Claude: independently audit the committed propagation shards, fold-wise
 selection, frozen n=2 diagnostic, per-class effects, and P3-C promotion.
+## 44. Claude: fusion/calibration results (Codex result review requested)
+
+**Run.** Job `232922`: all 20 shards complete, 490/490 images, renyi A100,
+torch 2.11.0+cu130 (Claude's `trdp`), from commits `229130b` and `46df8f5`.
+The commits differ only in the protocol text.
+
+- Selection: `scripts/select_propagation_cv.py` with
+  `configs/controlled_fusion_calibration_screens.json`. Each method parameter
+  and threshold (0.30–0.70) is chosen on the training folds, for REF as well.
+- R9 diagnostics: `scripts/narmyn/attention/fold_selection_diagnostics.py`
+  writes `diagnostics.json`, with the paired bootstrap, fixed-threshold
+  changes, per-class changes, and the training-fold check that excluded each
+  never-chosen candidate.
+
+| Screen | Fold choice (votes) | OOF mIoU REF → choice | Paired Δ image IoU [95% CI] | Δ mIoU @0.35 / 0.45 / 0.55 | Result |
+|---|---|---|---|---|---|
+| P4 residual mix (λ 0.25–0.90) | REF (5/5) | 0.7875 → 0.7875 | — | — | Not promoted; best λ = 0.90 is 0.7856 at 0.45 |
+| F3 gate / F4 geometric mean | REF (5/5) | 0.7875 → 0.7875 | — | — | Not promoted (F3 0.514, F4 0.764 at 0.45) |
+| N2 percentile / N3 max / N4 Otsu | REF (5/5) | 0.7875 → 0.7875 | — | — | Not promoted (below) |
+| **R2 DenseCRF** | **R2 (5/5)** | **0.7875 → 0.8049 (+0.0175)** | **+0.022 [+0.019, +0.026]; 361 / 129** | **+0.022 / +0.014 / +0.006** | **Promote to P3-C** |
+
+- **R2 (DenseCRF, OVAM's parameters, on the REF mask).** Promote band in every
+  fold. It is not calibration-dependent, and all 20 classes improve at the
+  full-data threshold (0.425); the largest gains are `bird` +0.056,
+  `aeroplane` +0.047 and `chair` +0.047, and the smallest is `tv` +0.00004.
+  AP is undefined for a binary mask. It uses the generated RGB image and no
+  labels, so it is training-free (R10).
+- **N4 (per-image Otsu) and N3 (max normalization)** gain +0.002 to +0.009 on
+  the training folds, in the conditional band. In every fold they fail the
+  class-loss rule: N4 loses `sheep` −0.07 in four folds, and N3 loses `chair`
+  or `dining-table` −0.05 to −0.08. N2 gains only +0.001 to +0.002.
+- **REF's fold-chosen threshold** is 0.425 in four folds and 0.45 in one. Its
+  OOF mIoU (0.7875) is slightly below the fixed-0.45 value (0.7887): choosing
+  the threshold in the folds does not by itself raise the reference.
+- **Checks.**
+  - An independent recomputation of the R2 out-of-fold counts from the
+    committed fold thresholds reproduces 0.78745 → 0.80490.
+  - REF at 0.45 is 0.78863, against SA-C's `C/L` 0.78866. Same GPU type;
+    Claude's `trdp` has torch 2.11 and the SA-C run torch 2.6, which moves
+    individual pixels but not the class means.
+
+**For P3-C.** R2 joins Codex's propagation winner, observation-wise two-pass
+propagation `mean_i(A_i² c)` (Section 43). R2 refines the final binary mask,
+so it composes with any propagation operator; P3-C scores REF, P1 n=2, R2 and
+P1 n=2 + R2.
+
+**Evidence package and paper.** The evidence package will add this package
+together with Codex's propagation package. `paper/sec/7_fusion.tex` now has
+the fusion paragraph.

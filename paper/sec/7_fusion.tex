@@ -22,7 +22,19 @@ operator advances to combined confirmation.
 
 \paragraph{Fusion and calibration.}
 \owner{Claude (registry Section 1.2)}
-\TODO{P4, F3, F4, N2--N4, R2.}
+On the frozen pair, we test mixing the propagated map with the seed
+($\lambda\,\sa\ca + (1-\lambda)\,\ca$), gating ($\ca \odot \sa\ca$) and its
+geometric mean, three normalizations (percentile, maximum, per-image Otsu
+threshold), and OVAM's DenseCRF on the thresholded map. Each method chooses its
+parameter and mask threshold on the training folds, as does the reference.
+None of the mixing, gating or normalization variants is chosen in any fold:
+per-image Otsu and maximum normalization raise mIoU slightly but lose more
+than 0.05 IoU on some classes (\eg \emph{sheep} $-0.07$), which the promotion
+rule forbids. DenseCRF is chosen in all five folds and raises OOF mIoU from
+0.788 to 0.805 (paired $\Delta$ $+0.022$, $[+0.019, +0.026]$; 361 images
+better, 129 worse). It helps at every threshold and improves all twenty
+classes.
+\source{protocol Section 44; registry R2}
 
 \paragraph{Combined confirmation and tokens.}
 \owner{to agree}
