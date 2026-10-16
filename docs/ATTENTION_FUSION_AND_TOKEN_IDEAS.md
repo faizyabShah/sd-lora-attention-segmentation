@@ -221,7 +221,7 @@ Q7's DiffSegmenter.
 | Comparisons (Q1–Q6) | Claude | `outputs/segmentation/comparisons/` |
 | Phase 3 confirmation P3-C | Codex runs; Claude reviews | `outputs/segmentation/controlled_attention_cv/phase3_confirmation/` |
 | Token confirmation T-C | to be agreed | `outputs/segmentation/controlled_attention_cv/token_confirmation/` |
-| Transfer | Claude (proposed, protocol Section 48) | `outputs/segmentation/coco_cap_transfer/` |
+| Transfer | Claude runs; Codex reviews (accepted, protocol Section 51) | `outputs/segmentation/coco_cap_transfer/` |
 
 ---
 
@@ -247,6 +247,12 @@ The four mandatory confirmation cells are REF, `P1/obs_n2`, `R2/crf`, and
 unpromoted alternatives become useful in combination. All 30 configurations
 are eligible under R3--R5; primary and additional cells are labelled
 separately in the report. No setting may be added after the run starts.
+
+**Result (protocol Section 51).** The mandatory winner is
+`P1/obs_n2 + R2/crf`, selected in all five folds with 0.8135 OOF mIoU; it
+freezes FTF. The expanded screen's Otsu cell reaches 0.8207 against REF but is
+not added to FTF: incrementally it gains 0.0072 mIoU and loses 0.060 IoU on
+sheep, failing R4's conditional class-loss guard.
 
 ---
 
@@ -309,6 +315,6 @@ Controlled reference for phase 3: REF, VOC-Sim 0.7887 (protocol Sections 33,
 | 2026-10-16 | registry | Claude | this file | `4ac06d9` | merged registry and rules R1–R11; protocol Section 38 |
 | 2026-10-16 | Q1–Q5 | Claude | `outputs/segmentation/comparisons/released_baselines/` | this commit; CPU job `232917` | released baselines scored with OVAM's procedures; protocol Section 41 |
 | 2026-10-16 | P4, F3, F4, N2–N4, R2 | Claude | `outputs/segmentation/controlled_attention_cv/fusion_calibration/` | `229130b`; job `232922` | R2 promoted; protocol Section 44 |
-| 2026-10-16 | P3-C expanded confirmation | Codex | `outputs/segmentation/controlled_attention_cv/phase3_confirmation/` | `371f791ee`; jobs `232945` → `232946` → `232947` | corrected smoke passed; mandatory 4-cell and expanded 30-cell screens; protocol Sections 45–46 |
+| 2026-10-16 | P3-C expanded confirmation | Codex | `outputs/segmentation/controlled_attention_cv/phase3_confirmation/` | this commit; jobs `232945` → `232946` → `232947` | FTF = P1 n=2 + R2; Otsu extension rejected incrementally; protocol Section 51 |
 | 2026-10-16 | Q2 (fold threshold) | Claude | `outputs/segmentation/comparisons/daam_fold_threshold/` | this commit; CPU job `232949` | DAAM threshold chosen in our folds; protocol Section 47 |
 | 2026-10-16 | B1, B1b | Claude | `outputs/segmentation/controlled_attention_cv/tokens/` | `326f173`; job `232957` | token promoted; protocol Section 50 |

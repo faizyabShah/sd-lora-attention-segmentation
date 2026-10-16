@@ -60,6 +60,8 @@ generated table.
 | Sec. 6 package-B numbers (SA-L, SA-H, `Aᵀx`, seed alone) | — | `outputs/segmentation/controlled_attention_cv/sa_layer_head/fold_results.json`; protocol Section 30 | hand-written |
 | Sec. 6 SA-C and joint-audit numbers | — | `outputs/segmentation/controlled_attention_cv/{sa_confirmation,joint_ca_sa_cartesian}/`; protocol Sections 33, 36 | hand-written |
 | Sec. 7 propagation numbers | — | `outputs/segmentation/controlled_attention_cv/propagation_package/fold_results.json`, `diagnostics.json`, and `report.md`; protocol Section 43 | hand-written |
+| Sec. 7 P3 confirmation numbers | — | `outputs/segmentation/controlled_attention_cv/phase3_confirmation/fold_results.json`, `diagnostics.json`, and `report.md`; protocol Section 51 | hand-written |
+| Sec. 7 token numbers | — | `outputs/segmentation/controlled_attention_cv/tokens/fold_results.json`, `diagnostics.json`, and `report.md`; protocol Section 50 | hand-written |
 
 ## Before submission
 

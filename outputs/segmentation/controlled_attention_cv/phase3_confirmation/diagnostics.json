@@ -1,0 +1,933 @@
+{
+  "reference": "REF/one_pass|N0/global|R0/none",
+  "mandatory": [
+    "REF/one_pass|N0/global|R0/none",
+    "P1/obs_n2|N0/global|R0/none",
+    "REF/one_pass|N0/global|R2/crf",
+    "P1/obs_n2|N0/global|R2/crf"
+  ],
+  "mandatory_selection": {
+    "reference": "REF/one_pass|N0/global|R0/none",
+    "candidates": [
+      "REF/one_pass|N0/global|R0/none",
+      "P1/obs_n2|N0/global|R0/none",
+      "REF/one_pass|N0/global|R2/crf",
+      "P1/obs_n2|N0/global|R2/crf"
+    ],
+    "folds": [
+      {
+        "fold": 0,
+        "chosen": "P1/obs_n2|N0/global|R2/crf",
+        "chosen_threshold": 0.45,
+        "reference_threshold": 0.425,
+        "reason": "promote",
+        "train_miou_chosen": 0.8127210883665452,
+        "train_miou_reference": 0.79017795269165,
+        "heldout_miou_chosen": 0.8209711993444607,
+        "heldout_miou_reference": 0.7855256885626571
+      },
+      {
+        "fold": 1,
+        "chosen": "P1/obs_n2|N0/global|R2/crf",
+        "chosen_threshold": 0.45,
+        "reference_threshold": 0.425,
+        "reason": "promote",
+        "train_miou_chosen": 0.8068264087219277,
+        "train_miou_reference": 0.7826953996037802,
+        "heldout_miou_chosen": 0.8409982932182001,
+        "heldout_miou_reference": 0.8113178500704541
+      },
+      {
+        "fold": 2,
+        "chosen": "P1/obs_n2|N0/global|R2/crf",
+        "chosen_threshold": 0.45,
+        "reference_threshold": 0.425,
+        "reason": "promote",
+        "train_miou_chosen": 0.8141890698733706,
+        "train_miou_reference": 0.7902207402906655,
+        "heldout_miou_chosen": 0.8138904053528193,
+        "heldout_miou_reference": 0.7860864940558743
+      },
+      {
+        "fold": 3,
+        "chosen": "P1/obs_n2|N0/global|R2/crf",
+        "chosen_threshold": 0.45,
+        "reference_threshold": 0.425,
+        "reason": "promote",
+        "train_miou_chosen": 0.8179295046923288,
+        "train_miou_reference": 0.7911979979876873,
+        "heldout_miou_chosen": 0.7994104873881089,
+        "heldout_miou_reference": 0.7805151551081406
+      },
+      {
+        "fold": 4,
+        "chosen": "P1/obs_n2|N0/global|R2/crf",
+        "chosen_threshold": 0.45,
+        "reference_threshold": 0.45,
+        "reason": "promote",
+        "train_miou_chosen": 0.8161651151451892,
+        "train_miou_reference": 0.790970026678861,
+        "heldout_miou_chosen": 0.7994937449855253,
+        "heldout_miou_reference": 0.7756694376872799
+      }
+    ],
+    "selection_counts": {
+      "P1/obs_n2|N0/global|R2/crf": 5
+    },
+    "vote_winner": "P1/obs_n2|N0/global|R2/crf",
+    "vote_winner_votes": 5,
+    "frozen": "P1/obs_n2|N0/global|R2/crf",
+    "freeze_reason": "fold vote and OOF guard passed",
+    "oof_miou_selection": 0.8134976701132626,
+    "oof_miou_reference": 0.7875085283208108,
+    "oof_gain": 0.02598914179245182,
+    "full_threshold_frozen": 0.45,
+    "full_threshold_reference": 0.425,
+    "full_miou_frozen": 0.8134976701132626,
+    "full_miou_reference": 0.7887910370070157,
+    "paired_oof": {
+      "mean": 0.030753096987949428,
+      "ci_low": 0.02507646445983469,
+      "ci_high": 0.03643578784834794,
+      "better": 378,
+      "worse": 112,
+      "ties": 0
+    }
+  },
+  "selected_pipeline": {
+    "reference": "REF/one_pass|N0/global|R0/none",
+    "candidates": [
+      "REF/one_pass|N0/global|R0/none",
+      "REF/one_pass|N0/global|R2/crf",
+      "REF/one_pass|N2/percentile|R0/none",
+      "REF/one_pass|N2/percentile|R2/crf",
+      "REF/one_pass|N4/otsu|R0/none",
+      "REF/one_pass|N4/otsu|R2/crf",
+      "P1/obs_n2|N0/global|R0/none",
+      "P1/obs_n2|N0/global|R2/crf",
+      "P1/obs_n2|N2/percentile|R0/none",
+      "P1/obs_n2|N2/percentile|R2/crf",
+      "P1/obs_n2|N4/otsu|R0/none",
+      "P1/obs_n2|N4/otsu|R2/crf",
+      "P1/obs_n3|N0/global|R0/none",
+      "P1/obs_n3|N0/global|R2/crf",
+      "P1/obs_n3|N2/percentile|R0/none",
+      "P1/obs_n3|N2/percentile|R2/crf",
+      "P1/obs_n3|N4/otsu|R0/none",
+      "P1/obs_n3|N4/otsu|R2/crf",
+      "P2/obs_b10_n4|N0/global|R0/none",
+      "P2/obs_b10_n4|N0/global|R2/crf",
+      "P2/obs_b10_n4|N2/percentile|R0/none",
+      "P2/obs_b10_n4|N2/percentile|R2/crf",
+      "P2/obs_b10_n4|N4/otsu|R0/none",
+      "P2/obs_b10_n4|N4/otsu|R2/crf",
+      "W3/mean_n2|N0/global|R0/none",
+      "W3/mean_n2|N0/global|R2/crf",
+      "W3/mean_n2|N2/percentile|R0/none",
+      "W3/mean_n2|N2/percentile|R2/crf",
+      "W3/mean_n2|N4/otsu|R0/none",
+      "W3/mean_n2|N4/otsu|R2/crf"
+    ],
+    "folds": [
+      {
+        "fold": 0,
+        "chosen": "P1/obs_n2|N4/otsu|R2/crf",
+        "chosen_threshold": 0.45,
+        "reference_threshold": 0.425,
+        "reason": "promote",
+        "train_miou_chosen": 0.8211045316164567,
+        "train_miou_reference": 0.79017795269165,
+        "heldout_miou_chosen": 0.8217186703314312,
+        "heldout_miou_reference": 0.7855256885626571
+      },
+      {
+        "fold": 1,
+        "chosen": "P1/obs_n2|N4/otsu|R2/crf",
+        "chosen_threshold": 0.45,
+        "reference_threshold": 0.425,
+        "reason": "promote",
+        "train_miou_chosen": 0.8129865596489667,
+        "train_miou_reference": 0.7826953996037802,
+        "heldout_miou_chosen": 0.8513489204990613,
+        "heldout_miou_reference": 0.8113178500704541
+      },
+      {
+        "fold": 2,
+        "chosen": "P1/obs_n2|N4/otsu|R2/crf",
+        "chosen_threshold": 0.45,
+        "reference_threshold": 0.425,
+        "reason": "promote",
+        "train_miou_chosen": 0.8235809901544011,
+        "train_miou_reference": 0.7902207402906655,
+        "heldout_miou_chosen": 0.8131761292376959,
+        "heldout_miou_reference": 0.7860864940558743
+      },
+      {
+        "fold": 3,
+        "chosen": "P1/obs_n2|N4/otsu|R2/crf",
+        "chosen_threshold": 0.45,
+        "reference_threshold": 0.425,
+        "reason": "promote",
+        "train_miou_chosen": 0.8224118189870794,
+        "train_miou_reference": 0.7911979979876873,
+        "heldout_miou_chosen": 0.8128554792157475,
+        "heldout_miou_reference": 0.7805151551081406
+      },
+      {
+        "fold": 4,
+        "chosen": "P1/obs_n2|N4/otsu|R2/crf",
+        "chosen_threshold": 0.45,
+        "reference_threshold": 0.45,
+        "reason": "promote",
+        "train_miou_chosen": 0.8231011629969138,
+        "train_miou_reference": 0.790970026678861,
+        "heldout_miou_chosen": 0.8047094332293288,
+        "heldout_miou_reference": 0.7756694376872799
+      }
+    ],
+    "selection_counts": {
+      "P1/obs_n2|N4/otsu|R2/crf": 5
+    },
+    "vote_winner": "P1/obs_n2|N4/otsu|R2/crf",
+    "vote_winner_votes": 5,
+    "frozen": "P1/obs_n2|N4/otsu|R2/crf",
+    "freeze_reason": "fold vote and OOF guard passed",
+    "oof_miou_selection": 0.8206748259206487,
+    "oof_miou_reference": 0.7875085283208108,
+    "oof_gain": 0.03316629759983791,
+    "full_threshold_frozen": 0.45,
+    "full_threshold_reference": 0.425,
+    "full_miou_frozen": 0.8206748259206487,
+    "full_miou_reference": 0.7887910370070157,
+    "paired_oof": {
+      "mean": 0.039684450605350856,
+      "ci_low": 0.031734322902923655,
+      "ci_high": 0.04775589592435826,
+      "better": 376,
+      "worse": 114,
+      "ties": 0
+    }
+  },
+  "fixed_candidate_crossfit": {
+    "P1/obs_n2|N0/global|R0/none": {
+      "configuration": "P1/obs_n2|N0/global|R0/none",
+      "reference": "REF/one_pass|N0/global|R0/none",
+      "thresholds": [
+        {
+          "fold": 0,
+          "selected": 0.45,
+          "reference": 0.425
+        },
+        {
+          "fold": 1,
+          "selected": 0.45,
+          "reference": 0.425
+        },
+        {
+          "fold": 2,
+          "selected": 0.45,
+          "reference": 0.425
+        },
+        {
+          "fold": 3,
+          "selected": 0.45,
+          "reference": 0.425
+        },
+        {
+          "fold": 4,
+          "selected": 0.475,
+          "reference": 0.45
+        }
+      ],
+      "oof_miou_selected": 0.7998225419548719,
+      "oof_miou_reference": 0.7875085283208108,
+      "paired_bootstrap": {
+        "mean": 0.014299295135171355,
+        "ci_low": 0.010711578572336617,
+        "ci_high": 0.01784258539818091,
+        "better": 365,
+        "worse": 125,
+        "ties": 0
+      },
+      "per_class": {
+        "aeroplane": {
+          "reference": 0.8371037597393085,
+          "selected": 0.8670273251405081,
+          "delta": 0.02992356540119956
+        },
+        "bicycle": {
+          "reference": 0.7371365070548255,
+          "selected": 0.7458195035170873,
+          "delta": 0.008682996462261783
+        },
+        "bird": {
+          "reference": 0.8454354840658875,
+          "selected": 0.8512317983967528,
+          "delta": 0.005796314330865249
+        },
+        "boat": {
+          "reference": 0.8178359470322155,
+          "selected": 0.8417096419942894,
+          "delta": 0.02387369496207392
+        },
+        "bottle": {
+          "reference": 0.8577485008249957,
+          "selected": 0.8635726934315773,
+          "delta": 0.005824192606581624
+        },
+        "bus": {
+          "reference": 0.9121527579209746,
+          "selected": 0.9070224372230139,
+          "delta": -0.005130320697960711
+        },
+        "car": {
+          "reference": 0.8261008479398161,
+          "selected": 0.8269435815428272,
+          "delta": 0.0008427336030111254
+        },
+        "cat": {
+          "reference": 0.8079587837123833,
+          "selected": 0.8203585131205537,
+          "delta": 0.012399729408170468
+        },
+        "chair": {
+          "reference": 0.6301245079941601,
+          "selected": 0.7081239629305869,
+          "delta": 0.0779994549364268
+        },
+        "cow": {
+          "reference": 0.8304693290758145,
+          "selected": 0.8356642715649979,
+          "delta": 0.005194942489183396
+        },
+        "dining-table": {
+          "reference": 0.45759233782021436,
+          "selected": 0.45302079409702706,
+          "delta": -0.004571543723187299
+        },
+        "dog": {
+          "reference": 0.8991281001697586,
+          "selected": 0.898046593547354,
+          "delta": -0.0010815066224045822
+        },
+        "horse": {
+          "reference": 0.8700507376245386,
+          "selected": 0.8783868800009978,
+          "delta": 0.008336142376459299
+        },
+        "motorbike": {
+          "reference": 0.8427412164157595,
+          "selected": 0.8524852408790237,
+          "delta": 0.009744024463264167
+        },
+        "person": {
+          "reference": 0.6900549119077786,
+          "selected": 0.7204740821444799,
+          "delta": 0.030419170236701376
+        },
+        "potted-plant": {
+          "reference": 0.727585325384165,
+          "selected": 0.7459121718611424,
+          "delta": 0.018326846476977465
+        },
+        "sheep": {
+          "reference": 0.789475626154331,
+          "selected": 0.7912455673097858,
+          "delta": 0.0017699411554548128
+        },
+        "sofa": {
+          "reference": 0.9380617912919474,
+          "selected": 0.9492444925147046,
+          "delta": 0.011182701222757108
+        },
+        "train": {
+          "reference": 0.6484875193153693,
+          "selected": 0.6668136236605742,
+          "delta": 0.018326104345204874
+        },
+        "tv": {
+          "reference": 0.7849265749719735,
+          "selected": 0.7733476642201543,
+          "delta": -0.01157891075181916
+        }
+      }
+    },
+    "REF/one_pass|N0/global|R2/crf": {
+      "configuration": "REF/one_pass|N0/global|R2/crf",
+      "reference": "REF/one_pass|N0/global|R0/none",
+      "thresholds": [
+        {
+          "fold": 0,
+          "selected": 0.425,
+          "reference": 0.425
+        },
+        {
+          "fold": 1,
+          "selected": 0.425,
+          "reference": 0.425
+        },
+        {
+          "fold": 2,
+          "selected": 0.425,
+          "reference": 0.425
+        },
+        {
+          "fold": 3,
+          "selected": 0.425,
+          "reference": 0.425
+        },
+        {
+          "fold": 4,
+          "selected": 0.425,
+          "reference": 0.45
+        }
+      ],
+      "oof_miou_selected": 0.8049644952518371,
+      "oof_miou_reference": 0.7875085283208108,
+      "paired_bootstrap": {
+        "mean": 0.02222907251469148,
+        "ci_low": 0.01851793508649968,
+        "ci_high": 0.02608739658589899,
+        "better": 362,
+        "worse": 128,
+        "ties": 0
+      },
+      "per_class": {
+        "aeroplane": {
+          "reference": 0.8371037597393085,
+          "selected": 0.882704275498908,
+          "delta": 0.04560051575959945
+        },
+        "bicycle": {
+          "reference": 0.7371365070548255,
+          "selected": 0.7487308580552517,
+          "delta": 0.011594351000426273
+        },
+        "bird": {
+          "reference": 0.8454354840658875,
+          "selected": 0.8968534160574106,
+          "delta": 0.051417931991523114
+        },
+        "boat": {
+          "reference": 0.8178359470322155,
+          "selected": 0.8216172131904593,
+          "delta": 0.0037812661582438123
+        },
+        "bottle": {
+          "reference": 0.8577485008249957,
+          "selected": 0.8844053046719251,
+          "delta": 0.026656803846929478
+        },
+        "bus": {
+          "reference": 0.9121527579209746,
+          "selected": 0.9114971861028809,
+          "delta": -0.0006555718180937253
+        },
+        "car": {
+          "reference": 0.8261008479398161,
+          "selected": 0.8288666743152713,
+          "delta": 0.0027658263754551937
+        },
+        "cat": {
+          "reference": 0.8079587837123833,
+          "selected": 0.8231114947459737,
+          "delta": 0.015152711033590394
+        },
+        "chair": {
+          "reference": 0.6301245079941601,
+          "selected": 0.6765290160664085,
+          "delta": 0.046404508072248385
+        },
+        "cow": {
+          "reference": 0.8304693290758145,
+          "selected": 0.8601229940735529,
+          "delta": 0.02965366499773836
+        },
+        "dining-table": {
+          "reference": 0.45759233782021436,
+          "selected": 0.4562644523513843,
+          "delta": -0.001327885468830059
+        },
+        "dog": {
+          "reference": 0.8991281001697586,
+          "selected": 0.9223993178442946,
+          "delta": 0.023271217674535993
+        },
+        "horse": {
+          "reference": 0.8700507376245386,
+          "selected": 0.8945793126985958,
+          "delta": 0.024528575074057257
+        },
+        "motorbike": {
+          "reference": 0.8427412164157595,
+          "selected": 0.8403300356737773,
+          "delta": -0.0024111807419822107
+        },
+        "person": {
+          "reference": 0.6900549119077786,
+          "selected": 0.7065679523699157,
+          "delta": 0.016513040462137085
+        },
+        "potted-plant": {
+          "reference": 0.727585325384165,
+          "selected": 0.737159634517198,
+          "delta": 0.009574309133033032
+        },
+        "sheep": {
+          "reference": 0.789475626154331,
+          "selected": 0.8135026627246557,
+          "delta": 0.024027036570324678
+        },
+        "sofa": {
+          "reference": 0.9380617912919474,
+          "selected": 0.9516462545461328,
+          "delta": 0.013584463254185386
+        },
+        "train": {
+          "reference": 0.6484875193153693,
+          "selected": 0.6494263618178997,
+          "delta": 0.0009388425025304015
+        },
+        "tv": {
+          "reference": 0.7849265749719735,
+          "selected": 0.7929754877148412,
+          "delta": 0.008048912742867675
+        }
+      }
+    },
+    "P1/obs_n2|N0/global|R2/crf": {
+      "configuration": "P1/obs_n2|N0/global|R2/crf",
+      "reference": "REF/one_pass|N0/global|R0/none",
+      "thresholds": [
+        {
+          "fold": 0,
+          "selected": 0.45,
+          "reference": 0.425
+        },
+        {
+          "fold": 1,
+          "selected": 0.45,
+          "reference": 0.425
+        },
+        {
+          "fold": 2,
+          "selected": 0.45,
+          "reference": 0.425
+        },
+        {
+          "fold": 3,
+          "selected": 0.45,
+          "reference": 0.425
+        },
+        {
+          "fold": 4,
+          "selected": 0.45,
+          "reference": 0.45
+        }
+      ],
+      "oof_miou_selected": 0.8134976701132626,
+      "oof_miou_reference": 0.7875085283208108,
+      "paired_bootstrap": {
+        "mean": 0.030753096987949428,
+        "ci_low": 0.02507646445983469,
+        "ci_high": 0.03643578784834794,
+        "better": 378,
+        "worse": 112,
+        "ties": 0
+      },
+      "per_class": {
+        "aeroplane": {
+          "reference": 0.8371037597393085,
+          "selected": 0.8952472073613064,
+          "delta": 0.05814344762199786
+        },
+        "bicycle": {
+          "reference": 0.7371365070548255,
+          "selected": 0.7635490189633224,
+          "delta": 0.026412511908496916
+        },
+        "bird": {
+          "reference": 0.8454354840658875,
+          "selected": 0.8840600708448334,
+          "delta": 0.03862458677894587
+        },
+        "boat": {
+          "reference": 0.8178359470322155,
+          "selected": 0.8406520479874382,
+          "delta": 0.022816100955222685
+        },
+        "bottle": {
+          "reference": 0.8577485008249957,
+          "selected": 0.879349377917449,
+          "delta": 0.021600877092453397
+        },
+        "bus": {
+          "reference": 0.9121527579209746,
+          "selected": 0.9039454951887932,
+          "delta": -0.00820726273218142
+        },
+        "car": {
+          "reference": 0.8261008479398161,
+          "selected": 0.8268258177856231,
+          "delta": 0.0007249698458070553
+        },
+        "cat": {
+          "reference": 0.8079587837123833,
+          "selected": 0.8333346642118074,
+          "delta": 0.025375880499424075
+        },
+        "chair": {
+          "reference": 0.6301245079941601,
+          "selected": 0.7762426666003418,
+          "delta": 0.14611815860618171
+        },
+        "cow": {
+          "reference": 0.8304693290758145,
+          "selected": 0.8552997349565031,
+          "delta": 0.024830405880688633
+        },
+        "dining-table": {
+          "reference": 0.45759233782021436,
+          "selected": 0.45081899826633093,
+          "delta": -0.0067733395538834285
+        },
+        "dog": {
+          "reference": 0.8991281001697586,
+          "selected": 0.9152729651530338,
+          "delta": 0.016144864983275165
+        },
+        "horse": {
+          "reference": 0.8700507376245386,
+          "selected": 0.8984151700737067,
+          "delta": 0.028364432449168198
+        },
+        "motorbike": {
+          "reference": 0.8427412164157595,
+          "selected": 0.8484584307351061,
+          "delta": 0.005717214319346575
+        },
+        "person": {
+          "reference": 0.6900549119077786,
+          "selected": 0.7377109887019504,
+          "delta": 0.04765607679417183
+        },
+        "potted-plant": {
+          "reference": 0.727585325384165,
+          "selected": 0.7515797621314393,
+          "delta": 0.023994436747274306
+        },
+        "sheep": {
+          "reference": 0.789475626154331,
+          "selected": 0.8101908933853867,
+          "delta": 0.020715267231055767
+        },
+        "sofa": {
+          "reference": 0.9380617912919474,
+          "selected": 0.958027933291776,
+          "delta": 0.0199661419998286
+        },
+        "train": {
+          "reference": 0.6484875193153693,
+          "selected": 0.6648211967785883,
+          "delta": 0.01633367746321901
+        },
+        "tv": {
+          "reference": 0.7849265749719735,
+          "selected": 0.7761509619305116,
+          "delta": -0.008775613041461905
+        }
+      }
+    },
+    "P1/obs_n2|N4/otsu|R2/crf": {
+      "configuration": "P1/obs_n2|N4/otsu|R2/crf",
+      "reference": "REF/one_pass|N0/global|R0/none",
+      "thresholds": [
+        {
+          "fold": 0,
+          "selected": 0.45,
+          "reference": 0.425
+        },
+        {
+          "fold": 1,
+          "selected": 0.45,
+          "reference": 0.425
+        },
+        {
+          "fold": 2,
+          "selected": 0.45,
+          "reference": 0.425
+        },
+        {
+          "fold": 3,
+          "selected": 0.45,
+          "reference": 0.425
+        },
+        {
+          "fold": 4,
+          "selected": 0.45,
+          "reference": 0.45
+        }
+      ],
+      "oof_miou_selected": 0.8206748259206487,
+      "oof_miou_reference": 0.7875085283208108,
+      "paired_bootstrap": {
+        "mean": 0.039684450605350856,
+        "ci_low": 0.031734322902923655,
+        "ci_high": 0.04775589592435826,
+        "better": 376,
+        "worse": 114,
+        "ties": 0
+      },
+      "per_class": {
+        "aeroplane": {
+          "reference": 0.8371037597393085,
+          "selected": 0.8929625519901567,
+          "delta": 0.05585879225084822
+        },
+        "bicycle": {
+          "reference": 0.7371365070548255,
+          "selected": 0.7842036699543848,
+          "delta": 0.04706716289955937
+        },
+        "bird": {
+          "reference": 0.8454354840658875,
+          "selected": 0.8679682659914059,
+          "delta": 0.02253278192551833
+        },
+        "boat": {
+          "reference": 0.8178359470322155,
+          "selected": 0.8379843561650855,
+          "delta": 0.02014840913286997
+        },
+        "bottle": {
+          "reference": 0.8577485008249957,
+          "selected": 0.9287935963324503,
+          "delta": 0.07104509550745464
+        },
+        "bus": {
+          "reference": 0.9121527579209746,
+          "selected": 0.8984352665234905,
+          "delta": -0.013717491397484127
+        },
+        "car": {
+          "reference": 0.8261008479398161,
+          "selected": 0.8364799502700607,
+          "delta": 0.010379102330244638
+        },
+        "cat": {
+          "reference": 0.8079587837123833,
+          "selected": 0.8269015980573394,
+          "delta": 0.01894281434495615
+        },
+        "chair": {
+          "reference": 0.6301245079941601,
+          "selected": 0.7904445794903335,
+          "delta": 0.16032007149617344
+        },
+        "cow": {
+          "reference": 0.8304693290758145,
+          "selected": 0.891475192765462,
+          "delta": 0.061005863689647555
+        },
+        "dining-table": {
+          "reference": 0.45759233782021436,
+          "selected": 0.44268771764736675,
+          "delta": -0.014904620172847605
+        },
+        "dog": {
+          "reference": 0.8991281001697586,
+          "selected": 0.9175424572734857,
+          "delta": 0.018414357103727075
+        },
+        "horse": {
+          "reference": 0.8700507376245386,
+          "selected": 0.8948487631314946,
+          "delta": 0.02479802550695609
+        },
+        "motorbike": {
+          "reference": 0.8427412164157595,
+          "selected": 0.8656992178425993,
+          "delta": 0.02295800142683979
+        },
+        "person": {
+          "reference": 0.6900549119077786,
+          "selected": 0.7864176274503808,
+          "delta": 0.09636271554260223
+        },
+        "potted-plant": {
+          "reference": 0.727585325384165,
+          "selected": 0.770831621096401,
+          "delta": 0.04324629571223604
+        },
+        "sheep": {
+          "reference": 0.789475626154331,
+          "selected": 0.7501684762715111,
+          "delta": -0.039307149882819914
+        },
+        "sofa": {
+          "reference": 0.9380617912919474,
+          "selected": 0.9649333405223619,
+          "delta": 0.02687154923041446
+        },
+        "train": {
+          "reference": 0.6484875193153693,
+          "selected": 0.6771286247134136,
+          "delta": 0.02864110539804432
+        },
+        "tv": {
+          "reference": 0.7849265749719735,
+          "selected": 0.7875896449237876,
+          "delta": 0.00266306995181409
+        }
+      }
+    }
+  },
+  "incremental_expanded_vs_mandatory": {
+    "configuration": "P1/obs_n2|N4/otsu|R2/crf",
+    "reference": "P1/obs_n2|N0/global|R2/crf",
+    "thresholds": [
+      {
+        "fold": 0,
+        "selected": 0.45,
+        "reference": 0.45
+      },
+      {
+        "fold": 1,
+        "selected": 0.45,
+        "reference": 0.45
+      },
+      {
+        "fold": 2,
+        "selected": 0.45,
+        "reference": 0.45
+      },
+      {
+        "fold": 3,
+        "selected": 0.45,
+        "reference": 0.45
+      },
+      {
+        "fold": 4,
+        "selected": 0.45,
+        "reference": 0.45
+      }
+    ],
+    "oof_miou_selected": 0.8206748259206487,
+    "oof_miou_reference": 0.8134976701132626,
+    "paired_bootstrap": {
+      "mean": 0.008931353617401428,
+      "ci_low": 0.0025550773443186723,
+      "ci_high": 0.015241694921840732,
+      "better": 256,
+      "worse": 234,
+      "ties": 0
+    },
+    "per_class": {
+      "aeroplane": {
+        "reference": 0.8952472073613064,
+        "selected": 0.8929625519901567,
+        "delta": -0.0022846553711496354
+      },
+      "bicycle": {
+        "reference": 0.7635490189633224,
+        "selected": 0.7842036699543848,
+        "delta": 0.02065465099106245
+      },
+      "bird": {
+        "reference": 0.8840600708448334,
+        "selected": 0.8679682659914059,
+        "delta": -0.016091804853427538
+      },
+      "boat": {
+        "reference": 0.8406520479874382,
+        "selected": 0.8379843561650855,
+        "delta": -0.0026676918223527135
+      },
+      "bottle": {
+        "reference": 0.879349377917449,
+        "selected": 0.9287935963324503,
+        "delta": 0.04944421841500124
+      },
+      "bus": {
+        "reference": 0.9039454951887932,
+        "selected": 0.8984352665234905,
+        "delta": -0.005510228665302708
+      },
+      "car": {
+        "reference": 0.8268258177856231,
+        "selected": 0.8364799502700607,
+        "delta": 0.009654132484437583
+      },
+      "cat": {
+        "reference": 0.8333346642118074,
+        "selected": 0.8269015980573394,
+        "delta": -0.006433066154467926
+      },
+      "chair": {
+        "reference": 0.7762426666003418,
+        "selected": 0.7904445794903335,
+        "delta": 0.01420191288999173
+      },
+      "cow": {
+        "reference": 0.8552997349565031,
+        "selected": 0.891475192765462,
+        "delta": 0.03617545780895892
+      },
+      "dining-table": {
+        "reference": 0.45081899826633093,
+        "selected": 0.44268771764736675,
+        "delta": -0.008131280618964176
+      },
+      "dog": {
+        "reference": 0.9152729651530338,
+        "selected": 0.9175424572734857,
+        "delta": 0.0022694921204519103
+      },
+      "horse": {
+        "reference": 0.8984151700737067,
+        "selected": 0.8948487631314946,
+        "delta": -0.003566406942212108
+      },
+      "motorbike": {
+        "reference": 0.8484584307351061,
+        "selected": 0.8656992178425993,
+        "delta": 0.017240787107493216
+      },
+      "person": {
+        "reference": 0.7377109887019504,
+        "selected": 0.7864176274503808,
+        "delta": 0.0487066387484304
+      },
+      "potted-plant": {
+        "reference": 0.7515797621314393,
+        "selected": 0.770831621096401,
+        "delta": 0.019251858964961732
+      },
+      "sheep": {
+        "reference": 0.8101908933853867,
+        "selected": 0.7501684762715111,
+        "delta": -0.06002241711387568
+      },
+      "sofa": {
+        "reference": 0.958027933291776,
+        "selected": 0.9649333405223619,
+        "delta": 0.006905407230585858
+      },
+      "train": {
+        "reference": 0.6648211967785883,
+        "selected": 0.6771286247134136,
+        "delta": 0.01230742793482531
+      },
+      "tv": {
+        "reference": 0.7761509619305116,
+        "selected": 0.7875896449237876,
+        "delta": 0.011438682993275995
+      }
+    },
+    "gain": 0.007177155807386093,
+    "classes_improved": 12,
+    "worst_class": "sheep",
+    "worst_class_delta": -0.06002241711387568,
+    "eligible_under_r4": false
+  }
+}

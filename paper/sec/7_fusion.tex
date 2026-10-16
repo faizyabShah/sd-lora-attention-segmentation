@@ -51,7 +51,12 @@ and OVAM's average of two or three images is the most stable.
 \source{protocol Section 50; registry B1, B1b, S4}
 
 \paragraph{Combined confirmation and tokens.}
-\owner{Codex runs P3-C; Claude reviews. Token confirmation ownership to agree.}
-\TODO{P3-C freezes the final training-free method; T-C for the token track
-(B1, B1b, B2a, B2b; shot scaling).}
-\source{registry Sections 2, 6}
+\owner{Codex (P3-C); token confirmation ownership to agree.}
+The mandatory confirmation selects two propagation passes followed by
+DenseCRF in all five folds. It raises OOF mIoU from 0.788 to 0.813 (paired
+$\Delta=+0.031$, 95\% CI $[+0.025,+0.036]$) and therefore freezes the
+training-free method. The expanded diagnostic screen reaches 0.821 with Otsu
+calibration, but its incremental gain over the mandatory winner is only 0.007
+and sheep IoU falls by 0.060, so it fails the prespecified class-loss guard.
+The separate T-C token confirmation remains pending.
+\source{protocol Section 51; registry Sections 2, 6}
