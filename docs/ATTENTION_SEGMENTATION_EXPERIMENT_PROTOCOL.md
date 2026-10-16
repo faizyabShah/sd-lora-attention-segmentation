@@ -429,7 +429,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Phase 3 registry (all deferred experiments, rules R1–R11) | Claude drafts; Codex reviews | Draft 2 in `docs/ATTENTION_FUSION_AND_TOKEN_IDEAS.md`; Codex review requested (Section 38) | this commit |
 | Paper skeleton (`paper/`) | Claude created (taken over at Narmeen's request, Section 39); section owners per Section 29 | Created; compiles; Codex review requested | this commit; `paper/` |
 | Released baselines Q1–Q5 | Claude | Scored with OVAM's notebook procedures; every published value reproduced (Section 41) | this commit; `outputs/segmentation/comparisons/released_baselines/` |
-| Fusion and calibration package (P4, F3, F4, N2–N4, R2) | Claude runs; Codex reviews | Runner ready and smoke-verified (Section 40); submission waits for Codex's registry review | `outputs/segmentation/controlled_attention_cv/fusion_calibration/` |
+| Fusion and calibration package (P4, F3, F4, N2–N4, R2) | Claude runs; Codex reviews | Running (job `232922`, renyi A100, `trdp`), launched at Narmeen's decision before the registry review (Section 42) | `outputs/segmentation/controlled_attention_cv/fusion_calibration/` |
 | Deferred propagation package | Codex runs; Claude reviews | Runner ready: P1 powers, P2 restart, P6 sparsity, W3 aggregation order on frozen joint pair (Section 37) | `outputs/segmentation/controlled_attention_cv/propagation_package/` |
 
 ### Pre-sync exploratory run
@@ -1607,3 +1607,23 @@ per-class IoU and the COCO-Cap caption-includes/excludes split, and
 
 **Not yet run:** DAAM with the threshold chosen inside our folds (R3), which
 is possible because DAAM shares our images.
+
+## 42. Claude: fusion/calibration package launched
+
+**Codex: the fusion/calibration package is running.** Narmeen decided to
+launch it without waiting for the registry review requested in Sections 38 and
+40.
+
+- Job `232922`: 20 class shards, all 490 VOC-Sim images, renyi A100 with the
+  `trdp` environment (the same as SA-C and the propagation package), from
+  commit `229130b`.
+- The grids are exactly those registered in the committed registry (Section
+  1.2, commit `4ac06d9`) and implemented in `scripts/run_fusion_calibration.py`
+  (Section 40), so rule R8 holds.
+- The first image reproduces SA-C's `C/L` (0.893 vs 0.892).
+
+The registry review is still welcome. If Codex asks for a grid or rule change,
+the package is rerun (about 50 minutes) and both runs are reported. Selection
+uses `scripts/select_propagation_cv.py` with
+`configs/controlled_fusion_calibration_screens.json`; results follow for
+Codex's review.
