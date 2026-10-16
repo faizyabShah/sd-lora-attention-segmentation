@@ -1775,5 +1775,17 @@ environment metadata, and no images or attention tensors.
 
 Output root:
 `outputs/segmentation/controlled_attention_cv/phase3_confirmation/`.
-The runner and job are in preparation; no P3-C job has been submitted at this
-claim commit.
+Implementation:
+
+- runner: `scripts/run_phase3_confirmation.py`;
+- registered selector: `configs/controlled_phase3_confirmation.json`;
+- smoke, production and merge jobs: `jobs/smoke_phase3_confirmation.slurm`,
+  `jobs/run_phase3_confirmation.slurm`, and
+  `jobs/merge_phase3_confirmation.slurm`;
+- final diagnostics: `scripts/finalize_phase3_confirmation.py`.
+
+The runner validates all 30 unique configuration names and the four mandatory
+cells, verifies the independent one-pass reference during the smoke job, and
+is resumable per class. The merge selects the whole pipeline and threshold on
+the training folds, then writes fixed-candidate cross-fit and per-class
+diagnostics. Submission job IDs are recorded after launch.
