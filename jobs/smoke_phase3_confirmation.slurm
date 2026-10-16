@@ -16,7 +16,7 @@ mkdir -p logs
 smoke_dir="/tmp/${USER}_phase3_confirmation_smoke_${SLURM_JOB_ID}"
 python scripts/run_phase3_confirmation.py \
   --class-shard 0 --max-samples 1 --verify-reference \
-  --crf-site "${CRF_SITE:-$HOME/TRDP/output/ovam_token_pilot/crf_site}" \
+  --crf-site "${CRF_SITE:-outputs/dependencies/simplecrf_py310}" \
   --output-dir "$smoke_dir"
 python - "$smoke_dir" <<'PY'
 import sys

@@ -94,6 +94,22 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def verify_densecrf(crf_site: Path | None) -> str:
+    """Fail before model loading if the Python-compatible CRF extension is absent."""
+    if crf_site is not None:
+        site = str(crf_site.resolve())
+        if site not in sys.path:
+            sys.path.insert(0, site)
+    try:
+        import denseCRF  # type: ignore
+    except ImportError as error:
+        raise RuntimeError(
+            f"SimpleCRF's denseCRF extension is unavailable for Python "
+            f"{sys.version_info.major}.{sys.version_info.minor}; checked {crf_site}"
+        ) from error
+    return str(Path(denseCRF.__file__).resolve())
+
+
 @torch.inference_mode()
 def propagation_maps(
     recorder, module_name: str, seed64: torch.Tensor, device: str
@@ -203,6 +219,7 @@ def main() -> None:
         raise RuntimeError("CUDA is required")
     if len(CONFIGURATIONS) != 30 or not set(MANDATORY).issubset(CONFIGURATIONS):
         raise RuntimeError("Registered 30-cell grid or mandatory cells are incomplete")
+    densecrf_extension = verify_densecrf(args.crf_site)
     seed_json = json.loads(args.ca_seed.read_text(encoding="utf-8"))
     if not seed_json.get("frozen", False):
         raise SystemExit(f"{args.ca_seed} is not a frozen CA seed")
@@ -231,6 +248,7 @@ def main() -> None:
         "refinements": list(REFINEMENTS),
         "thresholds": list(THRESHOLDS),
         "crf_parameters": "OVAM_CRF_PARAMETERS; unary from each thresholded candidate mask",
+        "densecrf_extension": densecrf_extension,
         "model": args.model,
         "model_dtype": "float32",
         "qk_storage_dtype": "float16",

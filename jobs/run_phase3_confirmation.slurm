@@ -29,6 +29,6 @@ requeue_at_timeout() {
 trap requeue_at_timeout USR1
 python scripts/run_phase3_confirmation.py \
   --class-shard "$SLURM_ARRAY_TASK_ID" \
-  --crf-site "${CRF_SITE:-$HOME/TRDP/output/ovam_token_pilot/crf_site}" &
+  --crf-site "${CRF_SITE:-outputs/dependencies/simplecrf_py310}" &
 child_pid=$!
 wait "$child_pid"
