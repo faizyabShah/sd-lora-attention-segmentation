@@ -40,6 +40,7 @@ Full data: `all_configurations.csv.gz` (one row per configuration, all experimen
 | A8 | Phase 3 propagation package (Codex): P1, W3, P2, P6 | VOC-Sim (490 images, 20 classes) | controlled, 5-fold cross-validated; threshold chosen in the folds | 40 | 0.7991 | two passes mean_i(A_i² c) promoted to P3-C |
 | A9 | Phase 3 fusion and calibration package: P4, F3, F4, N2-N4, R2 | VOC-Sim (490 images, 20 classes) | controlled, 5-fold cross-validated; threshold chosen in the folds | 12 | 0.8049 | DenseCRF promoted to P3-C; the rest kept at REF |
 | A10 | Released baselines scored with OVAM's procedures | VOC-Sim (490 images, 20 classes); COCO-Cap (707 images, 20 classes) (each method's own images) | reproduction of published values | 19 | — | every printed OVAM-notebook value reproduced |
+| A11 | Token track B1/B1b: OVAM's optimized tokens on the frozen pipeline | VOC-Sim (490 images, 20 classes) | controlled, 5-fold cross-validated; few-shot track (2-3 annotated images per class) | 27 | 0.8507 | token promoted on every pipeline: REF 0.787 -> 0.851 (conditional query) |
 
 ## 2. Where each setting came from
 
@@ -58,7 +59,7 @@ Full data: `all_configurations.csv.gz` (one row per configuration, all experimen
 | Mask threshold | 0.45 | B5, B9, B10 | 99 dev / 490 | Fig. b_joint_heads_threshold | CA/SA phases: fixed at 0.45; phase 3: chosen in the folds (0.30-0.70), REF picks 0.425-0.45 |
 | Cleanup | remove components < 1% | B10 | 490 (in-sample) | Table b_component_ablations | deferred phase |
 | DenseCRF | not in the final method | B17 (nothing selected) | — | Table b_token_crf | A9 R2 (CV): promoted (OOF +0.017, 20/20 classes); P3-C pending |
-| Optimized token | not in the final method | B17 (nothing selected; tokens trained by OVAM on separate images) | — | Table b_token_crf | deferred phase |
+| Optimized token | not in the final method | B17 (nothing selected; tokens trained by OVAM on separate images) | — | Table b_token_crf | A11 B1 (CV): released token promoted, OOF +0.063 (few-shot track); T-C pending |
 
 ## 3. Development of the method and its baselines
 
@@ -495,7 +496,7 @@ Every CA-C seed crossed with every SA-C cell and a no-SA control (78 configurati
 
 *Fig. 15. Joint CA×SA audit: mIoU of all 78 cells (in-sample); the box is the frozen pair.*
 
-## 6. Phase 3 controlled packages (tiers A8–A10)
+## 6. Phase 3 controlled packages and comparisons (tiers A8–A11)
 
 Same folds and decision rule as the CA and SA phases, with one change: each method parameter **and** the mask threshold (0.30–0.70, step 0.025) are chosen on the training folds, for the reference (REF, one pass) as well (registry R3). Winners go to the combined confirmation P3-C, which Codex is running (protocol Section 45).
 
@@ -532,7 +533,26 @@ Per-image Otsu and maximum normalization gain +0.002 to +0.009 on the training f
 
 All 12 configurations: `controlled_fusion_calibration.csv`.
 
-### 6.3 Released baselines (A10)
+### 6.3 Optimized tokens (A11, few-shot track)
+
+| Screen | Fold choice (votes) | OOF mIoU REF | OOF mIoU choice | OOF gain | Paired Δ image IoU [95% CI]; better/worse | Δ mIoU @0.35 / 0.45 / 0.55 | Candidates | Outcome |
+|---|---|---:|---:|---:|---|---|---:|---|
+| B1 released token, OVAM form (unconditional query) | TU/REF (5/5) | 0.7873 | 0.8428 | 0.0555 | +0.0470 [+0.0380, +0.0560]; 369/121 | +0.0324 / +0.0518 / +0.0819 | 1 | fold vote and OOF guard passed |
+| B1 released token, conditional query | TC/REF (5/5) | 0.7873 | 0.8507 | 0.0634 | +0.0529 [+0.0440, +0.0621]; 375/115 | +0.0414 / +0.0596 / +0.0852 | 1 | fold vote and OOF guard passed |
+
+| Pipeline | Class word | Token, OVAM form | Token, conditional |
+|---|---:|---:|---:|
+| seed | 0.6956 | 0.7893 | 0.7962 |
+| REF | 0.7884 | 0.8402 | 0.8480 |
+| P1 | 0.8006 | 0.8444 | 0.8519 |
+| R2 | 0.8024 | 0.8567 | 0.8650 |
+| P1+R2 | 0.8132 | 0.8589 | 0.8664 |
+
+The conditional form is the R5 choice: it beats the OVAM form by +0.0035 OOF but in only 3/5 folds, and changes only the attribution keys. Single per-image tokens give 0.831 / 0.853 / 0.842 OOF on REF against 0.851 for OVAM's 2–3-image mean (protocol Section 50).
+
+All 27 configurations: `controlled_token_package.csv`.
+
+### 6.4 Released baselines (A10)
 
 | Method | VOC-Sim word (images) | VOC-Sim token | COCO-Cap word (images) | COCO-Cap token |
 |---|---|---|---|---|
@@ -587,7 +607,8 @@ Best configuration of every family in the large VOC-Sim experiments: `tables/b_f
 ## 9. Limits of this evidence
 
 - Tier B settings were chosen on the reported images; only COCO-Cap is untouched by the earlier final method, and the revised one-pass system was informed by COCO-Cap.
-- Tier A is complete for CA and SA and for the Tier 1 phase 3 screens (propagation, fusion and calibration). The combined confirmation P3-C is running; tokens and the COCO-Cap transfer of the frozen method are still to run.
+- Tier A is complete for CA and SA and for the Tier 1 phase 3 screens (propagation, fusion and calibration, tokens B1/B1b). The combined confirmations P3-C and T-C and the COCO-Cap transfer are still to run.
+- The token track uses OVAM's released tokens, each the mean of 2–3 per-image tokens trained on hand-annotated images outside the evaluation sets; it is a few-shot result, reported separately from the training-free track.
 - The phase 3 packages run in two environments on the same GPU type (torch 2.6 and 2.11); their REF rows agree within 0.00003 mIoU, and every package compares only with its own REF.
 - The frozen SA (module 15 only) lowers `person` IoU by 0.055; SA-T and SA-R were calibration-dependent and do not survive SA-C.
 - The frozen CA change (CA-R) helps mainly at the 0.45 selection threshold and above and slightly lowers AP; CA-L and CA-H change sign at 0.35 (Fig. 3).

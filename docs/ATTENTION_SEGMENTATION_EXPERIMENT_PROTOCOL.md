@@ -434,7 +434,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Propagation package review | Claude | Accepted: every Section 43 value reproduced independently (Section 46) | `dba3126`, this commit |
 | P3-C (training-free combined confirmation) | Codex runs (Section 45); Claude reviews | Submitted: jobs `232942` → `232943` → `232944` (expanded 30-cell grid); Claude's duplicate proposal withdrawn (Section 46) | `outputs/segmentation/controlled_attention_cv/phase3_confirmation/` |
 | COCO-Cap transfer (registry Section 7) | Claude proposes to run; Codex reviews | Runner ready, self-test exact (Section 48); waits for P3-C | `outputs/segmentation/coco_cap_transfer/` |
-| Token track B1/B1b (registry Section 2) | Claude runs (taken over at Narmeen's request, Section 49); Codex reviews | Registered; runner smoke-verified; not launched | `outputs/segmentation/controlled_attention_cv/tokens/` |
+| Token track B1/B1b (registry Section 2) | Claude runs (taken over at Narmeen's request, Section 49); Codex reviews | Complete (490/490, job `232957`): released token promoted over the class word on every pipeline; conditional form chosen by R5 (Section 50); Codex review requested | this commit; `outputs/segmentation/controlled_attention_cv/tokens/` |
 
 ### Pre-sync exploratory run
 
@@ -1982,3 +1982,72 @@ image.
 **Run.** `jobs/run_token_package.slurm`: 20 class shards on the V100 nodes with
 the `gen` environment (renyi is running P3-C), all 490 VOC-Sim images. The
 package compares only with its own `W` cells (R7).
+
+## 50. Claude: token track B1/B1b results (Codex review requested)
+
+**Run.** Job `232957`: 20/20 shards, 490/490 images, V100 nodes (`gen`, torch
+2.4.1+cu121), commit `326f173`.
+
+**Correction to the shards.** The runner first wrote two per-class fields
+(`per_image_tokens`, `token_slots_repeat_first`) into the shard settings. The
+loader requires identical settings across shards, so these fields were moved
+to `tokens_per_class.json` and removed from each shard's `settings`. Counts,
+AP and image lists are byte-identical before and after (checked), and the
+runner now writes the sidecar file directly.
+
+**Registered screens** (`configs/controlled_token_screens.json`; parameter and
+threshold chosen in the folds, R3):
+
+| Screen (vs `W/REF`, class word) | Votes | OOF mIoU W → token | Paired Δ image IoU [95% CI] | Δ @0.35 / 0.45 / 0.55 | Classes improved |
+|---|---:|---|---|---|---:|
+| `TU/REF`: released token, OVAM form (unconditional query) | 5/5 | 0.7873 → 0.8428 (+0.0555) | +0.047 [+0.038, +0.056]; 369/121 | +0.032 / +0.052 / +0.082 | 19/20 (worst `bus` −0.001) |
+| `TC/REF`: released token, conditional query | 5/5 | 0.7873 → 0.8507 (+0.0634) | +0.053 [+0.044, +0.062]; 375/115 | +0.041 / +0.060 / +0.085 | 20/20 (smallest `dog` +0.006) |
+
+Both are promoted and neither is calibration-dependent. The largest class
+gain is `train` (+0.24 / +0.26): the class word is ambiguous and the token is
+not.
+
+**Which form (diagnostic, not registered as a screen).** Head to head, TC
+beats TU by +0.0035 OOF, but in only 3/5 folds, so neither form is promoted
+over the other. By R5 (the simpler change wins), **TC is the token
+attribution of the few-shot track**: it changes only the attribution keys and
+keeps the frozen conditional query, whereas TU also changes the query branch.
+A screen with both forms against W selects TC in 5/5 folds (0.8507).
+
+**Token on the other pipelines** (OOF, each vs its class-word cell; all 5/5;
+inputs to T-C):
+
+| Pipeline | W | TU | TC |
+|---|---:|---:|---:|
+| CA seed alone | 0.7128 | 0.7915 | 0.7967 |
+| REF (one pass) | 0.7873 | 0.8428 | 0.8507 |
+| P1 (two passes) | 0.7997 | 0.8462 | 0.8543 |
+| R2 (DenseCRF) | 0.8047 | 0.8580 | 0.8643 |
+| P1 + R2 | 0.8132 | 0.8603 | 0.8654 |
+
+With the token, two passes no longer help (TC: P1 vs REF +0.0000, REF kept
+5/5), while DenseCRF still does (TC: R2 vs REF +0.0137; P1+R2 +0.0147, both
+5/5). The final few-shot pipeline is decided in T-C, together with P3-C.
+
+**Shots (B1b/S4, TC, OOF on REF).**
+
+- Class word 0.7873; released 2–3-shot mean token 0.8507.
+- Single per-image tokens: 0.8309 (first), 0.8529 (second), 0.8421 (third,
+  without `cat`, `horse` and `tv`, which have two training images).
+- One annotated image already gives most of the gain, but which image matters
+  (0.831 to 0.853), and averaging is steadier.
+- With the TU form: 0.8233 / 0.8500 / 0.8390 against released 0.8428.
+
+**Checks.**
+
+- An independent recomputation of both registered screens from the committed
+  fold thresholds reproduces them exactly.
+- `W/REF` at 0.45 is 0.78844, against the fusion package's REF at 0.78863
+  (V100 vs A100); `W/R2` is 0.80243 against 0.80272.
+- The runner checked, for every class, that the released token equals the
+  mean of its per-image tokens.
+
+**For the paper.** OVAM's released token-optimized masks score 0.825 on
+VOC-Sim; the frozen pipeline with OVAM's released token scores 0.851 (REF,
+OOF) and 0.865 with DenseCRF (regenerated images; registry R10, few-shot
+track).

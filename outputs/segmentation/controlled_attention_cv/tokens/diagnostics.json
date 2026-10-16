@@ -1,0 +1,124 @@
+{
+  "images": 490,
+  "commits": [
+    "326f17360fea8c9355e05cff5eca5b0cd3f50adf"
+  ],
+  "environments": [
+    {
+      "commit": "326f17360fea8c9355e05cff5eca5b0cd3f50adf",
+      "conda_env": "gen",
+      "cudnn": "90100",
+      "diffusers": "0.36.0",
+      "gpu": "Tesla V100-PCIE-16GB",
+      "node": "erdos",
+      "numpy": "2.4.4",
+      "python": "3.11.15",
+      "slurm_job": "232957_0",
+      "torch": "2.4.1+cu121",
+      "torch_cuda": "12.1",
+      "transformers": "5.6.2"
+    },
+    {
+      "commit": "326f17360fea8c9355e05cff5eca5b0cd3f50adf",
+      "conda_env": "gen",
+      "cudnn": "90100",
+      "diffusers": "0.36.0",
+      "gpu": "Tesla V100S-PCIE-32GB",
+      "node": "neumann",
+      "numpy": "2.4.4",
+      "python": "3.11.15",
+      "slurm_job": "232957_2",
+      "torch": "2.4.1+cu121",
+      "torch_cuda": "12.1",
+      "transformers": "5.6.2"
+    }
+  ],
+  "screens": {
+    "B1 released token, OVAM form (unconditional query)": {
+      "frozen": "TU/REF",
+      "reference": "W/REF",
+      "oof_miou_reference": 0.7872793089786254,
+      "oof_miou_selection": 0.8427591716420292,
+      "oof_paired_bootstrap": {
+        "mean": 0.046958040173305675,
+        "ci_low": 0.03801370253509254,
+        "ci_high": 0.05604931378822834,
+        "better": 369,
+        "worse": 121,
+        "ties": 0
+      },
+      "delta_miou_fixed": {
+        "0.35": 0.03241610409115059,
+        "0.45": 0.051788225027331825,
+        "0.55": 0.08191026299078752
+      },
+      "per_class_delta_full": {
+        "aeroplane": 0.02210838864456921,
+        "bicycle": 0.051362107183870354,
+        "bird": 0.02641334664037398,
+        "boat": 0.007651716616042137,
+        "bottle": 0.0467739392745411,
+        "bus": -0.0008761785933204536,
+        "car": 0.04683324705833869,
+        "cat": 0.05164017596203663,
+        "chair": 0.06160926650111598,
+        "cow": 0.07388622024171543,
+        "dining-table": 0.03132856407025181,
+        "dog": 0.006314351568655119,
+        "horse": 0.026114714424410157,
+        "motorbike": 0.03123728624204314,
+        "person": 0.15345239801588872,
+        "potted-plant": 0.020585486791931396,
+        "sheep": 0.13076565575906574,
+        "sofa": 0.021530424748660737,
+        "train": 0.243765937762774,
+        "tv": 0.044448223402009046
+      },
+      "classes_improved_full": 19,
+      "never_chosen_training_fold_checks": {}
+    },
+    "B1 released token, conditional query": {
+      "frozen": "TC/REF",
+      "reference": "W/REF",
+      "oof_miou_reference": 0.7872793089786254,
+      "oof_miou_selection": 0.8506757047933926,
+      "oof_paired_bootstrap": {
+        "mean": 0.05291842832616233,
+        "ci_low": 0.0440088271034212,
+        "ci_high": 0.06213034714532347,
+        "better": 375,
+        "worse": 115,
+        "ties": 0
+      },
+      "delta_miou_fixed": {
+        "0.35": 0.041362122750742025,
+        "0.45": 0.05958631094168254,
+        "0.55": 0.0851779732640161
+      },
+      "per_class_delta_full": {
+        "aeroplane": 0.017367026027538035,
+        "bicycle": 0.06028093708133164,
+        "bird": 0.026179379337890052,
+        "boat": 0.03230114777417381,
+        "bottle": 0.046474406291987735,
+        "bus": 0.007396248444682674,
+        "car": 0.048361599968089086,
+        "cat": 0.056037718297698325,
+        "chair": 0.08680312615209451,
+        "cow": 0.07487790524512017,
+        "dining-table": 0.04067495738437066,
+        "dog": 0.006253133430374813,
+        "horse": 0.020383528329921075,
+        "motorbike": 0.026177357635641774,
+        "person": 0.17368336523612526,
+        "potted-plant": 0.026600296239287613,
+        "sheep": 0.12762100151904998,
+        "sofa": 0.021052166616989276,
+        "train": 0.25968905258824815,
+        "tv": 0.08311094978890177
+      },
+      "classes_improved_full": 20,
+      "never_chosen_training_fold_checks": {}
+    }
+  }
+}

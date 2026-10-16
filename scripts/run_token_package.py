@@ -169,10 +169,15 @@ def main() -> None:
         "attributions": {"W": "class word, frozen convention", "TU": "released token, [<SoT>, token], unconditional query",
                          "TC": "released token, [<SoT>, token], conditional query",
                          "TkU/TkC": "k-th per-image token (1-shot), both query forms"},
-        "per_image_tokens": token_files, "token_slots_repeat_first": len(token_files) < 3,
+        "per_class_token_files": "tokens_per_class.json",
         "ca_seed": seed_spec, "selected_sa_module": selected, "thresholds": list(THRESHOLDS),
         "configurations": list(CONFIGURATIONS), "model": args.model, "model_dtype": "float32", "qk_storage_dtype": "float16",
     }
+    sidecar = args.output_dir / "tokens_per_class.json"
+    per_class = json.loads(sidecar.read_text()) if sidecar.exists() else {}
+    per_class[classname] = {"per_image_tokens": token_files, "token_slots_repeat_first": len(token_files) < 3}
+    sidecar.parent.mkdir(parents=True, exist_ok=True)
+    sidecar.write_text(json.dumps(per_class, indent=2, sort_keys=True) + "\n")
     writer = cv.ShardWriter(args.output_dir / "shards" / f"class_{args.class_shard:02d}_{classname.replace(' ', '_')}.npz",
                             CONFIGURATIONS, folds, settings, thresholds=THRESHOLDS)
     t45 = THRESHOLDS.index(0.45)

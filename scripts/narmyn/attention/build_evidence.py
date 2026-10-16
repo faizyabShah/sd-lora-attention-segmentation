@@ -52,6 +52,7 @@ PKG_JOINT = SEG / "controlled_attention_cv" / "joint_ca_sa_cartesian"
 PKG_PROP = SEG / "controlled_attention_cv" / "propagation_package"
 PKG_FUSION = SEG / "controlled_attention_cv" / "fusion_calibration"
 BASELINES = SEG / "comparisons" / "released_baselines" / "summary.json"
+PKG_TOKENS = SEG / "controlled_attention_cv" / "tokens"
 
 # Reference palette (dataviz skill, light mode; static figures for print).
 SURFACE, INK, INK2, MUTED, GRID, AXIS = "#fcfcfb", "#0b0b0b", "#52514e", "#898781", "#e1e0d9", "#c3c2b7"
@@ -182,6 +183,10 @@ EXPERIMENTS = [
     ("A10", "Released baselines scored with OVAM's procedures", f"{VOC}; {COCO} (each method's own images)",
      "reproduction of published values", "OVAM, DAAM, Attn2Mask, Grounded Diffusion, DatasetDM; class word and token",
      "OVAM evaluation notebooks", "comparisons/released_baselines", None, "every printed OVAM-notebook value reproduced"),
+    ("A11", "Token track B1/B1b: OVAM's optimized tokens on the frozen pipeline", VOC,
+     "controlled, 5-fold cross-validated; few-shot track (2-3 annotated images per class)",
+     "released token (two query forms) and each per-image token, on 5 pipelines", "frozen pair; class word as reference",
+     "controlled_attention_cv/tokens", None, "token promoted on every pipeline: REF 0.787 -> 0.851 (conditional query)"),
 ]
 
 
@@ -1389,7 +1394,7 @@ DECISIONS = [
     ("Mask threshold", "0.45", "B5, B9, B10", "99 dev / 490", "Fig. b_joint_heads_threshold", "CA/SA phases: fixed at 0.45; phase 3: chosen in the folds (0.30-0.70), REF picks 0.425-0.45"),
     ("Cleanup", "remove components < 1%", "B10", "490 (in-sample)", "Table b_component_ablations", "deferred phase"),
     ("DenseCRF", "not in the final method", "B17 (nothing selected)", "—", "Table b_token_crf", "A9 R2 (CV): promoted (OOF +0.017, 20/20 classes); P3-C pending"),
-    ("Optimized token", "not in the final method", "B17 (nothing selected; tokens trained by OVAM on separate images)", "—", "Table b_token_crf", "deferred phase"),
+    ("Optimized token", "not in the final method", "B17 (nothing selected; tokens trained by OVAM on separate images)", "—", "Table b_token_crf", "A11 B1 (CV): released token promoted, OOF +0.063 (few-shot track); T-C pending"),
 ]
 
 
@@ -1619,7 +1624,7 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
         ]
     if p3.get("prop") or p3.get("fusion"):
         lines += [
-            "## 6. Phase 3 controlled packages (tiers A8–A10)",
+            "## 6. Phase 3 controlled packages and comparisons (tiers A8–A11)",
             "",
             "Same folds and decision rule as the CA and SA phases, with one change: each method parameter **and** the mask threshold "
             "(0.30–0.70, step 0.025) are chosen on the training folds, for the reference (REF, one pass) as well (registry R3). "
@@ -1638,7 +1643,17 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
                       fig("a9_fusion", "Fig. 17. Fusion and calibration: change against REF, each at its best threshold (in-sample)."),
                       "All 12 configurations: `controlled_fusion_calibration.csv`.", ""]
         if p3.get("baselines"):
-            lines += ["### 6.3 Released baselines (A10)", "", p3["baselines"]["table"], "",
+            if p3.get("tokens"):
+                tk = p3["tokens"]["by"]
+                pipes = ["seed", "REF", "P1", "R2", "P1+R2"]
+                tok_table = write_table("a11_token_pipelines", ["Pipeline", "Class word", "Token, OVAM form", "Token, conditional"],
+                                        [[p, tk[f"W/{p}"]["miou@0.45"], tk[f"TU/{p}"]["miou@0.45"], tk[f"TC/{p}"]["miou@0.45"]] for p in pipes],
+                                        "Token track: class word vs OVAM's released token on every pipeline (mIoU at 0.45, in-sample; OOF values in protocol Section 50)")
+                lines += ["### 6.3 Optimized tokens (A11, few-shot track)", "", p3["tokens"]["table"], "", tok_table, "",
+                          "The conditional form is the R5 choice: it beats the OVAM form by +0.0035 OOF but in only 3/5 folds, and changes only the attribution keys. "
+                          "Single per-image tokens give 0.831 / 0.853 / 0.842 OOF on REF against 0.851 for OVAM's 2–3-image mean (protocol Section 50).", "",
+                          "All 27 configurations: `controlled_token_package.csv`.", ""]
+            lines += ["### 6.4 Released baselines (A10)", "", p3["baselines"]["table"], "",
                       "Every value printed in OVAM's evaluation notebooks is reproduced (protocol Section 41). Only DAAM and OVAM share our "
                       "images and annotations; the other methods are scored on their own released sets, as in OVAM's comparison.", ""]
     lines += [
@@ -1657,7 +1672,8 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
         "## 9. Limits of this evidence",
         "",
         "- Tier B settings were chosen on the reported images; only COCO-Cap is untouched by the earlier final method, and the revised one-pass system was informed by COCO-Cap.",
-        "- Tier A is complete for CA and SA and for the Tier 1 phase 3 screens (propagation, fusion and calibration). The combined confirmation P3-C is running; tokens and the COCO-Cap transfer of the frozen method are still to run.",
+        "- Tier A is complete for CA and SA and for the Tier 1 phase 3 screens (propagation, fusion and calibration, tokens B1/B1b). The combined confirmations P3-C and T-C and the COCO-Cap transfer are still to run.",
+        "- The token track uses OVAM's released tokens, each the mean of 2–3 per-image tokens trained on hand-annotated images outside the evaluation sets; it is a few-shot result, reported separately from the training-free track.",
         "- The phase 3 packages run in two environments on the same GPU type (torch 2.6 and 2.11); their REF rows agree within 0.00003 mIoU, and every package compares only with its own REF.",
         "- The frozen SA (module 15 only) lowers `person` IoU by 0.055; SA-T and SA-R were calibration-dependent and do not survive SA-C.",
         "- The frozen CA change (CA-R) helps mainly at the 0.45 selection threshold and above and slightly lowers AP; CA-L and CA-H change sign at 0.35 (Fig. 3).",
@@ -1728,6 +1744,8 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
         figs += ["a9_fusion"]
     if p3.get("baselines"):
         tex += [r"\input{evidence/tables/a10_released_baselines.tex}"]
+    if p3.get("tokens"):
+        tex += [r"\input{evidence/tables/a11_cv_summary.tex}", r"\input{evidence/tables/a11_token_pipelines.tex}"]
         figs += ["a4_sa_l_single_leave1", "a4_sa_h"]
     figs += ["b_joint_passes_time", "b_joint_heads_threshold", "b_component_ablation"]
     for name in figs:
@@ -1818,12 +1836,13 @@ def main() -> None:
     p3 = {"joint": joint_audit(plt, figures),
           "prop": selected_package(plt, figures, PKG_PROP, "A8", "Phase 3 propagation package (Codex)", "controlled_propagation_package.csv"),
           "fusion": selected_package(plt, figures, PKG_FUSION, "A9", "Phase 3 fusion and calibration package", "controlled_fusion_calibration.csv"),
-          "baselines": released_baselines()}
+          "baselines": released_baselines(),
+          "tokens": selected_package(plt, figures, PKG_TOKENS, "A11", "Token track B1 (released token vs class word on REF)", "controlled_token_package.csv")}
     if p3["prop"]:
         propagation_figure(plt, figures, p3["prop"])
     if p3["fusion"]:
         fusion_figure(plt, figures, p3["fusion"])
-    for eid, key in (("A8", "prop"), ("A9", "fusion")):
+    for eid, key in (("A8", "prop"), ("A9", "fusion"), ("A11", "tokens")):
         if p3[key]:
             for r in p3[key]["rows"]:
                 a_rows.append({"experiment_id": eid, "dataset": VOC, "family": r["configuration"].split("/")[0],

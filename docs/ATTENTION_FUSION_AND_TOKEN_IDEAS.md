@@ -145,11 +145,11 @@ propagates it. Tokens are 768-dimensional text-encoder outputs, as in OVAM.
 
 | ID | Method | Training images | Shots | Owner | Tier | Status |
 |---|---|---|---|---|---|---|
-| B1 | OVAM released tokens | OVAM training set | 2–3 (mean) | Claude (taken over, protocol Section 49) | 1 | Registered; not run |
-| B1b | OVAM per-image tokens | OVAM training set, each image alone | 1 (every choice; report mean ± range) | Claude (taken over, protocol Section 49) | 1 | Registered; not run |
+| B1 | OVAM released tokens | OVAM training set | 2–3 (mean) | Claude (taken over, protocol Section 49) | 1 | Done (Section 50): TC promoted over the word, OOF 0.787 → 0.851 (TU 0.843) |
+| B1b | OVAM per-image tokens | OVAM training set, each image alone | 1 (every choice; report mean ± range) | Claude (taken over, protocol Section 49) | 1 | Done (Section 50): single tokens 0.831 / 0.853 / 0.842 (TC, OOF) |
 | B2a | Our tokens on OVAM's training images | OVAM training set, OVAM's recipe (S1) | 1 and 3 | Codex | 2 | Not run |
 | B2b | Our tokens from the training folds | 1 image per class from the 4 training folds, seeded choice registered before the run; 5 token sets | 1 | Codex | 2 | Not run |
-| S4 | Shot scaling | from B1b/B2a: 1, 2, 3 shots | 1–3 | Codex | 2 | Not run |
+| S4 | Shot scaling | from B1b/B2a: 1, 2, 3 shots | 1–3 | Codex | 2 | 1 vs 2–3 shots done from B1b (Section 50); B2a pending |
 | S3 | Train through our pipeline | loss on the SA-propagated map instead of raw CA | 1 | Codex | 3 | Not run |
 | S6 | Test-time self-consistency | per image, make `c` agree with `A c`; no labels (training-free track) | 0 | unassigned | 3 | Not run |
 | T1–T7, S2, S5, S7, S8 | Token variants | see Section 2.1 | — | unassigned | 3 | Not run |
@@ -311,3 +311,4 @@ Controlled reference for phase 3: REF, VOC-Sim 0.7887 (protocol Sections 33,
 | 2026-10-16 | P4, F3, F4, N2–N4, R2 | Claude | `outputs/segmentation/controlled_attention_cv/fusion_calibration/` | `229130b`; job `232922` | R2 promoted; protocol Section 44 |
 | 2026-10-16 | P3-C expanded confirmation | Codex | `outputs/segmentation/controlled_attention_cv/phase3_confirmation/` | `371f791ee`; jobs `232945` → `232946` → `232947` | corrected smoke passed; mandatory 4-cell and expanded 30-cell screens; protocol Sections 45–46 |
 | 2026-10-16 | Q2 (fold threshold) | Claude | `outputs/segmentation/comparisons/daam_fold_threshold/` | this commit; CPU job `232949` | DAAM threshold chosen in our folds; protocol Section 47 |
+| 2026-10-16 | B1, B1b | Claude | `outputs/segmentation/controlled_attention_cv/tokens/` | `326f173`; job `232957` | token promoted; protocol Section 50 |

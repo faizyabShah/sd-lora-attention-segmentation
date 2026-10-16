@@ -88,8 +88,12 @@ def released_baselines() -> None:
                        f"{d['training_free']['coco_cap']['miou_threshold_from_voc']:.3f} & "
                        f"{d['token_optimized']['coco_cap']['miou_threshold_from_voc']:.3f} \\\\")
     frozen = screen(sa_c, "SA-C")["out_of_fold_miou_selection"]
-    body.append("\\midrule\n" + f"Ours (frozen CA+SA) & {frozen:.3f}$^\\dagger$ & \\todo{{---}} & \\todo{{---}} & \\todo{{---}} \\\\")
-    tex = (header([base, sa_c] + ([daam_cv] if daam_cv.exists() else []))
+    tokens = CV / "tokens" / "fold_results.json"
+    token_cell = "\\todo{---}"
+    if tokens.exists():
+        token_cell = f"{screen(tokens, 'B1 released token, conditional query')['oof_miou_selection']:.3f}$^\\dagger$"
+    body.append("\\midrule\n" + f"Ours (frozen CA+SA) & {frozen:.3f}$^\\dagger$ & {token_cell} & \\todo{{---}} & \\todo{{---}} \\\\")
+    tex = (header([base, sa_c] + ([daam_cv] if daam_cv.exists() else []) + ([tokens] if tokens.exists() else []))
            + "\\footnotesize\\setlength{\\tabcolsep}{3pt}\n"
            + "\\begin{tabular}{@{}lcccc@{}}\n\\toprule\n"
            + "& \\multicolumn{2}{c}{VOC-Sim} & \\multicolumn{2}{c}{COCO-Cap} \\\\\n"

@@ -15,4 +15,4 @@
 | Mask threshold | 0.45 | B5, B9, B10 | 99 dev / 490 | Fig. b_joint_heads_threshold | CA/SA phases: fixed at 0.45; phase 3: chosen in the folds (0.30-0.70), REF picks 0.425-0.45 |
 | Cleanup | remove components < 1% | B10 | 490 (in-sample) | Table b_component_ablations | deferred phase |
 | DenseCRF | not in the final method | B17 (nothing selected) | — | Table b_token_crf | A9 R2 (CV): promoted (OOF +0.017, 20/20 classes); P3-C pending |
-| Optimized token | not in the final method | B17 (nothing selected; tokens trained by OVAM on separate images) | — | Table b_token_crf | deferred phase |
+| Optimized token | not in the final method | B17 (nothing selected; tokens trained by OVAM on separate images) | — | Table b_token_crf | A11 B1 (CV): released token promoted, OOF +0.063 (few-shot track); T-C pending |

@@ -1,5 +1,5 @@
 {\scriptsize\setlength{\tabcolsep}{3pt}
-\begin{longtable}{>{\raggedright\arraybackslash}p{1.40cm}>{\raggedright\arraybackslash}p{2.06cm}>{\raggedright\arraybackslash}p{2.79cm}>{\raggedright\arraybackslash}p{2.16cm}rr>{\raggedright\arraybackslash}p{2.60cm}}
+\begin{longtable}{>{\raggedright\arraybackslash}p{1.40cm}>{\raggedright\arraybackslash}p{2.07cm}>{\raggedright\arraybackslash}p{2.65cm}>{\raggedright\arraybackslash}p{2.43cm}rr>{\raggedright\arraybackslash}p{2.47cm}}
 \caption{Every experiment run so far}\label{tab:ledger}\\
 \toprule
 ID & Experiment & Dataset & Status & Configurations & Best mIoU & Decision /\allowbreak{} role \\
@@ -36,5 +36,6 @@ A7 & Joint CA x SA interaction audit (Codex) & VOC-Sim (490 images, 20 classes) 
 A8 & Phase 3 propagation package (Codex): P1, W3, P2, P6 & VOC-Sim (490 images, 20 classes) & controlled, 5-fold cross-validated; threshold chosen in the folds & 40 & 0.7991 & two passes mean\_\allowbreak{}i(A\_\allowbreak{}i$^2$ c) promoted to P3-C \\
 A9 & Phase 3 fusion and calibration package: P4, F3, F4, N2-N4, R2 & VOC-Sim (490 images, 20 classes) & controlled, 5-fold cross-validated; threshold chosen in the folds & 12 & 0.8049 & DenseCRF promoted to P3-C; the rest kept at REF \\
 A10 & Released baselines scored with OVAM's procedures & VOC-Sim (490 images, 20 classes); COCO-Cap (707 images, 20 classes) (each method's own images) & reproduction of published values & 19 & --- & every printed OVAM-notebook value reproduced \\
+A11 & Token track B1/\allowbreak{}B1b: OVAM's optimized tokens on the frozen pipeline & VOC-Sim (490 images, 20 classes) & controlled, 5-fold cross-validated; few-shot track (2-3 annotated images per class) & 27 & 0.8507 & token promoted on every pipeline: REF 0.787 -> 0.851 (conditional query) \\
 \bottomrule
 \end{longtable}}
