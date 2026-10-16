@@ -13,3 +13,5 @@ mkdir -p logs
 python scripts/select_propagation_cv.py \
   --package-dir outputs/segmentation/controlled_attention_cv/propagation_package \
   --spec configs/controlled_propagation_screens.json
+python scripts/finalize_propagation_package.py \
+  --package-dir outputs/segmentation/controlled_attention_cv/propagation_package

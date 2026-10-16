@@ -61,10 +61,10 @@ These make each conclusion reportable with the same evidence as CA-C and SA-C.
 
 | ID | Method | Definition | Registered grid | Targets | Owner | Tier | Status |
 |---|---|---|---|---|---|---|---|
-| P1 | Observation-wise power | `mean_i(A_iⁿ c)` | n = 1–4 | over-focus | Codex | 1 | Submitted, Section 37 |
-| W3 | Average-before power | `Āⁿ c` | n = 1–4 (n = 1 must equal REF) | — | Codex | 1 | Submitted, Section 37 |
-| P2 | Restart (personalized PageRank) | `x ← (1−β) A x + β c` from `x₀ = c`, both aggregation orders | β ∈ {0.10, 0.25, 0.50, 0.75}; iterations ∈ {2, 4, 8} | over-focus and leaking | Codex | 1 | Submitted, Section 37 |
-| P6 | Sparse affinity | row-wise top-k of `A_i`, renormalized, one pass | k ∈ {16, 32, 64, 128, 256, 512, 1024} | leaking | Codex | 1 | Submitted, Section 37 |
+| P1 | Observation-wise power | `mean_i(A_iⁿ c)` | n = 1–4 | over-focus | Codex | 1 | Complete: n=2 promoted to P3-C; protocol Section 43 |
+| W3 | Average-before power | `Āⁿ c` | n = 1–4 (n = 1 must equal REF) | — | Codex | 1 | Complete: REF retained; protocol Section 43 |
+| P2 | Restart (personalized PageRank) | `x ← (1−β) A x + β c` from `x₀ = c`, both aggregation orders | β ∈ {0.10, 0.25, 0.50, 0.75}; iterations ∈ {2, 4, 8} | over-focus and leaking | Codex | 1 | Complete: REF retained for both orders; protocol Section 43 |
+| P6 | Sparse affinity | row-wise top-k of `A_i`, renormalized, one pass | k ∈ {16, 32, 64, 128, 256, 512, 1024} | leaking | Codex | 1 | Complete: REF retained; protocol Section 43 |
 | P3 | Heat kernel | `Σ_{k=0}^{8} e^{−t} tᵏ/k! Āᵏ c` (truncated at 8 terms) | t ∈ {0.5, 1, 2, 4} | removes the hard choice of n | Codex (proposed) | 2 | Not run |
 | P5 | Symmetric affinity | `(D^{−½} W D^{−½})ⁿ c`, `W = (Ā + Āᵀ)/2` | n = 1–4 | — | Codex (proposed) | 2 | Not run |
 | P9 | Seeded progressive expansion (SeeDiff-style *(to verify)*) | threshold `c` into confident seeds, expand through SA from coarse to fine modules, then a background expansion stage | seed threshold ∈ {0.5, 0.7, 0.9}; module path; background stage on/off | over-focus and leaking | unassigned | 3 | Not run. Reopens SA module choice: report as a separate method |
@@ -289,5 +289,6 @@ Controlled reference for phase 3: REF, VOC-Sim 0.7887 (protocol Sections 33,
 |---|---|---|---|---|---|
 | 2026-10-13 | T-ovam, R2 | Claude | `outputs/segmentation/narmyn_token_crf/` | this branch | exploratory, pre-protocol |
 | 2026-10-16 | P1, P2, P6, W3 | Codex | `outputs/segmentation/controlled_attention_cv/propagation_package/` | `8f2f73acc`; jobs `232662` → `232663` → `232664` | official controlled package, protocol Section 37 |
+| 2026-10-16 | P1, P2, P6, W3 results | Codex | `outputs/segmentation/controlled_attention_cv/propagation_package/` | this commit | P1 n=2 promoted; W3/P2/P6 retain REF; protocol Section 43 |
 | 2026-10-16 | registry | Claude | this file | `4ac06d9` | merged registry and rules R1–R11; protocol Section 38 |
 | 2026-10-16 | Q1–Q5 | Claude | `outputs/segmentation/comparisons/released_baselines/` | this commit; CPU job `232917` | released baselines scored with OVAM's procedures; protocol Section 41 |

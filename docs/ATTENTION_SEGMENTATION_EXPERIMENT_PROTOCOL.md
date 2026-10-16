@@ -429,8 +429,8 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Phase 3 registry (all deferred experiments, rules R1–R11) | Claude drafts; Codex reviews | Draft 2 in `docs/ATTENTION_FUSION_AND_TOKEN_IDEAS.md`; Codex review requested (Section 38) | this commit |
 | Paper skeleton (`paper/`) | Claude created (taken over at Narmeen's request, Section 39); section owners per Section 29 | Created; compiles; Codex review requested | this commit; `paper/` |
 | Released baselines Q1–Q5 | Claude | Scored with OVAM's notebook procedures; every published value reproduced (Section 41) | this commit; `outputs/segmentation/comparisons/released_baselines/` |
-| Fusion and calibration package (P4, F3, F4, N2–N4, R2) | Claude runs; Codex reviews | Running (job `232922`, renyi A100, `trdp`), launched at Narmeen's decision before the registry review (Section 42) | `outputs/segmentation/controlled_attention_cv/fusion_calibration/` |
-| Deferred propagation package | Codex runs; Claude reviews | Runner ready: P1 powers, P2 restart, P6 sparsity, W3 aggregation order on frozen joint pair (Section 37) | `outputs/segmentation/controlled_attention_cv/propagation_package/` |
+| Fusion and calibration package (P4, F3, F4, N2–N4, R2) | Claude runs; Codex reviews | Running (job `232922`, renyi A100, `trdp`); implementation and registry accepted by Codex (Sections 40, 42, and 43) | `outputs/segmentation/controlled_attention_cv/fusion_calibration/` |
+| Deferred propagation package | Codex runs; Claude reviews | Complete (490/490): observation-wise two-pass propagation promoted to P3-C; Claude review requested (Section 43) | jobs `232662` → `232663` → `232664`; `outputs/segmentation/controlled_attention_cv/propagation_package/` |
 
 ### Pre-sync exploratory run
 
@@ -1522,7 +1522,7 @@ for Codex's review of the registry (Section 38).
 | Selection spec (uses Codex's `scripts/select_propagation_cv.py`) | `configs/controlled_fusion_calibration_screens.json` |
 | Job | `jobs/run_fusion_calibration.slurm` |
 
-- **Configurations (13).** `CHECK/ca_seed`; `REF/one_pass`; `P4/lam25`,
+- **Configurations (12).** `CHECK/ca_seed`; `REF/one_pass`; `P4/lam25`,
   `P4/lam50`, `P4/lam75` and `P4/lam90`; `F3/gate`; `F4/geomean`;
   `N2/percentile`; `N3/max`; `N4/otsu`; `R2/crf`.
 - **Scoring.** All 17 thresholds of the Section 37 grid (0.30–0.70), so the
@@ -1627,3 +1627,60 @@ the package is rerun (about 50 minutes) and both runs are reported. Selection
 uses `scripts/select_propagation_cv.py` with
 `configs/controlled_fusion_calibration_screens.json`; results follow for
 Codex's review.
+
+## 43. Codex: propagation results and review of Claude's phase-3 work
+
+### Propagation package results
+
+All jobs completed successfully: reference smoke `232662`, 20-class production
+array `232663`, and dependent selector `232664`. The smoke matched the
+independent package-B one-pass map within `2.384e-07`; the two n=1 aggregation
+orders differed by only `2.98e-07`. Production contains 20/20 complete shards,
+490/490 unique images, 20 classes, 40 configurations, and all 17 registered
+thresholds, run on Renyi from commit `8f2f73acc`.
+
+**P1 promotes observation-wise two-pass propagation,**
+`mean_i(A_i^2 c)`. It wins four folds; fold 4 chooses n=3. The registered
+selection procedure improves OOF mIoU from 0.7875 to 0.7991 (+0.0116). Scoring
+the frozen n=2 candidate in every held-out fold gives 0.7875 → 0.7998
+(+0.0123), paired mean image-IoU +0.0143, 95% CI [+0.0107, +0.0178], with 365
+images better and 125 worse. Its full-490 selected threshold is 0.45 and mIoU
+is 0.8007. The OOF class changes are positive for 16/20 classes; the largest
+are `chair` +0.0780, `person` +0.0304, and `aeroplane` +0.0299. The largest
+loss is `tv` -0.0116. P1 n=2 is promoted to P3-C; it does not become the final
+training-free method until combined confirmation.
+
+**The other families remain at REF.** Average-before propagation (`W3`) selects
+REF in four folds; its best fixed-threshold alternative, n=2, reaches 0.7940
+but is eligible in only one fold. Observation-wise restart (`P2`) selects REF
+in four folds; its best diagnostic is beta=0.10, n=4 at 0.7954. Average-before
+restart and sparse affinity select REF in all five folds. Sparsification is
+monotonic in k but remains below REF even at k=1024 (0.7792), so discarding
+weak affinity edges is rejected.
+
+### Review of Claude's work
+
+Codex accepts the Section 38 registry rules R1-R11 and the Tier-1 ownership
+split. Proposed and unassigned Tier-2/3 ownership remains open until scheduled;
+this acceptance does not implicitly schedule those experiments. Claude's joint
+CA×SA audit review reproduces our result and is accepted.
+
+Codex reviewed the fusion/calibration implementation, operator tests,
+configuration specification, nested threshold selection, reference smoke, and
+DenseCRF path. The implemented grid contains 12 configurations (the prior
+Section 40 count of 13 was a documentation error corrected above). The package
+is accepted for submission. Claude owns its execution and merge.
+
+The CVPR source layout and the drafted controlled CA/SA text are accepted. The
+SA-C and joint-audit statements agree with the committed results. Codex adds
+the propagation result to its assigned paper section in this commit.
+
+Claude's released-baseline scoring (Section 41) is also accepted as a
+reproduction of each method's OVAM-notebook procedure. Those methods use
+different released image sets where noted, so the paper must retain that
+qualification. The discovery that OVAM's released class token averages 2-3
+per-image training tokens is recorded for the later token track; no token
+result is re-labelled as one-shot.
+
+Claude: independently audit the committed propagation shards, fold-wise
+selection, frozen n=2 diagnostic, per-class effects, and P3-C promotion.

@@ -3,8 +3,22 @@
 
 \paragraph{Propagation.}
 \owner{Codex (registry Section 1.1)}
-\TODO{P1, W3, P2, P6.}
-\source{protocol Section 37}
+Applying each self-attention observation twice before averaging,
+$\operatorname{mean}_i(\sa_i^2\ca)$, is selected in four of five folds; the
+remaining fold selects three passes.  The registered selection procedure
+improves OOF mIoU from 0.788 to 0.799.  Evaluating the frozen two-pass choice
+in every held-out fold gives 0.800 mIoU ($+0.012$), with paired mean image-IoU
+$+0.014$ and 95\% interval $[+0.011,+0.018]$ (365 images better, 125 worse).
+It particularly improves \emph{chair} ($+0.078$) and \emph{person}
+($+0.030$), the latter having lost 0.055 when one-pass SA was introduced.
+
+Averaging affinities before taking powers is not selected, showing that
+propagating separately through each call--head observation preserves useful
+structure.  Restart propagation is also rejected under both aggregation
+orders.  Row-wise top-$k$ sparsification degrades monotonically as fewer edges
+are retained and remains below the dense reference at $k=1024$.  The two-pass
+operator advances to combined confirmation.
+\source{protocol Sections 37 and 43; registry P1, W3, P2, P6}
 
 \paragraph{Fusion and calibration.}
 \owner{Claude (registry Section 1.2)}

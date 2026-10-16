@@ -59,6 +59,7 @@ generated table.
 | Sec. 5 CA-C numbers | — | `outputs/segmentation/controlled_attention_cv/ca_confirmation/fold_results.json`; protocol Section 27 | hand-written |
 | Sec. 6 package-B numbers (SA-L, SA-H, `Aᵀx`, seed alone) | — | `outputs/segmentation/controlled_attention_cv/sa_layer_head/fold_results.json`; protocol Section 30 | hand-written |
 | Sec. 6 SA-C and joint-audit numbers | — | `outputs/segmentation/controlled_attention_cv/{sa_confirmation,joint_ca_sa_cartesian}/`; protocol Sections 33, 36 | hand-written |
+| Sec. 7 propagation numbers | — | `outputs/segmentation/controlled_attention_cv/propagation_package/fold_results.json`, `diagnostics.json`, and `report.md`; protocol Section 43 | hand-written |
 
 ## Before submission
 
