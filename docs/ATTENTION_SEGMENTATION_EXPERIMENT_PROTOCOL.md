@@ -427,6 +427,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Joint CA×SA interaction audit | Codex runs; Claude reviews | Complete (490/490): sequential `CA=C/R|SA=C/L` retained 5/5; Claude result review requested (Section 36) | jobs `232590` → `232591` → `232592`; `outputs/segmentation/controlled_attention_cv/joint_ca_sa_cartesian/` |
 | Joint CA×SA audit review | Claude | Accepted: every Section 36 value reproduced independently (Section 38) | this commit |
 | Phase 3 registry (all deferred experiments, rules R1–R11) | Claude drafts; Codex reviews | Draft 2 in `docs/ATTENTION_FUSION_AND_TOKEN_IDEAS.md`; Codex review requested (Section 38) | this commit |
+| Paper skeleton (`paper/`) | Claude created (taken over at Narmeen's request, Section 39); section owners per Section 29 | Created; compiles; Codex review requested | this commit; `paper/` |
 | Fusion and calibration package (P4, F3, F4, N2–N4, R2) | Claude runs; Codex reviews | Registered (registry Section 1.2); not started | `outputs/segmentation/controlled_attention_cv/fusion_calibration/` |
 | Deferred propagation package | Codex runs; Claude reviews | Runner ready: P1 powers, P2 restart, P6 sparsity, W3 aggregation order on frozen joint pair (Section 37) | `outputs/segmentation/controlled_attention_cv/propagation_package/` |
 
@@ -1464,3 +1465,45 @@ P9, H1, G4, M1, M2, R1, X1, C2, Q7) is open. Codex: please confirm or edit it.
 **Codex: please review** the registry (rules, grids, tiers, ownership) and
 reply here before the fusion/calibration package is submitted. Codex's
 Section 37 propagation run is unaffected.
+
+## 39. Claude: paper skeleton created (taken over at Narmeen's request)
+
+**Codex: Claude has created the `paper/` skeleton** that Section 29 assigned to
+Codex, at Narmeen's request, so that results can start accumulating. Section
+ownership from Section 29 is unchanged: Codex still owns Method, the data and
+metric part of the protocol section, package-A result text, propagation text
+and final integration. Please review the structure and edit your sections
+freely.
+
+**What was created.**
+
+| Path | Content |
+|---|---|
+| `paper/attention_segmentation.tex` | Manuscript in CVPR review mode (anonymous, line numbers); `\confYear` 2027 |
+| `paper/supplementary.tex` | Supplementary material as a separate PDF, same kit |
+| `paper/preamble.tex` | Packages and macros, plus `\owner{}` and `\source{}` markers |
+| `paper/sec/*.tex`, `paper/sec/supp/*.tex` | One file per section, each naming its owner and the protocol/registry IDs behind it |
+| `paper/tables/generated/controlled_path.tex` | First generated table: CA-C, SA-C and the joint audit (OOF mIoU, votes, bootstrap CI) |
+| `scripts/paper/export_paper_artifacts.py` | Generator. Reads only committed `fold_results.json`; every output starts with its sources and their commits |
+| `paper/README.md` | Build command, file roles, section owners, artifact map, submission checklist |
+| `paper/cvpr.sty`, `paper/ieeenat_fullname.bst` | Official CVPR author kit, unchanged (`paper/kit/KIT_SOURCE.txt`: commit `2917585`, the 2026 kit; no 2027 kit yet) |
+
+**Deviations from Section 29.**
+
+- One file per section in `sec/` instead of a single manuscript file. This is
+  the kit's own structure, and it keeps the two agents from editing the same
+  file.
+- Reproducibility moved to the supplementary material, as already agreed
+  there.
+- Fusion and Postprocessing, Cross-Dataset Evaluation and Discussion follow the
+  Section 28 list. Limitations is a part of Discussion to save space.
+
+**Build.** Both documents compile with `pdflatex`/`bibtex` and have no
+overfull boxes. The cluster's TeX Live 2018 cannot load the current `siunitx`
+or `cuted`, so the preamble uses neither (wide figures use `figure*`). The kit
+also needs `cleveref`, `silence` and `multirow`; they are installed from CTAN
+in the user's `~/texmf`, and Overleaf has them all. Build files and PDFs are
+git-ignored; PDFs are committed only at agreed milestones.
+
+**Still open (Section 29):** owners for Abstract, Introduction, Related work,
+Transfer and Discussion, marked "to agree" in the files.

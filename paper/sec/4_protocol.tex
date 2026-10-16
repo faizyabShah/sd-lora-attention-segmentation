@@ -1,0 +1,18 @@
+\section{Experimental protocol}
+\label{sec:protocol}
+
+\subsection{Data and metric}
+\owner{Codex (protocol Section 29)}
+\TODO{VOC-Sim (490 images, 20 classes) for selection; COCO-Cap (707) only for
+transfer; regenerated images scored on the released annotations; pooled class
+IoU and its macro mean.}
+\source{protocol Section 2; registry R1}
+
+\subsection{Cross-validated selection}
+\label{sec:selection}
+\owner{Claude (protocol Section 29: statistical-selection wording)}
+\TODO{One axis at a time from an inclusive reference; five class-stratified
+folds; promotion bands, fold vote and out-of-fold guard; ties to the more
+inclusive or simpler setting; combined confirmation of the promoted changes;
+paired bootstrap intervals; calibration at three thresholds.}
+\source{protocol Sections 5, 5a; registry R3--R5}

@@ -1,0 +1,18 @@
+\section{Controlled self-attention results}
+\label{sec:sa}
+
+\paragraph{Calls and resolutions.}
+\owner{Codex (package A)}
+\TODO{SA-T (call 30) and SA-R (8+64), both calibration-dependent.}
+\source{protocol Section 31; evidence A5}
+
+\paragraph{Modules, heads and operator.}
+\owner{Claude (package B)}
+\TODO{SA-L (module 15), SA-H (heads 1, 4, 6), and the $\sa^\top\ca$ check.}
+\source{protocol Section 30; evidence A4}
+
+\paragraph{Combined confirmation and joint audit.}
+\owner{Claude (SA-C text, protocol Section 29); Codex ran SA-C and the joint audit}
+\TODO{SA-C freezes module 15 alone; the joint CA$\times$SA audit keeps the
+sequential pair in all folds.}
+\source{protocol Sections 33, 35, 36, 38; evidence A6}

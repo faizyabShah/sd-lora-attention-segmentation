@@ -1,0 +1,26 @@
+\section{Controlled cross-attention results}
+\label{sec:ca}
+
+\paragraph{Calls and resolutions.}
+\owner{Codex (package A)}
+\TODO{CA-T keeps all calls; CA-R removes the 32$\times$32 modules.}
+\source{protocol Section 20; evidence A2}
+
+\paragraph{Layers, heads and attribution.}
+\owner{Claude (package B)}
+\TODO{CA-L, CA-H, CA-A.}
+\source{protocol Section 21; evidence A1}
+
+\paragraph{Combined confirmation.}
+\owner{Claude (CA-C)}
+\TODO{CA-C freezes CA-R alone; CA-H does not survive the combination.}
+\source{protocol Section 27; evidence A3}
+
+\begin{table}[t]
+  \centering
+  \input{tables/generated/controlled_path}
+  \caption{Controlled selection path on VOC-Sim. Out-of-fold (OOF) mIoU of the
+  reference and of the setting chosen on the other four folds; fold votes;
+  paired bootstrap 95\% interval of the change in image IoU.}
+  \label{tab:controlled_path}
+\end{table}

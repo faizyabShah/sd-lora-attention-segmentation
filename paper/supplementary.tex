@@ -1,0 +1,34 @@
+% Supplementary material, submitted as a separate PDF. Same kit and preamble.
+
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+\usepackage[review]{cvpr}
+
+\input{preamble}
+
+\definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
+\usepackage[pagebackref,breaklinks,colorlinks,allcolors=cvprblue]{hyperref}
+
+\def\paperID{*****}
+\def\confName{CVPR}
+\def\confYear{2027}
+
+\title{\TODO{Title}}
+\author{Anonymous CVPR submission}
+
+\begin{document}
+\maketitlesupplementary
+
+\input{sec/supp/A_protocol}
+\input{sec/supp/B_controlled_packages}
+\input{sec/supp/C_negative_results}
+\input{sec/supp/D_exploratory}
+\input{sec/supp/E_reproducibility}
+
+{
+    \small
+    \bibliographystyle{ieeenat_fullname}
+    \bibliography{references}
+}
+
+\end{document}

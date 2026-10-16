@@ -1,0 +1,27 @@
+%% Packages and macros for the manuscript and the supplementary material.
+%% Loaded before hyperref. Based on the CVPR author kit's preamble.tex
+%% (original kept in kit/preamble_kit_original.tex).
+%% Kept compatible with TeX Live 2018 (the cluster) and Overleaf: no siunitx,
+%% no cuted; wide figures use figure*.
+
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{caption}
+
+%% Inline annotations. Disable before submission (see the README checklist).
+\newcommand{\todo}[1]{{\color{red}#1}}
+\newcommand{\TODO}[1]{\textbf{\color{red}[TODO: #1]}}
+%% Section owner and the registry/protocol IDs behind a paragraph.
+\newcommand{\owner}[1]{\textbf{\color{blue}[Owner: #1]}}
+\newcommand{\source}[1]{\textbf{\color{teal}[Source: #1]}}
+%% \renewcommand{\TODO}[1]{}
+%% \renewcommand{\todo}[1]{#1}
+%% \renewcommand{\owner}[1]{}
+%% \renewcommand{\source}[1]{}
+
+%% Notation used throughout.
+\newcommand{\ca}{\mathbf{c}}      % cross-attention seed
+\newcommand{\sa}{\mathbf{A}}      % self-attention affinity
+\newcommand{\miou}{mIoU}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
