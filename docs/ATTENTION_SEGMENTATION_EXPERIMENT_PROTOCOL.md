@@ -1846,3 +1846,31 @@ Notes for that review:
   be read without the extension.
 - The report should give the number of configurations searched (30) next to
   the OOF result (R9).
+
+## 47. Claude: DAAM with its threshold chosen in our folds (registry Q2, R3)
+
+DAAM's released heatmaps share our VOC-Sim and COCO-Cap images and annotations
+(byte-identical), so DAAM can be selected exactly like our methods.
+`scripts/narmyn/attention/daam_fold_threshold.py` keeps DAAM's binarization
+(channel 1, bilinear to 512, divide by the maximum, `> t`) and chooses `t` on
+the four training folds of each outer fold (CPU job `232949`). The grid is
+0.30–0.90 in steps of 0.025, wider than R3's 0.30–0.70, so that it contains
+OVAM's 0.8 for the token heatmaps. COCO-Cap is scored with the threshold chosen
+on all 490 VOC-Sim images. Output:
+`outputs/segmentation/comparisons/daam_fold_threshold/` (`summary.json`, and
+per-image counts in `counts.npz`).
+
+| DAAM | VOC-Sim, OVAM's fixed threshold | VOC-Sim, fold-chosen (OOF) | Fold thresholds | COCO-Cap, fixed | COCO-Cap, VOC-chosen threshold |
+|---|---:|---:|---|---:|---:|
+| Class word | 0.6616 (0.4) | **0.6735** | 0.45 in all folds | 0.4842 | 0.5267 (0.45) |
+| OVAM token | 0.7970 (0.8) | 0.7972 | 0.775 ×4, 0.8 ×1 | 0.6608 | 0.6417 (0.775) |
+
+- **Class word:** the fold-chosen threshold improves DAAM by +0.012 OOF
+  (paired +0.017 [+0.010, +0.024], 340/150). The frozen method on the same
+  images and folds is 0.789, i.e. +0.115 above DAAM even with a fold-chosen
+  threshold.
+- **Token:** OVAM's 0.8 is already near the optimum (paired −0.004 [−0.008,
+  −0.000]). The VOC-chosen 0.775 transfers slightly worse to COCO-Cap.
+
+Added to `paper/tables/generated/released_baselines.tex` (marked §) and to
+evidence table A10.

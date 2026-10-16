@@ -80,9 +80,16 @@ def released_baselines() -> None:
     body = [f"{label} & {cell('voc_sim', m, 'training_free')} & {cell('voc_sim', m, 'token_optimized')} & "
             f"{cell('coco_cap', m, 'training_free')} & {cell('coco_cap', m, 'token_optimized')} \\\\"
             for m, label in names.items()]
+    daam_cv = ROOT / "outputs" / "segmentation" / "comparisons" / "daam_fold_threshold" / "summary.json"
+    if daam_cv.exists():
+        d = json.loads(daam_cv.read_text())["variants"]
+        body.insert(2, f"DAAM, threshold in our folds$^\\S$ & {d['training_free']['voc_sim']['oof_miou_fold_chosen']:.3f} & "
+                       f"{d['token_optimized']['voc_sim']['oof_miou_fold_chosen']:.3f} & "
+                       f"{d['training_free']['coco_cap']['miou_threshold_from_voc']:.3f} & "
+                       f"{d['token_optimized']['coco_cap']['miou_threshold_from_voc']:.3f} \\\\")
     frozen = screen(sa_c, "SA-C")["out_of_fold_miou_selection"]
     body.append("\\midrule\n" + f"Ours (frozen CA+SA) & {frozen:.3f}$^\\dagger$ & \\todo{{---}} & \\todo{{---}} & \\todo{{---}} \\\\")
-    tex = (header([base, sa_c])
+    tex = (header([base, sa_c] + ([daam_cv] if daam_cv.exists() else []))
            + "\\footnotesize\\setlength{\\tabcolsep}{3pt}\n"
            + "\\begin{tabular}{@{}lcccc@{}}\n\\toprule\n"
            + "& \\multicolumn{2}{c}{VOC-Sim} & \\multicolumn{2}{c}{COCO-Cap} \\\\\n"

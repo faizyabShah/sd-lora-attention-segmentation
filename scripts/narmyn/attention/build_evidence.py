@@ -1129,6 +1129,14 @@ def released_baselines() -> dict | None:
         return f"{e['all']['miou']:.4f} ({e['all']['images']})" if e else "—"
     rows = [[label, cell("voc_sim", m, "training_free"), cell("voc_sim", m, "token_optimized"),
              cell("coco_cap", m, "training_free"), cell("coco_cap", m, "token_optimized")] for m, label in names.items()]
+    daam_cv = SEG / "comparisons" / "daam_fold_threshold" / "summary.json"
+    if daam_cv.exists():
+        d = load_json(daam_cv)["variants"]
+        rows.insert(2, ["DAAM, threshold chosen in our folds (COCO-Cap: VOC-chosen threshold)",
+                        f"{d['training_free']['voc_sim']['oof_miou_fold_chosen']:.4f} (490, OOF)",
+                        f"{d['token_optimized']['voc_sim']['oof_miou_fold_chosen']:.4f} (OOF)",
+                        f"{d['training_free']['coco_cap']['miou_threshold_from_voc']:.4f} (707)",
+                        f"{d['token_optimized']['coco_cap']['miou_threshold_from_voc']:.4f}"])
     return {"table": write_table("a10_released_baselines",
                                  ["Method", "VOC-Sim word (images)", "VOC-Sim token", "COCO-Cap word (images)", "COCO-Cap token"], rows,
                                  "Released baseline masks scored with OVAM's evaluation-notebook procedures on each method's own released images and annotations")}

@@ -181,7 +181,7 @@ states this.
 | ID | Method | Source | VOC-Sim | COCO-Cap | Owner | Tier | Status |
 |---|---|---|---|---|---|---|---|
 | Q1 | OVAM (released masks: training-free and token-optimized) | OVAM archive | yes | training-free only | Claude | 1 | Scored (protocol Section 41): VOC 0.704 / 0.825; COCO 0.582 |
-| Q2 | DAAM (compared in the OVAM paper) | OVAM archive: heatmaps | yes | yes | Claude | 1 | Scored with OVAM's procedure (Section 41): VOC 0.662 / 0.797; COCO 0.484 / 0.661. Fold-chosen threshold (R3) not yet run |
+| Q2 | DAAM (compared in the OVAM paper) | OVAM archive: heatmaps | yes | yes | Claude | 1 | Scored with OVAM's procedure (Section 41): VOC 0.662 / 0.797; COCO 0.484 / 0.661. Fold-chosen threshold (R3, grid 0.30–0.90): VOC OOF 0.674 / 0.797; COCO with the VOC threshold 0.527 / 0.642 (Section 47) |
 | Q3 | Attn2Mask | OVAM archive: heatmaps | own images | own images | Claude | 1 | Scored (Section 41): VOC 0.603 / 0.811; COCO 0.584 / 0.676 |
 | Q4 | Grounded Diffusion | OVAM archive: masks and optimized masks | own images | own images | Claude | 1 | Scored (Section 41): VOC 0.621 / 0.866; COCO 0.502 / 0.732 |
 | Q5 | DatasetDM | OVAM archive: masks and optimized masks | own images | own images | Claude | 1 | Scored (Section 41): VOC 0.803 / 0.806; COCO 0.593 / 0.605 |
@@ -310,3 +310,4 @@ Controlled reference for phase 3: REF, VOC-Sim 0.7887 (protocol Sections 33,
 | 2026-10-16 | Q1–Q5 | Claude | `outputs/segmentation/comparisons/released_baselines/` | this commit; CPU job `232917` | released baselines scored with OVAM's procedures; protocol Section 41 |
 | 2026-10-16 | P4, F3, F4, N2–N4, R2 | Claude | `outputs/segmentation/controlled_attention_cv/fusion_calibration/` | `229130b`; job `232922` | R2 promoted; protocol Section 44 |
 | 2026-10-16 | P3-C expanded confirmation | Codex | `outputs/segmentation/controlled_attention_cv/phase3_confirmation/` | `371f791ee`; jobs `232945` → `232946` → `232947` | corrected smoke passed; mandatory 4-cell and expanded 30-cell screens; protocol Sections 45–46 |
+| 2026-10-16 | Q2 (fold threshold) | Claude | `outputs/segmentation/comparisons/daam_fold_threshold/` | this commit; CPU job `232949` | DAAM threshold chosen in our folds; protocol Section 47 |
