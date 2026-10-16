@@ -180,12 +180,12 @@ states this.
 
 | ID | Method | Source | VOC-Sim | COCO-Cap | Owner | Tier | Status |
 |---|---|---|---|---|---|---|---|
-| Q1 | OVAM (released masks: training-free and token-optimized) | OVAM archive | yes | training-free only | Claude | 1 | Scored (tier B16) |
-| Q2 | DAAM (compared in the OVAM paper) | OVAM archive: heatmaps | yes | yes | Claude | 1 | Not scored. Heatmaps: threshold chosen on the training folds (R3) |
-| Q3 | Attn2Mask | OVAM archive: masks / heatmaps | yes | yes | Claude | 1 | Not scored |
-| Q4 | Grounded Diffusion | OVAM archive: masks and optimized masks | yes | yes | Claude | 1 | Not scored |
-| Q5 | DatasetDM | OVAM archive: masks and optimized masks | yes | yes | Claude | 1 | Not scored |
-| Q6 | OVAM with SA (released) | OVAM archive: `ovam_sa` masks | yes | yes | Claude | 2 | Not scored |
+| Q1 | OVAM (released masks: training-free and token-optimized) | OVAM archive | yes | training-free only | Claude | 1 | Scored (protocol Section 41): VOC 0.704 / 0.825; COCO 0.582 |
+| Q2 | DAAM (compared in the OVAM paper) | OVAM archive: heatmaps | yes | yes | Claude | 1 | Scored with OVAM's procedure (Section 41): VOC 0.662 / 0.797; COCO 0.484 / 0.661. Fold-chosen threshold (R3) not yet run |
+| Q3 | Attn2Mask | OVAM archive: heatmaps | own images | own images | Claude | 1 | Scored (Section 41): VOC 0.603 / 0.811; COCO 0.584 / 0.676 |
+| Q4 | Grounded Diffusion | OVAM archive: masks and optimized masks | own images | own images | Claude | 1 | Scored (Section 41): VOC 0.621 / 0.866; COCO 0.502 / 0.732 |
+| Q5 | DatasetDM | OVAM archive: masks and optimized masks | own images | own images | Claude | 1 | Scored (Section 41): VOC 0.803 / 0.806; COCO 0.593 / 0.605 |
+| Q6 | OVAM with SA (released) | OVAM archive: `ovam_sa` masks | yes | yes | Claude | — | Same files as Q1 (OVAM's released masks are the `ovam_sa` DenseCRF masks) |
 | Q7 | DiffSeg, DiffSegmenter, SeeDiff, FA-Seg, DiffuMask, FreeSeg-Diff *(to verify)* | reproduction on our regenerated images | if feasible | if feasible | unassigned | 3 | Not run |
 
 The training-free baseline named in the OVAM paper, "Diffusion model is
@@ -289,4 +289,5 @@ Controlled reference for phase 3: REF, VOC-Sim 0.7887 (protocol Sections 33,
 |---|---|---|---|---|---|
 | 2026-10-13 | T-ovam, R2 | Claude | `outputs/segmentation/narmyn_token_crf/` | this branch | exploratory, pre-protocol |
 | 2026-10-16 | P1, P2, P6, W3 | Codex | `outputs/segmentation/controlled_attention_cv/propagation_package/` | `8f2f73acc`; jobs `232662` → `232663` → `232664` | official controlled package, protocol Section 37 |
-| 2026-10-16 | registry | Claude | this file | this commit | merged registry and rules R1–R11; protocol Section 38 |
+| 2026-10-16 | registry | Claude | this file | `4ac06d9` | merged registry and rules R1–R11; protocol Section 38 |
+| 2026-10-16 | Q1–Q5 | Claude | `outputs/segmentation/comparisons/released_baselines/` | this commit; CPU job `232917` | released baselines scored with OVAM's procedures; protocol Section 41 |

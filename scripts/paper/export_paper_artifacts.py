@@ -65,9 +65,37 @@ def controlled_path() -> None:
     (OUT / "controlled_path.tex").write_text(tex)
 
 
+def released_baselines() -> None:
+    """Registry Q1-Q5: released masks scored with OVAM's procedures, beside the frozen method."""
+    base = ROOT / "outputs" / "segmentation" / "comparisons" / "released_baselines" / "summary.json"
+    sa_c = CV / "sa_confirmation" / "fold_results.json"
+    results = json.loads(base.read_text())["results"]
+    names = {"ovam": "OVAM", "daam": "DAAM", "attn2mask": "Attn2Mask", "grounded_diffusion": "Grounded Diff.$^\\ddagger$",
+             "datasetdm": "DatasetDM$^\\ddagger$"}
+
+    def cell(dataset, method, variant):
+        entry = results.get(dataset, {}).get(method, {}).get(variant)
+        return f"{entry['all']['miou']:.3f}" if entry else "---"
+
+    body = [f"{label} & {cell('voc_sim', m, 'training_free')} & {cell('voc_sim', m, 'token_optimized')} & "
+            f"{cell('coco_cap', m, 'training_free')} & {cell('coco_cap', m, 'token_optimized')} \\\\"
+            for m, label in names.items()]
+    frozen = screen(sa_c, "SA-C")["out_of_fold_miou_selection"]
+    body.append("\\midrule\n" + f"Ours (frozen CA+SA) & {frozen:.3f}$^\\dagger$ & \\todo{{---}} & \\todo{{---}} & \\todo{{---}} \\\\")
+    tex = (header([base, sa_c])
+           + "\\footnotesize\\setlength{\\tabcolsep}{3pt}\n"
+           + "\\begin{tabular}{@{}lcccc@{}}\n\\toprule\n"
+           + "& \\multicolumn{2}{c}{VOC-Sim} & \\multicolumn{2}{c}{COCO-Cap} \\\\\n"
+           + "\\cmidrule(lr){2-3}\\cmidrule(l){4-5}\n"
+           + "Method & word & token & word & token \\\\\n\\midrule\n"
+           + "\n".join(body) + "\n\\bottomrule\n\\end{tabular}\n")
+    (OUT / "released_baselines.tex").write_text(tex)
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     controlled_path()
+    released_baselines()
     print(f"wrote {sorted(p.name for p in OUT.glob('*.tex'))}")
 
 

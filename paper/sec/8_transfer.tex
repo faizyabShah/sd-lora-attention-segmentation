@@ -7,3 +7,15 @@ VOC-Sim and COCO-Cap; released masks of OVAM, DAAM, Attn2Mask, Grounded
 Diffusion and DatasetDM scored with the same metric (registry Q1--Q6); the
 renders caveat.}
 \source{registry Sections 3, 7}
+
+\begin{table}[t]
+  \centering
+  \input{tables/generated/released_baselines}
+  \caption{mIoU of released baseline masks, scored with each method's
+  procedure from the OVAM evaluation code on that method's own released images
+  and annotations (only DAAM and OVAM share ours). \emph{word}: class name;
+  \emph{token}: OVAM's optimized token. $^\dagger$Out-of-fold, on regenerated
+  images; red cells await B1, the transfer and T-C (registry Sections 2, 7). $^\ddagger$Trains an additional module \TODO{verify against the
+  original papers before submission}.}
+  \label{tab:released_baselines}
+\end{table}

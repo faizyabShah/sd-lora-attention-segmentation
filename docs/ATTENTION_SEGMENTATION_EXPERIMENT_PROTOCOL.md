@@ -428,6 +428,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Joint CA×SA audit review | Claude | Accepted: every Section 36 value reproduced independently (Section 38) | this commit |
 | Phase 3 registry (all deferred experiments, rules R1–R11) | Claude drafts; Codex reviews | Draft 2 in `docs/ATTENTION_FUSION_AND_TOKEN_IDEAS.md`; Codex review requested (Section 38) | this commit |
 | Paper skeleton (`paper/`) | Claude created (taken over at Narmeen's request, Section 39); section owners per Section 29 | Created; compiles; Codex review requested | this commit; `paper/` |
+| Released baselines Q1–Q5 | Claude | Scored with OVAM's notebook procedures; every published value reproduced (Section 41) | this commit; `outputs/segmentation/comparisons/released_baselines/` |
 | Fusion and calibration package (P4, F3, F4, N2–N4, R2) | Claude runs; Codex reviews | Runner ready and smoke-verified (Section 40); submission waits for Codex's registry review | `outputs/segmentation/controlled_attention_cv/fusion_calibration/` |
 | Deferred propagation package | Codex runs; Claude reviews | Runner ready: P1 powers, P2 restart, P6 sparsity, W3 aggregation order on frozen joint pair (Section 37) | `outputs/segmentation/controlled_attention_cv/propagation_package/` |
 
@@ -1554,3 +1555,55 @@ for Codex's review of the registry (Section 38).
 
 Every number is listed with its source in the `paper/README.md` artifact map.
 Codex: please review, in particular the SA-C wording, since Codex ran it.
+
+## 41. Claude: released baselines scored (registry Q1–Q5)
+
+`scripts/narmyn/attention/score_released_baselines.py` scores the released
+masks and heatmaps in OVAM's public archive. It uses **each method's procedure
+from OVAM's evaluation notebooks** (`github.com/vpulab/ovam`,
+`experiments/evaluation/<method>/evaluation_<method>.ipynb`, commit `12afd87`)
+and OVAM's metric (per-class pooled IoU, macro mean), on each method's own
+released images and annotations. CPU job `232917`. Output:
+`outputs/segmentation/comparisons/released_baselines/` (`summary.json`, with
+per-class IoU and the COCO-Cap caption-includes/excludes split, and
+`per_image.csv`).
+
+| Method | Procedure | VOC-Sim word / token | COCO-Cap word / token | Images (VOC / COCO) |
+|---|---|---|---|---|
+| OVAM | released DenseCRF masks (`ovam_sa`) | 0.704 / 0.825 | 0.582 / — | 490 / 707 |
+| DAAM | channel 1, / max, > 0.4 (token > 0.8) | 0.662 / 0.797 | 0.484 / 0.661 | 490 / 707 |
+| Attn2Mask | channel −2 (token: channel 1), min–max, background `1 − h − β` (β 0.2 / −0.2), argmax; DenseCRF on COCO-Cap | 0.603 / 0.811 | 0.584 / 0.676 | 485 / 668 |
+| Grounded Diffusion | released masks | 0.621 / 0.866 | 0.502 / 0.732 | 496 / 588 |
+| DatasetDM | released masks | 0.803 / 0.806 | 0.593 / 0.605 | 500 / 728 |
+
+**Verification.**
+
+- Every value printed in OVAM's notebooks is reproduced to the printed
+  precision: DAAM 66.2/79.7 and 48.4/66.1; Grounded Diffusion
+  0.621276/0.865672 and 50.2/73.2; DatasetDM 80.3/80.6 and 59.3/60.5.
+- The OVAM rows equal the earlier scoring in
+  `outputs/segmentation/ovam_paper_baseline/` (0.7036 / 0.8247).
+- Attn2Mask has no printed notebook output to compare against.
+
+**Image sets.**
+
+- DAAM's annotations are byte-identical to OVAM's (490 and 707).
+- Attn2Mask, Grounded Diffusion and DatasetDM were evaluated on their own
+  generated images and annotations, as in OVAM's comparison, so their rows are
+  not on the same images as ours.
+- For Grounded Diffusion on COCO-Cap, the notebook uses `annotations` (588);
+  the archive also has `annotations_extra` (705, a superset), which is not used.
+
+**For the paper (`paper/tables/generated/released_baselines.tex`).**
+
+- The columns are *class word* vs *OVAM's optimized token*, not
+  "training-free". Grounded Diffusion and DatasetDM train additional modules
+  (marked ‡; to be verified against their papers before submission).
+- On VOC-Sim, the frozen training-free method (0.789 OOF, regenerated images)
+  is above every class-word baseline except DatasetDM (0.803), which trains a
+  decoder.
+- The COCO-Cap and token cells for our method wait for the transfer (registry
+  Section 7) and the token track (B1, T-C).
+
+**Not yet run:** DAAM with the threshold chosen inside our folds (R3), which
+is possible because DAAM shares our images.
