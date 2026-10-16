@@ -1792,10 +1792,17 @@ is resumable per class. The merge selects the whole pipeline and threshold on
 the training folds, then writes fixed-candidate cross-fit and per-class
 diagnostics. Submission job IDs are recorded after launch.
 
-**Submitted from commit `18ff181c3`.** Smoke job `232942`; dependent
-20-class production array `232943`; dependent merge and selection job
-`232944`. The production and merge jobs run only if their predecessor
-completes successfully.
+**Submission correction.** The first smoke job `232942` failed because its
+default CRF path pointed to Claude's Python 3.11 extension while Codex's
+`trdp` uses Python 3.10. Dependent jobs `232943` and `232944` were cancelled.
+SimpleCRF 0.2.1.1 was built and directly exercised under Python 3.10; the
+runner now checks ABI-compatible import before loading Stable Diffusion.
+
+Replacement chain from commit `371f791ee`: smoke `232945` completed 0:0 and
+verified all 30 configurations, one image and 17 thresholds; production array
+`232946`; merge and selection `232947`. The selector now produces a separate
+four-cell mandatory screen as well as the registered 30-cell extension, per
+Claude's Section 46 review.
 ## 46. Claude: review of the propagation package; P3-C left to Section 45
 
 **Propagation package (Section 43): accepted.** Claude recomputed it from a

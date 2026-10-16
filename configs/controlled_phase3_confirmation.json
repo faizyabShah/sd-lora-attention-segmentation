@@ -2,6 +2,21 @@
   "reference": "REF/one_pass|N0/global|R0/none",
   "screens": [
     {
+      "name": "P3-C mandatory confirmation",
+      "candidates": [
+        "REF/one_pass|N0/global|R0/none",
+        "P1/obs_n2|N0/global|R0/none",
+        "REF/one_pass|N0/global|R2/crf",
+        "P1/obs_n2|N0/global|R2/crf"
+      ],
+      "inclusiveness": {
+        "REF/one_pass|N0/global|R0/none": 0,
+        "P1/obs_n2|N0/global|R0/none": -1,
+        "REF/one_pass|N0/global|R2/crf": -1,
+        "P1/obs_n2|N0/global|R2/crf": -2
+      }
+    },
+    {
       "name": "P3-C expanded confirmation",
       "prefix": "",
       "inclusiveness": {

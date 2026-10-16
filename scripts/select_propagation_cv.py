@@ -181,9 +181,14 @@ def main() -> None:
     reference = spec["reference"]
     screens = {}
     for screen in spec["screens"]:
-        candidates = [
-            name for name in results.configurations if name.startswith(screen["prefix"])
-        ]
+        candidates = screen.get("candidates")
+        if candidates is None:
+            candidates = [
+                name for name in results.configurations if name.startswith(screen["prefix"])
+            ]
+        missing = [name for name in candidates if name not in results.configurations]
+        if missing:
+            raise ValueError(f"{screen['name']}: missing configurations: {missing}")
         screens[screen["name"]] = run_screen(
             results, reference, candidates, screen.get("inclusiveness", {})
         )
