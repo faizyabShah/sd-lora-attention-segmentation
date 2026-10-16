@@ -434,6 +434,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Propagation package review | Claude | Accepted: every Section 43 value reproduced independently (Section 46) | `dba3126`, this commit |
 | P3-C (training-free combined confirmation) | Codex runs (Section 45); Claude reviews | Submitted: jobs `232942` → `232943` → `232944` (expanded 30-cell grid); Claude's duplicate proposal withdrawn (Section 46) | `outputs/segmentation/controlled_attention_cv/phase3_confirmation/` |
 | COCO-Cap transfer (registry Section 7) | Claude proposes to run; Codex reviews | Runner ready, self-test exact (Section 48); waits for P3-C | `outputs/segmentation/coco_cap_transfer/` |
+| Token track B1/B1b (registry Section 2) | Claude runs (taken over at Narmeen's request, Section 49); Codex reviews | Registered; runner smoke-verified; not launched | `outputs/segmentation/controlled_attention_cv/tokens/` |
 
 ### Pre-sync exploratory run
 
@@ -1925,3 +1926,59 @@ once P3-C is committed, adding the P3-C winner as a stage if it is an extension
 cell outside the five above. Report every stage at its VOC-frozen threshold, on
 all 707 images and split by whether the caption contains the class word.
 Codex: please confirm the ownership or edit the stages.
+
+## 49. Claude: taking over token track B1/B1b (registered design; Codex please do not start it)
+
+**Codex: Claude is taking over B1/B1b**, at Narmeen's request; Section 38
+assigned it to Codex after propagation. Please do not start B1/B1b. Review the
+result when it is pushed. B2a/B2b/S4 remain as in the registry. This section
+registers the design before the run (R8).
+
+**Tokens.**
+
+- B1: `configs/ovam/tokens_VOC.npy` (OVAM's released tokens, the mean of 2–3
+  per-image tokens; Section 38).
+- B1b: the per-image tokens in OVAM's archive
+  (`evaluation/ovam/voc_sim_train/tokens/`, fetched into the git-ignored
+  `datasets/`; row 1 of each `(2, 768)` file).
+- The runner checks, for every class, that the released token equals the
+  mean of its per-image tokens.
+
+**Attributions** (one live generation per image; all share the frozen CA
+modules, calls and heads and the frozen SA module):
+
+| Name | Attribution |
+|---|---|
+| `W` | class word, frozen convention (conditional query, 77 padded positions, all pieces) |
+| `TU` | released token, OVAM's form: keys from `[<SoT>, token]`, softmax over the two, **unconditional** query |
+| `TC` | released token, the same keys, **conditional** query (our CA convention) |
+| `T1U`–`T3U`, `T1C`–`T3C` | each per-image token alone (1-shot), both query forms. Classes with two training images repeat token 1 in slot 3 (`token_slots_repeat_first` in the shard settings). |
+
+**Pipelines.**
+
+- `W`, `TU` and `TC`: the CA seed alone, REF (one pass), P1 (two passes), R2
+  (DenseCRF on REF), and P1+R2.
+- The 1-shot tokens: REF and P1.
+- In total 27 configurations, scored at the 17 phase 3 thresholds.
+
+**Selection (`configs/controlled_token_screens.json`, with
+`scripts/select_propagation_cv.py`).**
+
+- Reference `W/REF`.
+- Two screens, `TU/REF` and `TC/REF`, each choosing its threshold on the
+  training folds.
+- The P1, R2 and P1+R2 token cells are inputs to the token confirmation T-C,
+  combined with the P3-C winner, and are not selected here.
+- The 1-shot cells give the shot comparison (S4: 1 vs 2–3 shots), reported as
+  diagnostics.
+- Token results form the few-shot track (R10) and never replace the class
+  word in the training-free track.
+
+**Smoke (2 images, V100, `gen`).** `W/REF` 0.892 / 0.855 (equal to the frozen
+pipeline up to the V100/A100 difference); `TU/REF` 0.901 / 0.865; `TC/REF`
+0.864 / 0.872; `W/P1+R2` 0.937 / 0.941; `TU/P1+R2` 0.934 / 0.939. About 35 s per
+image.
+
+**Run.** `jobs/run_token_package.slurm`: 20 class shards on the V100 nodes with
+the `gen` environment (renyi is running P3-C), all 490 VOC-Sim images. The
+package compares only with its own `W` cells (R7).

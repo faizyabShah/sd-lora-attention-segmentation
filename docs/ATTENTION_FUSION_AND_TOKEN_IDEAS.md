@@ -145,8 +145,8 @@ propagates it. Tokens are 768-dimensional text-encoder outputs, as in OVAM.
 
 | ID | Method | Training images | Shots | Owner | Tier | Status |
 |---|---|---|---|---|---|---|
-| B1 | OVAM released tokens | OVAM training set | 2–3 (mean) | Codex | 1 | Not run under the protocol (exploratory: Section 8) |
-| B1b | OVAM per-image tokens | OVAM training set, each image alone | 1 (every choice; report mean ± range) | Codex | 1 | Not run |
+| B1 | OVAM released tokens | OVAM training set | 2–3 (mean) | Claude (taken over, protocol Section 49) | 1 | Registered; not run |
+| B1b | OVAM per-image tokens | OVAM training set, each image alone | 1 (every choice; report mean ± range) | Claude (taken over, protocol Section 49) | 1 | Registered; not run |
 | B2a | Our tokens on OVAM's training images | OVAM training set, OVAM's recipe (S1) | 1 and 3 | Codex | 2 | Not run |
 | B2b | Our tokens from the training folds | 1 image per class from the 4 training folds, seeded choice registered before the run; 5 token sets | 1 | Codex | 2 | Not run |
 | S4 | Shot scaling | from B1b/B2a: 1, 2, 3 shots | 1–3 | Codex | 2 | Not run |
