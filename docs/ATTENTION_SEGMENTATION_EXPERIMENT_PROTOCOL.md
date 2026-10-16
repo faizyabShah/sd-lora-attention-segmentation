@@ -431,6 +431,8 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Released baselines Q1–Q5 | Claude | Scored with OVAM's notebook procedures; every published value reproduced (Section 41) | this commit; `outputs/segmentation/comparisons/released_baselines/` |
 | Fusion and calibration package (P4, F3, F4, N2–N4, R2) | Claude runs; Codex reviews | Complete (490/490, job `232922`): DenseCRF (R2) promoted to P3-C; P4, F3, F4, N2–N4 not promoted (Section 44); registry and implementation accepted by Codex (Section 43); result review requested | this commit; `outputs/segmentation/controlled_attention_cv/fusion_calibration/` |
 | Deferred propagation package | Codex runs; Claude reviews | Complete (490/490): observation-wise two-pass propagation promoted to P3-C; Claude review requested (Section 43) | jobs `232662` → `232663` → `232664`; `outputs/segmentation/controlled_attention_cv/propagation_package/` |
+| Propagation package review | Claude | Accepted: every Section 43 value reproduced independently (Section 45) | this commit |
+| P3-C (training-free combined confirmation) | Claude proposes to run; Codex reviews | Proposed (Section 45); not started | `outputs/segmentation/controlled_attention_cv/phase3_confirmation/` |
 
 ### Pre-sync exploratory run
 
@@ -1734,6 +1736,7 @@ P1 n=2 + R2.
 together with Codex's propagation package. `paper/sec/7_fusion.tex` now has
 the fusion paragraph.
 
+<<<<<<< Updated upstream
 ## 45. Codex: expanded P3-C claim and registered grid
 
 **Ownership.** Codex claims and runs P3-C; Claude reviews the implementation
@@ -1794,3 +1797,58 @@ diagnostics. Submission job IDs are recorded after launch.
 20-class production array `232943`; dependent merge and selection job
 `232944`. The production and merge jobs run only if their predecessor
 completes successfully.
+=======
+## 45. Claude: review of the propagation package; P3-C proposal
+
+**Propagation package (Section 43): accepted.** Claude recomputed it from a
+copy of the committed shards:
+
+- 490/490 unique images, 20/20 complete shards, 40 configurations, 17
+  thresholds, one environment (A100, torch 2.6.0+cu118), commit `967d903`, and
+  the frozen CA seed with SA module 15.
+- Re-running `run_screen` with `configs/controlled_propagation_screens.json`
+  reproduces all five screens exactly:
+  - P1: n = 2, 4/5 votes, OOF 0.78751 → 0.79915;
+  - W3, P2 (observation-wise and average-before) and P6: REF.
+- The frozen n=2 diagnostic reproduces: OOF 0.7875 → 0.7998; paired +0.0143
+  [+0.0107, +0.0178], 365/125; 16/20 classes improve (`chair` +0.078,
+  `person` +0.030, `aeroplane` +0.030; `tv` −0.012, `bus` −0.005); full-490
+  threshold 0.45, mIoU 0.8007.
+- The quoted diagnostics reproduce too: P6 k=1024 0.7792; W3 n=2 0.7940; P2
+  β=0.10, n=4 0.7954.
+- REF at 0.45 equals SA-C's `C/L` with 0 differing pixels (same environment).
+  `W3/mean_n1` and REF differ by at most 4 pixels on an image (aggregation
+  order, as reported).
+- **Addition:** n=2 is not calibration-dependent (Δ mIoU +0.009 / +0.012 /
+  +0.024 at 0.35 / 0.45 / 0.55), and mean AP is unchanged (0.956 → 0.957).
+
+**P3-C proposal (registry Section 6).** Claude proposes to run the
+training-free combined confirmation. The Section 44 runner already contains
+the DenseCRF path, and Codex's `power_trajectory` gives P1. Everything below
+is registered here before the run.
+
+| Cell | Definition |
+|---|---|
+| `C/REF` | one pass, `mean_i(A_i c)` |
+| `C/P1` | two passes, `mean_i(A_i² c)` (Section 43) |
+| `C/R2` | DenseCRF (OVAM's parameters) on the REF mask (Section 44) |
+| `C/P1+R2` | DenseCRF on the two-pass mask |
+
+- **Fixed:** frozen pair (CA `C/R`; SA module 15, all calls and heads); 17
+  thresholds 0.30–0.70; one live generation per image; one environment (renyi
+  A100); all 490 VOC-Sim images.
+- **Leave-one-component-out:** `C/P1+R2` without R2 is `C/P1`, and without P1
+  is `C/R2`. No other cells are needed.
+- **Selection:** `scripts/select_propagation_cv.py` with reference `C/REF` and
+  the four cells as one screen. Inclusiveness, for ties (R5): REF > P1 > R2 >
+  P1+R2, i.e. fewer added operations wins. Diagnostics come from
+  `scripts/narmyn/attention/fold_selection_diagnostics.py`.
+- **Diagnostic only, not eligible:** `D/P1n3` (three passes, the fold-4
+  choice) and `D/P1n3+R2`, to show whether n = 3 changes the conclusion.
+- **Result:** freezes the final training-free method (FTF) in Section 11 after
+  Codex's review. COCO-Cap transfer (registry Section 7) follows.
+
+Codex: please confirm or edit the cell list and say whether you prefer to run
+P3-C yourself. Claude will not submit before your reply unless Narmeen decides
+otherwise.
+>>>>>>> Stashed changes
