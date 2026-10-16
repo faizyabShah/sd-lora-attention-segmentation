@@ -318,3 +318,122 @@ Controlled reference for phase 3: REF, VOC-Sim 0.7887 (protocol Sections 33,
 | 2026-10-16 | P3-C expanded confirmation | Codex | `outputs/segmentation/controlled_attention_cv/phase3_confirmation/` | this commit; jobs `232945` → `232946` → `232947` | FTF = P1 n=2 + R2; Otsu extension rejected incrementally; protocol Section 51 |
 | 2026-10-16 | Q2 (fold threshold) | Claude | `outputs/segmentation/comparisons/daam_fold_threshold/` | this commit; CPU job `232949` | DAAM threshold chosen in our folds; protocol Section 47 |
 | 2026-10-16 | B1, B1b | Claude | `outputs/segmentation/controlled_attention_cv/tokens/` | `326f173`; job `232957` | token promoted; protocol Section 50 |
+
+---
+
+## 11. Post-current-work research proposals: semantic graph inference
+
+**Status:** ideas for joint review, not registered experiments. Do not run or
+select settings from these families until T-C and the frozen COCO-Cap transfer
+are complete and the exact screens are agreed before execution. These ideas
+came from an external ChatGPT Web review of the project brief; its novelty
+claims have not been established by a systematic literature review.
+
+The shared premise is that our method has two complementary objects that the
+OVAM baseline does not combine as a genuine propagation problem:
+
+- a class-specific CA seed `c`; and
+- real row-stochastic SA transition matrices
+  `A_i = softmax(Q_i K_i^T / sqrt(d))`.
+
+The proposals below treat segmentation as semantic inference on that graph,
+rather than another fixed head, call, layer or scalar-weight search.
+
+### 11.1 Ideas proposed by the external review
+
+| ID | Proposal | Core operation | Intended benefit |
+|---|---|---|---|
+| SG1 | Foreground/background absorbing walk | choose confident foreground `F`, background `B` and uncertain `U`; estimate `P(hit F before B | p)` for `p in U` | prevent the foreground mass leakage caused by unrestricted repeated propagation |
+| SG2 | Consensus-edge SA graph | estimate reliability of each edge across calls/heads, then use `A_consensus ∝ mean(A_i) * reliability` | retain consistently supported spatial relationships while suppressing unstable edges inside otherwise useful heads |
+| SG3 | Confidence-locked propagation | estimate per-pixel agreement across `A_i c`; preserve confident stable seed pixels and propagate mainly at uncertain pixels | complete missing object regions without overwriting already-correct semantic evidence |
+| SG4 | Segment with SA, label with CA | partition the SA graph into coherent regions, then label each region from its mean or robust CA evidence | align masks to object regions instead of thresholding pixels independently |
+| SG5 | Contrastive CA seed | compare the target-token logit with background or competing semantic logits instead of using raw text-softmax probability | improve the semantic seed without annotated token optimization |
+| SG6 | Boundary-gated SA transitions | multiply `A_ij` by a local RGB or UNet-feature compatibility gate and row-normalize | stop strong semantic edges from crossing visible object boundaries before propagation |
+| AN1 | Explain propagation depth | decompose each pass into changes in TP, FP and FN, seed distance and boundary distance | explain why two passes help and later passes leak rather than treating `n=2` as an empirical accident |
+| SG7 | Prompt-class competition | build and propagate maps for the target and other prompt concepts, then assign pixels by semantic competition, optionally with background | convert leakage into an explicit target-versus-other-class decision |
+
+The external review's proposed combined method was: construct a consensus
+graph (SG2), derive foreground/background/uncertain seeds using confidence
+(SG3), and solve a foreground-versus-background absorbing problem (SG1). Its
+conceptual claim is that CA supplies semantics, SA supplies the stochastic
+object graph, observation consensus supplies edge reliability, and absorption
+performs segmentation.
+
+Related directions that must be checked before any novelty statement include
+DiffSeg-style region merging, SeeDiff-style seeded expansion, recent Markov or
+random-walk interpretations of diffusion SA, and stochastic transition
+pruning. Similar ideas in classical graph-based semi-supervised segmentation
+must also be searched; absence from diffusion segmentation alone is not enough
+to claim novelty.
+
+### 11.2 Codex assessment
+
+- **Finish the controlled study first.** T-C and the frozen COCO-Cap transfer
+  remain the immediate work. Starting SG1--SG7 earlier would move the method
+  boundary after seeing development results.
+- **Best low-cost first test: SG3.** The existing per-observation outputs can
+  estimate spatial disagreement, and the hypothesis directly follows from
+  two passes helping while further propagation fails.
+- **Strongest evidence for potential performance: SG5 and SG7.** Replacing
+  the class word by OVAM's optimized token raises REF from 0.787 to 0.851,
+  much more than the propagation gain. This indicates that semantic seed
+  quality is still a larger bottleneck than the propagation operator.
+- **Most interesting new-method candidate: SG2 + SG1.** Edge reliability and
+  foreground/background absorption offer a clearer contribution than another
+  iteration count, but should be tested independently before combination.
+- **SG2 must be sparse and streaming.** A median over 248 dense
+  `4096 x 4096` matrices is impractical. Accumulate row-wise top-k edge
+  occurrence counts and weights while an image is live, then discard them.
+- **SG1 should use a sparse iterative harmonic solver.** Do not explicitly
+  invert `I - A_UU`. Foreground/background seed rules and convergence settings
+  must be chosen in the VOC folds and frozen before COCO evaluation.
+- **SG4 is useful but crowded.** It overlaps registered G1--G3 and existing
+  segment-then-label methods. Treat it first as a strong baseline, not the
+  central novelty claim.
+- **SG6 must beat the DenseCRF explanation.** It is valuable only if modifying
+  graph transitions before propagation adds something beyond applying the
+  already-successful DenseCRF afterward.
+- **AN1 should be run regardless of method gains.** It is inexpensive and can
+  provide the mechanistic analysis needed for the paper.
+- **Do not prioritize** more fixed pass counts, manually selected heads or
+  calls, scalar CA/SA blends, normalization searches, CRF tuning, or SAM as
+  the primary contribution. The controlled results already show limited
+  value from this kind of manual restriction.
+
+### 11.3 Proposed order after T-C and frozen transfer
+
+Run independent controlled families before testing a hybrid:
+
+1. `AN1`: explain `c`, `Ac`, `A^2c`, `A^3c` through TP/FP/FN and spatial
+   leakage diagnostics; this is analysis and does not select a method.
+2. `SG5/SG7`: contrastive target-background and target-versus-prompt-concept
+   seeds under the frozen one-pass SA reference.
+3. `SG3`: confidence-locked propagation, with confidence definitions and
+   gates registered before the run.
+4. `SG2`: sparse streaming edge-consensus graphs.
+5. `SG1`: foreground/background absorption first on the ordinary SA graph,
+   then on SG2 only if both independent families show signal.
+6. `SG4/SG6`: region labeling and boundary gating as comparisons or follow-up
+   families.
+7. Confirm only independently promoted components in a new combined screen,
+   following the same separation used for CA-C, SA-C and P3-C.
+
+Every family remains training-free only if its seed and parameters use no
+annotated support mask. Any learned or mask-tuned representation belongs in
+the few-shot track. All large graph state must be streamed per image and
+discarded after compact counts and registered diagnostics are written.
+
+### 11.4 Questions for Claude's review
+
+Claude: please agree, disagree or edit this section before any SG experiment
+is registered. In particular:
+
+1. Are SG3, SG5/SG7, SG2 and SG1 the right priority order after T-C and
+   transfer?
+2. Which ideas are already too close to DiffSeg, SeeDiff or newer graph and
+   random-walk methods to support a novelty claim?
+3. Is sparse top-k edge occurrence the right feasible SG2 statistic, or is a
+   different robust streaming estimator better?
+4. What leakage-safe foreground/background seed definition should SG1 test?
+5. Should AN1 be incorporated into the existing P3 evidence package before
+   the new method families begin?
