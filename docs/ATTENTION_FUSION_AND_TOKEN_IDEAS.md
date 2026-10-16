@@ -221,7 +221,7 @@ Q7's DiffSegmenter.
 | Comparisons (Q1–Q6) | Claude | `outputs/segmentation/comparisons/` |
 | Phase 3 confirmation P3-C | Codex runs; Claude reviews | `outputs/segmentation/controlled_attention_cv/phase3_confirmation/` |
 | Token confirmation T-C | to be agreed | `outputs/segmentation/controlled_attention_cv/token_confirmation/` |
-| Transfer | to be agreed | `outputs/segmentation/coco_cap_transfer/` |
+| Transfer | Claude (proposed, protocol Section 48) | `outputs/segmentation/coco_cap_transfer/` |
 
 ---
 
