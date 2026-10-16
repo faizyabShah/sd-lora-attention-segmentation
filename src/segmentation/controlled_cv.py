@@ -100,6 +100,8 @@ def _natural_key(value: str) -> tuple:
 def normalize_batch(maps: torch.Tensor, method: str) -> torch.Tensor:
     """Batched ``attention_aggregation.normalize_map`` for ``[C, H, W]`` maps."""
     flat = maps.float().reshape(maps.shape[0], -1)
+    if method == "identity":  # maps already normalized by the caller (e.g. max normalization)
+        return flat.clamp(0, 1).reshape(maps.shape)
     if method == "minmax":
         low = flat.amin(dim=1, keepdim=True)
         scale = flat.amax(dim=1, keepdim=True) - low

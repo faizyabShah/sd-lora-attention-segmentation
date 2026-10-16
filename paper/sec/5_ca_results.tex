@@ -8,12 +8,30 @@
 
 \paragraph{Layers, heads and attribution.}
 \owner{Claude (package B)}
-\TODO{CA-L, CA-H, CA-A.}
+Removing the two 32$\times$32 decoder modules
+(\texttt{up\_blocks.2.attentions.0} and \texttt{.1}) is chosen in all five
+folds and raises OOF mIoU from 0.666 to 0.692. Removing head~1 in every module
+is chosen in four folds (0.666 to 0.674). Both changes are
+calibration-dependent: they help at 0.45 and 0.55 but not at 0.35, and both
+slightly lower AP, so they make the map more selective rather than rank
+pixels better. Head~1 alone scores 0.098 mIoU, against 0.26--0.43 for every
+other head. For the attribution convention, the reference (conditional query,
+softmax over all 77 padded positions, mean over all class-word pieces) is kept
+in all folds; OVAM's convention (unconditional query, unpadded softmax, first
+piece) is 0.016 lower.
 \source{protocol Section 21; evidence A1}
 
 \paragraph{Combined confirmation.}
 \owner{Claude (CA-C)}
-\TODO{CA-C freezes CA-R alone; CA-H does not survive the combination.}
+Re-scoring the three promoted changes together (\cref{tab:controlled_path})
+freezes the resolution change alone: without the five 32$\times$32 modules,
+OOF mIoU rises from 0.665 to 0.691 (four of five folds; paired
+$\Delta$ image IoU $+0.022$, 95\% interval $[+0.014, +0.029]$). It is not
+calibration-dependent ($+0.001$, $+0.030$ and $+0.045$ at 0.35, 0.45 and
+0.55), although mean AP falls from 0.922 to 0.913. The layer change is
+contained in it and adds nothing. Removing head~1 on top of it changes mIoU by
+only $+0.0004$, inside the tie band, so all eight heads are kept: a head
+restriction that passes its own screen does not survive the combination.
 \source{protocol Section 27; evidence A3}
 
 \begin{table}[t]

@@ -53,6 +53,11 @@ generated table.
 | Paper artifact | Generated file | Source | Generator |
 |---|---|---|---|
 | Table: controlled selection path | `tables/generated/controlled_path.tex` | `outputs/segmentation/controlled_attention_cv/{ca_confirmation,sa_confirmation,joint_ca_sa_cartesian}/fold_results.json` | `scripts/paper/export_paper_artifacts.py` |
+| Sec. 4.2 selection constants (5 folds of 98, seed, 20,000 resamples, bands) | — | `src/segmentation/controlled_cv.py`, `configs/voc_sim_folds.csv`, protocol Sections 5, 5a | hand-written |
+| Sec. 5 package-B numbers (CA-L, CA-H, CA-A) | — | `outputs/segmentation/controlled_attention_cv/ca_layer_head_attribution/{fold_results,head_report}.json`; protocol Section 21 | hand-written |
+| Sec. 5 CA-C numbers | — | `outputs/segmentation/controlled_attention_cv/ca_confirmation/fold_results.json`; protocol Section 27 | hand-written |
+| Sec. 6 package-B numbers (SA-L, SA-H, `Aᵀx`, seed alone) | — | `outputs/segmentation/controlled_attention_cv/sa_layer_head/fold_results.json`; protocol Section 30 | hand-written |
+| Sec. 6 SA-C and joint-audit numbers | — | `outputs/segmentation/controlled_attention_cv/{sa_confirmation,joint_ca_sa_cartesian}/`; protocol Sections 33, 36 | hand-written |
 
 ## Before submission
 

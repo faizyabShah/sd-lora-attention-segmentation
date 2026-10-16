@@ -11,8 +11,41 @@ IoU and its macro mean.}
 \subsection{Cross-validated selection}
 \label{sec:selection}
 \owner{Claude (protocol Section 29: statistical-selection wording)}
-\TODO{One axis at a time from an inclusive reference; five class-stratified
-folds; promotion bands, fold vote and out-of-fold guard; ties to the more
-inclusive or simpler setting; combined confirmation of the promoted changes;
-paired bootstrap intervals; calibration at three thresholds.}
+
+Every attention setting is chosen by the same cross-validated rule, so that
+no reported gain comes from tuning on the images it is reported on.
 \source{protocol Sections 5, 5a; registry R3--R5}
+
+\paragraph{One axis at a time.}
+Each screen varies one axis (calls, resolutions, modules, heads, or the
+attribution convention) away from an \emph{inclusive reference} that keeps
+every option of that axis, with all other settings held at their reference
+values.
+
+\paragraph{Folds.}
+The 490 VOC-Sim images are split once into five folds of 98 images,
+stratified by class (four or five images per class per fold) with a fixed
+seed. For each held-out fold, a candidate is chosen using only the other four
+folds and then scored on the held-out fold. Pooling the five held-out folds
+gives an out-of-fold (OOF) mIoU for the selection procedure and for the
+reference.
+
+\paragraph{Promotion rule.}
+On the training folds, a candidate replaces the reference if it improves
+mIoU at the 0.45 threshold by at least $0.010$, or by $0.005$--$0.0099$ when at
+least 12 of the 20 classes improve and no class loses more than $0.05$.
+Candidates within $0.002$ of each other are resolved towards the more
+inclusive setting. A setting is promoted only if at least four of the five
+folds choose it \emph{and} its pooled OOF mIoU exceeds the reference's.
+
+\paragraph{Combined confirmation.}
+Settings promoted by separate one-axis screens are not assumed to combine.
+They are re-scored together in a single run, alone and in every combination,
+and the same rule chooses among them. Only this confirmation freezes a stage.
+
+\paragraph{Uncertainty and calibration.}
+We report a paired bootstrap (20{,}000 resamples) 95\% interval of the mean
+per-image IoU change, the number of images that improve and worsen, the
+change in mIoU at thresholds 0.35 and 0.55, and the mean average precision
+(AP) of the continuous map. A change is \emph{calibration-dependent} if its
+sign differs across the three thresholds.

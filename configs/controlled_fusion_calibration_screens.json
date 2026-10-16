@@ -1,0 +1,24 @@
+{
+  "reference": "REF/one_pass",
+  "screens": [
+    {
+      "name": "P4 residual mix",
+      "prefix": "P4/",
+      "inclusiveness": {"P4/lam25": 25, "P4/lam50": 50, "P4/lam75": 75, "P4/lam90": 90}
+    },
+    {
+      "name": "F3/F4 gating",
+      "prefix": "F",
+      "inclusiveness": {"F3/gate": 2, "F4/geomean": 1}
+    },
+    {
+      "name": "N2-N4 calibration",
+      "prefix": "N",
+      "inclusiveness": {"N3/max": 3, "N2/percentile": 2, "N4/otsu": 1}
+    },
+    {
+      "name": "R2 DenseCRF",
+      "prefix": "R2/"
+    }
+  ]
+}

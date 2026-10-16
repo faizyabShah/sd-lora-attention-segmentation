@@ -428,7 +428,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Joint CA×SA audit review | Claude | Accepted: every Section 36 value reproduced independently (Section 38) | this commit |
 | Phase 3 registry (all deferred experiments, rules R1–R11) | Claude drafts; Codex reviews | Draft 2 in `docs/ATTENTION_FUSION_AND_TOKEN_IDEAS.md`; Codex review requested (Section 38) | this commit |
 | Paper skeleton (`paper/`) | Claude created (taken over at Narmeen's request, Section 39); section owners per Section 29 | Created; compiles; Codex review requested | this commit; `paper/` |
-| Fusion and calibration package (P4, F3, F4, N2–N4, R2) | Claude runs; Codex reviews | Registered (registry Section 1.2); not started | `outputs/segmentation/controlled_attention_cv/fusion_calibration/` |
+| Fusion and calibration package (P4, F3, F4, N2–N4, R2) | Claude runs; Codex reviews | Runner ready and smoke-verified (Section 40); submission waits for Codex's registry review | `outputs/segmentation/controlled_attention_cv/fusion_calibration/` |
 | Deferred propagation package | Codex runs; Claude reviews | Runner ready: P1 powers, P2 restart, P6 sparsity, W3 aggregation order on frozen joint pair (Section 37) | `outputs/segmentation/controlled_attention_cv/propagation_package/` |
 
 ### Pre-sync exploratory run
@@ -1507,3 +1507,50 @@ git-ignored; PDFs are committed only at agreed milestones.
 
 **Still open (Section 29):** owners for Abstract, Introduction, Related work,
 Transfer and Discussion, marked "to agree" in the files.
+
+## 40. Claude: fusion/calibration runner ready; first paper text
+
+**Runner (registry Section 1.2, rules R1–R11).** Not yet submitted: it waits
+for Codex's review of the registry (Section 38).
+
+| Item | Path |
+|---|---|
+| Operators (P4, F3, F4, N3, N4) | `src/segmentation/fusion_variants.py` |
+| Unit tests | `tests/test_fusion_variants.py` |
+| Runner | `scripts/run_fusion_calibration.py` |
+| Selection spec (uses Codex's `scripts/select_propagation_cv.py`) | `configs/controlled_fusion_calibration_screens.json` |
+| Job | `jobs/run_fusion_calibration.slurm` |
+
+- **Configurations (13).** `CHECK/ca_seed`; `REF/one_pass`; `P4/lam25`,
+  `P4/lam50`, `P4/lam75` and `P4/lam90`; `F3/gate`; `F4/geomean`;
+  `N2/percentile`; `N3/max`; `N4/otsu`; `R2/crf`.
+- **Scoring.** All 17 thresholds of the Section 37 grid (0.30–0.70), so the
+  selector chooses each parameter and threshold on the training folds, as for
+  propagation.
+- **Binary configurations.** `N4/otsu` stores the same counts in every
+  threshold slot. `R2/crf` applies OVAM's DenseCRF (`apply_ovam_densecrf`,
+  OVAM's parameters) to the REF mask at each threshold, so the threshold is
+  still chosen in the folds; its AP is NaN.
+- **Tie order (R5).** Larger λ (closer to REF); F3 before F4; N3, then N2,
+  then N4.
+- **Shared-code change.** `normalize_batch` gains an `"identity"` option, used
+  for N3's max-normalized map. Existing methods are unchanged, and all 21
+  shared CV tests pass.
+
+**Smoke (2 images, V100, `--verify-reference`).**
+
+- REF agrees with the independent package-B propagation within 2.4×10⁻⁷.
+- REF matches SA-C's `C/L` on the same images: 0.8916 vs 0.8919 and 0.8550 vs
+  0.8549 (A100/V100 difference).
+- Every configuration scores, at about 10 s per image, so the full run is about
+  80 GPU-minutes.
+
+**Paper text.** Claude's sections are drafted in `paper/sec/`:
+
+- 4.2, cross-validated selection;
+- Section 5, package B and CA-C;
+- Section 6, package B, SA-C and the joint audit, with Codex's SA-C and joint
+  audit numbers as verified in Sections 35 and 38.
+
+Every number is listed with its source in the `paper/README.md` artifact map.
+Codex: please review, in particular the SA-C wording, since Codex ran it.
