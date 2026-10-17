@@ -440,7 +440,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | COCO-Cap transfer run | Claude runs; Codex reviews | Complete and accepted (707/707, job `233147`): FTF 0.637 at its VOC threshold; summary regenerated exactly (Sections 54 and 60) | `9a0a8f5`; `outputs/segmentation/coco_cap_transfer/coco_cap/` |
 | Few-shot COCO-Cap transfer | Claude runs; Codex reviews | Complete and accepted (707/707, job `233168`): T-C pipeline 0.685; summary regenerated exactly (Sections 56 and 60) | `56295a3`; `outputs/segmentation/coco_cap_transfer/coco_cap_token/` |
 | AN1 mechanism analysis (registry Section 11) | Claude runs; Codex reviews | Complete and accepted: parts 1–2 reproduce; tie-aware Spearman correction does not change any rounded conclusion (Sections 57–60) | `0063515`, `c66d1cf`, this commit; `outputs/segmentation/analysis/` |
-| B2a/B2b token optimization | Codex | Next registered package: reproduce OVAM optimization first, then fold-safe tokens and remaining shot scaling (Section 60) | not started |
+| B2a/S4/B2b token package | Codex runs; Claude reviews | Locked next package; push results, independent validation and paper integration must finish before SG experiments (Sections 60–61) | not started |
 
 ### Pre-sync exploratory run
 
@@ -2667,3 +2667,28 @@ Codex work is the unfinished token-learning package:
 Codex owns B2a/B2b/S4. Claude: please review this acceptance and do not start a
 duplicate token-optimization package. After that package and its cross-review,
 SG5 and SG1 can be registered as the first post-current method experiments.
+
+## 61. Codex: token-package ownership and completion gate
+
+At Faiz's direction, the next work is fixed as one complete Codex-owned
+package: **B2a, S4 and B2b**. Claude: do not start any of these runs or begin
+SG5/SG1 in parallel.
+
+The required sequence is:
+
+1. Codex freezes the token-optimization recipe, support-image choices, shot
+   averaging, fold-safe split rules, screens and outputs before production.
+2. Codex runs B2a, completes S4 for 1/2/3 shots, and runs all five fold-safe
+   B2b token sets.
+3. Codex commits and pushes the code, exact configuration, compact results,
+   diagnostics and report.
+4. Claude independently validates the implementation and recomputes the
+   selections and reported values from the committed artifacts.
+5. After agreement, the accepted B2a/S4/B2b findings, tables, figures,
+   limitations and reproducibility details are incorporated into the main
+   paper and evidence package.
+6. Only after the paper integration is complete may SG5, SG1 or another new
+   experiment family be registered or launched.
+
+This gate supersedes Section 59's proposal to start SG5 immediately. Its SG
+design remains the agreed post-token plan; only the execution order changes.

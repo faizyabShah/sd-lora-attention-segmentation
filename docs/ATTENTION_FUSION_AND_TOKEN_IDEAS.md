@@ -147,9 +147,9 @@ propagates it. Tokens are 768-dimensional text-encoder outputs, as in OVAM.
 |---|---|---|---|---|---|---|
 | B1 | OVAM released tokens | OVAM training set | 2–3 (mean) | Claude (taken over, protocol Section 49) | 1 | Done (Section 50): TC promoted over the word, OOF 0.787 → 0.851 (TU 0.843) |
 | B1b | OVAM per-image tokens | OVAM training set, each image alone | 1 (every choice; report mean ± range) | Claude (taken over, protocol Section 49) | 1 | Done (Section 50): single tokens 0.831 / 0.853 / 0.842 (TC, OOF) |
-| B2a | Our tokens on OVAM's training images | OVAM training set, OVAM's recipe (S1) | 1 and 3 | Codex | 2 | Next registered Codex package (protocol Section 60) |
-| B2b | Our tokens from the training folds | 1 image per class from the 4 training folds, seeded choice registered before the run; 5 token sets | 1 | Codex | 2 | After B2a (protocol Section 60) |
-| S4 | Shot scaling | from B1b/B2a: 1, 2, 3 shots | 1–3 | Codex | 2 | 1 vs 2–3 shots done from B1b (Section 50); B2a pending |
+| B2a | Our tokens on OVAM's training images | OVAM training set, OVAM's recipe (S1) | 1 and 3 | Codex | 2 | Locked next package; Claude validates after push (protocol Section 61) |
+| B2b | Our tokens from the training folds | 1 image per class from the 4 training folds, seeded choice registered before the run; 5 token sets | 1 | Codex | 2 | Same locked package, after B2a/S4 (protocol Section 61) |
+| S4 | Shot scaling | from B1b/B2a: 1, 2, 3 shots | 1–3 | Codex | 2 | Complete 1/2/3 shots with B2a before B2b; protocol Section 61 |
 | S3 | Train through our pipeline | loss on the SA-propagated map instead of raw CA | 1 | Codex | 3 | Not run |
 | S6 | Test-time self-consistency | per image, make `c` agree with `A c`; no labels (training-free track) | 0 | unassigned | 3 | Not run |
 | T1–T7, S2, S5, S7, S8 | Token variants | see Section 2.1 | — | unassigned | 3 | Not run |
@@ -338,6 +338,11 @@ claims have not been established by a systematic literature review.
 (protocol Section 60). B2a/B2b token learning is the remaining current-package
 work. SG5 and SG1 follow only after that package and their exact screens are
 registered.
+
+**Execution gate (protocol Section 61):** Codex completes B2a, S4 and B2b and
+pushes the full package; Claude independently validates it; both agents put
+the accepted results into the paper and evidence package. No SG family starts
+before those steps are complete.
 
 The shared premise is that our method has two complementary objects that the
 OVAM baseline does not combine as a genuine propagation problem:
