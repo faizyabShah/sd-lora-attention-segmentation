@@ -1,0 +1,144 @@
+{
+  "images": 707,
+  "caption_includes_class": 465,
+  "caption_excludes_class": 242,
+  "commits": [
+    "61707fe9b4005de8fe19653ed63e2b2d5b9191a6",
+    "a002cc401f536f5225d3cd485b62e7cbb6590a30"
+  ],
+  "environments": [
+    {
+      "commit": "61707fe9b4005de8fe19653ed63e2b2d5b9191a6",
+      "conda_env": "trdp",
+      "cudnn": "91900",
+      "diffusers": "0.36.0",
+      "gpu": "NVIDIA A100-PCIE-40GB",
+      "node": "renyi",
+      "numpy": "2.4.4",
+      "python": "3.11.15",
+      "slurm_job": "233147_0",
+      "torch": "2.11.0+cu130",
+      "torch_cuda": "13.0",
+      "transformers": "5.6.2"
+    },
+    {
+      "commit": "a002cc401f536f5225d3cd485b62e7cbb6590a30",
+      "conda_env": "trdp",
+      "cudnn": "91900",
+      "diffusers": "0.36.0",
+      "gpu": "NVIDIA A100-PCIE-40GB",
+      "node": "renyi",
+      "numpy": "2.4.4",
+      "python": "3.11.15",
+      "slurm_job": "233147_3",
+      "torch": "2.11.0+cu130",
+      "torch_cuda": "13.0",
+      "transformers": "5.6.2"
+    }
+  ],
+  "note": "VOC-frozen thresholds; nothing chosen on COCO-Cap",
+  "stages": {
+    "CA/seed": {
+      "threshold": 0.45,
+      "miou_all": 0.5489089717966038,
+      "miou_caption_includes_class": 0.5530577328423225,
+      "miou_caption_excludes_class": 0.5418983270583937,
+      "mean_image_iou": 0.5576353757031087
+    },
+    "SA/REF": {
+      "threshold": 0.45,
+      "miou_all": 0.6261785914568627,
+      "miou_caption_includes_class": 0.6263846720270836,
+      "miou_caption_excludes_class": 0.6192458260144551,
+      "mean_image_iou": 0.6487175857234755
+    },
+    "P3/P1": {
+      "threshold": 0.45,
+      "miou_all": 0.6243854191644341,
+      "miou_caption_includes_class": 0.6207465301004825,
+      "miou_caption_excludes_class": 0.6256660653091319,
+      "mean_image_iou": 0.6507031660808205
+    },
+    "P3/R2": {
+      "threshold": 0.45,
+      "miou_all": 0.6419845412028133,
+      "miou_caption_includes_class": 0.6406365071613909,
+      "miou_caption_excludes_class": 0.6373134482191856,
+      "mean_image_iou": 0.6799703188574294
+    },
+    "P3/P1+R2": {
+      "threshold": 0.45,
+      "miou_all": 0.6370121345989274,
+      "miou_caption_includes_class": 0.6316838493858031,
+      "miou_caption_excludes_class": 0.639945830749232,
+      "mean_image_iou": 0.6762485220304526
+    }
+  },
+  "pairs": [
+    {
+      "stage": "SA/REF",
+      "versus": "CA/seed",
+      "delta_miou": 0.07726961966025891,
+      "paired_bootstrap": {
+        "mean": 0.09108221002036675,
+        "ci_low": 0.08055511319500545,
+        "ci_high": 0.10162815998660384,
+        "better": 533,
+        "worse": 174,
+        "ties": 0
+      }
+    },
+    {
+      "stage": "P3/P1",
+      "versus": "SA/REF",
+      "delta_miou": -0.0017931722924285909,
+      "paired_bootstrap": {
+        "mean": 0.00198558035734507,
+        "ci_low": -0.0017841319785984583,
+        "ci_high": 0.005962216294276253,
+        "better": 369,
+        "worse": 337,
+        "ties": 1
+      }
+    },
+    {
+      "stage": "P3/R2",
+      "versus": "SA/REF",
+      "delta_miou": 0.01580594974595062,
+      "paired_bootstrap": {
+        "mean": 0.03125273313395398,
+        "ci_low": 0.026870698441833884,
+        "ci_high": 0.035804151646691824,
+        "better": 530,
+        "worse": 176,
+        "ties": 1
+      }
+    },
+    {
+      "stage": "P3/P1+R2",
+      "versus": "SA/REF",
+      "delta_miou": 0.010833543142064639,
+      "paired_bootstrap": {
+        "mean": 0.02753093630697716,
+        "ci_low": 0.021722113623473992,
+        "ci_high": 0.033479999534112855,
+        "better": 429,
+        "worse": 277,
+        "ties": 1
+      }
+    },
+    {
+      "stage": "P3/P1+R2",
+      "versus": "P3/R2",
+      "delta_miou": -0.0049724066038859815,
+      "paired_bootstrap": {
+        "mean": -0.003721796826976812,
+        "ci_low": -0.007902420312347384,
+        "ci_high": 0.0006898837104089398,
+        "better": 318,
+        "worse": 387,
+        "ties": 2
+      }
+    }
+  ]
+}

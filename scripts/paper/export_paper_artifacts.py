@@ -89,11 +89,23 @@ def released_baselines() -> None:
                        f"{d['token_optimized']['coco_cap']['miou_threshold_from_voc']:.3f} \\\\")
     frozen = screen(sa_c, "SA-C")["out_of_fold_miou_selection"]
     tokens = CV / "tokens" / "fold_results.json"
-    token_cell = "\\todo{---}"
-    if tokens.exists():
-        token_cell = f"{screen(tokens, 'B1 released token, conditional query')['oof_miou_selection']:.3f}$^\\dagger$"
-    body.append("\\midrule\n" + f"Ours (frozen CA+SA) & {frozen:.3f}$^\\dagger$ & {token_cell} & \\todo{{---}} & \\todo{{---}} \\\\")
-    tex = (header([base, sa_c] + ([daam_cv] if daam_cv.exists() else []) + ([tokens] if tokens.exists() else []))
+    p3c = CV / "phase3_confirmation" / "fold_results.json"
+    t_c = CV / "token_confirmation" / "fold_results.json"
+    coco = ROOT / "outputs" / "segmentation" / "coco_cap_transfer" / "coco_cap" / "summary.json"
+    coco_stages = json.loads(coco.read_text())["stages"] if coco.exists() else {}
+
+    def coco_cell(stage):
+        return f"{coco_stages[stage]['miou_all']:.3f}$^\\ast$" if stage in coco_stages else "\\todo{---}"
+
+    def oof(path, name):
+        return f"{screen(path, name)['oof_miou_selection']:.3f}$^\\dagger$" if path.exists() else "\\todo{---}"
+
+    token_ref = oof(tokens, "B1 released token, conditional query")
+    body.append("\\midrule\n" + f"Ours, one SA pass & {frozen:.3f}$^\\dagger$ & {token_ref} & {coco_cell('SA/REF')} & \\todo{{---}} \\\\")
+    body.append(f"Ours, final$^\\P$ & {oof(p3c, 'P3-C mandatory confirmation')} & "
+                f"{oof(t_c, 'T-C mandatory confirmation (token on REF, P1, R2, P1+R2)')} & {coco_cell('P3/P1+R2')} & \\todo{{---}} \\\\")
+    sources = [base, sa_c] + [x for x in (daam_cv, tokens, p3c, t_c, coco) if x.exists()]
+    tex = (header(sources)
            + "\\footnotesize\\setlength{\\tabcolsep}{3pt}\n"
            + "\\begin{tabular}{@{}lcccc@{}}\n\\toprule\n"
            + "& \\multicolumn{2}{c}{VOC-Sim} & \\multicolumn{2}{c}{COCO-Cap} \\\\\n"

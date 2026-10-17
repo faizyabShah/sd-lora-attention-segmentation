@@ -437,7 +437,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Token track B1/B1b (registry Section 2) | Claude runs; Codex reviews | Complete and accepted (490/490): conditional released token promoted 5/5 to 0.8507 OOF; T-C remains (Sections 50–51) | job `232957`; `outputs/segmentation/controlled_attention_cv/tokens/` |
 | P3-C review | Claude | Accepted: every Section 51 value reproduced independently; FTF recorded in Section 11 (Section 52) | this commit |
 | Token confirmation T-C | Claude (ownership was "to agree"; taken at Narmeen's request); Codex reviews | Complete from the token package's committed shards: token + one pass + DenseCRF, 4/5 (Section 52) | this commit; `outputs/segmentation/controlled_attention_cv/token_confirmation/` |
-| COCO-Cap transfer run | Claude | Running: job `233147` (renyi, `trdp`), registered stages unchanged | `outputs/segmentation/coco_cap_transfer/coco_cap/` |
+| COCO-Cap transfer run | Claude | Complete (707/707, job `233147`): FTF 0.637 at its VOC threshold; results in Section 54; Codex review requested | this commit; `outputs/segmentation/coco_cap_transfer/coco_cap/` |
 
 ### Pre-sync exploratory run
 
@@ -2250,3 +2250,59 @@ live run is done.
 **Timing.** With CVPR in view, Claude suggests limiting the next phase to
 AN1, one seed family (SG5 or SG7) and SG1, so that the paper has a mechanism
 analysis and one new-method candidate. The rest can be listed as future work.
+
+## 54. Claude: COCO-Cap transfer of the frozen training-free pipelines (Codex review requested)
+
+**Run.** Job `233147`: 20/20 shards, 707/707 images, renyi A100 (`trdp`,
+torch 2.11), with the registered stages of Section 48 unchanged.
+
+- Every stage is read at its VOC-frozen threshold, 0.45 (Sections 11 and 51);
+  nothing is chosen on COCO-Cap.
+- The class name is the separate attribution prompt, encoded padded to 77
+  tokens (Section 48).
+- Summary: `scripts/narmyn/attention/summarize_coco_transfer.py` writes
+  `outputs/segmentation/coco_cap_transfer/coco_cap/summary.json`.
+
+| Stage (frozen on VOC-Sim) | COCO-Cap mIoU | Caption contains the class word (465) | Does not (242) |
+|---|---:|---:|---:|
+| CA seed alone | 0.5489 | 0.5531 | 0.5419 |
+| CA + one SA pass (Section 11) | 0.6262 | 0.6264 | 0.6192 |
+| Two passes | 0.6244 | 0.6207 | 0.6257 |
+| One pass + DenseCRF | 0.6420 | 0.6406 | 0.6373 |
+| **FTF: two passes + DenseCRF** | **0.6370** | 0.6317 | 0.6399 |
+
+**Paired per-image IoU.**
+
+| Comparison | Δ mIoU | Paired Δ [95% CI] | Better / worse |
+|---|---:|---|---:|
+| SA vs seed | +0.077 | +0.091 [+0.081, +0.102] | 533/174 |
+| DenseCRF vs one pass | +0.016 | +0.031 [+0.027, +0.036] | 530/176 |
+| FTF vs one pass | +0.011 | +0.028 [+0.022, +0.034] | 429/277 |
+| Two passes vs one | −0.002 | +0.002 [−0.002, +0.006] | 369/337 |
+| FTF vs one pass + DenseCRF | −0.005 | −0.004 [−0.008, +0.001] | 318/387 |
+
+- **What transfers.** SA propagation and DenseCRF transfer clearly; the second
+  pass has no significant effect on COCO-Cap in either direction. FTF stays as
+  frozen: COCO-Cap is never used to choose. The paper should state that the
+  two-pass gain is VOC-Sim-specific, and that with OVAM's token the second pass
+  is not selected even on VOC-Sim (Section 52).
+- **Against the released class-word baselines on COCO-Cap** (Section 41;
+  their own images): FTF 0.637 against OVAM 0.582, DatasetDM 0.593, Attn2Mask
+  0.584, Grounded Diffusion 0.502 and DAAM 0.484 (0.527 with the
+  VOC-fold-chosen threshold, on the same images as ours).
+- **Caption split.** The gap between captions that do and do not contain the
+  class word is small (at most 0.011, for the seed alone; under 0.01 after SA) for every stage: the separate attribution
+  prompt works when the caption omits the class.
+- **The earlier exploratory COCO-Cap value** of the class-word one-pass
+  pipeline was 0.6264 (registry Section 8), against 0.6262 here with the
+  controlled CA/SA choices.
+
+**Paper.** `paper/tables/generated/released_baselines.tex` now has two rows
+for our method: one SA pass, and the final pipelines (FTF for the class word;
+the T-C few-shot pipeline for the token, Section 52), with the COCO-Cap values
+marked ∗. The few-shot COCO-Cap cells wait for the token transfer.
+
+**Next (proposed, not yet registered):** the few-shot COCO-Cap transfer. Add a
+token attribution stage to `scripts/run_coco_cap_transfer.py` (OVAM's VOC
+tokens, keys `[<SoT>, token]`, conditional query; one pass + DenseCRF and the
+other T-C cells), register it here, and run it after Codex's review of T-C.

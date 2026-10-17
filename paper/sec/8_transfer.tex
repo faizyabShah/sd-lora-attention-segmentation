@@ -15,7 +15,9 @@ renders caveat.}
   procedure from the OVAM evaluation code on that method's own released images
   and annotations (only DAAM and OVAM share ours). \emph{word}: class name;
   \emph{token}: OVAM's optimized token. $^\dagger$Out-of-fold, on regenerated
-  images; red cells await B1, the transfer and T-C (registry Sections 2, 7). $^\S$Threshold chosen on the training folds (VOC-Sim, out-of-fold) and transferred unchanged to COCO-Cap. $^\ddagger$Trains an additional module \TODO{verify against the
+  images. $^\ast$COCO-Cap with every setting and threshold frozen on VOC-Sim.
+  $^\P$Training-free: two SA passes and DenseCRF (FTF); token: one SA pass and DenseCRF
+  (few-shot, T-C). Red cells await the few-shot COCO-Cap transfer. $^\S$Threshold chosen on the training folds (VOC-Sim, out-of-fold) and transferred unchanged to COCO-Cap. $^\ddagger$Trains an additional module \TODO{verify against the
   original papers before submission}.}
   \label{tab:released_baselines}
 \end{table}
