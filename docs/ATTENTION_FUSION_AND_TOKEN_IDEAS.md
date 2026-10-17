@@ -147,8 +147,8 @@ propagates it. Tokens are 768-dimensional text-encoder outputs, as in OVAM.
 |---|---|---|---|---|---|---|
 | B1 | OVAM released tokens | OVAM training set | 2–3 (mean) | Claude (taken over, protocol Section 49) | 1 | Done (Section 50): TC promoted over the word, OOF 0.787 → 0.851 (TU 0.843) |
 | B1b | OVAM per-image tokens | OVAM training set, each image alone | 1 (every choice; report mean ± range) | Claude (taken over, protocol Section 49) | 1 | Done (Section 50): single tokens 0.831 / 0.853 / 0.842 (TC, OOF) |
-| B2a | Our tokens on OVAM's training images | OVAM training set, OVAM's recipe (S1) | 1 and 3 | Codex | 2 | Not run |
-| B2b | Our tokens from the training folds | 1 image per class from the 4 training folds, seeded choice registered before the run; 5 token sets | 1 | Codex | 2 | Not run |
+| B2a | Our tokens on OVAM's training images | OVAM training set, OVAM's recipe (S1) | 1 and 3 | Codex | 2 | Next registered Codex package (protocol Section 60) |
+| B2b | Our tokens from the training folds | 1 image per class from the 4 training folds, seeded choice registered before the run; 5 token sets | 1 | Codex | 2 | After B2a (protocol Section 60) |
 | S4 | Shot scaling | from B1b/B2a: 1, 2, 3 shots | 1–3 | Codex | 2 | 1 vs 2–3 shots done from B1b (Section 50); B2a pending |
 | S3 | Train through our pipeline | loss on the SA-propagated map instead of raw CA | 1 | Codex | 3 | Not run |
 | S6 | Test-time self-consistency | per image, make `c` agree with `A c`; no labels (training-free track) | 0 | unassigned | 3 | Not run |
@@ -221,7 +221,7 @@ Q7's DiffSegmenter.
 | Comparisons (Q1–Q6) | Claude | `outputs/segmentation/comparisons/` |
 | Phase 3 confirmation P3-C | Codex runs; Claude reviews | `outputs/segmentation/controlled_attention_cv/phase3_confirmation/` |
 | Token confirmation T-C | Claude (protocol Section 52) | `outputs/segmentation/controlled_attention_cv/token_confirmation/` |
-| Transfer | Claude runs; Codex reviews (accepted, protocol Section 51) | `outputs/segmentation/coco_cap_transfer/` |
+| Transfer | Claude runs; Codex reviews (accepted, protocol Section 60) | `outputs/segmentation/coco_cap_transfer/` |
 
 ---
 
@@ -322,6 +322,7 @@ Controlled reference for phase 3: REF, VOC-Sim 0.7887 (protocol Sections 33,
 | 2026-10-17 | Transfer (few-shot) | Claude | `outputs/segmentation/coco_cap_transfer/coco_cap_token/` | `7a34721`; job `233168` | T-C pipeline 0.685 on COCO-Cap; protocol Sections 55–56 |
 | 2026-10-17 | AN1 (part 1) | Claude | `outputs/segmentation/analysis/an1_propagation_depth/` | `0063515` | second pass fills under-covered objects; protocol Section 57 |
 | 2026-10-17 | AN1 (part 2) | Claude | `outputs/segmentation/analysis/an1_spatial/` | this commit; job `233191` | where new pixels land; COCO-Cap leakage dominates; protocol Section 58 |
+| 2026-10-17 | T-C, transfers and AN1 review | Codex | committed packages above | this commit | accepted after independent recomputation; tie-aware AN1 Spearman fix; protocol Section 60 |
 
 ---
 
@@ -332,6 +333,11 @@ select settings from these families until T-C and the frozen COCO-Cap transfer
 are complete and the exact screens are agreed before execution. These ideas
 came from an external ChatGPT Web review of the project brief; its novelty
 claims have not been established by a systematic literature review.
+
+**2026-10-17 update:** T-C, both transfers and AN1 are complete and accepted
+(protocol Section 60). B2a/B2b token learning is the remaining current-package
+work. SG5 and SG1 follow only after that package and their exact screens are
+registered.
 
 The shared premise is that our method has two complementary objects that the
 OVAM baseline does not combine as a genuine propagation problem:

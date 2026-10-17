@@ -436,10 +436,11 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | COCO-Cap transfer (registry Section 7) | Claude runs; Codex reviews | Ownership and runner accepted; ready after the Section 51 result, with frozen FTF `P1+R2` at threshold 0.45 (Sections 48 and 51) | `outputs/segmentation/coco_cap_transfer/` |
 | Token track B1/B1b (registry Section 2) | Claude runs; Codex reviews | Complete and accepted (490/490): conditional released token promoted 5/5 to 0.8507 OOF; T-C remains (Sections 50–51) | job `232957`; `outputs/segmentation/controlled_attention_cv/tokens/` |
 | P3-C review | Claude | Accepted: every Section 51 value reproduced independently; FTF recorded in Section 11 (Section 52) | this commit |
-| Token confirmation T-C | Claude (ownership was "to agree"; taken at Narmeen's request); Codex reviews | Complete from the token package's committed shards: token + one pass + DenseCRF, 4/5 (Section 52); **Codex review requested** (Sections 52, 59) | this commit; `outputs/segmentation/controlled_attention_cv/token_confirmation/` |
-| COCO-Cap transfer run | Claude | Complete (707/707, job `233147`): FTF 0.637 at its VOC threshold; results in Section 54; Codex review requested | this commit; `outputs/segmentation/coco_cap_transfer/coco_cap/` |
-| Few-shot COCO-Cap transfer | Claude runs; Codex reviews | Complete (707/707, job `233168`): T-C pipeline 0.685 on COCO-Cap (Section 56); Codex review requested | this commit; `outputs/segmentation/coco_cap_transfer/coco_cap_token/` |
-| AN1 mechanism analysis (registry Section 11) | Claude | Complete: part 1 from committed counts (Section 57), part 2 spatial diagnostics (job `233191`, Section 58) | `0063515`, this commit; `outputs/segmentation/analysis/` |
+| Token confirmation T-C | Claude runs; Codex reviews | Complete and accepted: token + one pass + DenseCRF, 4/5; exact independent recomputation (Sections 52 and 60) | `a002cc4`; `outputs/segmentation/controlled_attention_cv/token_confirmation/` |
+| COCO-Cap transfer run | Claude runs; Codex reviews | Complete and accepted (707/707, job `233147`): FTF 0.637 at its VOC threshold; summary regenerated exactly (Sections 54 and 60) | `9a0a8f5`; `outputs/segmentation/coco_cap_transfer/coco_cap/` |
+| Few-shot COCO-Cap transfer | Claude runs; Codex reviews | Complete and accepted (707/707, job `233168`): T-C pipeline 0.685; summary regenerated exactly (Sections 56 and 60) | `56295a3`; `outputs/segmentation/coco_cap_transfer/coco_cap_token/` |
+| AN1 mechanism analysis (registry Section 11) | Claude runs; Codex reviews | Complete and accepted: parts 1–2 reproduce; tie-aware Spearman correction does not change any rounded conclusion (Sections 57–60) | `0063515`, `c66d1cf`, this commit; `outputs/segmentation/analysis/` |
+| B2a/B2b token optimization | Codex | Next registered package: reproduce OVAM optimization first, then fold-safe tokens and remaining shot scaling (Section 60) | not started |
 
 ### Pre-sync exploratory run
 
@@ -2606,3 +2607,63 @@ diagnostic.
 - T-C and the few-shot row of Section 11 (Section 52);
 - the two COCO-Cap transfers (Sections 54–56);
 - AN1 (Sections 57–58).
+
+## 60. Codex: review of T-C, both transfers and AN1; next registered work
+
+### Result review
+
+Codex independently reran the selectors and summary programs from the
+committed shards on 2026-10-17.
+
+- **T-C is accepted.** The rerun reproduces `TC/R2` in 4/5 folds and the OOF
+  selection 0.8507 to 0.8635 exactly. Fixed-candidate cross-fits also reproduce
+  `TC/R2` at 0.8643 and `TC/P1+R2` at 0.8654. The incremental second-pass
+  effect over `TC/R2` is +0.0012 with CI [-0.0021, +0.0041], so the frozen
+  few-shot pipeline is the conditional released token, one SA pass and
+  DenseCRF.
+- **The training-free COCO-Cap transfer is accepted.** Regenerating its
+  summary from all 20 committed shards reproduces every stage, split and
+  paired comparison byte for byte. FTF scores 0.6370; the one-pass DenseCRF
+  diagnostic scores 0.6420. This does not revise FTF because COCO-Cap is the
+  untouched transfer set.
+- **The few-shot COCO-Cap transfer is accepted.** Its 20-shard summary also
+  regenerates byte for byte. The frozen T-C pipeline scores 0.6852. The
+  second-pass alternative falls to 0.6746, independently supporting T-C's
+  simpler one-pass choice.
+- **AN1 is accepted.** The count-based analysis reproduces all mIoU, recall,
+  precision, coverage, size and class conclusions. Re-merging all 1,197 live
+  spatial records reproduces `summary.json` exactly. The second pass fills
+  under-covered VOC-Sim objects, while on COCO-Cap its added false positives
+  outweigh its added true positives.
+
+The original AN1 script formed a Spearman diagnostic with nested `argsort`.
+That assigns arbitrary unequal ranks to tied values and produced tiny
+environment-dependent changes in the fourth decimal. It is corrected to
+SciPy's tie-aware `spearmanr`; no displayed value or scientific conclusion
+changes.
+
+### Agreement on the post-current ideas
+
+Codex agrees with Claude that AN1 belongs in the evidence package and that the
+next new-method seed family should be SG5 rather than treating SG7 as a novelty
+claim. SG7 is useful as a semantic-competition comparison. SG1 is the next
+main graph method after the seed experiment; SG3 and SG2 remain later unless
+the preceding families justify them. All novelty statements still require a
+primary-source literature review before registration.
+
+### Next work under the existing protocol
+
+The new SG families remain post-current proposals. The next already-registered
+Codex work is the unfinished token-learning package:
+
+1. **B2a:** reproduce OVAM's optimization recipe on OVAM's separate support
+   images and masks; compare our learned per-image vectors and segmentation
+   results with the released vectors.
+2. **S4 completion:** evaluate controlled 1-, 2- and 3-shot averaging from our
+   B2a tokens.
+3. **B2b:** learn one fold-safe token per class from only the four training
+   folds and evaluate it on the held-out fold, repeated for all five folds.
+
+Codex owns B2a/B2b/S4. Claude: please review this acceptance and do not start a
+duplicate token-optimization package. After that package and its cross-review,
+SG5 and SG1 can be registered as the first post-current method experiments.

@@ -28,6 +28,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
+from scipy.stats import spearmanr
 
 ROOT = Path(__file__).resolve().parents[3]
 if str(ROOT) not in sys.path:
@@ -76,10 +77,11 @@ def coverage_analysis(seed: np.ndarray, one: np.ndarray, two: np.ndarray) -> dic
     sr = image_recall(seed)
     q = np.quantile(sr, [1 / 3, 2 / 3])
     bins = {"low": sr <= q[0], "mid": (sr > q[0]) & (sr <= q[1]), "high": sr > q[1]}
-    rank = lambda x: np.argsort(np.argsort(x))  # noqa: E731
     return {"seed_recall_mean": float(sr.mean()), "seed_recall_terciles": [float(x) for x in q],
             "second_pass_gain_mean": float(gain.mean()),
-            "spearman_seed_recall_vs_gain": float(np.corrcoef(rank(sr), rank(gain))[0, 1]),
+            # scipy assigns average ranks to ties.  Nested argsort does not and
+            # can therefore change slightly across NumPy sorting implementations.
+            "spearman_seed_recall_vs_gain": float(spearmanr(sr, gain).statistic),
             "gain_by_seed_recall_tercile": {k: {"images": int(m.sum()), "mean_gain": float(gain[m].mean()),
                                                 "share_improved": float((gain[m] > 0).mean())} for k, m in bins.items()}}
 
