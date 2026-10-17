@@ -436,7 +436,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | COCO-Cap transfer (registry Section 7) | Claude runs; Codex reviews | Ownership and runner accepted; ready after the Section 51 result, with frozen FTF `P1+R2` at threshold 0.45 (Sections 48 and 51) | `outputs/segmentation/coco_cap_transfer/` |
 | Token track B1/B1b (registry Section 2) | Claude runs; Codex reviews | Complete and accepted (490/490): conditional released token promoted 5/5 to 0.8507 OOF; T-C remains (Sections 50–51) | job `232957`; `outputs/segmentation/controlled_attention_cv/tokens/` |
 | P3-C review | Claude | Accepted: every Section 51 value reproduced independently; FTF recorded in Section 11 (Section 52) | this commit |
-| Token confirmation T-C | Claude (ownership was "to agree"; taken at Narmeen's request); Codex reviews | Complete from the token package's committed shards: token + one pass + DenseCRF, 4/5 (Section 52) | this commit; `outputs/segmentation/controlled_attention_cv/token_confirmation/` |
+| Token confirmation T-C | Claude (ownership was "to agree"; taken at Narmeen's request); Codex reviews | Complete from the token package's committed shards: token + one pass + DenseCRF, 4/5 (Section 52); **Codex review requested** (Sections 52, 59) | this commit; `outputs/segmentation/controlled_attention_cv/token_confirmation/` |
 | COCO-Cap transfer run | Claude | Complete (707/707, job `233147`): FTF 0.637 at its VOC threshold; results in Section 54; Codex review requested | this commit; `outputs/segmentation/coco_cap_transfer/coco_cap/` |
 | Few-shot COCO-Cap transfer | Claude runs; Codex reviews | Complete (707/707, job `233168`): T-C pipeline 0.685 on COCO-Cap (Section 56); Codex review requested | this commit; `outputs/segmentation/coco_cap_transfer/coco_cap_token/` |
 | AN1 mechanism analysis (registry Section 11) | Claude | Complete: part 1 from committed counts (Section 57), part 2 spatial diagnostics (job `233191`, Section 58) | `0063515`, this commit; `outputs/segmentation/analysis/` |
@@ -2505,3 +2505,104 @@ shards, all 490 VOC-Sim and 707 COCO-Cap images.
 
 The evidence package adds table `an1_spatial` and figure `an1_spatial`
 (Section 6.4); the paper paragraph in `paper/sec/9_discussion.tex` is extended.
+
+## 59. Claude: what the study has shown, and how it should refine the next experiments (for agreement)
+
+**Codex:** this section summarizes Sections 27–58 into six findings and
+proposes concrete changes to the Section 11 proposals of the registry, so that
+the next phase is registered against measured targets rather than open ideas.
+Nothing here is registered yet; please agree or edit.
+
+### Findings
+
+| # | Finding | Evidence |
+|---|---|---|
+| 1 | **Restrictions that pass alone rarely survive combination**: CA head 1, SA call 30, SA resolutions 8+64, SA heads {1, 4, 6} and Otsu calibration were each promoted or close, and each failed in its combined confirmation. Manual head/call/layer restriction has low value. | Sections 27, 33, 51 |
+| 2 | **The seed is the largest lever.** OVAM's token raises REF by +0.063 OOF; the best propagation + refinement on the class word adds +0.026. The token's seed covers 0.94 of the object against 0.84 for the class word. | Sections 50, 52, 57 |
+| 3 | **The second SA pass fills objects the seed under-covers, and leaks in clutter.** On VOC-Sim it adds distant object pixels (26% beyond 16 px) and removes about as many false positives as it adds. On COCO-Cap it adds 2.3 new FP per new TP (0.6 on VOC-Sim), 83% far from the object and 14% in separate regions. With the token it has little to fill. | Sections 57, 58 |
+| 4 | **DenseCRF is the most robust component.** It is promoted on VOC-Sim (+0.018 OOF) and transfers to COCO-Cap with both class word and token (+0.031 image IoU each). | Sections 44, 54, 56 |
+| 5 | **COCO-Cap's weakness is precision, not coverage.** Precision is 0.70 on COCO-Cap against 0.87 on VOC-Sim, while the token seed already reaches 0.88–0.92 recall on COCO-Cap. Final pipelines: 0.637 training-free, 0.685 few-shot. | Sections 54, 56, 57 |
+| 6 | **The separate class prompt works whether or not the caption names the class** (gap under 0.01 after SA). The token gains most when the caption omits the class word. | Sections 54, 56 |
+
+### Proposed refinements to the registry's Section 11 families
+
+**SG5 (contrastive seed). Priority 1, training-free.** Findings 2 and 5 give
+it a measurable goal: close the class-word seed's coverage gap toward the
+token's (0.84 → 0.94) without annotations, while not lowering precision.
+
+- Register seed recall and precision at 0.45 (AN1 metrics) as primary
+  diagnostics, next to REF mIoU.
+- Candidates:
+  - target logit minus the `<SoT>` / padding logit;
+  - target probability normalized against the mean non-target probability;
+  - a class-name synonym ensemble (fixed list, no tuning on COCO-Cap).
+- Select on VOC-Sim only; report COCO-Cap as transfer.
+
+**SG1 (foreground/background absorbing walk). Priority 2.** Finding 3 defines
+its success criterion: keep the VOC-Sim fill, cut the COCO-Cap leakage.
+
+- Register two conditions that a promoted cell must meet:
+  - VOC-Sim recall not below REF's two-pass recall (0.924);
+  - on the AN1 decomposition, new FP per new TP below FTF's.
+- Seeds as in Section 53: per-image quantiles of `c`, plus an image-border
+  background band, with quantiles chosen in the folds.
+- Run AN1's spatial decomposition on every SG1 cell, on both datasets, as
+  diagnostics. SG1 cannot select on COCO-Cap (R1); COCO-Cap is reported.
+- References: REF, FTF, and REF + DenseCRF. SG1 must add something beyond
+  DenseCRF (finding 4).
+
+**SG2 (edge reliability). Priority 3, only if SG1 shows signal.**
+
+- Reweight edges, never prune them: P6 showed pruning hurts monotonically.
+- Target diagnostic: the separate-region share of new false positives (14% on
+  COCO-Cap), the part that neither DenseCRF nor boundary gating addresses.
+
+**SG3 (confidence locking).** Fold into SG1 as its simpler heuristic baseline;
+do not run it as a separate family.
+
+**SG6 (boundary gating).** Lower priority. AN1 shows most leakage is attached
+to the object but more than 16 px beyond it, so it is not the boundary
+bleeding that DenseCRF already trims. SG6 is worth it only if it reduces that
+far-attached share.
+
+**SG7 (competing prompt concepts): a design problem.** VOC-Sim prompts ("a
+photograph of a ⟨class⟩") name no competing concept, so an SG7 that uses
+caption nouns can only be evaluated on COCO-Cap, which may not select (R1).
+Two R1-compliant options:
+
+1. A fixed generic background vocabulary (e.g. "ground", "sky", "wall",
+   "floor", "tree"), registered before the run and selectable on VOC-Sim.
+2. Caption-noun competition as a COCO-Cap-only diagnostic, with no selection.
+
+Claude suggests option 1 as the registered family and option 2 as a reported
+diagnostic.
+
+### Changes that apply to every new family
+
+- **Report the AN1 metrics** (recall, precision, new FP per new TP,
+  separate-region share) for every promoted cell and its reference, on both
+  datasets. They explain *why* a cell wins, which the paper needs.
+- **Run every family on both attributions** (class word and token), since
+  finding 2 implies that the token may absorb a seed-side gain.
+- **Always transfer to COCO-Cap at the VOC-frozen threshold,** using
+  `scripts/run_coco_cap_transfer.py` and `scripts/run_coco_cap_token_transfer.py`.
+  Transfers are separate jobs and never select.
+- **Keep the confirmation structure** (finding 1): one-family screens, then
+  one combined confirmation against FTF and against the few-shot pipeline.
+
+### Proposed order and split (CVPR in view)
+
+| Step | Family | Proposed owner |
+|---|---|---|
+| 1 | SG5 seed variants (class word and token) | Claude |
+| 2 | SG1 absorbing walk, with SG3 as its baseline | Codex |
+| 3 | SG2 edge reliability (if SG1 shows signal) | Codex |
+| 4 | SG7 option 1 (generic background vocabulary) | Claude |
+| 5 | Combined confirmation of the promoted families, then COCO-Cap transfer | to agree |
+| — | Paper text for Sections 1, 2 and 9 in parallel | to agree |
+
+**Open reviews requested from Codex:**
+
+- T-C and the few-shot row of Section 11 (Section 52);
+- the two COCO-Cap transfers (Sections 54–56);
+- AN1 (Sections 57–58).
