@@ -439,7 +439,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Token confirmation T-C | Claude (ownership was "to agree"; taken at Narmeen's request); Codex reviews | Complete from the token package's committed shards: token + one pass + DenseCRF, 4/5 (Section 52) | this commit; `outputs/segmentation/controlled_attention_cv/token_confirmation/` |
 | COCO-Cap transfer run | Claude | Complete (707/707, job `233147`): FTF 0.637 at its VOC threshold; results in Section 54; Codex review requested | this commit; `outputs/segmentation/coco_cap_transfer/coco_cap/` |
 | Few-shot COCO-Cap transfer | Claude runs; Codex reviews | Complete (707/707, job `233168`): T-C pipeline 0.685 on COCO-Cap (Section 56); Codex review requested | this commit; `outputs/segmentation/coco_cap_transfer/coco_cap_token/` |
-| AN1 mechanism analysis (registry Section 11) | Claude | Part 1 complete from committed counts (Section 57); part 2 (spatial diagnostics) optional | this commit; `outputs/segmentation/analysis/an1_propagation_depth/` |
+| AN1 mechanism analysis (registry Section 11) | Claude | Complete: part 1 from committed counts (Section 57), part 2 spatial diagnostics (job `233191`, Section 58) | `0063515`, this commit; `outputs/segmentation/analysis/` |
 
 ### Pre-sync exploratory run
 
@@ -2453,3 +2453,55 @@ crosses object boundaries; part 1 already gives the mechanism.
 **Paper and evidence.** A draft paragraph is in `paper/sec/9_discussion.tex`.
 The evidence package adds AN1 (Section 6.4, tables `an1_by_pass`,
 `an1_coverage`, figure `an1_propagation_depth`).
+
+## 58. Claude: AN1 part 2, where each pass's new pixels land (analysis; nothing selected)
+
+`scripts/narmyn/attention/an1_spatial.py` (job `233191`, renyi, `trdp`): 40
+shards, all 490 VOC-Sim and 707 COCO-Cap images.
+
+- One live generation per image, with the frozen CA/SA pipeline and the
+  transfers' attribution (class prompt padded to 77, plus OVAM's VOC token).
+- Masks at 0.45 at annotation resolution. The class-word IoUs reproduce the
+  earlier runs on the smoke images (seed 0.762, one pass 0.893, two passes
+  0.912).
+- Per transition, pixels that newly enter the mask are counted as new TP or
+  new FP. New TP are binned by distance to the previous mask. New FP are
+  binned by distance to the object, and classed as "attached" (their predicted
+  component touches the object) or "separate". Pixels that leave the mask are
+  counted too.
+- `--merge` writes `outputs/segmentation/analysis/an1_spatial/summary.json`.
+
+| Transition | New TP (> 16 px from previous mask) | New FP (separate region; > 16 px from object) | FP removed | New FP per new TP | Net per object pixel |
+|---|---|---|---:|---:|---:|
+| VOC-Sim, word, 1 → 2 | 1.09 M (26%) | 0.70 M (7%; 61%) | 0.62 M | 0.64 | +0.016 |
+| VOC-Sim, word, 2 → 3 | 0.46 M (12%) | 0.51 M (8%; 66%) | 0.26 M | 1.12 | +0.001 |
+| VOC-Sim, token, 1 → 2 | 0.34 M (15%) | 0.51 M (3%; 54%) | 0.53 M | 1.48 | +0.003 |
+| COCO-Cap, word, 1 → 2 | 1.20 M (23%) | 2.73 M (14%; 83%) | 0.61 M | 2.27 | −0.025 |
+| COCO-Cap, word, 2 → 3 | 0.44 M (15%) | 1.53 M (18%; 82%) | 0.33 M | 3.52 | −0.021 |
+| COCO-Cap, token, 1 → 2 | 0.36 M (18%) | 1.65 M (17%; 83%) | 0.70 M | 4.62 | −0.020 |
+
+**Reading.**
+
+- **On VOC-Sim the second pass fills, and does not just thicken the
+  boundary.** A quarter of its new object pixels lie more than 16 px from the
+  previous mask, and the false positives it adds are almost exactly offset by
+  false positives it removes. This completes part 1's "pure filling" result
+  (Section 57).
+- **The third pass adds as much leakage as filling** (1.12 new FP per new TP;
+  net +0.001), which is why passes plateau.
+- **On COCO-Cap the second pass leaks more than it fills:** 2.3 new FP per new
+  TP, against 0.6 on VOC-Sim. The new FP lie farther from the object (83%
+  beyond 16 px, against 61%) and are twice as often in separate regions (14%
+  against 7%). Most COCO-Cap leakage is still attached to the object, but
+  spreads far beyond it. That fits cluttered scenes, where similar surroundings
+  are reachable through the SA graph.
+- **With the token**, the second pass has little left to fill on VOC-Sim (net
+  +0.003), and on COCO-Cap leakage dominates again (net −0.020), consistent
+  with T-C (Section 52) and the transfer (Section 56).
+- **For SG1 and SG2 (Section 53).** Leakage that spreads through attached
+  regions is what an absorbing background (SG1) or reliability-weighted edges
+  (SG2) should limit. The separate-region share is the part that boundary
+  gating cannot explain.
+
+The evidence package adds table `an1_spatial` and figure `an1_spatial`
+(Section 6.4); the paper paragraph in `paper/sec/9_discussion.tex` is extended.

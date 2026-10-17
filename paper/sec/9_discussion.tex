@@ -16,9 +16,13 @@ covers least of the object (the lowest third gains $+0.029$ image IoU, the
 others under $+0.006$) and grows with object size; \emph{person} gains most.
 The optimized token's seed already covers 94\% of the object, against 84\% for
 the class word, which is why the token pipeline does not select a second pass.
-On COCO-Cap the extra recall is cancelled by lost precision in cluttered
-scenes, so the second pass does not transfer.
-\source{protocol Section 57; registry AN1}
+Tracking the pixels each pass adds confirms that the second pass genuinely
+fills: a quarter of its new object pixels lie more than 16 pixels from the
+previous mask, and the false positives it adds are offset by those it removes.
+On COCO-Cap, by contrast, it adds 2.3 false-positive pixels per new object
+pixel (0.6 on VOC-Sim), farther from the object and twice as often in separate
+regions, so the second pass does not transfer.
+\source{protocol Sections 57--58; registry AN1}
 
 \section{Conclusion}
 \label{sec:conclusion}

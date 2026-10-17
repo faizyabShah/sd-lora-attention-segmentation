@@ -54,6 +54,7 @@ PKG_FUSION = SEG / "controlled_attention_cv" / "fusion_calibration"
 BASELINES = SEG / "comparisons" / "released_baselines" / "summary.json"
 PKG_TOKENS = SEG / "controlled_attention_cv" / "tokens"
 AN1 = SEG / "analysis" / "an1_propagation_depth" / "summary.json"
+AN1_SPATIAL = SEG / "analysis" / "an1_spatial" / "summary.json"
 
 # Reference palette (dataviz skill, light mode; static figures for print).
 SURFACE, INK, INK2, MUTED, GRID, AXIS = "#fcfcfb", "#0b0b0b", "#52514e", "#898781", "#e1e0d9", "#c3c2b7"
@@ -1131,7 +1132,44 @@ def an1_analysis(plt, figures: list) -> dict | None:
             d["coverage"][k]["spearman_seed_recall_vs_gain"]] for k, _ in settings]
     cov_table = write_table("an1_coverage", ["Setting", "Seed recall", "Mean second-pass gain (image IoU)", "Spearman: seed recall vs gain"],
                             cov, "AN1: seed coverage and the second-pass gain")
-    return {"table": table, "coverage_table": cov_table}
+    out = {"table": table, "coverage_table": cov_table}
+    if AN1_SPATIAL.exists():
+        sp = load_json(AN1_SPATIAL)["datasets"]
+        cases = [("voc", "word", "1->2", "VOC-Sim, word, 1→2"), ("voc", "word", "2->3", "VOC-Sim, word, 2→3"),
+                 ("voc", "token", "1->2", "VOC-Sim, token, 1→2"), ("coco", "word", "1->2", "COCO-Cap, word, 1→2"),
+                 ("coco", "word", "2->3", "COCO-Cap, word, 2→3"), ("coco", "token", "1->2", "COCO-Cap, token, 1→2")]
+        rows = []
+        for ds, att, tr, label in cases:
+            a = sp[ds][att][tr]
+            rows.append([label, f"{a['new_tp'] / 1e6:.2f} M ({a['share_new_tp_far_gt16px']:.0%})",
+                         f"{a['new_fp'] / 1e6:.2f} M ({a['share_new_fp_jumping']:.0%}; {a['share_new_fp_far_gt16px']:.0%})",
+                         f"{a['lost_fp'] / 1e6:.2f} M", a["new_fp"] / max(a["new_tp"], 1), a["net_tp_minus_fp_per_object_pixel"]])
+        out["spatial_table"] = write_table(
+            "an1_spatial", ["Transition", "New TP (> 16 px from previous mask)", "New FP (separate; > 16 px from object)",
+                            "FP removed", "New FP per new TP", "Net per object pixel"], rows,
+            "AN1 part 2: where each pass's new pixels land (threshold 0.45, annotation resolution, summed over images)")
+        fig, ax = plt.subplots(figsize=(9, 3.4))
+        labels = [c[3] for c in cases]
+        xs = np.arange(len(cases))
+        tp = [sp[ds][att][tr]["new_tp"] for ds, att, tr, _ in cases]
+        fp_b = [sp[ds][att][tr]["new_fp_bleeding"] for ds, att, tr, _ in cases]
+        fp_j = [sp[ds][att][tr]["new_fp_jumping"] for ds, att, tr, _ in cases]
+        lost = [sp[ds][att][tr]["lost_fp"] for ds, att, tr, _ in cases]
+        scale = [max(t, 1) for t in tp]
+        ax.bar(xs - 0.2, [1.0] * len(cases), width=0.38, color=BLUE, label="new object pixels (= 1)")
+        ax.bar(xs + 0.2, [b / sc for b, sc in zip(fp_b, scale)], width=0.38, color=ORANGE, label="new false positives, attached")
+        ax.bar(xs + 0.2, [j / sc for j, sc in zip(fp_j, scale)], width=0.38, bottom=[b / sc for b, sc in zip(fp_b, scale)],
+               color=YELLOW, label="new false positives, separate region")
+        ax.scatter(xs + 0.2, [l / sc for l, sc in zip(lost, scale)], color=INK, marker="_", s=260, linewidths=2.5, zorder=3,
+                   label="false positives removed")
+        ax.set_xticks(xs, labels, fontsize=7.5, rotation=15, ha="right")
+        ax.set_ylabel("pixels per new object pixel")
+        ax.set_title("AN1: what each additional pass adds and removes")
+        ax.legend(loc="upper left", fontsize=7)
+        fig.tight_layout()
+        save(fig, "an1_spatial", figures)
+        plt.close(fig)
+    return out
 
 
 def joint_audit(plt, figures: list) -> dict | None:
@@ -1704,6 +1742,12 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
                           "On COCO-Cap the extra recall is cancelled by lost precision in cluttered scenes (protocol Section 57).", "",
                           p3["an1"]["coverage_table"], "",
                           fig("an1_propagation_depth", "Fig. 18. AN1: what each pass changes, and the second-pass gain by seed coverage."), ""]
+                if p3["an1"].get("spatial_table"):
+                    lines += ["**Where the new pixels land (part 2).** On VOC-Sim the second pass fills distant parts of the object (26% of its new object pixels lie more than 16 px from the previous mask) "
+                              "and removes about as many false positives as it adds. On COCO-Cap it adds 2.3 false-positive pixels per new object pixel (VOC-Sim 0.6), "
+                              "farther from the object and twice as often in separate regions (protocol Section 58).", "",
+                              p3["an1"]["spatial_table"], "",
+                              fig("an1_spatial", "Fig. 19. AN1 part 2: new object pixels, new false positives (attached or separate) and removed false positives, per new object pixel."), ""]
             lines += ["### 6.5 Released baselines (A10)", "", p3["baselines"]["table"], "",
                       "Every value printed in OVAM's evaluation notebooks is reproduced (protocol Section 41). Only DAAM and OVAM share our "
                       "images and annotations; the other methods are scored on their own released sets, as in OVAM's comparison.", ""]
@@ -1744,6 +1788,7 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
         "a_calibration": ("Calibration of the promoted CA changes at thresholds 0.35, 0.45 and 0.55.", 0.6),
         "a7_joint_audit": ("Joint CA×SA audit: mIoU of all 78 cells (in-sample); the box is the frozen pair.", 1.0),
         "a8_propagation": ("Propagation: passes under both aggregation orders, restart, and top-k sparsity (in-sample).", 1.0),
+        "an1_spatial": ("AN1 part 2: new object pixels, new false positives (attached or separate) and removed false positives, per new object pixel.", 1.0),
         "an1_propagation_depth": ("AN1: what each pass changes, and the second-pass gain by seed coverage.", 1.0),
         "a9_fusion": ("Fusion and calibration: change against REF, each at its best threshold (in-sample).", 0.7),
         "a6_sa_c_thresholds": ("SA-C: change in mIoU of every combination against the SA reference at thresholds 0.35, 0.45 and 0.55 (blue = frozen).", 1.0),
@@ -1801,6 +1846,9 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
     if p3.get("an1"):
         tex += [r"\input{evidence/tables/an1_by_pass.tex}", r"\input{evidence/tables/an1_coverage.tex}"]
         figs += ["an1_propagation_depth"]
+        if p3["an1"].get("spatial_table"):
+            tex += [r"\input{evidence/tables/an1_spatial.tex}"]
+            figs += ["an1_spatial"]
         figs += ["a4_sa_l_single_leave1", "a4_sa_h"]
     figs += ["b_joint_passes_time", "b_joint_heads_threshold", "b_component_ablation"]
     for name in figs:

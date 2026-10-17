@@ -1,0 +1,265 @@
+{
+  "bins_pixels_at_annotation_resolution": [
+    "1-4",
+    "5-16",
+    "17-64",
+    ">64"
+  ],
+  "threshold": 0.45,
+  "datasets": {
+    "voc": {
+      "images": 490,
+      "word": {
+        "seed->1": {
+          "new_tp": 5532595,
+          "new_fp": 1818257,
+          "lost_tp": 514915,
+          "lost_fp": 2282014,
+          "new_tp_dist_to_prev_mask": [
+            1345653,
+            2324873,
+            1711831,
+            150238
+          ],
+          "new_fp_dist_to_object": [
+            473917,
+            464670,
+            498258,
+            381412
+          ],
+          "new_fp_bleeding": 1762654,
+          "new_fp_jumping": 55603,
+          "share_new_fp_jumping": 0.030580385501059532,
+          "share_new_fp_far_gt16px": 0.48379849493223454,
+          "share_new_tp_far_gt16px": 0.33656340288779496,
+          "net_tp_minus_fp_per_object_pixel": 0.1151930843426285
+        },
+        "1->2": {
+          "new_tp": 1092864,
+          "new_fp": 703523,
+          "lost_tp": 259114,
+          "lost_fp": 624663,
+          "new_tp_dist_to_prev_mask": [
+            403058,
+            406150,
+            259866,
+            23790
+          ],
+          "new_fp_dist_to_object": [
+            134924,
+            139988,
+            214972,
+            213639
+          ],
+          "new_fp_bleeding": 657249,
+          "new_fp_jumping": 46274,
+          "share_new_fp_jumping": 0.06577467971907101,
+          "share_new_fp_far_gt16px": 0.6092352346689447,
+          "share_new_tp_far_gt16px": 0.25955288123682363,
+          "net_tp_minus_fp_per_object_pixel": 0.015864107794982745
+        },
+        "2->3": {
+          "new_tp": 456358,
+          "new_fp": 512349,
+          "lost_tp": 178914,
+          "lost_fp": 258662,
+          "new_tp_dist_to_prev_mask": [
+            245051,
+            154327,
+            54256,
+            2724
+          ],
+          "new_fp_dist_to_object": [
+            78152,
+            95894,
+            146269,
+            192034
+          ],
+          "new_fp_bleeding": 472655,
+          "new_fp_jumping": 39694,
+          "share_new_fp_jumping": 0.07747453396024975,
+          "share_new_fp_far_gt16px": 0.6602979609602049,
+          "share_new_tp_far_gt16px": 0.12485811577752554,
+          "net_tp_minus_fp_per_object_pixel": 0.0004992563272601373
+        }
+      },
+      "token": {
+        "seed->1": {
+          "new_tp": 1608332,
+          "new_fp": 1241914,
+          "lost_tp": 382637,
+          "lost_fp": 2721500,
+          "new_tp_dist_to_prev_mask": [
+            576850,
+            749665,
+            271426,
+            10391
+          ],
+          "new_fp_dist_to_object": [
+            336459,
+            354155,
+            335219,
+            216081
+          ],
+          "new_fp_bleeding": 1221003,
+          "new_fp_jumping": 20911,
+          "share_new_fp_jumping": 0.01683771984211467,
+          "share_new_fp_far_gt16px": 0.44391157519763846,
+          "share_new_tp_far_gt16px": 0.17522315044406253,
+          "net_tp_minus_fp_per_object_pixel": 0.05685181867519601
+        },
+        "1->2": {
+          "new_tp": 341380,
+          "new_fp": 505014,
+          "lost_tp": 209458,
+          "lost_fp": 531389,
+          "new_tp_dist_to_prev_mask": [
+            182073,
+            107706,
+            46469,
+            5132
+          ],
+          "new_fp_dist_to_object": [
+            100098,
+            130706,
+            159395,
+            114815
+          ],
+          "new_fp_bleeding": 488379,
+          "new_fp_jumping": 16635,
+          "share_new_fp_jumping": 0.03293968088013401,
+          "share_new_fp_far_gt16px": 0.542975046236342,
+          "share_new_tp_far_gt16px": 0.1511541390825473,
+          "net_tp_minus_fp_per_object_pixel": 0.0033266312596833755
+        }
+      }
+    },
+    "coco": {
+      "images": 707,
+      "word": {
+        "seed->1": {
+          "new_tp": 7858716,
+          "new_fp": 9048615,
+          "lost_tp": 359006,
+          "lost_fp": 1942252,
+          "new_tp_dist_to_prev_mask": [
+            2240337,
+            3598799,
+            1823627,
+            195953
+          ],
+          "new_fp_dist_to_object": [
+            815009,
+            1209255,
+            2345612,
+            4678739
+          ],
+          "new_fp_bleeding": 8052618,
+          "new_fp_jumping": 995997,
+          "share_new_fp_jumping": 0.11007176236363245,
+          "share_new_fp_far_gt16px": 0.7762901836358382,
+          "share_new_tp_far_gt16px": 0.25698600127552645,
+          "net_tp_minus_fp_per_object_pixel": 0.009170719770252541
+        },
+        "1->2": {
+          "new_tp": 1203924,
+          "new_fp": 2730374,
+          "lost_tp": 162778,
+          "lost_fp": 610924,
+          "new_tp_dist_to_prev_mask": [
+            508078,
+            421491,
+            248370,
+            25985
+          ],
+          "new_fp_dist_to_object": [
+            167302,
+            291142,
+            686779,
+            1585151
+          ],
+          "new_fp_bleeding": 2357980,
+          "new_fp_jumping": 372394,
+          "share_new_fp_jumping": 0.13638937376344779,
+          "share_new_fp_far_gt16px": 0.8320947972695316,
+          "share_new_tp_far_gt16px": 0.22788398603234092,
+          "net_tp_minus_fp_per_object_pixel": -0.02514020397039356
+        },
+        "2->3": {
+          "new_tp": 435592,
+          "new_fp": 1531771,
+          "lost_tp": 139161,
+          "lost_fp": 327617,
+          "new_tp_dist_to_prev_mask": [
+            241133,
+            127340,
+            62423,
+            4696
+          ],
+          "new_fp_dist_to_object": [
+            82364,
+            190844,
+            421829,
+            836734
+          ],
+          "new_fp_bleeding": 1250888,
+          "new_fp_jumping": 280883,
+          "share_new_fp_jumping": 0.18337140473347519,
+          "share_new_fp_far_gt16px": 0.8216391353537833,
+          "share_new_tp_far_gt16px": 0.15408685191647228,
+          "net_tp_minus_fp_per_object_pixel": -0.021163179742092725
+        }
+      },
+      "token": {
+        "seed->1": {
+          "new_tp": 2083897,
+          "new_fp": 3757562,
+          "lost_tp": 558796,
+          "lost_fp": 3460896,
+          "new_tp_dist_to_prev_mask": [
+            711412,
+            947140,
+            411881,
+            13464
+          ],
+          "new_fp_dist_to_object": [
+            383774,
+            625010,
+            1107676,
+            1641102
+          ],
+          "new_fp_bleeding": 3406412,
+          "new_fp_jumping": 351150,
+          "share_new_fp_jumping": 0.0934515518306817,
+          "share_new_fp_far_gt16px": 0.7315323073844158,
+          "share_new_tp_far_gt16px": 0.2041103758966974,
+          "net_tp_minus_fp_per_object_pixel": 0.0286404450547994
+        },
+        "1->2": {
+          "new_tp": 357152,
+          "new_fp": 1650405,
+          "lost_tp": 239797,
+          "lost_fp": 697506,
+          "new_tp_dist_to_prev_mask": [
+            178441,
+            115101,
+            59790,
+            3820
+          ],
+          "new_fp_dist_to_object": [
+            101459,
+            176718,
+            403002,
+            969226
+          ],
+          "new_fp_bleeding": 1372992,
+          "new_fp_jumping": 277413,
+          "share_new_fp_jumping": 0.16808783298644878,
+          "share_new_fp_far_gt16px": 0.8314492503355237,
+          "share_new_tp_far_gt16px": 0.17810344055192187,
+          "net_tp_minus_fp_per_object_pixel": -0.01948035673264545
+        }
+      }
+    }
+  }
+}
