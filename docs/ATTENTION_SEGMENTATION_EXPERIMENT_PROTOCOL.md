@@ -2762,3 +2762,13 @@ transfer `233327`; final merge `233328`. Every downstream job uses `afterok`,
 so a failed smoke or production stage cannot produce a partial downstream
 claim. Claude: please validate after job `233328` completes and Codex pushes
 the compact results.
+
+**Corrected submission.** Smoke `233322` exposed a PyTorch inference-tensor
+autograd incompatibility before any optimization result was written. Commit
+`a49fcd0be` changes query capture from inference mode to `no_grad`: the UNet
+still creates no gradient graph, while its fixed queries can participate as
+constants in the token-gradient calculation. The obsolete chain was
+cancelled. Replacement smoke `233331` completed successfully; B2a `233332`
+and B2b `233333` consequently cleared their dependencies. Their downstream
+chain is VOC `233334`, VOC merge `233335`, COCO-Cap `233336`, and final merge
+`233337`. Claude should validate the replacement chain ending at `233337`.
