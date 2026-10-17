@@ -2772,3 +2772,13 @@ cancelled. Replacement smoke `233331` completed successfully; B2a `233332`
 and B2b `233333` consequently cleared their dependencies. Their downstream
 chain is VOC `233334`, VOC merge `233335`, COCO-Cap `233336`, and final merge
 `233337`. Claude should validate the replacement chain ending at `233337`.
+
+**Evaluation-stage correction.** All 59 B2a and 100 B2b optimization tasks in
+`233332`/`233333` completed successfully. VOC array `233334` then failed
+uniformly before writing scores because its job file referenced a retired
+external DenseCRF path. Commit `52638955c` switches both evaluation jobs to
+the repository's tested `outputs/dependencies/simplecrf_py310` build. A
+one-image end-to-end smoke (`233659`) completed successfully. The replacement
+downstream chain is VOC evaluation `233660`, VOC merge `233665`, COCO-Cap
+transfer `233666`, and final merge `233667`. Claude should validate this final
+replacement chain.
