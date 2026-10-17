@@ -438,7 +438,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | P3-C review | Claude | Accepted: every Section 51 value reproduced independently; FTF recorded in Section 11 (Section 52) | this commit |
 | Token confirmation T-C | Claude (ownership was "to agree"; taken at Narmeen's request); Codex reviews | Complete from the token package's committed shards: token + one pass + DenseCRF, 4/5 (Section 52) | this commit; `outputs/segmentation/controlled_attention_cv/token_confirmation/` |
 | COCO-Cap transfer run | Claude | Complete (707/707, job `233147`): FTF 0.637 at its VOC threshold; results in Section 54; Codex review requested | this commit; `outputs/segmentation/coco_cap_transfer/coco_cap/` |
-| Few-shot COCO-Cap transfer | Claude runs; Codex reviews | Registered (Section 55); smoke exact on the class-word cells; launching | `outputs/segmentation/coco_cap_transfer/coco_cap_token/` |
+| Few-shot COCO-Cap transfer | Claude runs; Codex reviews | Complete (707/707, job `233168`): T-C pipeline 0.685 on COCO-Cap (Section 56); Codex review requested | this commit; `outputs/segmentation/coco_cap_transfer/coco_cap_token/` |
 
 ### Pre-sync exploratory run
 
@@ -2344,3 +2344,48 @@ the first 77 (softmax over 77, as before) and the token CA the last two
 - COCO-Cap, two images: `W/seed` and `W/REF` equal Section 54's `CA/seed` and
   `SA/REF` with 0 differing pixels.
 - `T/R2` 0.860 / 0.967 against `W/REF` 0.770 / 0.751.
+
+## 56. Claude: few-shot COCO-Cap transfer results (Codex review requested)
+
+**Run.** Job `233168`: 20/20 shards, 707/707 images, renyi A100 (`trdp`), from
+commit `7a34721`. Every stage is read at the threshold registered in Section 55
+(0.45 for the class word, 0.475 for the token). Summary:
+`scripts/narmyn/attention/summarize_coco_transfer.py` writes
+`outputs/segmentation/coco_cap_transfer/coco_cap_token/summary.json`. The
+Section 54 summary is unchanged when regenerated.
+
+**Check.** `W/seed` and `W/REF` equal Section 54's `CA/seed` and `SA/REF` with
+**0 differing pixels on all 707 images at all 17 thresholds**.
+
+| Stage | COCO-Cap mIoU | Caption contains the class word (465) | Does not (242) |
+|---|---:|---:|---:|
+| Class word: seed / one pass | 0.5489 / 0.6262 | 0.5531 / 0.6264 | 0.5419 / 0.6192 |
+| Token seed alone | 0.6383 | 0.6382 | 0.6442 |
+| Token, one pass | 0.6683 | 0.6626 | 0.6833 |
+| Token, two passes | 0.6608 | 0.6532 | 0.6805 |
+| **Token, one pass + DenseCRF (T-C pipeline)** | **0.6852** | 0.6795 | 0.7010 |
+| Token, two passes + DenseCRF | 0.6746 | 0.6664 | 0.6948 |
+
+| Comparison | Δ mIoU | Paired Δ image IoU [95% CI] | Better / worse |
+|---|---:|---|---:|
+| Token vs class-word seed | +0.089 | +0.073 [+0.059, +0.087] | 458/249 |
+| Token vs class word, one pass | +0.042 | +0.036 [+0.022, +0.050] | 405/301 |
+| DenseCRF on the token, one pass | +0.017 | +0.031 [+0.027, +0.035] | 537/169 |
+| Two passes vs one, token + DenseCRF | −0.011 | −0.008 [−0.012, −0.004] | 329/374 |
+| T-C pipeline vs class-word one pass | +0.059 | +0.067 [+0.052, +0.082] | 492/214 |
+
+**Reading.**
+
+- The few-shot pipeline transfers to COCO-Cap (0.685, against 0.637 for FTF).
+- **T-C's one-pass choice holds on unseen data:** with the token, the second
+  pass significantly hurts on COCO-Cap, as it did not help on VOC-Sim.
+- The token helps more when the caption omits the class word (0.701 vs
+  0.680), consistent with the token carrying the class identity itself.
+- The tokens are OVAM's VOC tokens; OVAM released no COCO tokens.
+- For context: OVAM reports 0.692 for its token-optimized method on COCO-Cap
+  (paper Table 1, its renders). The released baselines with OVAM's token score
+  0.605–0.732 on their own image sets (Section 41).
+
+**Paper.** Both COCO-Cap token cells are filled in
+`paper/tables/generated/released_baselines.tex`: one pass 0.668 and the final
+pipeline 0.685.

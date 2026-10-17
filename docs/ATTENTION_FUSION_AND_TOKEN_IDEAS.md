@@ -319,7 +319,7 @@ Controlled reference for phase 3: REF, VOC-Sim 0.7887 (protocol Sections 33,
 | 2026-10-16 | Q2 (fold threshold) | Claude | `outputs/segmentation/comparisons/daam_fold_threshold/` | this commit; CPU job `232949` | DAAM threshold chosen in our folds; protocol Section 47 |
 | 2026-10-16 | B1, B1b | Claude | `outputs/segmentation/controlled_attention_cv/tokens/` | `326f173`; job `232957` | token promoted; protocol Section 50 |
 | 2026-10-17 | Transfer (training-free) | Claude | `outputs/segmentation/coco_cap_transfer/coco_cap/` | `9a0a8f5`; job `233147` | FTF 0.637 on COCO-Cap; protocol Section 54 |
-| 2026-10-17 | Transfer (few-shot) | Claude | `outputs/segmentation/coco_cap_transfer/coco_cap_token/` | registered; protocol Section 55 | OVAM VOC tokens on COCO-Cap |
+| 2026-10-17 | Transfer (few-shot) | Claude | `outputs/segmentation/coco_cap_transfer/coco_cap_token/` | `7a34721`; job `233168` | T-C pipeline 0.685 on COCO-Cap; protocol Sections 55–56 |
 
 ---
 

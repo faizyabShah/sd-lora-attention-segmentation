@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Summarize the COCO-Cap transfer (phase 3 registry Section 7; protocol Sections 48, 54).
+"""Summarize the COCO-Cap transfers (phase 3 registry Section 7; protocol Sections 48, 54-56).
 
 Every stage is read at its VOC-frozen threshold (0.45 for all stages here;
 protocol Sections 11 and 51); nothing is chosen on COCO-Cap. Reports pooled
 class mIoU on all 707 images and split by whether the caption contains the
-class word, and paired bootstraps between stages. Writes ``summary.json``.
+class word, and paired bootstraps between stages. Writes ``summary.json`` in
+``coco_cap/`` (training-free, Section 54) and ``coco_cap_token/`` (few-shot, Section 55,
+thresholds registered there).
 
     python scripts/narmyn/attention/summarize_coco_transfer.py
 """
@@ -24,13 +26,23 @@ if str(ROOT) not in sys.path:
 
 from src.segmentation import controlled_cv as cv  # noqa: E402
 
-PKG = ROOT / "outputs" / "segmentation" / "coco_cap_transfer" / "coco_cap"
+TRANSFER = ROOT / "outputs" / "segmentation" / "coco_cap_transfer"
 CAPTIONS = ROOT / "datasets" / "ovam_experiment_with_dataset" / "evaluation" / "coco_captions_sampled.csv"
-FROZEN_THRESHOLD = {"CA/seed": 0.45, "SA/REF": 0.45, "P3/P1": 0.45, "P3/R2": 0.45, "P3/P1+R2": 0.45}
-PAIRS = (("SA/REF", "CA/seed"), ("P3/P1", "SA/REF"), ("P3/R2", "SA/REF"), ("P3/P1+R2", "SA/REF"), ("P3/P1+R2", "P3/R2"))
+PACKAGES = {
+    "coco_cap": ({"CA/seed": 0.45, "SA/REF": 0.45, "P3/P1": 0.45, "P3/R2": 0.45, "P3/P1+R2": 0.45},
+                 (("SA/REF", "CA/seed"), ("P3/P1", "SA/REF"), ("P3/R2", "SA/REF"), ("P3/P1+R2", "SA/REF"), ("P3/P1+R2", "P3/R2"))),
+    "coco_cap_token": ({"W/seed": 0.45, "W/REF": 0.45, "T/seed": 0.475, "T/REF": 0.475, "T/P1": 0.475, "T/R2": 0.475, "T/P1+R2": 0.475},
+                       (("T/seed", "W/seed"), ("T/REF", "W/REF"), ("T/R2", "T/REF"), ("T/P1+R2", "T/R2"), ("T/R2", "W/REF"))),
+}
 
 
 def main() -> None:
+    for name, (frozen, pairs) in PACKAGES.items():
+        if (TRANSFER / name / "shards").exists():
+            summarize(TRANSFER / name, frozen, pairs)
+
+
+def summarize(PKG, FROZEN_THRESHOLD, PAIRS) -> None:
     r = cv.load_results(sorted((PKG / "shards").glob("*.npz")))
     if len(r.image_ids) != 707 or not all(r.complete):
         raise SystemExit(f"{len(r.image_ids)} images; complete={all(r.complete)}")

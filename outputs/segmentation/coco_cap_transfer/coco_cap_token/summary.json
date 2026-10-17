@@ -1,0 +1,143 @@
+{
+  "images": 707,
+  "caption_includes_class": 465,
+  "caption_excludes_class": 242,
+  "commits": [
+    "7a347217470c0fc8f4d4f042711670d0279f4d1a"
+  ],
+  "environments": [
+    {
+      "commit": "7a347217470c0fc8f4d4f042711670d0279f4d1a",
+      "conda_env": "trdp",
+      "cudnn": "91900",
+      "diffusers": "0.36.0",
+      "gpu": "NVIDIA A100-PCIE-40GB",
+      "node": "renyi",
+      "numpy": "2.4.4",
+      "python": "3.11.15",
+      "slurm_job": "233168_0",
+      "torch": "2.11.0+cu130",
+      "torch_cuda": "13.0",
+      "transformers": "5.6.2"
+    }
+  ],
+  "note": "VOC-frozen thresholds; nothing chosen on COCO-Cap",
+  "stages": {
+    "W/seed": {
+      "threshold": 0.45,
+      "miou_all": 0.5489089717966038,
+      "miou_caption_includes_class": 0.5530577328423225,
+      "miou_caption_excludes_class": 0.5418983270583937,
+      "mean_image_iou": 0.5576353757031087
+    },
+    "W/REF": {
+      "threshold": 0.45,
+      "miou_all": 0.6261785914568627,
+      "miou_caption_includes_class": 0.6263846720270836,
+      "miou_caption_excludes_class": 0.6192458260144551,
+      "mean_image_iou": 0.6487175857234755
+    },
+    "T/seed": {
+      "threshold": 0.475,
+      "miou_all": 0.6383150967941555,
+      "miou_caption_includes_class": 0.638168175553129,
+      "miou_caption_excludes_class": 0.644221041484238,
+      "mean_image_iou": 0.630742897683058
+    },
+    "T/REF": {
+      "threshold": 0.475,
+      "miou_all": 0.6682543624552537,
+      "miou_caption_includes_class": 0.6625711516826711,
+      "miou_caption_excludes_class": 0.6832772344854616,
+      "mean_image_iou": 0.6845264611821115
+    },
+    "T/P1": {
+      "threshold": 0.475,
+      "miou_all": 0.660846171448622,
+      "miou_caption_includes_class": 0.6531791131810324,
+      "miou_caption_excludes_class": 0.6804555720435719,
+      "mean_image_iou": 0.6832704221644561
+    },
+    "T/R2": {
+      "threshold": 0.475,
+      "miou_all": 0.6852405597379627,
+      "miou_caption_includes_class": 0.679514613691298,
+      "miou_caption_excludes_class": 0.7010316909118548,
+      "mean_image_iou": 0.7154431389054898
+    },
+    "T/P1+R2": {
+      "threshold": 0.475,
+      "miou_all": 0.6746093340394871,
+      "miou_caption_includes_class": 0.6664228060528541,
+      "miou_caption_excludes_class": 0.6947665087141429,
+      "mean_image_iou": 0.7077985214770652
+    }
+  },
+  "pairs": [
+    {
+      "stage": "T/seed",
+      "versus": "W/seed",
+      "delta_miou": 0.08940612499755174,
+      "paired_bootstrap": {
+        "mean": 0.07310752197994948,
+        "ci_low": 0.05926024015227934,
+        "ci_high": 0.08686481276086258,
+        "better": 458,
+        "worse": 249,
+        "ties": 0
+      }
+    },
+    {
+      "stage": "T/REF",
+      "versus": "W/REF",
+      "delta_miou": 0.04207577099839099,
+      "paired_bootstrap": {
+        "mean": 0.035808875458635994,
+        "ci_low": 0.021770279153166962,
+        "ci_high": 0.049613240649810424,
+        "better": 405,
+        "worse": 301,
+        "ties": 1
+      }
+    },
+    {
+      "stage": "T/R2",
+      "versus": "T/REF",
+      "delta_miou": 0.016986197282709004,
+      "paired_bootstrap": {
+        "mean": 0.030916677723378458,
+        "ci_low": 0.026763253267799252,
+        "ci_high": 0.03519373800718255,
+        "better": 537,
+        "worse": 169,
+        "ties": 1
+      }
+    },
+    {
+      "stage": "T/P1+R2",
+      "versus": "T/R2",
+      "delta_miou": -0.010631225698475633,
+      "paired_bootstrap": {
+        "mean": -0.0076446174284245634,
+        "ci_low": -0.01180858270099823,
+        "ci_high": -0.0038969326585739077,
+        "better": 329,
+        "worse": 374,
+        "ties": 4
+      }
+    },
+    {
+      "stage": "T/R2",
+      "versus": "W/REF",
+      "delta_miou": 0.0590619682811,
+      "paired_bootstrap": {
+        "mean": 0.06672555318201444,
+        "ci_low": 0.051686691000841216,
+        "ci_high": 0.08160070407595119,
+        "better": 492,
+        "worse": 214,
+        "ties": 1
+      }
+    }
+  ]
+}

@@ -93,6 +93,9 @@ def released_baselines() -> None:
     t_c = CV / "token_confirmation" / "fold_results.json"
     coco = ROOT / "outputs" / "segmentation" / "coco_cap_transfer" / "coco_cap" / "summary.json"
     coco_stages = json.loads(coco.read_text())["stages"] if coco.exists() else {}
+    coco_t = ROOT / "outputs" / "segmentation" / "coco_cap_transfer" / "coco_cap_token" / "summary.json"
+    if coco_t.exists():
+        coco_stages.update(json.loads(coco_t.read_text())["stages"])
 
     def coco_cell(stage):
         return f"{coco_stages[stage]['miou_all']:.3f}$^\\ast$" if stage in coco_stages else "\\todo{---}"
@@ -101,10 +104,10 @@ def released_baselines() -> None:
         return f"{screen(path, name)['oof_miou_selection']:.3f}$^\\dagger$" if path.exists() else "\\todo{---}"
 
     token_ref = oof(tokens, "B1 released token, conditional query")
-    body.append("\\midrule\n" + f"Ours, one SA pass & {frozen:.3f}$^\\dagger$ & {token_ref} & {coco_cell('SA/REF')} & \\todo{{---}} \\\\")
+    body.append("\\midrule\n" + f"Ours, one SA pass & {frozen:.3f}$^\\dagger$ & {token_ref} & {coco_cell('SA/REF')} & {coco_cell('T/REF')} \\\\")
     body.append(f"Ours, final$^\\P$ & {oof(p3c, 'P3-C mandatory confirmation')} & "
-                f"{oof(t_c, 'T-C mandatory confirmation (token on REF, P1, R2, P1+R2)')} & {coco_cell('P3/P1+R2')} & \\todo{{---}} \\\\")
-    sources = [base, sa_c] + [x for x in (daam_cv, tokens, p3c, t_c, coco) if x.exists()]
+                f"{oof(t_c, 'T-C mandatory confirmation (token on REF, P1, R2, P1+R2)')} & {coco_cell('P3/P1+R2')} & {coco_cell('T/R2')} \\\\")
+    sources = [base, sa_c] + [x for x in (daam_cv, tokens, p3c, t_c, coco, coco_t) if x.exists()]
     tex = (header(sources)
            + "\\footnotesize\\setlength{\\tabcolsep}{3pt}\n"
            + "\\begin{tabular}{@{}lcccc@{}}\n\\toprule\n"
