@@ -438,6 +438,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | P3-C review | Claude | Accepted: every Section 51 value reproduced independently; FTF recorded in Section 11 (Section 52) | this commit |
 | Token confirmation T-C | Claude (ownership was "to agree"; taken at Narmeen's request); Codex reviews | Complete from the token package's committed shards: token + one pass + DenseCRF, 4/5 (Section 52) | this commit; `outputs/segmentation/controlled_attention_cv/token_confirmation/` |
 | COCO-Cap transfer run | Claude | Complete (707/707, job `233147`): FTF 0.637 at its VOC threshold; results in Section 54; Codex review requested | this commit; `outputs/segmentation/coco_cap_transfer/coco_cap/` |
+| Few-shot COCO-Cap transfer | Claude runs; Codex reviews | Registered (Section 55); smoke exact on the class-word cells; launching | `outputs/segmentation/coco_cap_transfer/coco_cap_token/` |
 
 ### Pre-sync exploratory run
 
@@ -2306,3 +2307,40 @@ marked ∗. The few-shot COCO-Cap cells wait for the token transfer.
 token attribution stage to `scripts/run_coco_cap_transfer.py` (OVAM's VOC
 tokens, keys `[<SoT>, token]`, conditional query; one pass + DenseCRF and the
 other T-C cells), register it here, and run it after Codex's review of T-C.
+
+## 55. Claude: few-shot COCO-Cap transfer (registered before the run)
+
+At Narmeen's request, the few-shot transfer runs now. Codex's review of T-C
+(Section 52) is still requested; the run covers every T-C cell, so it does not
+depend on which one T-C freezes.
+
+**Runner.** `scripts/run_coco_cap_token_transfer.py`, job
+`jobs/run_coco_cap_token_transfer.slurm`; renyi, `trdp` (the same environment
+as the Section 54 transfer); all 707 COCO-Cap images. Nothing is chosen on
+COCO-Cap: every stage is read at its VOC-frozen threshold.
+
+| Stage | Definition | VOC-frozen threshold |
+|---|---|---|
+| `W/seed`, `W/REF` | class word, separate class prompt padded to 77 (Section 48). Must equal Section 54's `CA/seed` and `SA/REF` exactly | 0.45 |
+| `T/seed` | OVAM's released **VOC** token (OVAM released no COCO tokens), keys `[<SoT>, token]`, conditional query (Section 50) | — (diagnostic) |
+| `T/REF`, `T/P1` | one / two SA passes on the token seed | 0.475 |
+| `T/R2` | **the T-C few-shot pipeline** (Section 52): one pass + DenseCRF | 0.475 |
+| `T/P1+R2` | two passes + DenseCRF | 0.475 |
+
+The thresholds are the ones each token cell selects on all 490 VOC-Sim
+images in the token package (0.475 for every token cell; same tie order as the
+selector), registered here before any COCO-Cap value is read.
+
+**Implementation.** One generation per image. The attribution keys are the 77
+padded class-prompt keys followed by the two token keys. The class-word CA uses
+the first 77 (softmax over 77, as before) and the token CA the last two
+(softmax over two). SA propagation is shared.
+
+**Smoke (renyi).**
+
+- VOC-Sim self-test, two images: `W/seed` and `W/REF` equal the fusion
+  package's cells with 0 differing pixels, and the token cells are within 27–142
+  pixels of the token package's (V100 vs A100).
+- COCO-Cap, two images: `W/seed` and `W/REF` equal Section 54's `CA/seed` and
+  `SA/REF` with 0 differing pixels.
+- `T/R2` 0.860 / 0.967 against `W/REF` 0.770 / 0.751.
