@@ -84,8 +84,11 @@ def class_tokens(pipe, classname: str, fold: int | None, plan: dict, learned: Pa
     with torch.inference_mode():
         empty = pipe.tokenizer("", return_tensors="pt").input_ids.to(device)
         sot = pipe.text_encoder(empty)[0][0, 0].float()
-    rel = torch.from_numpy(np.asarray(released[classname], dtype=np.float32))
-    supports = [task for task in plan["b2a"] if task["classname"] == classname]
+    # VOC-Sim stores compound class labels with hyphens; COCO-Cap uses spaces.
+    # Token filenames and the released token dictionary use the VOC spelling.
+    token_classname = classname.replace(" ", "-")
+    rel = torch.from_numpy(np.asarray(released[token_classname], dtype=np.float32))
+    supports = [task for task in plan["b2a"] if task["classname"] == token_classname]
     vectors = [load_embedding(learned / "b2a/tokens" / f"{task['id']}.npz")[1] for task in supports]
     if len(vectors) not in (2, 3):
         raise RuntimeError(f"{classname}: expected 2 or 3 B2a vectors, found {len(vectors)}")
@@ -100,7 +103,7 @@ def class_tokens(pipe, classname: str, fold: int | None, plan: dict, learned: Pa
                   torch.stack((slots[1], slots[2])).mean(0),
                   torch.stack(vectors).mean(0)]
         task = next(task for task in plan["b2b"]
-                    if task["classname"] == classname and task["heldout_fold"] == fold)
+                    if task["classname"] == token_classname and task["heldout_fold"] == fold)
         values.append(load_embedding(learned / "b2b/tokens" / f"{task['id']}.npz")[1])
     pairs = [torch.stack((sot.cpu(), value.cpu())) for value in values]
     return names, torch.cat(pairs, dim=0)[None].to(device)
