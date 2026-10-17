@@ -1,11 +1,18 @@
 \section{Discussion and limitations}
 \label{sec:discussion}
-\owner{to agree}
+\owner{Claude (draft from frozen results; Codex review requested, protocol Section 63)}
 
-\TODO{What the controlled path shows (restrictions that pass alone and fail
-in combination); class effects (e.g.\ person); calibration and AP;
-limitations: synthetic benchmarks, regenerated images, environments,
-selection on one dataset.}
+\paragraph{What the controlled path shows.}
+Restrictions chosen on their own screen rarely survive: removing a
+cross-attention head, keeping only the last denoising call, a subset of
+self-attention resolutions or heads, and per-image Otsu thresholding each
+passed or nearly passed alone and failed in combination. The changes that did
+survive are simple: drop one cross-attention resolution, propagate through
+one self-attention module, and refine with DenseCRF. The largest single lever
+is the seed. OVAM's token raises the one-pass pipeline by 0.063 out-of-fold,
+more than all propagation and refinement choices together on the class word
+(0.026). DenseCRF is the most robust component: it is selected on VOC-Sim and
+transfers to COCO-Cap with both the class word and the token.
 
 \paragraph{Why a second propagation pass helps.}
 \owner{Claude (AN1)}
@@ -24,6 +31,25 @@ pixel (0.6 on VOC-Sim), farther from the object and twice as often in separate
 regions, so the second pass does not transfer.
 \source{protocol Sections 57--58; registry AN1}
 
+\paragraph{Limitations.}
+\owner{Claude (draft)}
+Both benchmarks are generated images: VOC-Sim and COCO-Cap are rendered by
+Stable Diffusion~1.5 from released prompts and seeds. Our scores are on
+regenerated images and released annotations, while the released baseline masks
+were produced on their authors' renders and, for Attn2Mask, Grounded Diffusion
+and DatasetDM, on their own image sets. All choices are made on one dataset
+(VOC-Sim, 490 images, about 25 per class), so per-class conclusions are noisy.
+COCO-Cap is scored with OVAM's VOC tokens because no COCO-Cap tokens were
+released. Finally, all experiments use one model; whether the selected modules
+transfer to other diffusion models or to domain-adapted ones is open.
+\source{protocol Sections 41, 48, 54--56; registry R1, R10}
+
 \section{Conclusion}
 \label{sec:conclusion}
-\TODO{Two or three sentences.}
+\owner{Claude (draft)}
+Read out under a controlled, cross-validated selection, the attention of a
+text-to-image diffusion model segments objects well with few, simple choices.
+One self-attention module propagates a cross-attention seed, DenseCRF refines
+it, and a better seed matters more than a deeper propagation. The resulting
+training-free pipeline transfers to COCO-Cap without tuning, and an optimized
+token closes much of the remaining gap.

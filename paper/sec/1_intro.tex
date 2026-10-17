@@ -1,10 +1,50 @@
 \section{Introduction}
 \label{sec:intro}
-\owner{to agree}
+\owner{Claude (draft from frozen results; Codex review requested, protocol Section 63)}
 
-\TODO{Problem: open-vocabulary segmentation from a text-to-image diffusion
-model's attention. Gap: attention settings are usually chosen on the evaluation
-images. Contribution list (each tied to a registry or protocol ID):
-(1) a controlled, cross-validated selection of cross- and self-attention
-settings; (2) the frozen training-free method; (3) the few-shot token track;
-(4) transfer to COCO-Cap without tuning.}
+Text-to-image diffusion models localize the concepts they draw. The
+cross-attention between image positions and prompt tokens marks where a word
+is rendered, and the self-attention between image positions groups pixels that
+belong together \todo{[cite: Prompt-to-Prompt; DAAM --- verify]}. Several
+training-free segmenters read these maps out directly, and OVAM extends them
+to words that are absent from the prompt and to tokens optimized on a few
+annotated images \todo{[cite: OVAM; DiffSegmenter; DiffSeg --- verify]}.
+
+Such methods expose many settings: which denoising calls, resolutions, layers
+and heads to aggregate, how to combine cross- and self-attention, how to
+normalize and threshold the map, and how to refine it. When these choices are
+made on the images used for evaluation, the reported numbers are optimistic.
+In our own exploratory phase, a pipeline tuned in this way reached 0.800 mIoU
+on VOC-Sim, in-sample. Under held-out selection, several of its tuned choices
+(fixed head subsets, a late window of denoising calls, a subset of
+cross-attention layers) are not selected; the frozen pipeline is simpler and
+reaches 0.813 out-of-fold.
+
+We therefore study diffusion-attention segmentation under a controlled
+protocol. Each setting is varied one axis at a time from an inclusive
+reference, chosen on four of five class-stratified folds and scored on the
+fifth, and frozen only after a combined confirmation in which separately
+promoted changes are re-tested together. COCO-Cap is never used to choose
+anything and serves only to measure transfer.
+
+Our contributions are:
+\begin{itemize}
+\item \textbf{A controlled selection protocol} for diffusion-attention
+  segmentation, and the finding that most single-axis restrictions that pass
+  their own screen, including head, call and resolution subsets, fail when
+  combined (\cref{sec:selection,sec:ca,sec:sa}).
+\item \textbf{A training-free pipeline}, frozen under that protocol: the
+  cross-attention seed without the $32\times32$ modules, two passes through a
+  single $64\times64$ self-attention module, and DenseCRF. It scores 0.813
+  out-of-fold on VOC-Sim and 0.637 on COCO-Cap without any COCO-Cap tuning,
+  above every released class-word baseline (\cref{sec:fusion,sec:transfer}).
+\item \textbf{A few-shot variant} that replaces the class word by OVAM's
+  optimized token: 0.864 on VOC-Sim and 0.685 on COCO-Cap. We also find that
+  OVAM's released tokens average two or three per-image tokens, each learned
+  from one annotated image (\cref{sec:fusion}).
+\item \textbf{A mechanism analysis} of propagation: a second pass fills
+  objects that the seed under-covers, a better seed makes it unnecessary, and
+  in cluttered scenes its leakage outweighs the fill
+  (\cref{sec:discussion}).
+\end{itemize}
+\source{protocol Sections 11, 27, 33, 51, 52, 54, 56, 57; registry B1--B17}

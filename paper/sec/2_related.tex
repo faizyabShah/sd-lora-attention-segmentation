@@ -1,8 +1,46 @@
 \section{Related work}
 \label{sec:related}
-\owner{to agree}
+\owner{Claude (draft; every citation to be verified against its primary source before submission, protocol Section 29)}
 
-\TODO{Diffusion attention for segmentation (OVAM, DAAM, DiffSeg,
-DiffSegmenter, others in registry Q7); token optimization and textual
-inversion; propagation and refinement with self-attention. Every citation is
-checked against its DOI before it is added to references.bib.}
+\paragraph{Attention maps of diffusion models.}
+Cross-attention maps of text-to-image diffusion models have been used to
+explain and edit generated images \todo{[cite: Prompt-to-Prompt; DAAM ---
+verify]}, and to segment the objects they depict without training
+\todo{[cite: DAAM; DiffSegmenter; OVAM --- verify]}. OVAM generalizes the
+attribution to arbitrary words through a separate attribution prompt and fuses
+cross-attention with a self-attention map \todo{[cite: OVAM --- verify]}. We
+score the released masks and heatmaps of OVAM, DAAM and Attn2Mask with the
+procedures of OVAM's evaluation code, and use OVAM's separate attribution
+prompt for COCO-Cap.
+
+\paragraph{Self-attention as a grouping signal.}
+Self-attention of diffusion models groups pixels into coherent regions. DiffSeg
+merges attention maps by their similarity, and DiffCut partitions diffusion
+features with a normalized cut \todo{[cite: DiffSeg; DiffCut --- verify]};
+iterative self-attention refinement of a cross-attention seed has also been
+proposed \todo{[cite: iSeg --- verify]}. Our propagation $\sa\ca$ is of this
+kind, and is related to classical graph-based label propagation and random
+walks \todo{[cite: Zhou et al.\ 2003; Grady 2006 --- verify]}. Rather than
+proposing a new operator, we ask which propagation choices survive a
+controlled selection, and why.
+
+\paragraph{Generative data and grounding.}
+DatasetDM, Grounded Diffusion and DiffuMask train additional modules on
+synthetic or annotated data to produce masks from a generator
+\todo{[cite: DatasetDM; Grounded Diffusion; DiffuMask --- verify]}. They are
+not training-free; we report their released masks as reference points and
+mark them as such.
+
+\paragraph{Learned tokens.}
+Textual inversion learns a word embedding for a concept from a few images
+\todo{[cite: Textual Inversion --- verify]}. OVAM learns a class token in the
+text-encoder output space against annotated masks \todo{[cite: OVAM ---
+verify]}. We use OVAM's released tokens in a separately reported few-shot
+track and show that each is an average of two or three per-image tokens.
+
+\paragraph{Refinement and selection.}
+DenseCRF is a standard post-processing step for coarse masks \todo{[cite:
+Kr\"ahenb\"uhl and Koltun 2011 --- verify]} and is part of OVAM's pipeline. We
+are not aware of a cross-validated, combination-confirmed selection of
+diffusion-attention settings \todo{[verify by literature search before
+claiming]}.
