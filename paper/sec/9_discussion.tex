@@ -7,6 +7,19 @@ in combination); class effects (e.g.\ person); calibration and AP;
 limitations: synthetic benchmarks, regenerated images, environments,
 selection on one dataset.}
 
+\paragraph{Why a second propagation pass helps.}
+\owner{Claude (AN1)}
+Decomposing the error by pass shows that the second pass is pure filling: on
+VOC-Sim it raises recall from 0.912 to 0.924 at unchanged precision, while
+further passes lower precision. Its gain is concentrated in images whose seed
+covers least of the object (the lowest third gains $+0.029$ image IoU, the
+others under $+0.006$) and grows with object size; \emph{person} gains most.
+The optimized token's seed already covers 94\% of the object, against 84\% for
+the class word, which is why the token pipeline does not select a second pass.
+On COCO-Cap the extra recall is cancelled by lost precision in cluttered
+scenes, so the second pass does not transfer.
+\source{protocol Section 57; registry AN1}
+
 \section{Conclusion}
 \label{sec:conclusion}
 \TODO{Two or three sentences.}

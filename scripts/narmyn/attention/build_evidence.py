@@ -53,6 +53,7 @@ PKG_PROP = SEG / "controlled_attention_cv" / "propagation_package"
 PKG_FUSION = SEG / "controlled_attention_cv" / "fusion_calibration"
 BASELINES = SEG / "comparisons" / "released_baselines" / "summary.json"
 PKG_TOKENS = SEG / "controlled_attention_cv" / "tokens"
+AN1 = SEG / "analysis" / "an1_propagation_depth" / "summary.json"
 
 # Reference palette (dataviz skill, light mode; static figures for print).
 SURFACE, INK, INK2, MUTED, GRID, AXIS = "#fcfcfb", "#0b0b0b", "#52514e", "#898781", "#e1e0d9", "#c3c2b7"
@@ -183,6 +184,9 @@ EXPERIMENTS = [
     ("A10", "Released baselines scored with OVAM's procedures", f"{VOC}; {COCO} (each method's own images)",
      "reproduction of published values", "OVAM, DAAM, Attn2Mask, Grounded Diffusion, DatasetDM; class word and token",
      "OVAM evaluation notebooks", "comparisons/released_baselines", None, "every printed OVAM-notebook value reproduced"),
+    ("AN1", "Why a second SA pass helps (analysis, nothing selected)", f"{VOC}; {COCO}", "analysis of committed counts",
+     "seed, 1-4 passes; class word vs token; VOC-Sim vs COCO-Cap", "threshold 0.45", "analysis/an1_propagation_depth", None,
+     "second pass fills under-covered objects; the token seed already covers them; COCO-Cap leakage cancels the gain"),
     ("A11", "Token track B1/B1b: OVAM's optimized tokens on the frozen pipeline", VOC,
      "controlled, 5-fold cross-validated; few-shot track (2-3 annotated images per class)",
      "released token (two query forms) and each per-image token, on 5 pipelines", "frozen pair; class word as reference",
@@ -1091,6 +1095,45 @@ def fusion_figure(plt, figures: list, fus: dict) -> None:
     plt.close(fig)
 
 
+def an1_analysis(plt, figures: list) -> dict | None:
+    if not AN1.exists():
+        return None
+    d = load_json(AN1)
+    passes = list(d["by_pass_voc_word"])
+    fig, axes = plt.subplots(1, 2, figsize=(10.5, 3.4))
+    xs = np.arange(len(passes))
+    for key, colour, label in (("recall", BLUE, "recall (object covered)"), ("precision", ORANGE, "precision (no leakage)"),
+                               ("miou", INK2, "mIoU")):
+        axes[0].plot(xs, [d["by_pass_voc_word"][p][key] for p in passes], color=colour, marker="o", markersize=5, label=label)
+    axes[0].set_xticks(xs, passes)
+    axes[0].set_ylabel("at threshold 0.45")
+    axes[0].set_title("VOC-Sim, class word: what each pass changes")
+    axes[0].legend(loc="lower right", fontsize=7)
+    settings = [("voc_word", "VOC-Sim\nclass word"), ("voc_token", "VOC-Sim\ntoken"), ("coco_word", "COCO-Cap\nclass word"),
+                ("coco_token", "COCO-Cap\ntoken")]
+    width = 0.25
+    for j, (tercile, colour) in enumerate((("low", BLUE), ("mid", AQUA), ("high", MUTED))):
+        vals = [d["coverage"][k]["gain_by_seed_recall_tercile"][tercile]["mean_gain"] for k, _ in settings]
+        axes[1].bar(np.arange(len(settings)) + (j - 1) * width, vals, width=width * 0.9, color=colour,
+                    label=f"{tercile} seed coverage")
+    axes[1].axhline(0, color=AXIS, linewidth=1)
+    axes[1].set_xticks(range(len(settings)), [l for _, l in settings], fontsize=8)
+    axes[1].set_ylabel("Δ image IoU, 2 passes vs 1")
+    axes[1].set_title("Second-pass gain by how much of the object the seed covers")
+    axes[1].legend(loc="upper right", fontsize=7)
+    fig.tight_layout()
+    save(fig, "an1_propagation_depth", figures)
+    plt.close(fig)
+    rows = [[p, v["miou"], v["recall"], v["precision"], v["fp_per_object_pixel"]] for p, v in d["by_pass_voc_word"].items()]
+    table = write_table("an1_by_pass", ["Passes", "mIoU@0.45", "Recall", "Precision", "FP per object pixel"], rows,
+                        "AN1: error decomposition by propagation pass (VOC-Sim, class word, threshold 0.45, in-sample)")
+    cov = [[k, d["coverage"][k]["seed_recall_mean"], d["coverage"][k]["second_pass_gain_mean"],
+            d["coverage"][k]["spearman_seed_recall_vs_gain"]] for k, _ in settings]
+    cov_table = write_table("an1_coverage", ["Setting", "Seed recall", "Mean second-pass gain (image IoU)", "Spearman: seed recall vs gain"],
+                            cov, "AN1: seed coverage and the second-pass gain")
+    return {"table": table, "coverage_table": cov_table}
+
+
 def joint_audit(plt, figures: list) -> dict | None:
     if not (PKG_JOINT / "fold_results.json").exists():
         return None
@@ -1653,7 +1696,15 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
                           "The conditional form is the R5 choice: it beats the OVAM form by +0.0035 OOF but in only 3/5 folds, and changes only the attribution keys. "
                           "Single per-image tokens give 0.831 / 0.853 / 0.842 OOF on REF against 0.851 for OVAM's 2–3-image mean (protocol Section 50).", "",
                           "All 27 configurations: `controlled_token_package.csv`.", ""]
-            lines += ["### 6.4 Released baselines (A10)", "", p3["baselines"]["table"], "",
+            if p3.get("an1"):
+                lines += ["### 6.4 Why a second SA pass helps (AN1, analysis)", "", p3["an1"]["table"], "",
+                          "The second pass is pure filling: recall rises and precision stays flat; from the third pass precision falls (leakage). "
+                          "The gain sits in images whose seed covers little of the object, and grows with object size. "
+                          "The token's seed already covers 0.94 of the object (class word 0.84), so the second pass has little left to fill. "
+                          "On COCO-Cap the extra recall is cancelled by lost precision in cluttered scenes (protocol Section 57).", "",
+                          p3["an1"]["coverage_table"], "",
+                          fig("an1_propagation_depth", "Fig. 18. AN1: what each pass changes, and the second-pass gain by seed coverage."), ""]
+            lines += ["### 6.5 Released baselines (A10)", "", p3["baselines"]["table"], "",
                       "Every value printed in OVAM's evaluation notebooks is reproduced (protocol Section 41). Only DAAM and OVAM share our "
                       "images and annotations; the other methods are scored on their own released sets, as in OVAM's comparison.", ""]
     lines += [
@@ -1693,6 +1744,7 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
         "a_calibration": ("Calibration of the promoted CA changes at thresholds 0.35, 0.45 and 0.55.", 0.6),
         "a7_joint_audit": ("Joint CA×SA audit: mIoU of all 78 cells (in-sample); the box is the frozen pair.", 1.0),
         "a8_propagation": ("Propagation: passes under both aggregation orders, restart, and top-k sparsity (in-sample).", 1.0),
+        "an1_propagation_depth": ("AN1: what each pass changes, and the second-pass gain by seed coverage.", 1.0),
         "a9_fusion": ("Fusion and calibration: change against REF, each at its best threshold (in-sample).", 0.7),
         "a6_sa_c_thresholds": ("SA-C: change in mIoU of every combination against the SA reference at thresholds 0.35, 0.45 and 0.55 (blue = frozen).", 1.0),
         "a5_sa_t_calls": ("SA-T: SA from a single UNet call, and all calls except one.", 1.0),
@@ -1746,6 +1798,9 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
         tex += [r"\input{evidence/tables/a10_released_baselines.tex}"]
     if p3.get("tokens"):
         tex += [r"\input{evidence/tables/a11_cv_summary.tex}", r"\input{evidence/tables/a11_token_pipelines.tex}"]
+    if p3.get("an1"):
+        tex += [r"\input{evidence/tables/an1_by_pass.tex}", r"\input{evidence/tables/an1_coverage.tex}"]
+        figs += ["an1_propagation_depth"]
         figs += ["a4_sa_l_single_leave1", "a4_sa_h"]
     figs += ["b_joint_passes_time", "b_joint_heads_threshold", "b_component_ablation"]
     for name in figs:
@@ -1837,6 +1892,7 @@ def main() -> None:
           "prop": selected_package(plt, figures, PKG_PROP, "A8", "Phase 3 propagation package (Codex)", "controlled_propagation_package.csv"),
           "fusion": selected_package(plt, figures, PKG_FUSION, "A9", "Phase 3 fusion and calibration package", "controlled_fusion_calibration.csv"),
           "baselines": released_baselines(),
+          "an1": an1_analysis(plt, figures),
           "tokens": selected_package(plt, figures, PKG_TOKENS, "A11", "Token track B1 (released token vs class word on REF)", "controlled_token_package.csv")}
     if p3["prop"]:
         propagation_figure(plt, figures, p3["prop"])
@@ -1856,6 +1912,9 @@ def main() -> None:
         entry = next(e for e in ledger if e["id"] == "A7")
         entry.update({"configurations": p3["joint"]["configurations"], "best_configuration": p3["joint"]["screen"]["frozen"],
                       "best_miou": round(p3["joint"]["screen"]["out_of_fold_miou_selection"], 4)})
+    if p3["an1"]:
+        entry = next(e for e in ledger if e["id"] == "AN1")
+        entry.update({"configurations": "—", "best_configuration": "analysis", "best_miou": "—"})
     if p3["baselines"]:
         entry = next(e for e in ledger if e["id"] == "A10")
         entry.update({"configurations": 19, "best_configuration": "see Table a10", "best_miou": "—"})

@@ -1,0 +1,316 @@
+{
+  "threshold": 0.45,
+  "note": "analysis only; nothing selected",
+  "by_pass_voc_word": {
+    "seed": {
+      "miou": 0.6957064834623677,
+      "recall": 0.8219566524731288,
+      "precision": 0.8434217953487337,
+      "fp_per_object_pixel": 0.19957684690800767,
+      "best_threshold_in_sample": 0.4,
+      "miou_at_best_threshold": 0.7136203708676658
+    },
+    "1 pass": {
+      "miou": 0.7886558382302244,
+      "recall": 0.9123481469225443,
+      "precision": 0.8649547559487806,
+      "fp_per_object_pixel": 0.18274551550956802,
+      "best_threshold_in_sample": 0.425,
+      "miou_at_best_threshold": 0.7887910370070157
+    },
+    "2 passes": {
+      "miou": 0.8007098284412473,
+      "recall": 0.9239236030348034,
+      "precision": 0.8654600435081201,
+      "fp_per_object_pixel": 0.18216676090345768,
+      "best_threshold_in_sample": 0.45,
+      "miou_at_best_threshold": 0.8007098284412473
+    },
+    "3 passes": {
+      "miou": 0.8014055337953666,
+      "recall": 0.9271036414330152,
+      "precision": 0.8623507214513394,
+      "fp_per_object_pixel": 0.18743002887628307,
+      "best_threshold_in_sample": 0.475,
+      "miou_at_best_threshold": 0.8018626532221177
+    },
+    "4 passes": {
+      "miou": 0.8003923482426988,
+      "recall": 0.9290651783156854,
+      "precision": 0.8588743905067033,
+      "fp_per_object_pixel": 0.19358828489862567,
+      "best_threshold_in_sample": 0.475,
+      "miou_at_best_threshold": 0.8005209794756933
+    }
+  },
+  "per_class_second_pass_voc_word": {
+    "aeroplane": {
+      "delta_recall": -0.003758583479283928,
+      "delta_iou": 0.02053916151500279
+    },
+    "bicycle": {
+      "delta_recall": -0.029196437935169683,
+      "delta_iou": 0.002367166082105965
+    },
+    "bird": {
+      "delta_recall": 0.011129618413082909,
+      "delta_iou": -0.013546020201884779
+    },
+    "boat": {
+      "delta_recall": 0.0012204629819134727,
+      "delta_iou": 0.005373433213620271
+    },
+    "bottle": {
+      "delta_recall": -0.013407810078159166,
+      "delta_iou": -0.0014123330555373403
+    },
+    "bus": {
+      "delta_recall": 0.003824745141884245,
+      "delta_iou": -0.01575939578197083
+    },
+    "car": {
+      "delta_recall": -0.00043487051158319634,
+      "delta_iou": -0.016522502919590787
+    },
+    "cat": {
+      "delta_recall": 0.04964577571497031,
+      "delta_iou": 0.04454676512573508
+    },
+    "chair": {
+      "delta_recall": 0.001720242470841793,
+      "delta_iou": 0.05827038292372588
+    },
+    "cow": {
+      "delta_recall": 0.027738379019552784,
+      "delta_iou": 0.02539439604394178
+    },
+    "dining-table": {
+      "delta_recall": -0.003020861813534337,
+      "delta_iou": -0.018144182845682033
+    },
+    "dog": {
+      "delta_recall": 0.0057128218650566165,
+      "delta_iou": 0.006143604126563895
+    },
+    "horse": {
+      "delta_recall": 0.005053537811000597,
+      "delta_iou": 0.007006158057006884
+    },
+    "motorbike": {
+      "delta_recall": 0.000296422804517249,
+      "delta_iou": -0.002120682752650982
+    },
+    "person": {
+      "delta_recall": 0.07948014557217953,
+      "delta_iou": 0.06730871521514459
+    },
+    "potted-plant": {
+      "delta_recall": 0.05044013231530309,
+      "delta_iou": 0.03974229121005701
+    },
+    "sheep": {
+      "delta_recall": 0.037053557860534436,
+      "delta_iou": 0.0333086615072572
+    },
+    "sofa": {
+      "delta_recall": 0.003520532647090957,
+      "delta_iou": 0.0038169715328594256
+    },
+    "train": {
+      "delta_recall": 0.0006302223305050259,
+      "delta_iou": -0.0071742278774844515
+    },
+    "tv": {
+      "delta_recall": 0.003861089114481131,
+      "delta_iou": 0.0019414431022385381
+    }
+  },
+  "size_voc_word": {
+    "area_terciles_pixels": [
+      62333.0,
+      110227.0
+    ],
+    "gain_by_object_size": {
+      "small": {
+        "images": 164,
+        "mean_gain": 0.005867493359884491
+      },
+      "medium": {
+        "images": 163,
+        "mean_gain": 0.009205437057223386
+      },
+      "large": {
+        "images": 163,
+        "mean_gain": 0.02257588948681188
+      }
+    }
+  },
+  "coverage": {
+    "voc_word": {
+      "seed_recall_mean": 0.8402931409140687,
+      "seed_recall_terciles": [
+        0.8502122229311732,
+        0.946810960165784
+      ],
+      "second_pass_gain_mean": 0.012666832327878233,
+      "spearman_seed_recall_vs_gain": -0.23698219382463923,
+      "gain_by_seed_recall_tercile": {
+        "low": {
+          "images": 164,
+          "mean_gain": 0.028576960607944978,
+          "share_improved": 0.7804878048780488
+        },
+        "mid": {
+          "images": 163,
+          "mean_gain": 0.0036134502787893534,
+          "share_improved": 0.6380368098159509
+        },
+        "high": {
+          "images": 163,
+          "mean_gain": 0.005712477947942907,
+          "share_improved": 0.6503067484662577
+        }
+      }
+    },
+    "voc_token": {
+      "seed_recall_mean": 0.9424379597683292,
+      "seed_recall_terciles": [
+        0.939738085345398,
+        0.9835086094759353
+      ],
+      "second_pass_gain_mean": 0.005351074534428362,
+      "spearman_seed_recall_vs_gain": -0.03324133896808384,
+      "gain_by_seed_recall_tercile": {
+        "low": {
+          "images": 164,
+          "mean_gain": 0.008241820396811204,
+          "share_improved": 0.6646341463414634
+        },
+        "mid": {
+          "images": 163,
+          "mean_gain": 0.001231896825619289,
+          "share_improved": 0.5705521472392638
+        },
+        "high": {
+          "images": 163,
+          "mean_gain": 0.0065617717436620565,
+          "share_improved": 0.6871165644171779
+        }
+      }
+    },
+    "coco_word": {
+      "seed_recall_mean": 0.7582121476217334,
+      "seed_recall_terciles": [
+        0.7463784442534547,
+        0.9096469281513657
+      ],
+      "second_pass_gain_mean": 0.00198558035734507,
+      "spearman_seed_recall_vs_gain": -0.0925794765512535,
+      "gain_by_seed_recall_tercile": {
+        "low": {
+          "images": 236,
+          "mean_gain": 0.01566149918727275,
+          "share_improved": 0.5508474576271186
+        },
+        "mid": {
+          "images": 235,
+          "mean_gain": -0.0051700300568610314,
+          "share_improved": 0.502127659574468
+        },
+        "high": {
+          "images": 236,
+          "mean_gain": -0.004565048441487556,
+          "share_improved": 0.5127118644067796
+        }
+      }
+    },
+    "coco_token": {
+      "seed_recall_mean": 0.9130899009058114,
+      "seed_recall_terciles": [
+        0.9404487230260405,
+        0.9851805464013147
+      ],
+      "second_pass_gain_mean": 0.0001020413922047023,
+      "spearman_seed_recall_vs_gain": 0.098936079396991,
+      "gain_by_seed_recall_tercile": {
+        "low": {
+          "images": 236,
+          "mean_gain": -0.0010485234154519604,
+          "share_improved": 0.5127118644067796
+        },
+        "mid": {
+          "images": 235,
+          "mean_gain": -0.0016023655893608742,
+          "share_improved": 0.5106382978723404
+        },
+        "high": {
+          "images": 236,
+          "mean_gain": 0.002949791117945731,
+          "share_improved": 0.597457627118644
+        }
+      }
+    }
+  },
+  "by_pass_other": {
+    "voc_token": {
+      "seed": {
+        "miou": 0.7962396442249514,
+        "recall": 0.9340095342540209,
+        "precision": 0.8460501324385638,
+        "fp_per_object_pixel": 0.19934083847799958
+      },
+      "1 pass": {
+        "miou": 0.8480252663509111,
+        "recall": 0.9609683008525947,
+        "precision": 0.8805904186551754,
+        "fp_per_object_pixel": 0.1587967255404519
+      },
+      "2 passes": {
+        "miou": 0.8518696301693751,
+        "recall": 0.9626381945391284,
+        "precision": 0.8828931850968251,
+        "fp_per_object_pixel": 0.156011863840463
+      }
+    },
+    "coco_word": {
+      "seed": {
+        "miou": 0.5489089717966038,
+        "recall": 0.7011861310052858,
+        "precision": 0.7246110392948327,
+        "fp_per_object_pixel": 0.2889164025370042
+      },
+      "1 pass": {
+        "miou": 0.6261785914568627,
+        "recall": 0.8756857494462181,
+        "precision": 0.6980920275498373,
+        "fp_per_object_pixel": 0.4683171878511695
+      },
+      "2 passes": {
+        "miou": 0.6243854191644341,
+        "recall": 0.8991078309743811,
+        "precision": 0.6830040641743145,
+        "fp_per_object_pixel": 0.5199332421434322
+      }
+    },
+    "coco_token": {
+      "seed": {
+        "miou": 0.6336366289139773,
+        "recall": 0.8819759034205716,
+        "precision": 0.7021352805876484,
+        "fp_per_object_pixel": 0.43438587664554984
+      },
+      "1 pass": {
+        "miou": 0.6577121213537749,
+        "recall": 0.9198213239503985,
+        "precision": 0.7056537272076822,
+        "fp_per_object_pixel": 0.44942982343301674
+      },
+      "2 passes": {
+        "miou": 0.6499104966418694,
+        "recall": 0.9227247764992536,
+        "precision": 0.6947740290208307,
+        "fp_per_object_pixel": 0.47833190367960104
+      }
+    }
+  }
+}

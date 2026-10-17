@@ -40,6 +40,7 @@ Full data: `all_configurations.csv.gz` (one row per configuration, all experimen
 | A8 | Phase 3 propagation package (Codex): P1, W3, P2, P6 | VOC-Sim (490 images, 20 classes) | controlled, 5-fold cross-validated; threshold chosen in the folds | 40 | 0.7991 | two passes mean_i(A_i² c) promoted to P3-C |
 | A9 | Phase 3 fusion and calibration package: P4, F3, F4, N2-N4, R2 | VOC-Sim (490 images, 20 classes) | controlled, 5-fold cross-validated; threshold chosen in the folds | 12 | 0.8049 | DenseCRF promoted to P3-C; the rest kept at REF |
 | A10 | Released baselines scored with OVAM's procedures | VOC-Sim (490 images, 20 classes); COCO-Cap (707 images, 20 classes) (each method's own images) | reproduction of published values | 19 | — | every printed OVAM-notebook value reproduced |
+| AN1 | Why a second SA pass helps (analysis, nothing selected) | VOC-Sim (490 images, 20 classes); COCO-Cap (707 images, 20 classes) | analysis of committed counts | — | — | second pass fills under-covered objects; the token seed already covers them; COCO-Cap leakage cancels the gain |
 | A11 | Token track B1/B1b: OVAM's optimized tokens on the frozen pipeline | VOC-Sim (490 images, 20 classes) | controlled, 5-fold cross-validated; few-shot track (2-3 annotated images per class) | 27 | 0.8507 | token promoted on every pipeline: REF 0.787 -> 0.851 (conditional query) |
 
 ## 2. Where each setting came from
@@ -552,7 +553,31 @@ The conditional form is the R5 choice: it beats the OVAM form by +0.0035 OOF but
 
 All 27 configurations: `controlled_token_package.csv`.
 
-### 6.4 Released baselines (A10)
+### 6.4 Why a second SA pass helps (AN1, analysis)
+
+| Passes | mIoU@0.45 | Recall | Precision | FP per object pixel |
+|---|---:|---:|---:|---:|
+| seed | 0.6957 | 0.8220 | 0.8434 | 0.1996 |
+| 1 pass | 0.7887 | 0.9123 | 0.8650 | 0.1827 |
+| 2 passes | 0.8007 | 0.9239 | 0.8655 | 0.1822 |
+| 3 passes | 0.8014 | 0.9271 | 0.8624 | 0.1874 |
+| 4 passes | 0.8004 | 0.9291 | 0.8589 | 0.1936 |
+
+The second pass is pure filling: recall rises and precision stays flat; from the third pass precision falls (leakage). The gain sits in images whose seed covers little of the object, and grows with object size. The token's seed already covers 0.94 of the object (class word 0.84), so the second pass has little left to fill. On COCO-Cap the extra recall is cancelled by lost precision in cluttered scenes (protocol Section 57).
+
+| Setting | Seed recall | Mean second-pass gain (image IoU) | Spearman: seed recall vs gain |
+|---|---:|---:|---:|
+| voc_word | 0.8403 | 0.0127 | -0.2370 |
+| voc_token | 0.9424 | 0.0054 | -0.0332 |
+| coco_word | 0.7582 | 0.0020 | -0.0926 |
+| coco_token | 0.9131 | 0.0001 | 0.0989 |
+
+![Fig. 18. AN1: what each pass changes, and the second-pass gain by seed coverage.](figures/an1_propagation_depth.png)
+
+*Fig. 18. AN1: what each pass changes, and the second-pass gain by seed coverage.*
+
+
+### 6.5 Released baselines (A10)
 
 | Method | VOC-Sim word (images) | VOC-Sim token | COCO-Cap word (images) | COCO-Cap token |
 |---|---|---|---|---|

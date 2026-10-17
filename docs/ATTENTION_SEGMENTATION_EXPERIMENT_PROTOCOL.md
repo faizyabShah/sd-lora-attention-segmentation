@@ -439,6 +439,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Token confirmation T-C | Claude (ownership was "to agree"; taken at Narmeen's request); Codex reviews | Complete from the token package's committed shards: token + one pass + DenseCRF, 4/5 (Section 52) | this commit; `outputs/segmentation/controlled_attention_cv/token_confirmation/` |
 | COCO-Cap transfer run | Claude | Complete (707/707, job `233147`): FTF 0.637 at its VOC threshold; results in Section 54; Codex review requested | this commit; `outputs/segmentation/coco_cap_transfer/coco_cap/` |
 | Few-shot COCO-Cap transfer | Claude runs; Codex reviews | Complete (707/707, job `233168`): T-C pipeline 0.685 on COCO-Cap (Section 56); Codex review requested | this commit; `outputs/segmentation/coco_cap_transfer/coco_cap_token/` |
+| AN1 mechanism analysis (registry Section 11) | Claude | Part 1 complete from committed counts (Section 57); part 2 (spatial diagnostics) optional | this commit; `outputs/segmentation/analysis/an1_propagation_depth/` |
 
 ### Pre-sync exploratory run
 
@@ -2389,3 +2390,66 @@ Section 54 summary is unchanged when regenerated.
 **Paper.** Both COCO-Cap token cells are filled in
 `paper/tables/generated/released_baselines.tex`: one pass 0.668 and the final
 pipeline 0.685.
+
+## 57. Claude: AN1, why a second SA pass helps (analysis; nothing selected)
+
+AN1 (registry Section 11, agreed in Section 53) is run from committed counts
+only:
+
+- the propagation package (seed, 1–4 passes, A100);
+- the token package (class word vs token, V100);
+- both COCO-Cap transfers.
+
+`scripts/narmyn/attention/an1_propagation_depth.py` writes
+`outputs/segmentation/analysis/an1_propagation_depth/summary.json`. Every cell
+is read at threshold 0.45, so passes are compared on equal terms (in-sample,
+analysis only).
+
+**1. Error decomposition by pass (VOC-Sim, class word).** Macro over classes
+of pooled recall and precision:
+
+| | mIoU | Recall | Precision | FP per object pixel | Best threshold |
+|---|---:|---:|---:|---:|---:|
+| Seed | 0.696 | 0.822 | 0.843 | 0.200 | 0.40 |
+| 1 pass | 0.789 | 0.912 | 0.865 | 0.183 | 0.425 |
+| 2 passes | 0.801 | 0.924 | 0.866 | 0.182 | 0.45 |
+| 3 passes | 0.801 | 0.927 | 0.862 | 0.187 | 0.475 |
+| 4 passes | 0.800 | 0.929 | 0.859 | 0.194 | 0.475 |
+
+The second pass is **pure filling**: recall +0.012 with unchanged precision.
+From the third pass, recall gains are small and precision falls (leakage). The
+best threshold rises with each pass, as the map becomes smoother.
+
+**2. The gain follows under-coverage.** Images are split into terciles by the
+seed's own recall (the share of the object the seed covers):
+
+| Setting | Seed recall | Mean second-pass gain (image IoU) | Gain: low / mid / high coverage | Spearman (seed recall, gain) |
+|---|---:|---:|---|---:|
+| VOC-Sim, class word | 0.840 | +0.013 | +0.029 / +0.004 / +0.006 | −0.24 |
+| VOC-Sim, token | 0.942 | +0.005 | +0.008 / +0.001 / +0.007 | −0.03 |
+| COCO-Cap, class word | 0.758 | +0.002 | +0.016 / −0.005 / −0.005 | −0.09 |
+| COCO-Cap, token | 0.913 | +0.000 | −0.001 / −0.002 / +0.003 | +0.10 |
+
+- On VOC-Sim, the gain is concentrated where the class-word seed covers least
+  of the object. It also grows with object size (small +0.006, medium +0.009,
+  large +0.023).
+- By class, `person` gains most (+0.067 IoU, +0.079 recall: filling body parts
+  the seed misses), then `chair`, `cat` and `potted-plant`. The small losses
+  are `bus`, `car` and `dining-table` (≤ 0.018).
+- **The token's seed already covers 0.94 of the object** (class word 0.84), so
+  the second pass has little to fill. This is the mechanism behind T-C
+  rejecting the second pass (Section 52).
+- **COCO-Cap:** the second pass still adds recall (class word +0.023), but
+  loses precision (−0.015) in cluttered multi-object scenes, where precision
+  is far lower overall (0.70 against 0.87 on VOC-Sim). The two cancel; only
+  the lowest-coverage images still gain. This explains the null transfer in
+  Section 54.
+
+**Part 2 (optional, needs a short live run):** the spatial diagnostics of
+registry Section 11 (distance of new true positives and false positives from
+the seed, and from the annotation boundary). They would show whether leakage
+crosses object boundaries; part 1 already gives the mechanism.
+
+**Paper and evidence.** A draft paragraph is in `paper/sec/9_discussion.tex`.
+The evidence package adds AN1 (Section 6.4, tables `an1_by_pass`,
+`an1_coverage`, figure `an1_propagation_depth`).
