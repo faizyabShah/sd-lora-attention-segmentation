@@ -84,21 +84,24 @@ class OptimizationQueryRecorder:
             raise RuntimeError(f"Attention modules were not observed: {missing}")
 
 
-@torch.inference_mode()
 def capture_optimization_queries(pipe: Any, prompt: str, seed: int,
                                  steps: int = 30) -> OptimizationQueryRecorder:
     """Generate one sample and retain only query sums needed by optimization."""
     recorder = OptimizationQueryRecorder()
     _install(pipe, recorder)
     seed_everything(seed)
-    result = pipe(
-        prompt,
-        num_inference_steps=steps,
-        guidance_scale=7.5,
-        height=512,
-        width=512,
-        output_type="latent",
-    )
+    # ``inference_mode`` tensors cannot participate even as constants in the
+    # later token-gradient graph. ``no_grad`` avoids a UNet graph while
+    # producing ordinary tensors that autograd may save for backward.
+    with torch.no_grad():
+        result = pipe(
+            prompt,
+            num_inference_steps=steps,
+            guidance_scale=7.5,
+            height=512,
+            width=512,
+            output_type="latent",
+        )
     recorder.finalize()
     del result
     return recorder
