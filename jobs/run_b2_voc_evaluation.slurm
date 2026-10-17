@@ -14,5 +14,5 @@ export PYTHONDONTWRITEBYTECODE=1 HF_HUB_OFFLINE=1
 cd /home/shafa/sd-lora-attention-segmentation
 mkdir -p logs
 python scripts/run_b2_token_evaluation.py --dataset voc --class-shard "${SLURM_ARRAY_TASK_ID}" \
-  --crf-site "${CRF_SITE:-$HOME/TRDP/output/ovam_token_pilot/crf_site}"
+  --crf-site "${CRF_SITE:-outputs/dependencies/simplecrf_py310}" "$@"
 
