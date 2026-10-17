@@ -1,0 +1,1434 @@
+{
+  "version": 1,
+  "selection_seed": 20261017,
+  "recipe": {
+    "model": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+    "steps": 30,
+    "epochs": 800,
+    "optimizer": "SGD",
+    "initial_lr": 100.0,
+    "scheduler": "StepLR",
+    "step_size": 120,
+    "gamma": 0.7,
+    "loss": "CrossEntropyLoss",
+    "normalization": "global min-max",
+    "attention": "OVAM linear DAAM, unconditional queries, no middle block"
+  },
+  "b2a": [
+    {
+      "id": "sd-15_aeroplane_1791095845",
+      "classname": "aeroplane",
+      "prompt": "A photograph of a aeroplane",
+      "seed": 1791095845,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_aeroplane_1791095845.png"
+    },
+    {
+      "id": "sd-15_aeroplane_3093770124",
+      "classname": "aeroplane",
+      "prompt": "A photograph of a aeroplane",
+      "seed": 3093770124,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_aeroplane_3093770124.png"
+    },
+    {
+      "id": "sd-15_aeroplane_4282876139",
+      "classname": "aeroplane",
+      "prompt": "A photograph of a aeroplane",
+      "seed": 4282876139,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_aeroplane_4282876139.png"
+    },
+    {
+      "id": "sd-15_bicycle_4005303368",
+      "classname": "bicycle",
+      "prompt": "A photograph of a bicycle",
+      "seed": 4005303368,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_bicycle_4005303368.png"
+    },
+    {
+      "id": "sd-15_bicycle_491263",
+      "classname": "bicycle",
+      "prompt": "A photograph of a bicycle",
+      "seed": 491263,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_bicycle_491263.png"
+    },
+    {
+      "id": "sd-15_bicycle_550290313",
+      "classname": "bicycle",
+      "prompt": "A photograph of a bicycle",
+      "seed": 550290313,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_bicycle_550290313.png"
+    },
+    {
+      "id": "sd-15_bird_1298508491",
+      "classname": "bird",
+      "prompt": "A photograph of a bird",
+      "seed": 1298508491,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_bird_1298508491.png"
+    },
+    {
+      "id": "sd-15_bird_4290846341",
+      "classname": "bird",
+      "prompt": "A photograph of a bird",
+      "seed": 4290846341,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_bird_4290846341.png"
+    },
+    {
+      "id": "sd-15_bird_630311759",
+      "classname": "bird",
+      "prompt": "A photograph of a bird",
+      "seed": 630311759,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_bird_630311759.png"
+    },
+    {
+      "id": "sd-15_boat_1013994432",
+      "classname": "boat",
+      "prompt": "A photograph of a boat",
+      "seed": 1013994432,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_boat_1013994432.png"
+    },
+    {
+      "id": "sd-15_boat_1703301249",
+      "classname": "boat",
+      "prompt": "A photograph of a boat",
+      "seed": 1703301249,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_boat_1703301249.png"
+    },
+    {
+      "id": "sd-15_boat_396591248",
+      "classname": "boat",
+      "prompt": "A photograph of a boat",
+      "seed": 396591248,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_boat_396591248.png"
+    },
+    {
+      "id": "sd-15_bottle_1484172013",
+      "classname": "bottle",
+      "prompt": "A photograph of a bottle",
+      "seed": 1484172013,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_bottle_1484172013.png"
+    },
+    {
+      "id": "sd-15_bottle_1666063943",
+      "classname": "bottle",
+      "prompt": "A photograph of a bottle",
+      "seed": 1666063943,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_bottle_1666063943.png"
+    },
+    {
+      "id": "sd-15_bottle_799981516",
+      "classname": "bottle",
+      "prompt": "A photograph of a bottle",
+      "seed": 799981516,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_bottle_799981516.png"
+    },
+    {
+      "id": "sd-15_bus_1704103302",
+      "classname": "bus",
+      "prompt": "A photograph of a bus",
+      "seed": 1704103302,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_bus_1704103302.png"
+    },
+    {
+      "id": "sd-15_bus_2876537340",
+      "classname": "bus",
+      "prompt": "A photograph of a bus",
+      "seed": 2876537340,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_bus_2876537340.png"
+    },
+    {
+      "id": "sd-15_bus_4018109721",
+      "classname": "bus",
+      "prompt": "A photograph of a bus",
+      "seed": 4018109721,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_bus_4018109721.png"
+    },
+    {
+      "id": "sd-15_car_1800426750",
+      "classname": "car",
+      "prompt": "A photograph of a car",
+      "seed": 1800426750,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_car_1800426750.png"
+    },
+    {
+      "id": "sd-15_car_2314200242",
+      "classname": "car",
+      "prompt": "A photograph of a car",
+      "seed": 2314200242,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_car_2314200242.png"
+    },
+    {
+      "id": "sd-15_car_3634877716",
+      "classname": "car",
+      "prompt": "A photograph of a car",
+      "seed": 3634877716,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_car_3634877716.png"
+    },
+    {
+      "id": "sd-15_cat_1345499493",
+      "classname": "cat",
+      "prompt": "A photograph of a cat",
+      "seed": 1345499493,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_cat_1345499493.png"
+    },
+    {
+      "id": "sd-15_cat_2252917204",
+      "classname": "cat",
+      "prompt": "A photograph of a cat",
+      "seed": 2252917204,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_cat_2252917204.png"
+    },
+    {
+      "id": "sd-15_cat_2942995346",
+      "classname": "cat",
+      "prompt": "A photograph of a cat",
+      "seed": 2942995346,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_cat_2942995346.png"
+    },
+    {
+      "id": "sd-15_chair_1904615676",
+      "classname": "chair",
+      "prompt": "A photograph of a chair",
+      "seed": 1904615676,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_chair_1904615676.png"
+    },
+    {
+      "id": "sd-15_chair_3771485674",
+      "classname": "chair",
+      "prompt": "A photograph of a chair",
+      "seed": 3771485674,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_chair_3771485674.png"
+    },
+    {
+      "id": "sd-15_chair_878115723",
+      "classname": "chair",
+      "prompt": "A photograph of a chair",
+      "seed": 878115723,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_chair_878115723.png"
+    },
+    {
+      "id": "sd-15_cow_117628829",
+      "classname": "cow",
+      "prompt": "A photograph of a cow",
+      "seed": 117628829,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_cow_117628829.png"
+    },
+    {
+      "id": "sd-15_cow_2295290254",
+      "classname": "cow",
+      "prompt": "A photograph of a cow",
+      "seed": 2295290254,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_cow_2295290254.png"
+    },
+    {
+      "id": "sd-15_cow_986026652",
+      "classname": "cow",
+      "prompt": "A photograph of a cow",
+      "seed": 986026652,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_cow_986026652.png"
+    },
+    {
+      "id": "sd-15_dining-table_1792310487",
+      "classname": "dining-table",
+      "prompt": "A photograph of a dining table",
+      "seed": 1792310487,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_dining-table_1792310487.png"
+    },
+    {
+      "id": "sd-15_dining-table_2879636018",
+      "classname": "dining-table",
+      "prompt": "A photograph of a dining table",
+      "seed": 2879636018,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_dining-table_2879636018.png"
+    },
+    {
+      "id": "sd-15_dining-table_3925436996",
+      "classname": "dining-table",
+      "prompt": "A photograph of a dining table",
+      "seed": 3925436996,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_dining-table_3925436996.png"
+    },
+    {
+      "id": "sd-15_dog_1849836273",
+      "classname": "dog",
+      "prompt": "A photograph of a dog",
+      "seed": 1849836273,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_dog_1849836273.png"
+    },
+    {
+      "id": "sd-15_dog_1963679703",
+      "classname": "dog",
+      "prompt": "A photograph of a dog",
+      "seed": 1963679703,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_dog_1963679703.png"
+    },
+    {
+      "id": "sd-15_dog_2399554537",
+      "classname": "dog",
+      "prompt": "A photograph of a dog",
+      "seed": 2399554537,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_dog_2399554537.png"
+    },
+    {
+      "id": "sd-15_horse_4033523166",
+      "classname": "horse",
+      "prompt": "A photograph of a horse",
+      "seed": 4033523166,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_horse_4033523166.png"
+    },
+    {
+      "id": "sd-15_horse_602957303",
+      "classname": "horse",
+      "prompt": "A photograph of a horse",
+      "seed": 602957303,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_horse_602957303.png"
+    },
+    {
+      "id": "sd-15_horse_850839392",
+      "classname": "horse",
+      "prompt": "A photograph of a horse",
+      "seed": 850839392,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_horse_850839392.png"
+    },
+    {
+      "id": "sd-15_motorbike_3075069929",
+      "classname": "motorbike",
+      "prompt": "A photograph of a motorbike",
+      "seed": 3075069929,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_motorbike_3075069929.png"
+    },
+    {
+      "id": "sd-15_motorbike_3343156310",
+      "classname": "motorbike",
+      "prompt": "A photograph of a motorbike",
+      "seed": 3343156310,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_motorbike_3343156310.png"
+    },
+    {
+      "id": "sd-15_motorbike_3439171725",
+      "classname": "motorbike",
+      "prompt": "A photograph of a motorbike",
+      "seed": 3439171725,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_motorbike_3439171725.png"
+    },
+    {
+      "id": "sd-15_person_1346146623",
+      "classname": "person",
+      "prompt": "A photograph of a person",
+      "seed": 1346146623,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_person_1346146623.png"
+    },
+    {
+      "id": "sd-15_person_3447817223",
+      "classname": "person",
+      "prompt": "A photograph of a person",
+      "seed": 3447817223,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_person_3447817223.png"
+    },
+    {
+      "id": "sd-15_person_4158651785",
+      "classname": "person",
+      "prompt": "A photograph of a person",
+      "seed": 4158651785,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_person_4158651785.png"
+    },
+    {
+      "id": "sd-15_potted-plant_2225448249",
+      "classname": "potted-plant",
+      "prompt": "A photograph of a potted plant",
+      "seed": 2225448249,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_potted-plant_2225448249.png"
+    },
+    {
+      "id": "sd-15_potted-plant_2973502998",
+      "classname": "potted-plant",
+      "prompt": "A photograph of a potted plant",
+      "seed": 2973502998,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_potted-plant_2973502998.png"
+    },
+    {
+      "id": "sd-15_potted-plant_398576445",
+      "classname": "potted-plant",
+      "prompt": "A photograph of a potted plant",
+      "seed": 398576445,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_potted-plant_398576445.png"
+    },
+    {
+      "id": "sd-15_sheep_3715233664",
+      "classname": "sheep",
+      "prompt": "A photograph of a sheep",
+      "seed": 3715233664,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_sheep_3715233664.png"
+    },
+    {
+      "id": "sd-15_sheep_3764062721",
+      "classname": "sheep",
+      "prompt": "A photograph of a sheep",
+      "seed": 3764062721,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_sheep_3764062721.png"
+    },
+    {
+      "id": "sd-15_sheep_3842306364",
+      "classname": "sheep",
+      "prompt": "A photograph of a sheep",
+      "seed": 3842306364,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_sheep_3842306364.png"
+    },
+    {
+      "id": "sd-15_sofa_3561158865",
+      "classname": "sofa",
+      "prompt": "A photograph of a sofa",
+      "seed": 3561158865,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_sofa_3561158865.png"
+    },
+    {
+      "id": "sd-15_sofa_3563119320",
+      "classname": "sofa",
+      "prompt": "A photograph of a sofa",
+      "seed": 3563119320,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_sofa_3563119320.png"
+    },
+    {
+      "id": "sd-15_sofa_365262088",
+      "classname": "sofa",
+      "prompt": "A photograph of a sofa",
+      "seed": 365262088,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_sofa_365262088.png"
+    },
+    {
+      "id": "sd-15_train_254447594",
+      "classname": "train",
+      "prompt": "A photograph of a train",
+      "seed": 254447594,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_train_254447594.png"
+    },
+    {
+      "id": "sd-15_train_2879896008",
+      "classname": "train",
+      "prompt": "A photograph of a train",
+      "seed": 2879896008,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_train_2879896008.png"
+    },
+    {
+      "id": "sd-15_train_3771593337",
+      "classname": "train",
+      "prompt": "A photograph of a train",
+      "seed": 3771593337,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_train_3771593337.png"
+    },
+    {
+      "id": "sd-15_tv_1172740723",
+      "classname": "tv",
+      "prompt": "A photograph of a tv",
+      "seed": 1172740723,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_tv_1172740723.png"
+    },
+    {
+      "id": "sd-15_tv_167739021",
+      "classname": "tv",
+      "prompt": "A photograph of a tv",
+      "seed": 167739021,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim_train/annotations/sd-15_tv_167739021.png"
+    }
+  ],
+  "b2b": [
+    {
+      "id": "fold0_aeroplane",
+      "heldout_fold": 0,
+      "classname": "aeroplane",
+      "support_image_id": "ovam-voc-sim-5",
+      "support_fold": 1,
+      "prompt": "A photograph of a aeroplane",
+      "seed": 2327993476,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/aeroplane_sd15_seed2327993476_annotation.png"
+    },
+    {
+      "id": "fold0_bicycle",
+      "heldout_fold": 0,
+      "classname": "bicycle",
+      "support_image_id": "ovam-voc-sim-41",
+      "support_fold": 3,
+      "prompt": "A photograph of a bicycle",
+      "seed": 4134540311,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/bicycle_sd15_seed4134540311_annotation.png"
+    },
+    {
+      "id": "fold0_bird",
+      "heldout_fold": 0,
+      "classname": "bird",
+      "support_image_id": "ovam-voc-sim-62",
+      "support_fold": 4,
+      "prompt": "A photograph of a bird",
+      "seed": 3194216459,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/bird_sd15_seed3194216459_annotation.png"
+    },
+    {
+      "id": "fold0_boat",
+      "heldout_fold": 0,
+      "classname": "boat",
+      "support_image_id": "ovam-voc-sim-88",
+      "support_fold": 2,
+      "prompt": "A photograph of a boat",
+      "seed": 3197351734,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/boat_sd15_seed3197351734_annotation.png"
+    },
+    {
+      "id": "fold0_bottle",
+      "heldout_fold": 0,
+      "classname": "bottle",
+      "support_image_id": "ovam-voc-sim-122",
+      "support_fold": 1,
+      "prompt": "A photograph of a bottle",
+      "seed": 566976589,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/bottle_sd15_seed566976589_annotation.png"
+    },
+    {
+      "id": "fold0_bus",
+      "heldout_fold": 0,
+      "classname": "bus",
+      "support_image_id": "ovam-voc-sim-149",
+      "support_fold": 4,
+      "prompt": "A photograph of a bus",
+      "seed": 937166307,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/bus_sd15_seed937166307_annotation.png"
+    },
+    {
+      "id": "fold0_car",
+      "heldout_fold": 0,
+      "classname": "car",
+      "support_image_id": "ovam-voc-sim-153",
+      "support_fold": 4,
+      "prompt": "A photograph of a car",
+      "seed": 156257565,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/car_sd15_seed156257565_annotation.png"
+    },
+    {
+      "id": "fold0_cat",
+      "heldout_fold": 0,
+      "classname": "cat",
+      "support_image_id": "ovam-voc-sim-192",
+      "support_fold": 4,
+      "prompt": "A photograph of a cat",
+      "seed": 4115572993,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/cat_sd15_seed4115572993_annotation.png"
+    },
+    {
+      "id": "fold0_chair",
+      "heldout_fold": 0,
+      "classname": "chair",
+      "support_image_id": "ovam-voc-sim-218",
+      "support_fold": 2,
+      "prompt": "A photograph of a chair",
+      "seed": 3451010692,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/chair_sd15_seed3451010692_annotation.png"
+    },
+    {
+      "id": "fold0_cow",
+      "heldout_fold": 0,
+      "classname": "cow",
+      "support_image_id": "ovam-voc-sim-238",
+      "support_fold": 1,
+      "prompt": "A photograph of a cow",
+      "seed": 3025811345,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/cow_sd15_seed3025811345_annotation.png"
+    },
+    {
+      "id": "fold0_dining-table",
+      "heldout_fold": 0,
+      "classname": "dining-table",
+      "support_image_id": "ovam-voc-sim-272",
+      "support_fold": 1,
+      "prompt": "A photograph of a dining-table",
+      "seed": 754338450,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/dining-table_sd15_seed754338450_annotation.png"
+    },
+    {
+      "id": "fold0_dog",
+      "heldout_fold": 0,
+      "classname": "dog",
+      "support_image_id": "ovam-voc-sim-292",
+      "support_fold": 4,
+      "prompt": "A photograph of a dog",
+      "seed": 3743018802,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/dog_sd15_seed3743018802_annotation.png"
+    },
+    {
+      "id": "fold0_horse",
+      "heldout_fold": 0,
+      "classname": "horse",
+      "support_image_id": "ovam-voc-sim-301",
+      "support_fold": 1,
+      "prompt": "A photograph of a horse",
+      "seed": 1191074131,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/horse_sd15_seed1191074131_annotation.png"
+    },
+    {
+      "id": "fold0_motorbike",
+      "heldout_fold": 0,
+      "classname": "motorbike",
+      "support_image_id": "ovam-voc-sim-332",
+      "support_fold": 1,
+      "prompt": "A photograph of a motorbike",
+      "seed": 172224235,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/motorbike_sd15_seed172224235_annotation.png"
+    },
+    {
+      "id": "fold0_person",
+      "heldout_fold": 0,
+      "classname": "person",
+      "support_image_id": "ovam-voc-sim-353",
+      "support_fold": 4,
+      "prompt": "A photograph of a person",
+      "seed": 1225768520,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/person_sd15_seed1225768520_annotation.png"
+    },
+    {
+      "id": "fold0_potted-plant",
+      "heldout_fold": 0,
+      "classname": "potted-plant",
+      "support_image_id": "ovam-voc-sim-383",
+      "support_fold": 2,
+      "prompt": "A photograph of a potted-plant",
+      "seed": 2914136602,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/potted-plant_sd15_seed2914136602_annotation.png"
+    },
+    {
+      "id": "fold0_sheep",
+      "heldout_fold": 0,
+      "classname": "sheep",
+      "support_image_id": "ovam-voc-sim-401",
+      "support_fold": 4,
+      "prompt": "A photograph of a sheep",
+      "seed": 1283190650,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/sheep_sd15_seed1283190650_annotation.png"
+    },
+    {
+      "id": "fold0_sofa",
+      "heldout_fold": 0,
+      "classname": "sofa",
+      "support_image_id": "ovam-voc-sim-432",
+      "support_fold": 4,
+      "prompt": "A photograph of a sofa",
+      "seed": 1672185994,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/sofa_sd15_seed1672185994_annotation.png"
+    },
+    {
+      "id": "fold0_train",
+      "heldout_fold": 0,
+      "classname": "train",
+      "support_image_id": "ovam-voc-sim-460",
+      "support_fold": 2,
+      "prompt": "A photograph of a train",
+      "seed": 2994710267,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/train_sd15_seed2994710267_annotation.png"
+    },
+    {
+      "id": "fold0_tv",
+      "heldout_fold": 0,
+      "classname": "tv",
+      "support_image_id": "ovam-voc-sim-488",
+      "support_fold": 3,
+      "prompt": "A photograph of a tv",
+      "seed": 3224598679,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/tv_sd15_seed3224598679_annotation.png"
+    },
+    {
+      "id": "fold1_aeroplane",
+      "heldout_fold": 1,
+      "classname": "aeroplane",
+      "support_image_id": "ovam-voc-sim-23",
+      "support_fold": 2,
+      "prompt": "A photograph of a aeroplane",
+      "seed": 4204688153,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/aeroplane_sd15_seed4204688153_annotation.png"
+    },
+    {
+      "id": "fold1_bicycle",
+      "heldout_fold": 1,
+      "classname": "bicycle",
+      "support_image_id": "ovam-voc-sim-31",
+      "support_fold": 3,
+      "prompt": "A photograph of a bicycle",
+      "seed": 2491132216,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/bicycle_sd15_seed2491132216_annotation.png"
+    },
+    {
+      "id": "fold1_bird",
+      "heldout_fold": 1,
+      "classname": "bird",
+      "support_image_id": "ovam-voc-sim-63",
+      "support_fold": 0,
+      "prompt": "A photograph of a bird",
+      "seed": 3281430340,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/bird_sd15_seed3281430340_annotation.png"
+    },
+    {
+      "id": "fold1_boat",
+      "heldout_fold": 1,
+      "classname": "boat",
+      "support_image_id": "ovam-voc-sim-89",
+      "support_fold": 0,
+      "prompt": "A photograph of a boat",
+      "seed": 3246206399,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/boat_sd15_seed3246206399_annotation.png"
+    },
+    {
+      "id": "fold1_bottle",
+      "heldout_fold": 1,
+      "classname": "bottle",
+      "support_image_id": "ovam-voc-sim-118",
+      "support_fold": 2,
+      "prompt": "A photograph of a bottle",
+      "seed": 4113214108,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/bottle_sd15_seed4113214108_annotation.png"
+    },
+    {
+      "id": "fold1_bus",
+      "heldout_fold": 1,
+      "classname": "bus",
+      "support_image_id": "ovam-voc-sim-144",
+      "support_fold": 2,
+      "prompt": "A photograph of a bus",
+      "seed": 4066390655,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/bus_sd15_seed4066390655_annotation.png"
+    },
+    {
+      "id": "fold1_car",
+      "heldout_fold": 1,
+      "classname": "car",
+      "support_image_id": "ovam-voc-sim-165",
+      "support_fold": 0,
+      "prompt": "A photograph of a car",
+      "seed": 3109961333,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/car_sd15_seed3109961333_annotation.png"
+    },
+    {
+      "id": "fold1_cat",
+      "heldout_fold": 1,
+      "classname": "cat",
+      "support_image_id": "ovam-voc-sim-192",
+      "support_fold": 4,
+      "prompt": "A photograph of a cat",
+      "seed": 4115572993,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/cat_sd15_seed4115572993_annotation.png"
+    },
+    {
+      "id": "fold1_chair",
+      "heldout_fold": 1,
+      "classname": "chair",
+      "support_image_id": "ovam-voc-sim-209",
+      "support_fold": 0,
+      "prompt": "A photograph of a chair",
+      "seed": 211370389,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/chair_sd15_seed211370389_annotation.png"
+    },
+    {
+      "id": "fold1_cow",
+      "heldout_fold": 1,
+      "classname": "cow",
+      "support_image_id": "ovam-voc-sim-226",
+      "support_fold": 3,
+      "prompt": "A photograph of a cow",
+      "seed": 1152572731,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/cow_sd15_seed1152572731_annotation.png"
+    },
+    {
+      "id": "fold1_dining-table",
+      "heldout_fold": 1,
+      "classname": "dining-table",
+      "support_image_id": "ovam-voc-sim-251",
+      "support_fold": 3,
+      "prompt": "A photograph of a dining-table",
+      "seed": 1207627690,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/dining-table_sd15_seed1207627690_annotation.png"
+    },
+    {
+      "id": "fold1_dog",
+      "heldout_fold": 1,
+      "classname": "dog",
+      "support_image_id": "ovam-voc-sim-288",
+      "support_fold": 3,
+      "prompt": "A photograph of a dog",
+      "seed": 315660924,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/dog_sd15_seed315660924_annotation.png"
+    },
+    {
+      "id": "fold1_horse",
+      "heldout_fold": 1,
+      "classname": "horse",
+      "support_image_id": "ovam-voc-sim-315",
+      "support_fold": 0,
+      "prompt": "A photograph of a horse",
+      "seed": 2917056477,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/horse_sd15_seed2917056477_annotation.png"
+    },
+    {
+      "id": "fold1_motorbike",
+      "heldout_fold": 1,
+      "classname": "motorbike",
+      "support_image_id": "ovam-voc-sim-346",
+      "support_fold": 2,
+      "prompt": "A photograph of a motorbike",
+      "seed": 3807650127,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/motorbike_sd15_seed3807650127_annotation.png"
+    },
+    {
+      "id": "fold1_person",
+      "heldout_fold": 1,
+      "classname": "person",
+      "support_image_id": "ovam-voc-sim-353",
+      "support_fold": 4,
+      "prompt": "A photograph of a person",
+      "seed": 1225768520,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/person_sd15_seed1225768520_annotation.png"
+    },
+    {
+      "id": "fold1_potted-plant",
+      "heldout_fold": 1,
+      "classname": "potted-plant",
+      "support_image_id": "ovam-voc-sim-377",
+      "support_fold": 0,
+      "prompt": "A photograph of a potted-plant",
+      "seed": 1606984179,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/potted-plant_sd15_seed1606984179_annotation.png"
+    },
+    {
+      "id": "fold1_sheep",
+      "heldout_fold": 1,
+      "classname": "sheep",
+      "support_image_id": "ovam-voc-sim-407",
+      "support_fold": 0,
+      "prompt": "A photograph of a sheep",
+      "seed": 2174307262,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/sheep_sd15_seed2174307262_annotation.png"
+    },
+    {
+      "id": "fold1_sofa",
+      "heldout_fold": 1,
+      "classname": "sofa",
+      "support_image_id": "ovam-voc-sim-446",
+      "support_fold": 2,
+      "prompt": "A photograph of a sofa",
+      "seed": 678354947,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/sofa_sd15_seed678354947_annotation.png"
+    },
+    {
+      "id": "fold1_train",
+      "heldout_fold": 1,
+      "classname": "train",
+      "support_image_id": "ovam-voc-sim-452",
+      "support_fold": 0,
+      "prompt": "A photograph of a train",
+      "seed": 1428750565,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/train_sd15_seed1428750565_annotation.png"
+    },
+    {
+      "id": "fold1_tv",
+      "heldout_fold": 1,
+      "classname": "tv",
+      "support_image_id": "ovam-voc-sim-482",
+      "support_fold": 2,
+      "prompt": "A photograph of a tv",
+      "seed": 1928205303,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/tv_sd15_seed1928205303_annotation.png"
+    },
+    {
+      "id": "fold2_aeroplane",
+      "heldout_fold": 2,
+      "classname": "aeroplane",
+      "support_image_id": "ovam-voc-sim-18",
+      "support_fold": 3,
+      "prompt": "A photograph of a aeroplane",
+      "seed": 3548614172,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/aeroplane_sd15_seed3548614172_annotation.png"
+    },
+    {
+      "id": "fold2_bicycle",
+      "heldout_fold": 2,
+      "classname": "bicycle",
+      "support_image_id": "ovam-voc-sim-41",
+      "support_fold": 3,
+      "prompt": "A photograph of a bicycle",
+      "seed": 4134540311,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/bicycle_sd15_seed4134540311_annotation.png"
+    },
+    {
+      "id": "fold2_bird",
+      "heldout_fold": 2,
+      "classname": "bird",
+      "support_image_id": "ovam-voc-sim-65",
+      "support_fold": 3,
+      "prompt": "A photograph of a bird",
+      "seed": 3378602535,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/bird_sd15_seed3378602535_annotation.png"
+    },
+    {
+      "id": "fold2_boat",
+      "heldout_fold": 2,
+      "classname": "boat",
+      "support_image_id": "ovam-voc-sim-82",
+      "support_fold": 4,
+      "prompt": "A photograph of a boat",
+      "seed": 2833666105,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/boat_sd15_seed2833666105_annotation.png"
+    },
+    {
+      "id": "fold2_bottle",
+      "heldout_fold": 2,
+      "classname": "bottle",
+      "support_image_id": "ovam-voc-sim-121",
+      "support_fold": 1,
+      "prompt": "A photograph of a bottle",
+      "seed": 504889926,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/bottle_sd15_seed504889926_annotation.png"
+    },
+    {
+      "id": "fold2_bus",
+      "heldout_fold": 2,
+      "classname": "bus",
+      "support_image_id": "ovam-voc-sim-149",
+      "support_fold": 4,
+      "prompt": "A photograph of a bus",
+      "seed": 937166307,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/bus_sd15_seed937166307_annotation.png"
+    },
+    {
+      "id": "fold2_car",
+      "heldout_fold": 2,
+      "classname": "car",
+      "support_image_id": "ovam-voc-sim-161",
+      "support_fold": 1,
+      "prompt": "A photograph of a car",
+      "seed": 2511222728,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/car_sd15_seed2511222728_annotation.png"
+    },
+    {
+      "id": "fold2_cat",
+      "heldout_fold": 2,
+      "classname": "cat",
+      "support_image_id": "ovam-voc-sim-179",
+      "support_fold": 3,
+      "prompt": "A photograph of a cat",
+      "seed": 1724683861,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/cat_sd15_seed1724683861_annotation.png"
+    },
+    {
+      "id": "fold2_chair",
+      "heldout_fold": 2,
+      "classname": "chair",
+      "support_image_id": "ovam-voc-sim-209",
+      "support_fold": 0,
+      "prompt": "A photograph of a chair",
+      "seed": 211370389,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/chair_sd15_seed211370389_annotation.png"
+    },
+    {
+      "id": "fold2_cow",
+      "heldout_fold": 2,
+      "classname": "cow",
+      "support_image_id": "ovam-voc-sim-236",
+      "support_fold": 3,
+      "prompt": "A photograph of a cow",
+      "seed": 244219916,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/cow_sd15_seed244219916_annotation.png"
+    },
+    {
+      "id": "fold2_dining-table",
+      "heldout_fold": 2,
+      "classname": "dining-table",
+      "support_image_id": "ovam-voc-sim-259",
+      "support_fold": 1,
+      "prompt": "A photograph of a dining-table",
+      "seed": 2198438683,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/dining-table_sd15_seed2198438683_annotation.png"
+    },
+    {
+      "id": "fold2_dog",
+      "heldout_fold": 2,
+      "classname": "dog",
+      "support_image_id": "ovam-voc-sim-292",
+      "support_fold": 4,
+      "prompt": "A photograph of a dog",
+      "seed": 3743018802,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/dog_sd15_seed3743018802_annotation.png"
+    },
+    {
+      "id": "fold2_horse",
+      "heldout_fold": 2,
+      "classname": "horse",
+      "support_image_id": "ovam-voc-sim-304",
+      "support_fold": 3,
+      "prompt": "A photograph of a horse",
+      "seed": 1841504974,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/horse_sd15_seed1841504974_annotation.png"
+    },
+    {
+      "id": "fold2_motorbike",
+      "heldout_fold": 2,
+      "classname": "motorbike",
+      "support_image_id": "ovam-voc-sim-331",
+      "support_fold": 4,
+      "prompt": "A photograph of a motorbike",
+      "seed": 1687963427,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/motorbike_sd15_seed1687963427_annotation.png"
+    },
+    {
+      "id": "fold2_person",
+      "heldout_fold": 2,
+      "classname": "person",
+      "support_image_id": "ovam-voc-sim-350",
+      "support_fold": 3,
+      "prompt": "A photograph of a person",
+      "seed": 1005722776,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/person_sd15_seed1005722776_annotation.png"
+    },
+    {
+      "id": "fold2_potted-plant",
+      "heldout_fold": 2,
+      "classname": "potted-plant",
+      "support_image_id": "ovam-voc-sim-377",
+      "support_fold": 0,
+      "prompt": "A photograph of a potted-plant",
+      "seed": 1606984179,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/potted-plant_sd15_seed1606984179_annotation.png"
+    },
+    {
+      "id": "fold2_sheep",
+      "heldout_fold": 2,
+      "classname": "sheep",
+      "support_image_id": "ovam-voc-sim-403",
+      "support_fold": 1,
+      "prompt": "A photograph of a sheep",
+      "seed": 1448012301,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/sheep_sd15_seed1448012301_annotation.png"
+    },
+    {
+      "id": "fold2_sofa",
+      "heldout_fold": 2,
+      "classname": "sofa",
+      "support_image_id": "ovam-voc-sim-428",
+      "support_fold": 1,
+      "prompt": "A photograph of a sofa",
+      "seed": 1228471436,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/sofa_sd15_seed1228471436_annotation.png"
+    },
+    {
+      "id": "fold2_train",
+      "heldout_fold": 2,
+      "classname": "train",
+      "support_image_id": "ovam-voc-sim-450",
+      "support_fold": 1,
+      "prompt": "A photograph of a train",
+      "seed": 1196543666,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/train_sd15_seed1196543666_annotation.png"
+    },
+    {
+      "id": "fold2_tv",
+      "heldout_fold": 2,
+      "classname": "tv",
+      "support_image_id": "ovam-voc-sim-477",
+      "support_fold": 4,
+      "prompt": "A photograph of a tv",
+      "seed": 1144084003,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/tv_sd15_seed1144084003_annotation.png"
+    },
+    {
+      "id": "fold3_aeroplane",
+      "heldout_fold": 3,
+      "classname": "aeroplane",
+      "support_image_id": "ovam-voc-sim-24",
+      "support_fold": 1,
+      "prompt": "A photograph of a aeroplane",
+      "seed": 981369162,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/aeroplane_sd15_seed981369162_annotation.png"
+    },
+    {
+      "id": "fold3_bicycle",
+      "heldout_fold": 3,
+      "classname": "bicycle",
+      "support_image_id": "ovam-voc-sim-34",
+      "support_fold": 1,
+      "prompt": "A photograph of a bicycle",
+      "seed": 3041668138,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/bicycle_sd15_seed3041668138_annotation.png"
+    },
+    {
+      "id": "fold3_bird",
+      "heldout_fold": 3,
+      "classname": "bird",
+      "support_image_id": "ovam-voc-sim-70",
+      "support_fold": 0,
+      "prompt": "A photograph of a bird",
+      "seed": 427816932,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/bird_sd15_seed427816932_annotation.png"
+    },
+    {
+      "id": "fold3_boat",
+      "heldout_fold": 3,
+      "classname": "boat",
+      "support_image_id": "ovam-voc-sim-92",
+      "support_fold": 1,
+      "prompt": "A photograph of a boat",
+      "seed": 3660910269,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/boat_sd15_seed3660910269_annotation.png"
+    },
+    {
+      "id": "fold3_bottle",
+      "heldout_fold": 3,
+      "classname": "bottle",
+      "support_image_id": "ovam-voc-sim-116",
+      "support_fold": 2,
+      "prompt": "A photograph of a bottle",
+      "seed": 3669773806,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/bottle_sd15_seed3669773806_annotation.png"
+    },
+    {
+      "id": "fold3_bus",
+      "heldout_fold": 3,
+      "classname": "bus",
+      "support_image_id": "ovam-voc-sim-139",
+      "support_fold": 0,
+      "prompt": "A photograph of a bus",
+      "seed": 3250654929,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/bus_sd15_seed3250654929_annotation.png"
+    },
+    {
+      "id": "fold3_car",
+      "heldout_fold": 3,
+      "classname": "car",
+      "support_image_id": "ovam-voc-sim-159",
+      "support_fold": 4,
+      "prompt": "A photograph of a car",
+      "seed": 2349526797,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/car_sd15_seed2349526797_annotation.png"
+    },
+    {
+      "id": "fold3_cat",
+      "heldout_fold": 3,
+      "classname": "cat",
+      "support_image_id": "ovam-voc-sim-184",
+      "support_fold": 1,
+      "prompt": "A photograph of a cat",
+      "seed": 2511252585,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/cat_sd15_seed2511252585_annotation.png"
+    },
+    {
+      "id": "fold3_chair",
+      "heldout_fold": 3,
+      "classname": "chair",
+      "support_image_id": "ovam-voc-sim-219",
+      "support_fold": 4,
+      "prompt": "A photograph of a chair",
+      "seed": 3462385062,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/chair_sd15_seed3462385062_annotation.png"
+    },
+    {
+      "id": "fold3_cow",
+      "heldout_fold": 3,
+      "classname": "cow",
+      "support_image_id": "ovam-voc-sim-239",
+      "support_fold": 1,
+      "prompt": "A photograph of a cow",
+      "seed": 3244137509,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/cow_sd15_seed3244137509_annotation.png"
+    },
+    {
+      "id": "fold3_dining-table",
+      "heldout_fold": 3,
+      "classname": "dining-table",
+      "support_image_id": "ovam-voc-sim-265",
+      "support_fold": 1,
+      "prompt": "A photograph of a dining-table",
+      "seed": 3048250845,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/dining-table_sd15_seed3048250845_annotation.png"
+    },
+    {
+      "id": "fold3_dog",
+      "heldout_fold": 3,
+      "classname": "dog",
+      "support_image_id": "ovam-voc-sim-283",
+      "support_fold": 4,
+      "prompt": "A photograph of a dog",
+      "seed": 2672792600,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/dog_sd15_seed2672792600_annotation.png"
+    },
+    {
+      "id": "fold3_horse",
+      "heldout_fold": 3,
+      "classname": "horse",
+      "support_image_id": "ovam-voc-sim-316",
+      "support_fold": 1,
+      "prompt": "A photograph of a horse",
+      "seed": 3022797403,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/horse_sd15_seed3022797403_annotation.png"
+    },
+    {
+      "id": "fold3_motorbike",
+      "heldout_fold": 3,
+      "classname": "motorbike",
+      "support_image_id": "ovam-voc-sim-340",
+      "support_fold": 0,
+      "prompt": "A photograph of a motorbike",
+      "seed": 2727345106,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/motorbike_sd15_seed2727345106_annotation.png"
+    },
+    {
+      "id": "fold3_person",
+      "heldout_fold": 3,
+      "classname": "person",
+      "support_image_id": "ovam-voc-sim-367",
+      "support_fold": 2,
+      "prompt": "A photograph of a person",
+      "seed": 3963069756,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/person_sd15_seed3963069756_annotation.png"
+    },
+    {
+      "id": "fold3_potted-plant",
+      "heldout_fold": 3,
+      "classname": "potted-plant",
+      "support_image_id": "ovam-voc-sim-384",
+      "support_fold": 0,
+      "prompt": "A photograph of a potted-plant",
+      "seed": 2997345516,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/potted-plant_sd15_seed2997345516_annotation.png"
+    },
+    {
+      "id": "fold3_sheep",
+      "heldout_fold": 3,
+      "classname": "sheep",
+      "support_image_id": "ovam-voc-sim-417",
+      "support_fold": 4,
+      "prompt": "A photograph of a sheep",
+      "seed": 3910956852,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/sheep_sd15_seed3910956852_annotation.png"
+    },
+    {
+      "id": "fold3_sofa",
+      "heldout_fold": 3,
+      "classname": "sofa",
+      "support_image_id": "ovam-voc-sim-427",
+      "support_fold": 0,
+      "prompt": "A photograph of a sofa",
+      "seed": 1171402645,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/sofa_sd15_seed1171402645_annotation.png"
+    },
+    {
+      "id": "fold3_train",
+      "heldout_fold": 3,
+      "classname": "train",
+      "support_image_id": "ovam-voc-sim-461",
+      "support_fold": 4,
+      "prompt": "A photograph of a train",
+      "seed": 3280246934,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/train_sd15_seed3280246934_annotation.png"
+    },
+    {
+      "id": "fold3_tv",
+      "heldout_fold": 3,
+      "classname": "tv",
+      "support_image_id": "ovam-voc-sim-477",
+      "support_fold": 4,
+      "prompt": "A photograph of a tv",
+      "seed": 1144084003,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/tv_sd15_seed1144084003_annotation.png"
+    },
+    {
+      "id": "fold4_aeroplane",
+      "heldout_fold": 4,
+      "classname": "aeroplane",
+      "support_image_id": "ovam-voc-sim-2",
+      "support_fold": 0,
+      "prompt": "A photograph of a aeroplane",
+      "seed": 1900203331,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/aeroplane_sd15_seed1900203331_annotation.png"
+    },
+    {
+      "id": "fold4_bicycle",
+      "heldout_fold": 4,
+      "classname": "bicycle",
+      "support_image_id": "ovam-voc-sim-25",
+      "support_fold": 2,
+      "prompt": "A photograph of a bicycle",
+      "seed": 1052124838,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/bicycle_sd15_seed1052124838_annotation.png"
+    },
+    {
+      "id": "fold4_bird",
+      "heldout_fold": 4,
+      "classname": "bird",
+      "support_image_id": "ovam-voc-sim-74",
+      "support_fold": 3,
+      "prompt": "A photograph of a bird",
+      "seed": 852015166,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/bird_sd15_seed852015166_annotation.png"
+    },
+    {
+      "id": "fold4_boat",
+      "heldout_fold": 4,
+      "classname": "boat",
+      "support_image_id": "ovam-voc-sim-95",
+      "support_fold": 3,
+      "prompt": "A photograph of a boat",
+      "seed": 4016172450,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/boat_sd15_seed4016172450_annotation.png"
+    },
+    {
+      "id": "fold4_bottle",
+      "heldout_fold": 4,
+      "classname": "bottle",
+      "support_image_id": "ovam-voc-sim-105",
+      "support_fold": 0,
+      "prompt": "A photograph of a bottle",
+      "seed": 1858931230,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/bottle_sd15_seed1858931230_annotation.png"
+    },
+    {
+      "id": "fold4_bus",
+      "heldout_fold": 4,
+      "classname": "bus",
+      "support_image_id": "ovam-voc-sim-147",
+      "support_fold": 1,
+      "prompt": "A photograph of a bus",
+      "seed": 714860915,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/bus_sd15_seed714860915_annotation.png"
+    },
+    {
+      "id": "fold4_car",
+      "heldout_fold": 4,
+      "classname": "car",
+      "support_image_id": "ovam-voc-sim-163",
+      "support_fold": 2,
+      "prompt": "A photograph of a car",
+      "seed": 2720759428,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/car_sd15_seed2720759428_annotation.png"
+    },
+    {
+      "id": "fold4_cat",
+      "heldout_fold": 4,
+      "classname": "cat",
+      "support_image_id": "ovam-voc-sim-196",
+      "support_fold": 2,
+      "prompt": "A photograph of a cat",
+      "seed": 537899103,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/cat_sd15_seed537899103_annotation.png"
+    },
+    {
+      "id": "fold4_chair",
+      "heldout_fold": 4,
+      "classname": "chair",
+      "support_image_id": "ovam-voc-sim-213",
+      "support_fold": 2,
+      "prompt": "A photograph of a chair",
+      "seed": 2608031260,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/chair_sd15_seed2608031260_annotation.png"
+    },
+    {
+      "id": "fold4_cow",
+      "heldout_fold": 4,
+      "classname": "cow",
+      "support_image_id": "ovam-voc-sim-232",
+      "support_fold": 0,
+      "prompt": "A photograph of a cow",
+      "seed": 189803037,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/cow_sd15_seed189803037_annotation.png"
+    },
+    {
+      "id": "fold4_dining-table",
+      "heldout_fold": 4,
+      "classname": "dining-table",
+      "support_image_id": "ovam-voc-sim-264",
+      "support_fold": 1,
+      "prompt": "A photograph of a dining-table",
+      "seed": 2911578622,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/dining-table_sd15_seed2911578622_annotation.png"
+    },
+    {
+      "id": "fold4_dog",
+      "heldout_fold": 4,
+      "classname": "dog",
+      "support_image_id": "ovam-voc-sim-277",
+      "support_fold": 3,
+      "prompt": "A photograph of a dog",
+      "seed": 1696913507,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/dog_sd15_seed1696913507_annotation.png"
+    },
+    {
+      "id": "fold4_horse",
+      "heldout_fold": 4,
+      "classname": "horse",
+      "support_image_id": "ovam-voc-sim-323",
+      "support_fold": 2,
+      "prompt": "A photograph of a horse",
+      "seed": 4270519192,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/horse_sd15_seed4270519192_annotation.png"
+    },
+    {
+      "id": "fold4_motorbike",
+      "heldout_fold": 4,
+      "classname": "motorbike",
+      "support_image_id": "ovam-voc-sim-333",
+      "support_fold": 1,
+      "prompt": "A photograph of a motorbike",
+      "seed": 2004510582,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/motorbike_sd15_seed2004510582_annotation.png"
+    },
+    {
+      "id": "fold4_person",
+      "heldout_fold": 4,
+      "classname": "person",
+      "support_image_id": "ovam-voc-sim-370",
+      "support_fold": 0,
+      "prompt": "A photograph of a person",
+      "seed": 488872879,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/person_sd15_seed488872879_annotation.png"
+    },
+    {
+      "id": "fold4_potted-plant",
+      "heldout_fold": 4,
+      "classname": "potted-plant",
+      "support_image_id": "ovam-voc-sim-390",
+      "support_fold": 1,
+      "prompt": "A photograph of a potted-plant",
+      "seed": 343768389,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/potted-plant_sd15_seed343768389_annotation.png"
+    },
+    {
+      "id": "fold4_sheep",
+      "heldout_fold": 4,
+      "classname": "sheep",
+      "support_image_id": "ovam-voc-sim-402",
+      "support_fold": 0,
+      "prompt": "A photograph of a sheep",
+      "seed": 1408580568,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/sheep_sd15_seed1408580568_annotation.png"
+    },
+    {
+      "id": "fold4_sofa",
+      "heldout_fold": 4,
+      "classname": "sofa",
+      "support_image_id": "ovam-voc-sim-439",
+      "support_fold": 0,
+      "prompt": "A photograph of a sofa",
+      "seed": 263902145,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/sofa_sd15_seed263902145_annotation.png"
+    },
+    {
+      "id": "fold4_train",
+      "heldout_fold": 4,
+      "classname": "train",
+      "support_image_id": "ovam-voc-sim-472",
+      "support_fold": 1,
+      "prompt": "A photograph of a train",
+      "seed": 637496291,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/train_sd15_seed637496291_annotation.png"
+    },
+    {
+      "id": "fold4_tv",
+      "heldout_fold": 4,
+      "classname": "tv",
+      "support_image_id": "ovam-voc-sim-480",
+      "support_fold": 1,
+      "prompt": "A photograph of a tv",
+      "seed": 1729447468,
+      "annotation": "datasets/ovam_experiment_with_dataset/evaluation/ovam/voc_sim/annotations/tv_sd15_seed1729447468_annotation.png"
+    }
+  ]
+}
