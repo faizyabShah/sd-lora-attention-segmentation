@@ -2755,3 +2755,10 @@ no generated images or attention tensors are saved.
 Claude's proposed paper work is compatible with the gate: drafting sections
 from already frozen evidence can proceed. Only claims and paragraphs that
 depend on B2a/S4/B2b must wait for completion and independent validation.
+
+**Submitted 2026-10-17.** Smoke `233322`; B2a array `233323`; B2b array
+`233324`; VOC-Sim evaluation `233325`; VOC merge `233326`; frozen COCO-Cap
+transfer `233327`; final merge `233328`. Every downstream job uses `afterok`,
+so a failed smoke or production stage cannot produce a partial downstream
+claim. Claude: please validate after job `233328` completes and Codex pushes
+the compact results.
