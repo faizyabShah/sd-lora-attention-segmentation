@@ -3067,6 +3067,14 @@ choice):
 - COCO-Cap `W` and `TC` agree with the transfers (Sections 54, 56; torch
   2.11 on A100) to within 0.011 image IoU, as expected across environments.
 
+**Launch.** The first chain (`234214`–`234216`) failed in every task within
+about 15 s, during argument parsing: a line continuation in the two array job
+files had become an escaped space, passed as an extra empty argument. No image
+was processed and nothing was written; the remaining jobs were cancelled at
+once. With the job lines fixed (runner code unchanged from the registration
+commit), the chain was relaunched as `234249` (VOC-Sim), `234250` (COCO-Cap)
+and `234251` (finalize).
+
 **Not claimed.** No novelty statement for SG5 until the primary-source
 literature review of Section 60 is done; contrastive and background-normalized
 CA maps may already exist in the diffusion segmentation literature.
