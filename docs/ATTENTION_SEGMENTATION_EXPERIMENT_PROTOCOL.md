@@ -3571,3 +3571,45 @@ array `234512` and untouched COCO array `234513` are submitted without a node
 constraint. CPU finalizer `234516` has an `afterok:234512:234513` dependency
 and invalid-dependency cancellation. Claude should verify the committed
 package and results after Codex pushes the completed outputs.
+
+## 74. Owners' next experiment: SG9 reciprocal SA propagation
+
+Faiz supplied and authorized SG9. Codex owns implementation and execution;
+**Claude will independently verify the committed results after completion**.
+SG9 tests whether propagation edges supported in both spatial directions are
+more reliable than asymmetric long-range shortcuts. It uses the same frozen
+SD1.5 CA, all 31 calls and all 8 heads of 64×64 SA module 15, genuine
+conditional QK affinities, and no learned or external features.
+
+The word (`W`) and OVAM released-token (`T`) tracks are screened separately.
+Each contains exactly four cells:
+
+| Cell | Per-observation affinity before propagation |
+|---|---|
+| `REF` | original row-stochastic `A` |
+| `R1_geometric` | `sqrt(A * A^T)`, then row-normalize |
+| `R2_minimum` | `min(A, A^T)`, then row-normalize |
+| `R3_soft_gate` | `A * sqrt(A^T)`, then row-normalize |
+
+Every operator is formed independently for each call/head before propagation;
+affinities are never averaged first. The initial screen is one-pass only.
+Two-pass propagation, DenseCRF, SG8, SG3, RGB/features, top-k pruning and
+head/call selection are excluded. Within the registered 0.002 tie tolerance,
+the candidate preference is R3, then R1, then R2 because that orders the
+operators from closest to the reference to most restrictive.
+
+VOC-Sim alone selects the operator and mask threshold with the existing
+five-fold rules. A candidate must pass the existing gain/class-loss rule, win
+at least 4/5 folds, and have positive pooled OOF gain. COCO-Cap uses the
+full-VOC setting and threshold and cannot select. The runner stores compact
+metric counts, AN1-style added/removed TP/FP, distant and separate-component
+new FP counts, and per-pixel seed-weighted edge asymmetry/two-step return
+statistics. Generated images, maps and full affinities are discarded.
+
+Before production, a fixed one-image smoke must verify all 248 observations,
+row stochasticity through unit checks, and numerical equality of `REF` with
+the existing one-pass implementation for both tracks. It also saves the
+preregistered CA/REF/R1/difference/error panels and top-edge reciprocal values
+for inspection; these diagnostics cannot alter the operator grid. Production
+may start only after the smoke succeeds. Claude should then check the code,
+selection, transfer and mechanistic interpretation after results are pushed.

@@ -1,0 +1,17 @@
+{
+  "name": "SG9 reciprocal self-attention propagation",
+  "protocol": "protocol Section 74",
+  "registered_before_run": true,
+  "tracks": ["W", "T"],
+  "sa": {"module_index": 15, "resolution": 64, "calls": 31, "heads": 8, "observations": 248},
+  "epsilon": 1e-12,
+  "operators": ["REF", "R1_geometric", "R2_minimum", "R3_soft_gate"],
+  "tie_break": "within 0.002 prefer the operator closest to REF: R3 soft gate, then R1 geometric, then R2 minimum",
+  "normalization": "per-map minmax, identical to reference",
+  "thresholds": [0.30, 0.325, 0.35, 0.375, 0.40, 0.425, 0.45, 0.475, 0.50, 0.525, 0.55, 0.575, 0.60, 0.625, 0.65, 0.675, 0.70],
+  "selection": "operator and threshold selected independently for W and T on four VOC-Sim folds and scored on the held-out fold",
+  "transfer": "COCO-Cap uses the operator and threshold chosen on VOC-Sim and never selects",
+  "excluded_initially": ["two_pass", "DenseCRF", "SG8", "SG3", "RGB", "top_k", "head_selection", "call_selection"],
+  "storage": "compact counts and per-image reciprocal diagnostics only; generated images, maps, affinities, and propagated values are discarded"
+}
+
