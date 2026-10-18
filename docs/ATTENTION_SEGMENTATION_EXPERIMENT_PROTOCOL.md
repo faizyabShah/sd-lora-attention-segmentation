@@ -3560,3 +3560,14 @@ also writes fixed diagnostic panels for inspection; these cannot change the
 registered grid. Production starts only after that smoke succeeds. The final
 report must include ordinary metrics, added/removed TP/FP, agreement
 summaries, and whether distant false-positive additions have weaker consensus.
+
+**Launch.** Commit `ee68c93ce` preregistered and implemented SG8. The
+three-image smoke `234511` was assigned to renyi without a node constraint and
+completed successfully: all 31×8 observations were present, the REF equality
+assertion passed for both tracks, all 32 cells and compact diagnostics were
+finite, and the fixed panels were inspected without changing the grid. Commit
+`0d648901f` records the smoke-discovered sidecar filtering fix. Production VOC
+array `234512` and untouched COCO array `234513` are submitted without a node
+constraint. CPU finalizer `234516` has an `afterok:234512:234513` dependency
+and invalid-dependency cancellation. Claude should verify the committed
+package and results after Codex pushes the completed outputs.
