@@ -30,13 +30,31 @@ CONFIG = ROOT / "configs" / "sg5_contrastive_seed.json"
 OUT = ROOT / "outputs" / "segmentation" / "controlled_attention_cv" / "sg5_contrastive_seed"
 
 
+PER_CLASS = ("synonyms", "attribution_prompt")  # settings that legitimately differ between class shards
+PER_CLASS_SETTINGS: dict = {}
+
+
 def load(dataset: str) -> cv.Results | None:
+    """``cv.load_results`` shard by shard: shared settings must agree; per-class ones are kept apart."""
     shards = sorted((OUT / dataset / "shards").glob("*.npz"))
     if not shards:
         return None
-    results = cv.load_results(shards)
-    if not all(results.complete) or len(set(results.classes)) != 20:
-        raise SystemExit(f"{dataset}: shards are incomplete")
+    parts = [cv.load_results([s]) for s in shards]
+    shared = {k: v for k, v in parts[0].settings.items() if k not in PER_CLASS}
+    for part, shard in zip(parts, shards):
+        if {k: v for k, v in part.settings.items() if k not in PER_CLASS} != shared:
+            raise SystemExit(f"{shard}: shared settings differ")
+        if part.configurations != parts[0].configurations or part.thresholds != parts[0].thresholds:
+            raise SystemExit(f"{shard}: configurations or thresholds differ")
+        PER_CLASS_SETTINGS.setdefault(dataset, {})[part.classes[0]] = {k: part.settings[k] for k in PER_CLASS}
+    image_ids = tuple(i for p in parts for i in p.image_ids)
+    results = cv.Results(
+        parts[0].configurations, parts[0].thresholds, image_ids, tuple(c for p in parts for c in p.classes),
+        np.concatenate([p.folds for p in parts]), np.concatenate([p.counts for p in parts], axis=1),
+        np.concatenate([p.ap for p in parts], axis=1), shared, tuple(c for p in parts for c in p.complete),
+        tuple(dict.fromkeys(c for p in parts for c in p.commits)), tuple(e for p in parts for e in p.environments))
+    if len(set(image_ids)) != len(image_ids) or not all(results.complete) or len(set(results.classes)) != 20:
+        raise SystemExit(f"{dataset}: shards are incomplete or overlap")
     return results
 
 
@@ -73,7 +91,9 @@ def main() -> None:
                                 "coco_miou_frozen": pooled_miou(a, coco_classes), "coco_miou_reference": pooled_miou(b, coco_classes),
                                 "paired_image_iou": cv.paired_bootstrap(image_ious(a), image_ious(b))}
     output = {"protocol": "Section 66", "voc_images": len(voc.image_ids), "coco_images": len(coco.image_ids) if coco else 0,
-              "screens": screens, "coco_transfer": transfer, "cells": cells}
+              "screens": screens, "coco_transfer": transfer, "cells": cells, "per_class_settings": PER_CLASS_SETTINGS,
+              "environments": sorted({json.dumps({k: e.get(k) for k in ("torch", "gpu", "node", "conda_env")}, sort_keys=True)
+                                      for r in (voc, coco) if r for e in r.environments})}
     (OUT / "summary.json").write_text(json.dumps(output, indent=2) + "\n", encoding="utf-8")
 
     lines = ["# SG5 contrastive CA seed (protocol Section 66)", "",

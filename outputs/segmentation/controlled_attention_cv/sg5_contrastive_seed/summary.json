@@ -1,0 +1,1354 @@
+{
+  "protocol": "Section 66",
+  "voc_images": 490,
+  "coco_images": 707,
+  "screens": {
+    "SG5-W seed under REF": {
+      "reference": "W/REF",
+      "candidates": [
+        "WS/REF",
+        "WK/REF",
+        "WN/REF",
+        "WE/REF",
+        "WY/REF"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "W/REF",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7899816641952978,
+          "train_miou_reference": 0.7899816641952978,
+          "heldout_miou_chosen": 0.7854522101571091,
+          "heldout_miou_reference": 0.7854522101571091
+        },
+        {
+          "fold": 1,
+          "chosen": "W/REF",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7824813086766824,
+          "train_miou_reference": 0.7824813086766824,
+          "heldout_miou_chosen": 0.8113943651854273,
+          "heldout_miou_reference": 0.8113943651854273
+        },
+        {
+          "fold": 2,
+          "chosen": "W/REF",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.790077341192178,
+          "train_miou_reference": 0.790077341192178,
+          "heldout_miou_chosen": 0.785796535670584,
+          "heldout_miou_reference": 0.785796535670584
+        },
+        {
+          "fold": 3,
+          "chosen": "W/REF",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7911286619437017,
+          "train_miou_reference": 0.7911286619437017,
+          "heldout_miou_chosen": 0.7799206142618165,
+          "heldout_miou_reference": 0.7799206142618165
+        },
+        {
+          "fold": 4,
+          "chosen": "W/REF",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7907455849794168,
+          "train_miou_reference": 0.7907455849794168,
+          "heldout_miou_chosen": 0.7756662695055543,
+          "heldout_miou_reference": 0.7756662695055543
+        }
+      ],
+      "selection_counts": {
+        "W/REF": 5
+      },
+      "vote_winner": "W/REF",
+      "vote_winner_votes": 5,
+      "frozen": "W/REF",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.7873295938688071,
+      "oof_miou_reference": 0.7873295938688071,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.425,
+      "full_threshold_reference": 0.425,
+      "full_miou_frozen": 0.7886203452805808,
+      "full_miou_reference": 0.7886203452805808,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "SG5-W in the training-free pipeline (FTF)": {
+      "reference": "W/P1+R2",
+      "candidates": [
+        "WS/P1+R2",
+        "WK/P1+R2",
+        "WN/P1+R2",
+        "WE/P1+R2",
+        "WY/P1+R2"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "W/P1+R2",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8126509768516991,
+          "train_miou_reference": 0.8126509768516991,
+          "heldout_miou_chosen": 0.8208326812496456,
+          "heldout_miou_reference": 0.8208326812496456
+        },
+        {
+          "fold": 1,
+          "chosen": "W/P1+R2",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8066440807576738,
+          "train_miou_reference": 0.8066440807576738,
+          "heldout_miou_chosen": 0.8413498300275888,
+          "heldout_miou_reference": 0.8413498300275888
+        },
+        {
+          "fold": 2,
+          "chosen": "W/P1+R2",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8141531591401779,
+          "train_miou_reference": 0.8141531591401779,
+          "heldout_miou_chosen": 0.8136211454540956,
+          "heldout_miou_reference": 0.8136211454540956
+        },
+        {
+          "fold": 3,
+          "chosen": "W/P1+R2",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8179158180207029,
+          "train_miou_reference": 0.8179158180207029,
+          "heldout_miou_chosen": 0.7990873007931707,
+          "heldout_miou_reference": 0.7990873007931707
+        },
+        {
+          "fold": 4,
+          "chosen": "W/P1+R2",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8160461861478261,
+          "train_miou_reference": 0.8160461861478261,
+          "heldout_miou_chosen": 0.7994842700869992,
+          "heldout_miou_reference": 0.7994842700869992
+        }
+      ],
+      "selection_counts": {
+        "W/P1+R2": 5
+      },
+      "vote_winner": "W/P1+R2",
+      "vote_winner_votes": 5,
+      "frozen": "W/P1+R2",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.8134134783734803,
+      "oof_miou_reference": 0.8134134783734803,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.45,
+      "full_threshold_reference": 0.45,
+      "full_miou_frozen": 0.8134134783734803,
+      "full_miou_reference": 0.8134134783734803,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "SG5-T seed under REF": {
+      "reference": "TC/REF",
+      "candidates": [
+        "TS/REF"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "TC/REF",
+          "chosen_threshold": 0.475,
+          "reference_threshold": 0.475,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8530678425415905,
+          "train_miou_reference": 0.8530678425415905,
+          "heldout_miou_chosen": 0.8367152865377326,
+          "heldout_miou_reference": 0.8367152865377326
+        },
+        {
+          "fold": 1,
+          "chosen": "TC/REF",
+          "chosen_threshold": 0.475,
+          "reference_threshold": 0.475,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8441928410441202,
+          "train_miou_reference": 0.8441928410441202,
+          "heldout_miou_chosen": 0.8694771274846529,
+          "heldout_miou_reference": 0.8694771274846529
+        },
+        {
+          "fold": 2,
+          "chosen": "TC/REF",
+          "chosen_threshold": 0.475,
+          "reference_threshold": 0.475,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8500123343528779,
+          "train_miou_reference": 0.8500123343528779,
+          "heldout_miou_chosen": 0.8503082696784837,
+          "heldout_miou_reference": 0.8503082696784837
+        },
+        {
+          "fold": 3,
+          "chosen": "TC/REF",
+          "chosen_threshold": 0.475,
+          "reference_threshold": 0.475,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8518804748924058,
+          "train_miou_reference": 0.8518804748924058,
+          "heldout_miou_chosen": 0.8421809844455883,
+          "heldout_miou_reference": 0.8421809844455883
+        },
+        {
+          "fold": 4,
+          "chosen": "TC/REF",
+          "chosen_threshold": 0.5,
+          "reference_threshold": 0.5,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8507048851780894,
+          "train_miou_reference": 0.8507048851780894,
+          "heldout_miou_chosen": 0.840816507783065,
+          "heldout_miou_reference": 0.840816507783065
+        }
+      ],
+      "selection_counts": {
+        "TC/REF": 5
+      },
+      "vote_winner": "TC/REF",
+      "vote_winner_votes": 5,
+      "frozen": "TC/REF",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.8495843421174121,
+      "oof_miou_reference": 0.8495843421174121,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.475,
+      "full_threshold_reference": 0.475,
+      "full_miou_frozen": 0.8500919968064317,
+      "full_miou_reference": 0.8500919968064317,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "SG5-T in the few-shot pipeline (T-C)": {
+      "reference": "TC/R2",
+      "candidates": [
+        "TS/R2"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "TC/R2",
+          "chosen_threshold": 0.475,
+          "reference_threshold": 0.475,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8670839995860872,
+          "train_miou_reference": 0.8670839995860872,
+          "heldout_miou_chosen": 0.8549139327951295,
+          "heldout_miou_reference": 0.8549139327951295
+        },
+        {
+          "fold": 1,
+          "chosen": "TC/R2",
+          "chosen_threshold": 0.475,
+          "reference_threshold": 0.475,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8583304358161682,
+          "train_miou_reference": 0.8583304358161682,
+          "heldout_miou_chosen": 0.8880608323084175,
+          "heldout_miou_reference": 0.8880608323084175
+        },
+        {
+          "fold": 2,
+          "chosen": "TC/R2",
+          "chosen_threshold": 0.475,
+          "reference_threshold": 0.475,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8653926167860447,
+          "train_miou_reference": 0.8653926167860447,
+          "heldout_miou_chosen": 0.8618507702703884,
+          "heldout_miou_reference": 0.8618507702703884
+        },
+        {
+          "fold": 3,
+          "chosen": "TC/R2",
+          "chosen_threshold": 0.475,
+          "reference_threshold": 0.475,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8670462158138467,
+          "train_miou_reference": 0.8670462158138467,
+          "heldout_miou_chosen": 0.8551496324961126,
+          "heldout_miou_reference": 0.8551496324961126
+        },
+        {
+          "fold": 4,
+          "chosen": "TC/R2",
+          "chosen_threshold": 0.475,
+          "reference_threshold": 0.475,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.865246267653319,
+          "train_miou_reference": 0.865246267653319,
+          "heldout_miou_chosen": 0.8572880327614139,
+          "heldout_miou_reference": 0.8572880327614139
+        }
+      ],
+      "selection_counts": {
+        "TC/R2": 5
+      },
+      "vote_winner": "TC/R2",
+      "vote_winner_votes": 5,
+      "frozen": "TC/R2",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.8647174098560033,
+      "oof_miou_reference": 0.8647174098560033,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.475,
+      "full_threshold_reference": 0.475,
+      "full_miou_frozen": 0.8647174098560033,
+      "full_miou_reference": 0.8647174098560033,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    }
+  },
+  "coco_transfer": {
+    "SG5-W seed under REF": {
+      "frozen": "W/REF",
+      "reference": "W/REF",
+      "coco_miou_frozen": 0.6172969652232135,
+      "coco_miou_reference": 0.6172969652232135,
+      "paired_image_iou": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 707
+      }
+    },
+    "SG5-W in the training-free pipeline (FTF)": {
+      "frozen": "W/P1+R2",
+      "reference": "W/P1+R2",
+      "coco_miou_frozen": 0.6370220476459181,
+      "coco_miou_reference": 0.6370220476459181,
+      "paired_image_iou": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 707
+      }
+    },
+    "SG5-T seed under REF": {
+      "frozen": "TC/REF",
+      "reference": "TC/REF",
+      "coco_miou_frozen": 0.6679502186457055,
+      "coco_miou_reference": 0.6679502186457055,
+      "paired_image_iou": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 707
+      }
+    },
+    "SG5-T in the few-shot pipeline (T-C)": {
+      "frozen": "TC/R2",
+      "reference": "TC/R2",
+      "coco_miou_frozen": 0.684781029054401,
+      "coco_miou_reference": 0.684781029054401,
+      "paired_image_iou": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 707
+      }
+    }
+  },
+  "cells": {
+    "W/seed": {
+      "voc_miou@0.45": 0.6952928678165063,
+      "voc_full_threshold": 0.4,
+      "voc_miou@full_threshold": 0.7133015208574982,
+      "voc_an1@0.45": {
+        "miou": 0.6952928678165063,
+        "recall": 0.8215365316760452,
+        "precision": 0.8434151741199594,
+        "fp_per_object_pixel": 0.19968998846775596
+      },
+      "coco_miou@voc_threshold": 0.5629308545699389,
+      "coco_an1@0.45": {
+        "miou": 0.5488007038836896,
+        "recall": 0.701241757349307,
+        "precision": 0.7242898903263862,
+        "fp_per_object_pixel": 0.2895469533581256
+      }
+    },
+    "W/REF": {
+      "voc_miou@0.45": 0.7884857245336435,
+      "voc_full_threshold": 0.425,
+      "voc_miou@full_threshold": 0.7886203452805808,
+      "voc_an1@0.45": {
+        "miou": 0.7884857245336435,
+        "recall": 0.9122437691565952,
+        "precision": 0.8648782583139336,
+        "fp_per_object_pixel": 0.1829318956418441
+      },
+      "coco_miou@voc_threshold": 0.6172969652232135,
+      "coco_an1@0.45": {
+        "miou": 0.6259836187030956,
+        "recall": 0.8754136433938413,
+        "precision": 0.6981182502903647,
+        "fp_per_object_pixel": 0.4684254570361401
+      }
+    },
+    "W/P1": {
+      "voc_miou@0.45": 0.800531102772086,
+      "voc_full_threshold": 0.45,
+      "voc_miou@full_threshold": 0.800531102772086,
+      "voc_an1@0.45": {
+        "miou": 0.800531102772086,
+        "recall": 0.9238789974564284,
+        "precision": 0.8653299500365759,
+        "fp_per_object_pixel": 0.18250524995083145
+      },
+      "coco_miou@voc_threshold": 0.62440742699684,
+      "coco_an1@0.45": {
+        "miou": 0.62440742699684,
+        "recall": 0.8989802751509911,
+        "precision": 0.6831504482611679,
+        "fp_per_object_pixel": 0.5196805367669424
+      }
+    },
+    "W/R2": {
+      "voc_miou@0.45": 0.8026692186529685,
+      "voc_full_threshold": 0.425,
+      "voc_miou@full_threshold": 0.8048795229649736,
+      "voc_an1@0.45": {
+        "miou": 0.8026692186529685,
+        "recall": 0.9079366431538807,
+        "precision": 0.8842783169952165,
+        "fp_per_object_pixel": 0.15679461640690232
+      },
+      "coco_miou@voc_threshold": 0.6348551277748139,
+      "coco_an1@0.45": {
+        "miou": 0.6416250098337912,
+        "recall": 0.8686848953717299,
+        "precision": 0.7197734557456058,
+        "fp_per_object_pixel": 0.42117214603240233
+      }
+    },
+    "W/P1+R2": {
+      "voc_miou@0.45": 0.8134134783734803,
+      "voc_full_threshold": 0.45,
+      "voc_miou@full_threshold": 0.8134134783734803,
+      "voc_an1@0.45": {
+        "miou": 0.8134134783734803,
+        "recall": 0.917597452952454,
+        "precision": 0.8847894472550045,
+        "fp_per_object_pixel": 0.1561702605652797
+      },
+      "coco_miou@voc_threshold": 0.6370220476459181,
+      "coco_an1@0.45": {
+        "miou": 0.6370220476459181,
+        "recall": 0.891088027037652,
+        "precision": 0.7014602165848222,
+        "fp_per_object_pixel": 0.47606243633035483
+      }
+    },
+    "WS/seed": {
+      "voc_miou@0.45": 0.6466731157529219,
+      "voc_full_threshold": 0.55,
+      "voc_miou@full_threshold": 0.7002024277618146,
+      "voc_an1@0.45": {
+        "miou": 0.6466731157529219,
+        "recall": 0.9616712706844497,
+        "precision": 0.6703560134621176,
+        "fp_per_object_pixel": 0.5434667116130487
+      },
+      "coco_miou@voc_threshold": 0.5407628001625073,
+      "coco_an1@0.45": {
+        "miou": 0.47295127986555513,
+        "recall": 0.9178891309439738,
+        "precision": 0.5100393679834888,
+        "fp_per_object_pixel": 1.0649506232656039
+      }
+    },
+    "WS/REF": {
+      "voc_miou@0.45": 0.7634474404266388,
+      "voc_full_threshold": 0.525,
+      "voc_miou@full_threshold": 0.7839207381310576,
+      "voc_an1@0.45": {
+        "miou": 0.7634474404266388,
+        "recall": 0.9591004271031476,
+        "precision": 0.7942740967465363,
+        "fp_per_object_pixel": 0.2912102594258744
+      },
+      "coco_miou@voc_threshold": 0.5777684404419058,
+      "coco_an1@0.45": {
+        "miou": 0.5267372118503946,
+        "recall": 0.9194182553214129,
+        "precision": 0.5689529648663882,
+        "fp_per_object_pixel": 0.8369606577765252
+      }
+    },
+    "WS/P1": {
+      "voc_miou@0.45": 0.7756756588393088,
+      "voc_full_threshold": 0.525,
+      "voc_miou@full_threshold": 0.7926341140890296,
+      "voc_an1@0.45": {
+        "miou": 0.7756756588393088,
+        "recall": 0.9569086025394817,
+        "precision": 0.8079233863209438,
+        "fp_per_object_pixel": 0.26866816305573504
+      },
+      "coco_miou@voc_threshold": 0.577247094063394,
+      "coco_an1@0.45": {
+        "miou": 0.5293214196176155,
+        "recall": 0.917871360889664,
+        "precision": 0.5722834933595672,
+        "fp_per_object_pixel": 0.8203894218431209
+      }
+    },
+    "WS/R2": {
+      "voc_miou@0.45": 0.7857610337517744,
+      "voc_full_threshold": 0.525,
+      "voc_miou@full_threshold": 0.8019421085273557,
+      "voc_an1@0.45": {
+        "miou": 0.7857610337517744,
+        "recall": 0.9545014454783596,
+        "precision": 0.8208270605347405,
+        "fp_per_object_pixel": 0.24912127668518566
+      },
+      "coco_miou@voc_threshold": 0.5933265428022818,
+      "coco_an1@0.45": {
+        "miou": 0.5427483995912963,
+        "recall": 0.9134356385299369,
+        "precision": 0.5885893685695208,
+        "fp_per_object_pixel": 0.7705198206778134
+      }
+    },
+    "WS/P1+R2": {
+      "voc_miou@0.45": 0.7949315385923049,
+      "voc_full_threshold": 0.5,
+      "voc_miou@full_threshold": 0.8059058590565998,
+      "voc_an1@0.45": {
+        "miou": 0.7949315385923049,
+        "recall": 0.9503838437982777,
+        "precision": 0.8330235236961085,
+        "fp_per_object_pixel": 0.22994386763346025
+      },
+      "coco_miou@voc_threshold": 0.5741630506686756,
+      "coco_an1@0.45": {
+        "miou": 0.5429530277689143,
+        "recall": 0.9106722012640505,
+        "precision": 0.5898961932468174,
+        "fp_per_object_pixel": 0.7593036480276876
+      }
+    },
+    "WK/seed": {
+      "voc_miou@0.45": 0.6799787221959402,
+      "voc_full_threshold": 0.375,
+      "voc_miou@full_threshold": 0.7090479233351604,
+      "voc_an1@0.45": {
+        "miou": 0.6799787221959402,
+        "recall": 0.7913495013857349,
+        "precision": 0.8482145243474685,
+        "fp_per_object_pixel": 0.17861339598638878
+      },
+      "coco_miou@voc_threshold": 0.5513941847470607,
+      "coco_an1@0.45": {
+        "miou": 0.5422633047728338,
+        "recall": 0.7036778328964147,
+        "precision": 0.7089730585713253,
+        "fp_per_object_pixel": 0.32653523711638976
+      }
+    },
+    "WK/REF": {
+      "voc_miou@0.45": 0.7733156276551741,
+      "voc_full_threshold": 0.45,
+      "voc_miou@full_threshold": 0.7733156276551741,
+      "voc_an1@0.45": {
+        "miou": 0.7733156276551741,
+        "recall": 0.8995100801158754,
+        "precision": 0.8572580201223774,
+        "fp_per_object_pixel": 0.1915067460855052
+      },
+      "coco_miou@voc_threshold": 0.6143713850244262,
+      "coco_an1@0.45": {
+        "miou": 0.6143713850244262,
+        "recall": 0.8736548663965881,
+        "precision": 0.6854957502871397,
+        "fp_per_object_pixel": 0.5043562995507348
+      }
+    },
+    "WK/P1": {
+      "voc_miou@0.45": 0.7849532807913217,
+      "voc_full_threshold": 0.45,
+      "voc_miou@full_threshold": 0.7849532807913217,
+      "voc_an1@0.45": {
+        "miou": 0.7849532807913217,
+        "recall": 0.9127071135955594,
+        "precision": 0.8567355157718411,
+        "fp_per_object_pixel": 0.19458675497926076
+      },
+      "coco_miou@voc_threshold": 0.6090967728328962,
+      "coco_an1@0.45": {
+        "miou": 0.6090967728328962,
+        "recall": 0.8945277419382457,
+        "precision": 0.6671872087854808,
+        "fp_per_object_pixel": 0.5660918113156573
+      }
+    },
+    "WK/R2": {
+      "voc_miou@0.45": 0.7869302838855965,
+      "voc_full_threshold": 0.425,
+      "voc_miou@full_threshold": 0.7885955209386311,
+      "voc_an1@0.45": {
+        "miou": 0.7869302838855965,
+        "recall": 0.8952141040388895,
+        "precision": 0.8763927496952085,
+        "fp_per_object_pixel": 0.16585648041069057
+      },
+      "coco_miou@voc_threshold": 0.6207567367586077,
+      "coco_an1@0.45": {
+        "miou": 0.62840660837529,
+        "recall": 0.8672177448534042,
+        "precision": 0.7050928077708986,
+        "fp_per_object_pixel": 0.4609597139980483
+      }
+    },
+    "WK/P1+R2": {
+      "voc_miou@0.45": 0.7976347790759789,
+      "voc_full_threshold": 0.425,
+      "voc_miou@full_threshold": 0.7977598630910169,
+      "voc_an1@0.45": {
+        "miou": 0.7976347790759789,
+        "recall": 0.9060138512574092,
+        "precision": 0.87672690452984,
+        "fp_per_object_pixel": 0.16771278902282788
+      },
+      "coco_miou@voc_threshold": 0.6093377973957989,
+      "coco_an1@0.45": {
+        "miou": 0.6209457456571161,
+        "recall": 0.886126834419926,
+        "precision": 0.6849377022050223,
+        "fp_per_object_pixel": 0.5224414633531731
+      }
+    },
+    "WN/seed": {
+      "voc_miou@0.45": 0.5874136460229192,
+      "voc_full_threshold": 0.6,
+      "voc_miou@full_threshold": 0.6999268839585318,
+      "voc_an1@0.45": {
+        "miou": 0.5874136460229192,
+        "recall": 0.9781925924669188,
+        "precision": 0.5997809656170032,
+        "fp_per_object_pixel": 0.7569663561983082
+      },
+      "coco_miou@voc_threshold": 0.5461261444131555,
+      "coco_an1@0.45": {
+        "miou": 0.4637981600590483,
+        "recall": 0.9228772922363561,
+        "precision": 0.4985582687586663,
+        "fp_per_object_pixel": 1.1162100057671245
+      }
+    },
+    "WN/REF": {
+      "voc_miou@0.45": 0.757337652524156,
+      "voc_full_threshold": 0.55,
+      "voc_miou@full_threshold": 0.7948166908730256,
+      "voc_an1@0.45": {
+        "miou": 0.757337652524156,
+        "recall": 0.9692143303658147,
+        "precision": 0.7798650875672319,
+        "fp_per_object_pixel": 0.31857812748427905
+      },
+      "coco_miou@voc_threshold": 0.5906846023639057,
+      "coco_an1@0.45": {
+        "miou": 0.5232667745855959,
+        "recall": 0.9212943900512597,
+        "precision": 0.5643605090225511,
+        "fp_per_object_pixel": 0.8526574385881576
+      }
+    },
+    "WN/P1": {
+      "voc_miou@0.45": 0.7742804606197701,
+      "voc_full_threshold": 0.55,
+      "voc_miou@full_threshold": 0.8023636498892641,
+      "voc_an1@0.45": {
+        "miou": 0.7742804606197701,
+        "recall": 0.9650870697958931,
+        "precision": 0.8000649503539329,
+        "fp_per_object_pixel": 0.28308040712609117
+      },
+      "coco_miou@voc_threshold": 0.5893887545364175,
+      "coco_an1@0.45": {
+        "miou": 0.5264540535970184,
+        "recall": 0.919189024369717,
+        "precision": 0.568611442136931,
+        "fp_per_object_pixel": 0.8313200156834363
+      }
+    },
+    "WN/R2": {
+      "voc_miou@0.45": 0.7791315750320978,
+      "voc_full_threshold": 0.55,
+      "voc_miou@full_threshold": 0.8126994357054315,
+      "voc_an1@0.45": {
+        "miou": 0.7791315750320978,
+        "recall": 0.9648646687977974,
+        "precision": 0.805419462320784,
+        "fp_per_object_pixel": 0.27631444144856654
+      },
+      "coco_miou@voc_threshold": 0.6049583381427658,
+      "coco_an1@0.45": {
+        "miou": 0.5388770704246404,
+        "recall": 0.9155853079887528,
+        "precision": 0.5832793564056693,
+        "fp_per_object_pixel": 0.7877928454835585
+      }
+    },
+    "WN/P1+R2": {
+      "voc_miou@0.45": 0.7936311684930005,
+      "voc_full_threshold": 0.525,
+      "voc_miou@full_threshold": 0.8165434148797521,
+      "voc_an1@0.45": {
+        "miou": 0.7936311684930005,
+        "recall": 0.958956252528257,
+        "precision": 0.8248281310353475,
+        "fp_per_object_pixel": 0.24423502915496073
+      },
+      "coco_miou@voc_threshold": 0.5879684993343027,
+      "coco_an1@0.45": {
+        "miou": 0.5397464823723782,
+        "recall": 0.9121613809349085,
+        "precision": 0.5857163536576062,
+        "fp_per_object_pixel": 0.7709174321420421
+      }
+    },
+    "WE/seed": {
+      "voc_miou@0.45": 0.45024705226530903,
+      "voc_full_threshold": 0.65,
+      "voc_miou@full_threshold": 0.5930246349452066,
+      "voc_an1@0.45": {
+        "miou": 0.45024705226530903,
+        "recall": 0.9717316399944347,
+        "precision": 0.4655310168891834,
+        "fp_per_object_pixel": 1.429233238137109
+      },
+      "coco_miou@voc_threshold": 0.4581937829501606,
+      "coco_an1@0.45": {
+        "miou": 0.34008436874633946,
+        "recall": 0.9406053696843916,
+        "precision": 0.35902181062285354,
+        "fp_per_object_pixel": 2.2465280460530535
+      }
+    },
+    "WE/REF": {
+      "voc_miou@0.45": 0.6672406032094377,
+      "voc_full_threshold": 0.625,
+      "voc_miou@full_threshold": 0.7375198558015041,
+      "voc_an1@0.45": {
+        "miou": 0.6672406032094377,
+        "recall": 0.9459267218616635,
+        "precision": 0.7009516732501472,
+        "fp_per_object_pixel": 0.4979836635643329
+      },
+      "coco_miou@voc_threshold": 0.5569207319716705,
+      "coco_an1@0.45": {
+        "miou": 0.4619061363566147,
+        "recall": 0.9254488242876185,
+        "precision": 0.4862045715973958,
+        "fp_per_object_pixel": 1.289729055807265
+      }
+    },
+    "WE/P1": {
+      "voc_miou@0.45": 0.6906948193603177,
+      "voc_full_threshold": 0.625,
+      "voc_miou@full_threshold": 0.7469847762067154,
+      "voc_an1@0.45": {
+        "miou": 0.6906948193603177,
+        "recall": 0.9418182872783285,
+        "precision": 0.7278412058498132,
+        "fp_per_object_pixel": 0.4313166827847308
+      },
+      "coco_miou@voc_threshold": 0.5551778692510465,
+      "coco_an1@0.45": {
+        "miou": 0.4729286145839092,
+        "recall": 0.9233037928459356,
+        "precision": 0.49813932946460476,
+        "fp_per_object_pixel": 1.237024169867523
+      }
+    },
+    "WE/R2": {
+      "voc_miou@0.45": 0.6825349618792863,
+      "voc_full_threshold": 0.6,
+      "voc_miou@full_threshold": 0.7498599180297256,
+      "voc_an1@0.45": {
+        "miou": 0.6825349618792863,
+        "recall": 0.9438035039438659,
+        "precision": 0.7185252081334732,
+        "fp_per_object_pixel": 0.4672536430359804
+      },
+      "coco_miou@voc_threshold": 0.5599123005770734,
+      "coco_an1@0.45": {
+        "miou": 0.46981639913941436,
+        "recall": 0.9252449889211393,
+        "precision": 0.4939889431123117,
+        "fp_per_object_pixel": 1.2586815100340172
+      }
+    },
+    "WE/P1+R2": {
+      "voc_miou@0.45": 0.7037457129776693,
+      "voc_full_threshold": 0.6,
+      "voc_miou@full_threshold": 0.7541658029866551,
+      "voc_an1@0.45": {
+        "miou": 0.7037457129776693,
+        "recall": 0.9378681063597254,
+        "precision": 0.7444906420033285,
+        "fp_per_object_pixel": 0.40198620550965797
+      },
+      "coco_miou@voc_threshold": 0.55474802502081,
+      "coco_an1@0.45": {
+        "miou": 0.4797970005357457,
+        "recall": 0.9216902913016547,
+        "precision": 0.5051722615902496,
+        "fp_per_object_pixel": 1.2111477343390709
+      }
+    },
+    "WY/seed": {
+      "voc_miou@0.45": 0.6939197659621535,
+      "voc_full_threshold": 0.4,
+      "voc_miou@full_threshold": 0.7111429885800334,
+      "voc_an1@0.45": {
+        "miou": 0.6939197659621535,
+        "recall": 0.8190865476029682,
+        "precision": 0.841352968865181,
+        "fp_per_object_pixel": 0.19645491226519493
+      },
+      "coco_miou@voc_threshold": 0.5588726267858799,
+      "coco_an1@0.45": {
+        "miou": 0.5474385825475568,
+        "recall": 0.7026529136565227,
+        "precision": 0.7208601811509703,
+        "fp_per_object_pixel": 0.29239671715778554
+      }
+    },
+    "WY/REF": {
+      "voc_miou@0.45": 0.7822351087151935,
+      "voc_full_threshold": 0.45,
+      "voc_miou@full_threshold": 0.7822351087151935,
+      "voc_an1@0.45": {
+        "miou": 0.7822351087151935,
+        "recall": 0.9084828389792079,
+        "precision": 0.8610582651921895,
+        "fp_per_object_pixel": 0.18602735085726024
+      },
+      "coco_miou@voc_threshold": 0.6201078983436201,
+      "coco_an1@0.45": {
+        "miou": 0.6201078983436201,
+        "recall": 0.8725723208006464,
+        "precision": 0.6920028047666802,
+        "fp_per_object_pixel": 0.47824028309790345
+      }
+    },
+    "WY/P1": {
+      "voc_miou@0.45": 0.7938824539593747,
+      "voc_full_threshold": 0.45,
+      "voc_miou@full_threshold": 0.7938824539593747,
+      "voc_an1@0.45": {
+        "miou": 0.7938824539593747,
+        "recall": 0.9203165578441223,
+        "precision": 0.8612818324950569,
+        "fp_per_object_pixel": 0.18629095023011094
+      },
+      "coco_miou@voc_threshold": 0.6178432165370236,
+      "coco_an1@0.45": {
+        "miou": 0.6178432165370236,
+        "recall": 0.8950161545512618,
+        "precision": 0.676404178027595,
+        "fp_per_object_pixel": 0.5311483606740299
+      }
+    },
+    "WY/R2": {
+      "voc_miou@0.45": 0.7962551910725857,
+      "voc_full_threshold": 0.425,
+      "voc_miou@full_threshold": 0.7978285515687867,
+      "voc_an1@0.45": {
+        "miou": 0.7962551910725857,
+        "recall": 0.9041038188266874,
+        "precision": 0.8805666381818764,
+        "fp_per_object_pixel": 0.15976900891551452
+      },
+      "coco_miou@voc_threshold": 0.6283075091255355,
+      "coco_an1@0.45": {
+        "miou": 0.6344107733679379,
+        "recall": 0.8651458738231108,
+        "precision": 0.7121347896621062,
+        "fp_per_object_pixel": 0.4334619208623014
+      }
+    },
+    "WY/P1+R2": {
+      "voc_miou@0.45": 0.8058524630876152,
+      "voc_full_threshold": 0.425,
+      "voc_miou@full_threshold": 0.8058944467045048,
+      "voc_an1@0.45": {
+        "miou": 0.8058524630876152,
+        "recall": 0.9133141762345127,
+        "precision": 0.8806895631816211,
+        "fp_per_object_pixel": 0.1599905687638757
+      },
+      "coco_miou@voc_threshold": 0.6202248072752221,
+      "coco_an1@0.45": {
+        "miou": 0.6297492409543126,
+        "recall": 0.8869930893015813,
+        "precision": 0.6939250998216233,
+        "fp_per_object_pixel": 0.48892058554674406
+      }
+    },
+    "TC/seed": {
+      "voc_miou@0.45": 0.7954655963406422,
+      "voc_full_threshold": 0.475,
+      "voc_miou@full_threshold": 0.7959548564743789,
+      "voc_an1@0.45": {
+        "miou": 0.7954655963406422,
+        "recall": 0.9331543509823146,
+        "precision": 0.846093246298649,
+        "fp_per_object_pixel": 0.19922447177815866
+      },
+      "coco_miou@voc_threshold": 0.6380182427544139,
+      "coco_an1@0.45": {
+        "miou": 0.6333122989463458,
+        "recall": 0.8817306709138295,
+        "precision": 0.7019241669073427,
+        "fp_per_object_pixel": 0.43470078937112994
+      }
+    },
+    "TC/REF": {
+      "voc_miou@0.45": 0.8472966456372717,
+      "voc_full_threshold": 0.475,
+      "voc_miou@full_threshold": 0.8500919968064317,
+      "voc_an1@0.45": {
+        "miou": 0.8472966456372717,
+        "recall": 0.9601832682360166,
+        "precision": 0.8805896062645175,
+        "fp_per_object_pixel": 0.15888883683872418
+      },
+      "coco_miou@voc_threshold": 0.6679502186457055,
+      "coco_an1@0.45": {
+        "miou": 0.6574236175245528,
+        "recall": 0.9194609068515638,
+        "precision": 0.7056147851147897,
+        "fp_per_object_pixel": 0.4494265201055006
+      }
+    },
+    "TC/P1": {
+      "voc_miou@0.45": 0.8505482179573944,
+      "voc_full_threshold": 0.475,
+      "voc_miou@full_threshold": 0.853426855678547,
+      "voc_an1@0.45": {
+        "miou": 0.8505482179573944,
+        "recall": 0.9612386064423422,
+        "precision": 0.8828682125508784,
+        "fp_per_object_pixel": 0.15615174188252556
+      },
+      "coco_miou@voc_threshold": 0.6606324286507659,
+      "coco_an1@0.45": {
+        "miou": 0.6497423264098436,
+        "recall": 0.9224605483421175,
+        "precision": 0.6948034436920332,
+        "fp_per_object_pixel": 0.478242020478969
+      }
+    },
+    "TC/R2": {
+      "voc_miou@0.45": 0.8643081671139772,
+      "voc_full_threshold": 0.475,
+      "voc_miou@full_threshold": 0.8647174098560033,
+      "voc_an1@0.45": {
+        "miou": 0.8643081671139772,
+        "recall": 0.9547998097227499,
+        "precision": 0.9031751015827497,
+        "fp_per_object_pixel": 0.12941551436140414
+      },
+      "coco_miou@voc_threshold": 0.684781029054401,
+      "coco_an1@0.45": {
+        "miou": 0.6763214117096346,
+        "recall": 0.9135772327121547,
+        "precision": 0.7294896376599371,
+        "fp_per_object_pixel": 0.40023436748996455
+      }
+    },
+    "TC/P1+R2": {
+      "voc_miou@0.45": 0.8651613947628469,
+      "voc_full_threshold": 0.475,
+      "voc_miou@full_threshold": 0.8660883683894681,
+      "voc_an1@0.45": {
+        "miou": 0.8651613947628469,
+        "recall": 0.9542021353278296,
+        "precision": 0.9044495125188442,
+        "fp_per_object_pixel": 0.1280763150106995
+      },
+      "coco_miou@voc_threshold": 0.6742548034870554,
+      "coco_an1@0.45": {
+        "miou": 0.6654424418822434,
+        "recall": 0.9151758081265188,
+        "precision": 0.7158674408900754,
+        "fp_per_object_pixel": 0.43146337157765363
+      }
+    },
+    "TS/seed": {
+      "voc_miou@0.45": 0.7511025759476335,
+      "voc_full_threshold": 0.575,
+      "voc_miou@full_threshold": 0.8013663655111097,
+      "voc_an1@0.45": {
+        "miou": 0.7511025759476335,
+        "recall": 0.9818948353084173,
+        "precision": 0.7636612225091788,
+        "fp_per_object_pixel": 0.3619499769373403
+      },
+      "coco_miou@voc_threshold": 0.6306799749228525,
+      "coco_an1@0.45": {
+        "miou": 0.5533964940518097,
+        "recall": 0.9544039775931698,
+        "precision": 0.5806012139351647,
+        "fp_per_object_pixel": 0.8448819829170686
+      }
+    },
+    "TS/REF": {
+      "voc_miou@0.45": 0.8285414506655717,
+      "voc_full_threshold": 0.55,
+      "voc_miou@full_threshold": 0.8517411319660848,
+      "voc_an1@0.45": {
+        "miou": 0.8285414506655717,
+        "recall": 0.9788680622014174,
+        "precision": 0.8453366706572417,
+        "fp_per_object_pixel": 0.2198696233578537
+      },
+      "coco_miou@voc_threshold": 0.6546942737147543,
+      "coco_an1@0.45": {
+        "miou": 0.5969419952958057,
+        "recall": 0.9494809702711728,
+        "precision": 0.6284498201982591,
+        "fp_per_object_pixel": 0.6912595312750558
+      }
+    },
+    "TS/P1": {
+      "voc_miou@0.45": 0.8363767433110478,
+      "voc_full_threshold": 0.55,
+      "voc_miou@full_threshold": 0.8527677217153397,
+      "voc_an1@0.45": {
+        "miou": 0.8363767433110478,
+        "recall": 0.9762291957873822,
+        "precision": 0.8555453393110944,
+        "fp_per_object_pixel": 0.2045204225824811
+      },
+      "coco_miou@voc_threshold": 0.6512787185392158,
+      "coco_an1@0.45": {
+        "miou": 0.5964306437530947,
+        "recall": 0.9458417067925469,
+        "precision": 0.62916399242449,
+        "fp_per_object_pixel": 0.6833952460312253
+      }
+    },
+    "TS/R2": {
+      "voc_miou@0.45": 0.8496469263790564,
+      "voc_full_threshold": 0.55,
+      "voc_miou@full_threshold": 0.8644799047051739,
+      "voc_an1@0.45": {
+        "miou": 0.8496469263790564,
+        "recall": 0.9731505018846487,
+        "precision": 0.871438485889002,
+        "fp_per_object_pixel": 0.1827040923752256
+      },
+      "coco_miou@voc_threshold": 0.6687231065262015,
+      "coco_an1@0.45": {
+        "miou": 0.6170729688671378,
+        "recall": 0.9439997840526099,
+        "precision": 0.6520235151100494,
+        "fp_per_object_pixel": 0.6299487845884304
+      }
+    },
+    "TS/P1+R2": {
+      "voc_miou@0.45": 0.8534974786944696,
+      "voc_full_threshold": 0.525,
+      "voc_miou@full_threshold": 0.8646233133560683,
+      "voc_an1@0.45": {
+        "miou": 0.8534974786944696,
+        "recall": 0.9689942450576641,
+        "precision": 0.8791298560783259,
+        "fp_per_object_pixel": 0.17173270667290869
+      },
+      "coco_miou@voc_threshold": 0.6517220152759872,
+      "coco_an1@0.45": {
+        "miou": 0.6127162510729691,
+        "recall": 0.9392636966787261,
+        "precision": 0.6493769553907028,
+        "fp_per_object_pixel": 0.629176465025173
+      }
+    }
+  },
+  "per_class_settings": {
+    "voc": {
+      "aeroplane": {
+        "synonyms": [
+          "airplane",
+          "aircraft"
+        ],
+        "attribution_prompt": "A photograph of a aeroplane"
+      },
+      "bicycle": {
+        "synonyms": [
+          "bike"
+        ],
+        "attribution_prompt": "A photograph of a bicycle"
+      },
+      "bird": {
+        "synonyms": [],
+        "attribution_prompt": "A photograph of a bird"
+      },
+      "boat": {
+        "synonyms": [
+          "ship"
+        ],
+        "attribution_prompt": "A photograph of a boat"
+      },
+      "bottle": {
+        "synonyms": [],
+        "attribution_prompt": "A photograph of a bottle"
+      },
+      "bus": {
+        "synonyms": [],
+        "attribution_prompt": "A photograph of a bus"
+      },
+      "car": {
+        "synonyms": [
+          "automobile"
+        ],
+        "attribution_prompt": "A photograph of a car"
+      },
+      "cat": {
+        "synonyms": [],
+        "attribution_prompt": "A photograph of a cat"
+      },
+      "chair": {
+        "synonyms": [],
+        "attribution_prompt": "A photograph of a chair"
+      },
+      "cow": {
+        "synonyms": [
+          "cattle"
+        ],
+        "attribution_prompt": "A photograph of a cow"
+      },
+      "dining-table": {
+        "synonyms": [
+          "table"
+        ],
+        "attribution_prompt": "A photograph of a dining-table"
+      },
+      "dog": {
+        "synonyms": [],
+        "attribution_prompt": "A photograph of a dog"
+      },
+      "horse": {
+        "synonyms": [],
+        "attribution_prompt": "A photograph of a horse"
+      },
+      "motorbike": {
+        "synonyms": [
+          "motorcycle"
+        ],
+        "attribution_prompt": "A photograph of a motorbike"
+      },
+      "person": {
+        "synonyms": [
+          "human"
+        ],
+        "attribution_prompt": "A photograph of a person"
+      },
+      "potted-plant": {
+        "synonyms": [
+          "houseplant"
+        ],
+        "attribution_prompt": "A photograph of a potted-plant"
+      },
+      "sheep": {
+        "synonyms": [],
+        "attribution_prompt": "A photograph of a sheep"
+      },
+      "sofa": {
+        "synonyms": [
+          "couch"
+        ],
+        "attribution_prompt": "A photograph of a sofa"
+      },
+      "train": {
+        "synonyms": [
+          "locomotive"
+        ],
+        "attribution_prompt": "A photograph of a train"
+      },
+      "tv": {
+        "synonyms": [
+          "television"
+        ],
+        "attribution_prompt": "A photograph of a tv"
+      }
+    },
+    "coco": {
+      "aeroplane": {
+        "synonyms": [
+          "airplane",
+          "aircraft"
+        ],
+        "attribution_prompt": "aeroplane"
+      },
+      "bicycle": {
+        "synonyms": [
+          "bike"
+        ],
+        "attribution_prompt": "bicycle"
+      },
+      "bird": {
+        "synonyms": [],
+        "attribution_prompt": "bird"
+      },
+      "boat": {
+        "synonyms": [
+          "ship"
+        ],
+        "attribution_prompt": "boat"
+      },
+      "bottle": {
+        "synonyms": [],
+        "attribution_prompt": "bottle"
+      },
+      "bus": {
+        "synonyms": [],
+        "attribution_prompt": "bus"
+      },
+      "car": {
+        "synonyms": [
+          "automobile"
+        ],
+        "attribution_prompt": "car"
+      },
+      "cat": {
+        "synonyms": [],
+        "attribution_prompt": "cat"
+      },
+      "chair": {
+        "synonyms": [],
+        "attribution_prompt": "chair"
+      },
+      "cow": {
+        "synonyms": [
+          "cattle"
+        ],
+        "attribution_prompt": "cow"
+      },
+      "dining table": {
+        "synonyms": [
+          "table"
+        ],
+        "attribution_prompt": "dining table"
+      },
+      "dog": {
+        "synonyms": [],
+        "attribution_prompt": "dog"
+      },
+      "horse": {
+        "synonyms": [],
+        "attribution_prompt": "horse"
+      },
+      "motorbike": {
+        "synonyms": [
+          "motorcycle"
+        ],
+        "attribution_prompt": "motorbike"
+      },
+      "person": {
+        "synonyms": [
+          "human"
+        ],
+        "attribution_prompt": "person"
+      },
+      "potted plant": {
+        "synonyms": [
+          "houseplant"
+        ],
+        "attribution_prompt": "potted plant"
+      },
+      "sheep": {
+        "synonyms": [],
+        "attribution_prompt": "sheep"
+      },
+      "sofa": {
+        "synonyms": [
+          "couch"
+        ],
+        "attribution_prompt": "sofa"
+      },
+      "train": {
+        "synonyms": [
+          "locomotive"
+        ],
+        "attribution_prompt": "train"
+      },
+      "tv": {
+        "synonyms": [
+          "television"
+        ],
+        "attribution_prompt": "tv"
+      }
+    }
+  },
+  "environments": [
+    "{\"conda_env\": \"gen\", \"gpu\": \"NVIDIA A100-PCIE-40GB\", \"node\": \"renyi\", \"torch\": \"2.4.1+cu121\"}"
+  ]
+}

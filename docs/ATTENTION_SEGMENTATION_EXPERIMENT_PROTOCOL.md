@@ -442,7 +442,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | AN1 mechanism analysis (registry Section 11) | Claude runs; Codex reviews | Complete and accepted: parts 1–2 reproduce; tie-aware Spearman correction does not change any rounded conclusion (Sections 57–60) | `0063515`, `c66d1cf`, this commit; `outputs/segmentation/analysis/` |
 | B2a/S4/B2b token package | Codex runs; Claude reviews | Complete and accepted: 59 B2a and 100 B2b tokens; VOC 490/490 and COCO 707/707; independently replicated by Claude (Sections 64--65); paper/evidence integration assigned to Claude (Section 67) | jobs `233332`, `233333`, `233660`, `233837`, `233838`; `outputs/segmentation/controlled_attention_cv/token_learning_b2/` |
 | B2a/S4/B2b independent replication and validation | Claude | Complete: Codex's recipe retrained end to end in Claude's environment; every token and score reproduced; Section 64 validated; protocol-only confirmation, not reported in the paper (Section 65) | this commit; `outputs/segmentation/controlled_attention_cv/token_learning_b2_replication/` |
-| SG5 contrastive CA seed | Claude runs; Codex reviews | Registered before the run (Section 66); departs from the Section 61 order at Narmeen's decision | this commit; `configs/sg5_contrastive_seed.json` |
+| SG5 contrastive CA seed | Claude runs; Codex reviews | Complete (VOC 490/490, COCO 707/707, job `234257`): reference won 5/5 in all four screens; no seed promoted; Codex review requested (Section 70) | this commit; `outputs/segmentation/controlled_attention_cv/sg5_contrastive_seed/` |
 | SG1 absorbing walk + SG3 confidence lock | Codex runs; Claude reviews | Running: smoke passed; VOC `234264`, COCO `234265`, finalizer `234266` (Section 68); SG5/DenseCRF interaction deferred until owner review | `71933337a`; `configs/sg1_sg3_graph_refinement.json` |
 | B2 optimizer audit against OVAM (Section 64, request 1) | Claude | Complete: B2 uses linear maps where OVAM optimizes token-softmax maps; everything else matches; rerun proposed and paper integration held (Section 69) | this commit; `outputs/segmentation/analysis/b2_recipe_audit/` |
 
@@ -3325,3 +3325,77 @@ installed or run).
 **Files.** `scripts/narmyn/attention/audit_b2_recipe.py`;
 `outputs/segmentation/analysis/b2_recipe_audit/` (`epoch0_loss.jsonl`,
 `optimize.jsonl`, `summary.json`; 52 KB).
+
+## 70. Claude: SG5 results; no seed promoted (Codex review requested)
+
+**Run.** Job `234257` (renyi, 2× A100, env `gen`, torch 2.4.1+cu121; one
+environment for the whole package, Section 66 amendment): 40/40 class shards,
+VOC-Sim 490 and COCO-Cap 707 images, no failure. The first finalize stopped on
+a merge check: the per-class settings `synonyms` and `attribution_prompt`
+differ between class shards by design. `finalize_sg5.py` now requires every
+other setting to agree, keeps those two per class in `summary.json`, and
+merges; no count was changed.
+
+**Reference check.** `W/seed`, `W/REF`, `W/P1+R2`, `TC/REF` and `TC/R2`
+agree with the V100 token package (Section 50) to within 0.0007 mIoU at 0.45
+(mean image-IoU difference ≤ 0.0014), and with the frozen pipelines (REF
+0.787, FTF 0.813, T-C 0.865).
+
+**Screens (protocol v1.2).** The reference won all five folds in every
+screen; nothing is frozen and no pipeline changes.
+
+| Screen | Reference OOF | Votes for the reference | Frozen |
+|---|---:|---:|---|
+| SG5-W seed under REF | 0.7873 | 5/5 | `W/REF` |
+| SG5-W in FTF | 0.8134 | 5/5 | `W/P1+R2` |
+| SG5-T seed under REF | 0.8496 | 5/5 | `TC/REF` |
+| SG5-T in T-C | 0.8647 | 5/5 | `TC/R2` |
+
+**Cells** (VOC-Sim mIoU at each cell's all-VOC threshold; seed recall /
+precision at 0.45; COCO-Cap at the VOC threshold, transfer only):
+
+| Seed | REF | P1+R2 (FTF) | Seed recall / precision | COCO REF | COCO P1+R2 |
+|---|---:|---:|---:|---:|---:|
+| `W` | 0.7886 | 0.8134 | 0.822 / 0.843 | 0.6173 | 0.6370 |
+| `WS` | 0.7839 | 0.8059 | 0.962 / 0.670 | 0.5778 | 0.5742 |
+| `WK` | 0.7733 | 0.7978 | 0.791 / 0.848 | 0.6144 | 0.6093 |
+| `WN` | 0.7948 | 0.8165 | 0.978 / 0.600 | 0.5907 | 0.5880 |
+| `WE` | 0.7375 | 0.7542 | 0.972 / 0.466 | 0.5569 | 0.5547 |
+| `WY` | 0.7822 | 0.8059 | 0.819 / 0.841 | 0.6201 | 0.6202 |
+
+| Token seed | REF | R2 (T-C) | Seed recall / precision | COCO REF | COCO R2 |
+|---|---:|---:|---:|---:|---:|
+| `TC` | 0.8501 | 0.8647 | 0.933 / 0.846 | 0.6680 | 0.6848 |
+| `TS` | 0.8517 | 0.8645 | 0.982 / 0.764 | 0.6547 | 0.6687 |
+
+**What SG5 shows.**
+
+1. **Contrast closes the coverage gap but costs precision.** The log-ratio
+   seeds (`WS`, `WN`, `WE`) raise seed recall from 0.82 to 0.96–0.98, past the
+   token's 0.93, but precision falls from 0.84 to 0.47–0.67. Section 66 asked
+   for coverage *without lowering precision*; none achieves it. The best,
+   `WN`, is +0.006 at REF and +0.003 at FTF in-sample, below the promotion
+   band and not chosen in any fold.
+2. **On COCO-Cap the precision loss dominates** (−0.03 to −0.08 at FTF),
+   consistent with Section 59, finding 5: COCO-Cap's weakness is precision.
+3. **The token's advantage is not the two-key normalization.** The class
+   word in OVAM's two-key form (`WK`) is worse than the frozen class word
+   (−0.015 at REF). What the token adds is the learned embedding, not the
+   `[<SoT>, token]` softmax.
+4. **Synonyms add nothing** (`WY` −0.006 at REF on VOC-Sim; +0.003 on
+   COCO-Cap).
+5. **The token's log-ratio (`TS`)** behaves like `WS`: higher recall, lower
+   precision, equal after DenseCRF on VOC-Sim, lower on COCO-Cap.
+
+**Implication for SG1/SG3 (Section 68).** SG5 promotes no seed, so SG1/SG3
+use the existing frozen seeds, as registered. The recall/precision trade of
+the contrastive seeds suggests a possible combination: a high-recall
+contrastive seed with SG1's background anchors to restore precision. That
+would be a new, separately registered experiment, for the owners' joint
+review (Section 68).
+
+**Codex:** please review the package before any SG5 result enters the paper.
+
+**Files.** `outputs/segmentation/controlled_attention_cv/sg5_contrastive_seed/`
+(`voc/` and `coco/` shards, `summary.json`, `report.md`);
+`scripts/narmyn/attention/finalize_sg5.py` (merge fix).
