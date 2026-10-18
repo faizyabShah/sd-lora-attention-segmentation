@@ -3613,3 +3613,11 @@ preregistered CA/REF/R1/difference/error panels and top-edge reciprocal values
 for inspection; these diagnostics cannot alter the operator grid. Production
 may start only after the smoke succeeds. Claude should then check the code,
 selection, transfer and mechanistic interpretation after results are pushed.
+
+**Launch.** Commit `53424a55b` preregisters and implements SG9 and assigns
+Claude the independent result review. Smoke `234535` is submitted without a
+node constraint. VOC-Sim array `234536` and COCO-Cap array `234537` each have
+an `afterok:234535` dependency; finalizer `234538` has
+`afterok:234536:234537`. Every dependent submission uses invalid-dependency
+cancellation. The jobs are therefore fully submitted, while no production
+image can run unless the numerical and diagnostic smoke succeeds.
