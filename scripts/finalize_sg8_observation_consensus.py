@@ -21,7 +21,9 @@ OUT = ROOT / "outputs/segmentation/controlled_attention_cv/sg8_observation_conse
 
 
 def load(dataset: str) -> cv.Results:
-    result = cv.load_results(sorted((OUT / dataset / "shards").glob("class_*.npz")))
+    shards = [path for path in sorted((OUT / dataset / "shards").glob("class_*.npz"))
+              if not path.name.endswith(".diagnostics.npz")]
+    result = cv.load_results(shards)
     if not all(result.complete) or len(set(result.classes)) != 20:
         raise SystemExit(f"{dataset}: incomplete result shards")
     return result

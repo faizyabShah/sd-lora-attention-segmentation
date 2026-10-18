@@ -5,6 +5,8 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=48G
 #SBATCH --time=01:00:00
+#SBATCH --output=logs/%x_%j.out
+#SBATCH --error=logs/%x_%j.err
 set -eo pipefail
 repo="${SLURM_SUBMIT_DIR:?submit from the repository root}"
 cd "$repo"

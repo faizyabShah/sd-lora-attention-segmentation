@@ -9,6 +9,8 @@
 #SBATCH --requeue
 #SBATCH --signal=B:USR1@180
 #SBATCH --open-mode=append
+#SBATCH --output=logs/%x_%A_%a.out
+#SBATCH --error=logs/%x_%A_%a.err
 set -eo pipefail
 dataset="${1:?usage: sbatch ... jobs/run_sg8_observation_consensus.slurm voc|coco}"
 if [[ "$dataset" != voc && "$dataset" != coco ]]; then
