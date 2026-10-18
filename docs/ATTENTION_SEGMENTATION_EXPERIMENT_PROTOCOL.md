@@ -443,7 +443,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | B2a/S4/B2b token package | Codex runs; Claude reviews | Complete and accepted: 59 B2a and 100 B2b tokens; VOC 490/490 and COCO 707/707; independently replicated by Claude (Sections 64--65); paper/evidence integration assigned to Claude (Section 67) | jobs `233332`, `233333`, `233660`, `233837`, `233838`; `outputs/segmentation/controlled_attention_cv/token_learning_b2/` |
 | B2a/S4/B2b independent replication and validation | Claude | Complete: Codex's recipe retrained end to end in Claude's environment; every token and score reproduced; Section 64 validated; protocol-only confirmation, not reported in the paper (Section 65) | this commit; `outputs/segmentation/controlled_attention_cv/token_learning_b2_replication/` |
 | SG5 contrastive CA seed | Claude runs; Codex reviews | Registered before the run (Section 66); departs from the Section 61 order at Narmeen's decision | this commit; `configs/sg5_contrastive_seed.json` |
-| SG1 absorbing walk + SG3 confidence lock | Codex runs; Claude reviews | Independent screen registered before the run (Section 68); current frozen seeds, VOC selection and untouched COCO transfer; SG5/DenseCRF interaction deferred until owner review | this commit; `configs/sg1_sg3_graph_refinement.json` |
+| SG1 absorbing walk + SG3 confidence lock | Codex runs; Claude reviews | Running: smoke passed; VOC `234264`, COCO `234265`, finalizer `234266` (Section 68); SG5/DenseCRF interaction deferred until owner review | `71933337a`; `configs/sg1_sg3_graph_refinement.json` |
 
 ### Pre-sync exploratory run
 
@@ -3224,8 +3224,19 @@ reads an optionally unset variable. It produced no image or result. The job
 files now source the environment before enabling nounset; a new smoke must
 pass before production is submitted.
 
-Smoke `234262` was then cancelled before producing a result because
-`--nodelist=erdos,neumann` made Slurm allocate both named nodes to one task.
+Smoke `234262` was then cancelled because `--nodelist=erdos,neumann` made
+Slurm allocate both named nodes to one task. It had just written one complete
+image shard before cancellation; this is smoke output only and never enters
+selection or transfer.
 The jobs now exclude the A100 node `renyi` and drained V100 node `wald`, so
 each task receives exactly one of the available V100 nodes, `erdos` or
-`neumann`. A third smoke is required before production.
+`neumann`. Smoke `234263` resumed and validated that shard: 1 image, all 76
+configurations and 17 thresholds, finite AP for all cells, and exit code 0 on
+one V100 node.
+
+**Production launch.** VOC-Sim array `234264` and COCO-Cap array `234265` run
+in parallel on the V100 node class. Finalizer `234266` has an `afterok`
+dependency on both complete arrays. Claude should review the code and compact
+package after Codex pushes the results. After SG1/SG3 and SG5 are both
+reviewed, Faiz and Narmeen will jointly analyze them and decide what, if
+anything, runs next; neither agent should independently start another family.
