@@ -443,6 +443,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | B2a/S4/B2b token package | Codex runs; Claude reviews | Complete and accepted: 59 B2a and 100 B2b tokens; VOC 490/490 and COCO 707/707; independently replicated by Claude (Sections 64--65); paper/evidence integration assigned to Claude (Section 67) | jobs `233332`, `233333`, `233660`, `233837`, `233838`; `outputs/segmentation/controlled_attention_cv/token_learning_b2/` |
 | B2a/S4/B2b independent replication and validation | Claude | Complete: Codex's recipe retrained end to end in Claude's environment; every token and score reproduced; Section 64 validated; protocol-only confirmation, not reported in the paper (Section 65) | this commit; `outputs/segmentation/controlled_attention_cv/token_learning_b2_replication/` |
 | SG5 contrastive CA seed | Claude runs; Codex reviews | Registered before the run (Section 66); departs from the Section 61 order at Narmeen's decision | this commit; `configs/sg5_contrastive_seed.json` |
+| SG1 absorbing walk + SG3 confidence lock | Codex runs; Claude reviews | Independent screen registered before the run (Section 68); current frozen seeds, VOC selection and untouched COCO transfer; SG5/DenseCRF interaction deferred until owner review | this commit; `configs/sg1_sg3_graph_refinement.json` |
 
 ### Pre-sync exploratory run
 
@@ -3148,3 +3149,71 @@ is run and should use the completed SG5 result as the seed reference if SG5 is
 promoted; otherwise it uses the existing frozen seed. SG2 remains conditional
 on SG1 showing signal. Codex will not launch SG1 until SG5 has produced the
 seed decision needed to fix that reference.
+
+## 68. Codex: SG1/SG3 independent screen registration and ownership gate
+
+**Owner decision.** Faiz asked Codex to run SG1 and SG3 now against the
+existing frozen seeds rather than idle while SG5 runs. If SG5 promotes a new
+seed, only the already-frozen SG1/SG3 winners will be rerun with it; graph
+parameters will not be retuned. This supersedes the final sentence of Section
+67 while retaining its leakage safeguard.
+
+**Question.** Can foreground/background anchors keep the object completion of
+SA propagation while limiting diffusion into unrelated regions? SG1 solves a
+foreground-before-background hitting probability; SG3 is its finite-step,
+confidence-locked baseline.
+
+**Fixed inputs.** Both attribution tracks are evaluated in the same live
+generation: `W`, the current frozen class-word CA seed, and `T`, OVAM's
+released 2--3-support token. The spatial graph is the mean row-stochastic
+conditional SA affinity over every head and denoising call of frozen module
+15. No CA/SA head, call or layer is selected here. Maps and affinities are
+discarded after compact scores are written.
+
+**Registered anchors.** Each 64x64 seed is min--max normalized. Foreground
+anchors are pixels at or above quantile 0.80, 0.90 or 0.95. Background anchors
+are pixels at or below quantile 0.05 or 0.10, optionally unioned with a
+one-pixel image border; foreground takes precedence at overlap. This gives 12
+anchor configurations per attribution.
+
+- **SG1:** set foreground/background anchors to one/zero and iterate the mean
+  graph, reclamping after every step, until maximum change is below `1e-4` or
+  200 iterations.
+- **SG3:** start from the CA seed; run one or two mean-graph steps and restore
+  the original CA values at both anchor sets after every step.
+- **References:** `REF` is the established observation-wise one-pass map and
+  `P1` is the established observation-wise two-pass map. They are recomputed
+  in the package for within-environment comparisons.
+
+This is 38 cells per attribution and 76 total: two references, 12 SG1 cells
+and 24 SG3 cells. All use the 17 phase-3 thresholds.
+
+**Selection and transfer.** Four screens (`W-SG1`, `W-SG3`, `T-SG1`,
+`T-SG3`) independently compare a family with that attribution's `REF`.
+Protocol v1.2 chooses method and threshold on four folds, scores the fifth,
+and freezes only with at least 4/5 votes and positive OOF gain. Within the
+0.002 tie band, no border and one SG3 step are simpler. COCO-Cap never selects:
+every cell is reported at its threshold selected on all VOC-Sim.
+
+A fold freeze in this screen is provisional. Final adoption must additionally
+pass Section 59's locked confirmation: recall may not fall below the two-pass
+reference, new false positives per new true positive must improve over FTF,
+and the candidate must add value beyond DenseCRF. Those AN1 spatial and
+DenseCRF checks are intentionally performed only for the frozen winners, so
+they cannot be used to search this 76-cell grid.
+
+This independent screen deliberately excludes DenseCRF and the still-running
+SG5 seed. After both packages finish, **the owners, Faiz and Narmeen, will
+jointly analyze the results before the project moves to another experiment
+family**. Only afterward may a locked confirmation cross the frozen SG1/SG3
+winners with a promoted SG5 seed and DenseCRF. That confirmation cannot
+retune graph parameters. SG2 and all other new families remain paused until
+the owners make that decision.
+
+**Files and execution.** The reusable operators are in
+`src/segmentation/graph_refinement.py`; the live runner and merger are
+`scripts/run_sg1_sg3_graph_refinement.py` and
+`scripts/finalize_sg1_sg3_graph_refinement.py`; the fixed grid is
+`configs/sg1_sg3_graph_refinement.json`. The SLURM chain first runs a one-image
+smoke test, then VOC-Sim and COCO-Cap arrays on the V100 node class, then the
+CPU finalizer. Every class shard is resumable.

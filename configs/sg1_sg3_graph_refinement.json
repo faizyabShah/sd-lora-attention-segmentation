@@ -1,0 +1,17 @@
+{
+  "family": "SG1 absorbing walk with SG3 confidence-lock baseline",
+  "protocol": "protocol Section 68; registry Section 11",
+  "registered_before_run": true,
+  "reference_seed": "current frozen class-word CA and OVAM released token; SG5 is not used in this independent screen",
+  "graph": "mean row-stochastic conditional SA affinity over every head and denoising call of frozen module 15",
+  "foreground_quantiles": [0.8, 0.9, 0.95],
+  "background_quantiles": [0.05, 0.1],
+  "border_widths": [0, 1],
+  "sg3_steps": [1, 2],
+  "sg1_tolerance": 0.0001,
+  "sg1_max_iterations": 200,
+  "attributions": ["W", "T"],
+  "selection": "four training folds choose method and threshold; held-out fold scores it; freeze requires at least 4/5 votes and positive OOF gain under protocol v1.2",
+  "transfer": "COCO-Cap is reported at thresholds selected on all VOC-Sim and never selects a setting",
+  "deferred_confirmation": "after owner review and SG5: locked SG1/SG3 winners crossed with the SG5 seed if promoted and DenseCRF; no graph-parameter retuning"
+}
