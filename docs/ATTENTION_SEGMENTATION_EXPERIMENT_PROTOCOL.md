@@ -440,10 +440,10 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | COCO-Cap transfer run | Claude runs; Codex reviews | Complete and accepted (707/707, job `233147`): FTF 0.637 at its VOC threshold; summary regenerated exactly (Sections 54 and 60) | `9a0a8f5`; `outputs/segmentation/coco_cap_transfer/coco_cap/` |
 | Few-shot COCO-Cap transfer | Claude runs; Codex reviews | Complete and accepted (707/707, job `233168`): T-C pipeline 0.685; summary regenerated exactly (Sections 56 and 60) | `56295a3`; `outputs/segmentation/coco_cap_transfer/coco_cap_token/` |
 | AN1 mechanism analysis (registry Section 11) | Claude runs; Codex reviews | Complete and accepted: parts 1–2 reproduce; tie-aware Spearman correction does not change any rounded conclusion (Sections 57–60) | `0063515`, `c66d1cf`, this commit; `outputs/segmentation/analysis/` |
-| B2a/S4/B2b token package | Codex runs; Claude reviews | Complete and accepted: 59 B2a and 100 B2b tokens; VOC 490/490 and COCO 707/707; independently replicated by Claude (Sections 64--65); paper/evidence integration assigned to Claude (Section 67) | jobs `233332`, `233333`, `233660`, `233837`, `233838`; `outputs/segmentation/controlled_attention_cv/token_learning_b2/` |
-| B2a/S4/B2b independent replication and validation | Claude | Complete: Codex's recipe retrained end to end in Claude's environment; every token and score reproduced; Section 64 validated; protocol-only confirmation, not reported in the paper (Section 65) | this commit; `outputs/segmentation/controlled_attention_cv/token_learning_b2_replication/` |
-| SG5 contrastive CA seed | Claude runs; Codex reviews | Complete (VOC 490/490, COCO 707/707, job `234257`): reference won 5/5 in all four screens; no seed promoted; Codex review requested (Section 70) | this commit; `outputs/segmentation/controlled_attention_cv/sg5_contrastive_seed/` |
-| SG1 absorbing walk + SG3 confidence lock | Codex runs; Claude reviews | Running: smoke passed; VOC `234264`, COCO `234265`, finalizer `234266` (Section 68); SG5/DenseCRF interaction deferred until owner review | `71933337a`; `configs/sg1_sg3_graph_refinement.json` |
+| B2a/S4/B2b token package | Codex runs; Claude reviews | Measurements reproduced, but OVAM-fidelity claim withdrawn: B2 uses a linear objective while OVAM used token softmax; faithful-rerun decision and paper integration pending owner review (Sections 64--65, 69, 71) | jobs `233332`, `233333`, `233660`, `233837`, `233838`; `outputs/segmentation/controlled_attention_cv/token_learning_b2/` |
+| B2a/S4/B2b independent replication | Claude | Complete: independently reproduces Codex's linear-objective package; this validates its measurements, not equivalence to OVAM's optimizer (Sections 65, 69) | `4472e2d`; `outputs/segmentation/controlled_attention_cv/token_learning_b2_replication/` |
+| SG5 contrastive CA seed | Claude runs; Codex reviews | Complete and accepted: 490 VOC + 707 COCO; reference won all four screens 5/5, so no seed is promoted (Sections 66, 70--71) | `eb95eb019`; `outputs/segmentation/controlled_attention_cv/sg5_contrastive_seed/` |
+| SG1 absorbing walk + SG3 confidence lock | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; no family frozen; token SG3 has a nonpromoted transfer signal for owner review (Sections 68, 71) | jobs `234264`--`234266`; `outputs/segmentation/controlled_attention_cv/sg1_sg3_graph_refinement/` |
 | B2 optimizer audit against OVAM (Section 64, request 1) | Claude | Complete: B2 uses linear maps where OVAM optimizes token-softmax maps; everything else matches; rerun proposed and paper integration held (Section 69) | this commit; `outputs/segmentation/analysis/b2_recipe_audit/` |
 
 ### Pre-sync exploratory run
@@ -3399,3 +3399,71 @@ review (Section 68).
 **Files.** `outputs/segmentation/controlled_attention_cv/sg5_contrastive_seed/`
 (`voc/` and `coco/` shards, `summary.json`, `report.md`);
 `scripts/narmyn/attention/finalize_sg5.py` (merge fix).
+
+## 71. Codex: SG5 review and SG1/SG3 results; owner-analysis gate
+
+**Completeness and independent checks.** SG1/SG3 jobs `234264` (VOC-Sim),
+`234265` (COCO-Cap) and `234266` (finalizer) completed. Its 20+20 resumable
+shards contain 490 and 707 unique complete images, 20 classes, 76 cells and 17
+thresholds. Rerunning the finalizer changes neither `summary.json` nor
+`report.md`. SG5 likewise has 20+20 complete shards, 490/707 unique images;
+its class-aware finalizer regenerates both committed files exactly. The
+SG1/SG3 references reproduce the established OOF values (`W/REF` 0.7873,
+`T/REF` 0.8507), and their COCO scores agree with SG5 within 0.0002. Codex
+therefore accepts Claude's SG5 package and interpretation in Section 70.
+
+**Registered SG1/SG3 screens.** No family meets the 4/5-fold freeze rule.
+
+| Screen | Fold choice | OOF reference -> selected path | Gain | Frozen |
+|---|---:|---:|---:|---|
+| word SG1 | reference 5/5 | 0.7873 -> 0.7873 | +0.0000 | `W/REF` |
+| word SG3 | reference 5/5 | 0.7873 -> 0.7873 | +0.0000 | `W/REF` |
+| token SG1 | reference 5/5 | 0.8507 -> 0.8507 | +0.0000 | `T/REF` |
+| token SG3 | candidate 2/5, reference 3/5 | 0.8507 -> 0.8534 | +0.0027 | `T/REF` |
+
+SG1 is decisively rejected. Even its best full-VOC cells fall from 0.7886 to
+0.7456 for the word and from 0.8507 to 0.7672 for the token; their COCO-Cap
+scores are 0.5350 and 0.5330. Hard foreground/background anchors followed to
+convergence discard too much useful graded evidence, and the dense diffusion
+graph does not provide a clean absorbing partition.
+
+SG3 is safer because it performs only one or two graph steps and restores the
+original values at confident anchors. It still hurts the class-word track:
+the best full-VOC cell is 0.7767 versus 0.7886. The strongest token cell,
+`T/SG3/f95_b05_r0_n1` (top 5% and bottom 5% anchors, no border, one step), is
+the only positive signal:
+
+- full VOC-Sim 0.8562 versus 0.8507 (+0.0056), with recall 0.944 and precision
+  0.906 at 0.45, versus 0.954/0.884 for `T/REF`;
+- the fold-selected path uses it in only folds 0 and 2, giving OOF +0.0027;
+  paired image-IoU +0.0031 [0.0001, 0.0060], but only 2/5 votes, so it is not
+  frozen;
+- untouched COCO-Cap transfer is 0.6920 versus 0.6681 for token REF; paired
+  image-IoU +0.0126 [0.0049, 0.0204], 444/263 images and 17/20 classes better.
+
+The COCO result is promising evidence that confidence locking can trade a
+small amount of recall for useful precision, especially with the already
+strong token seed. It remains a diagnostic rather than a promoted method:
+the preregistered VOC fold rule failed, and COCO-Cap may not override it.
+DenseCRF and spatial AN1 confirmation are therefore not triggered as an
+automatic promotion.
+
+**SG5 together with SG1/SG3.** SG5 promotes no replacement seed, so the
+registered SG1/SG3 reference remains correct and no SG5 rerun is required.
+SG5's contrastive maps obtain high recall by losing too much precision; SG1
+does not recover that precision, while token SG3 suggests that finite
+confidence locking is the more plausible mechanism. A contrastive-seed plus
+SG3 experiment would be a new family and is not launched here.
+
+**B2 audit correction.** Codex accepts Section 69's evidence: the B2 package
+faithfully reproduces its own linear-attention objective but not OVAM's
+token-softmax optimizer. Sections 64--65 remain valid measurements of that
+linear variant. Section 67's paper handoff stays paused until the owners decide
+whether to rerun B2a/S4/B2b with token softmax; the paper must not call the
+linear package an exact OVAM-recipe reproduction.
+
+**Gate.** As requested in Section 68, Faiz and Narmeen now jointly analyze
+SG5, SG1/SG3 and the B2 audit before either agent registers or launches
+another experiment family. Claude should review this committed SG1/SG3
+package. Codex will not start the token-softmax rerun, SG2, a contrastive-SG3
+combination or any other experiment until the owners decide.
