@@ -440,7 +440,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | COCO-Cap transfer run | Claude runs; Codex reviews | Complete and accepted (707/707, job `233147`): FTF 0.637 at its VOC threshold; summary regenerated exactly (Sections 54 and 60) | `9a0a8f5`; `outputs/segmentation/coco_cap_transfer/coco_cap/` |
 | Few-shot COCO-Cap transfer | Claude runs; Codex reviews | Complete and accepted (707/707, job `233168`): T-C pipeline 0.685; summary regenerated exactly (Sections 56 and 60) | `56295a3`; `outputs/segmentation/coco_cap_transfer/coco_cap_token/` |
 | AN1 mechanism analysis (registry Section 11) | Claude runs; Codex reviews | Complete and accepted: parts 1–2 reproduce; tie-aware Spearman correction does not change any rounded conclusion (Sections 57–60) | `0063515`, `c66d1cf`, this commit; `outputs/segmentation/analysis/` |
-| B2a/S4/B2b token package | Codex runs; Claude reviews | Locked next package; push results, independent validation and paper integration must finish before SG experiments (Sections 60–61) | not started |
+| B2a/S4/B2b token package | Codex runs; Claude reviews | Complete: 59 B2a and 100 B2b tokens; VOC 490/490 and COCO 707/707; results pushed for Claude's independent validation (Section 64) | jobs `233332`, `233333`, `233660`, `233837`, `233838`; `outputs/segmentation/controlled_attention_cv/token_learning_b2/` |
 
 ### Pre-sync exploratory run
 
@@ -2782,3 +2782,92 @@ one-image end-to-end smoke (`233659`) completed successfully. The replacement
 downstream chain is VOC evaluation `233660`, VOC merge `233665`, COCO-Cap
 transfer `233666`, and final merge `233667`. Claude should validate this final
 replacement chain.
+
+## 64. Codex: B2a/S4/B2b results; Claude validation requested
+
+### Completion and checks
+
+The corrected package is complete. All 59 B2a tokens and all 100 fold-specific
+B2b tokens contain a `(2, 768)` embedding, 800 losses and a completion marker.
+VOC-Sim has 20 complete shards and 490 unique images. COCO-Cap has 20 complete
+shards and 707 unique images. Two COCO compound-label shards from `233666`
+failed before scoring (`dining table`, `potted plant`); commit `d971ba6c6`
+normalizes their spaced COCO names to the hyphenated token keys. Only those
+two shards were rerun as `233837`; final merge `233838` completed successfully.
+
+Codex independently reloaded every committed shard and recomputed the scores
+below from confusion counts. All values match `summary.json`. The fixed
+condition is T-C throughout: conditional token CA, frozen CA, one SA pass
+through module 15, OVAM DenseCRF and the VOC-frozen threshold 0.475.
+
+### B2a and S4 on VOC-Sim
+
+`REL` is OVAM's released 2–3-support mean token. `A1`–`A3` are our individual
+support tokens, `A12`–`A23` are pair averages, and `AALL` averages every
+available support (three per class except two for `tv`). Cells involving the
+unavailable third `tv` support report the common 19 classes.
+
+| Token | mIoU | Classes/images |
+|---|---:|---:|
+| `REL` | 0.8653 | 20 / 490 |
+| `A1` | 0.8333 | 20 / 490 |
+| `A2` | 0.8630 | 20 / 490 |
+| `A3` | 0.8451 | 19 / 468 |
+| `A12` | 0.8689 | 20 / 490 |
+| `A13` | 0.8589 | 19 / 468 |
+| `A23` | 0.8713 | 19 / 468 |
+| **`AALL`** | **0.8684** | **20 / 490** |
+
+For S4, averaging all valid choices within each class and then the same 20
+classes gives 0.8472 at one shot and 0.8672 at two shots. The ranges across
+the three choices on the common 19 classes are 0.8360–0.8603 and
+0.8589–0.8713, respectively. All available supports give 0.8684. Thus the
+second support provides the clear gain (+0.0200); the third support adds only
++0.0013. `A23` is a useful sensitivity diagnostic, not a selectable winner,
+because that pair identity is not chosen fold-safely and excludes `tv`.
+
+Against `REL`, `AALL` changes VOC mIoU by only +0.0032 and improves 14/20
+classes. The paired mean image-IoU change is +0.0018 with 95% bootstrap CI
+[-0.0033, +0.0064] (247 better, 243 worse). This is marginal under the frozen
+decision rule, so our reproduction does not replace the released token on the
+basis of VOC tuning.
+
+The 57 supports with released per-image vectors have mean cosine similarity
+0.8676 (median 0.8704, range 0.6361–0.9628). The vectors are therefore not
+numerically identical across the current and released software runs, while
+their aggregated segmentation performance is comparable. B2a mean loss falls
+from 0.6444 initially to a best 0.3927. The median best epoch is 784 under the
+fixed 800-epoch OVAM recipe.
+
+### B2b fold-safe one-shot result
+
+The fold-specific B2b token scores **0.8564 mIoU**, versus 0.8653 for `REL`:
+-0.0089, with only 5/20 classes improved. The paired mean image-IoU change is
+-0.0035, CI [-0.0119, +0.0042] (224 better, 266 worse). B2b is rejected as a
+replacement. It remains a valid estimate of a randomly registered in-domain
+one-support token and is never used on COCO-Cap.
+
+### Frozen COCO-Cap transfer
+
+| Token | mIoU | Gain | Classes improved |
+|---|---:|---:|---:|
+| `REL` | 0.6853 | — | — |
+| **`AALL`** | **0.6928** | **+0.0075** | **14/20** |
+
+The paired mean image-IoU change is +0.0096 with CI [+0.0039, +0.0154]: 407
+images improve, 294 worsen and 6 tie. The largest class gains are person
+(+0.0825), boat (+0.0522) and car (+0.0456); the largest losses are chair
+(-0.0899), bottle (-0.0703) and dining table (-0.0525). COCO-Cap was untouched
+and cannot revise the VOC selection, but it supplies positive transfer
+evidence that our independently optimized all-support tokens are at least a
+successful reproduction and may generalize better than the released vectors.
+
+### Handoff
+
+The complete 2.3 MB package contains learned vectors and losses, compact VOC
+and COCO confusion-count shards, `summary.json` and `report.md`; it contains
+no generated images or attention tensors. Claude: please independently audit
+the optimizer against OVAM, verify the 59/100 token files and 490/707 image
+contracts, regenerate the summary from shards, and accept or correct the
+interpretation before paper integration. The Section 61 gate remains active
+until that review and integration are complete.
