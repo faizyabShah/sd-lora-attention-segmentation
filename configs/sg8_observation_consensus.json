@@ -1,0 +1,27 @@
+{
+  "name": "SG8 observation-consensus self-attention propagation",
+  "protocol": "protocol Section 73",
+  "registered_before_run": true,
+  "tracks": ["W", "T"],
+  "sa": {
+    "module_index": 15,
+    "resolution": 64,
+    "calls": 31,
+    "heads": 8,
+    "observations": 248
+  },
+  "sg8_a": {
+    "aggregations": ["mean_reference", "trimmed_mean_10", "trimmed_mean_20", "median"],
+    "trim_count_rule": "floor(fraction * observation_count) from each tail"
+  },
+  "sg8_b": {"taus": [0.02, 0.05, 0.10, 0.20]},
+  "sg8_c": {"rhos": [0.60, 0.70, 0.80, 0.90]},
+  "sg8_d": {"rhos": [0.60, 0.70, 0.80, 0.90]},
+  "normalization": "per-map minmax, identical to reference",
+  "thresholds": [0.30, 0.325, 0.35, 0.375, 0.40, 0.425, 0.45, 0.475, 0.50, 0.525, 0.55, 0.575, 0.60, 0.625, 0.65, 0.675, 0.70],
+  "selection": "each family and track selected independently on four VOC-Sim folds and evaluated on the held-out fold",
+  "tie_break": "within the registered 0.002 tolerance prefer the candidate closest to the reference: trim10 over trim20 over median; larger tau; larger rho",
+  "transfer": "COCO-Cap uses the setting and threshold chosen on VOC-Sim and never selects",
+  "storage": "compact counts and per-image diagnostics only; generated images, maps, affinities, and propagated vectors are discarded"
+}
+

@@ -3515,3 +3515,48 @@ and COCO array `234492` depend on its successful completion; finalizer
 invalid-dependency cancellation, so a failed prerequisite cancels its
 dependents instead of leaving `DependencyNeverSatisfied` jobs. Claude: the
 paper decision above is final, and this package is the next result to review.
+
+## 73. Owners' next experiment: SG8 observation-consensus SA propagation
+
+Faiz supplied and authorized SG8 as the next new experiment family. Codex
+owns implementation and execution; **Claude will independently verify the
+committed results after the production package is pushed**. SG8 asks whether
+agreement among the 248 individual SA observations (31 denoising calls × 8
+heads of frozen 64×64 module 15) identifies pixels where propagation is
+reliable. It computes each `z_i = A_i c` independently and never averages the
+affinities before propagation.
+
+Both frozen attribution tracks are screened separately: `W`, the class-word
+CA seed, and `T`, OVAM's released 2–3-support optimized token under our frozen
+conditional-query convention. No token is trained or altered. The registered
+families are:
+
+| Family | Cells besides ordinary mean `REF` |
+|---|---|
+| SG8-A | per-pixel 10% trimmed mean, 20% trimmed mean, median |
+| SG8-B | variance-guided CA retention, τ ∈ {0.02, 0.05, 0.10, 0.20} |
+| SG8-C | symmetric sign agreement, ρ ∈ {0.60, 0.70, 0.80, 0.90} |
+| SG8-D | conservative expansion-only agreement, same four ρ values |
+
+Each family is an independent screen; variants are not combined with each
+other, DenseCRF, SG3, SG1, token learning, or another new operation. Per-map
+min–max normalization and the 17 phase-3 thresholds are unchanged. Within
+the 0.002 tie tolerance, the registered simpler/conservative preference is
+trim10 over trim20 over median, larger τ, and larger ρ.
+
+Selection uses only the existing five VOC-Sim folds. For each held-out fold,
+the family setting and threshold are selected on the other four folds using
+the existing promotion and class-loss rules. A candidate must win at least
+4/5 folds and have positive OOF gain. W and T cannot select for each other.
+COCO-Cap uses the setting and threshold chosen on VOC-Sim and cannot choose
+anything.
+
+The runner asserts that all 31 calls and 8 heads exist and that its arithmetic
+mean equals the existing observation-wise one-pass reference to numerical
+tolerance. It retains only the 248×2×4096 propagated values, compact metric
+counts, seed-change counts, and agreement summaries. Full affinities,
+generated images and maps are released after each image. A three-image smoke
+also writes fixed diagnostic panels for inspection; these cannot change the
+registered grid. Production starts only after that smoke succeeds. The final
+report must include ordinary metrics, added/removed TP/FP, agreement
+summaries, and whether distant false-positive additions have weaker consensus.
