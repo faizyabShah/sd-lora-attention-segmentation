@@ -441,6 +441,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Few-shot COCO-Cap transfer | Claude runs; Codex reviews | Complete and accepted (707/707, job `233168`): T-C pipeline 0.685; summary regenerated exactly (Sections 56 and 60) | `56295a3`; `outputs/segmentation/coco_cap_transfer/coco_cap_token/` |
 | AN1 mechanism analysis (registry Section 11) | Claude runs; Codex reviews | Complete and accepted: parts 1–2 reproduce; tie-aware Spearman correction does not change any rounded conclusion (Sections 57–60) | `0063515`, `c66d1cf`, this commit; `outputs/segmentation/analysis/` |
 | B2a/S4/B2b token package | Codex runs; Claude reviews | Complete: 59 B2a and 100 B2b tokens; VOC 490/490 and COCO 707/707; results pushed for Claude's independent validation (Section 64) | jobs `233332`, `233333`, `233660`, `233837`, `233838`; `outputs/segmentation/controlled_attention_cv/token_learning_b2/` |
+| B2a/S4/B2b independent replication and validation | Claude | Complete: Codex's recipe retrained end to end in Claude's environment; every token and score reproduced; Section 64 validated; protocol-only confirmation, not reported in the paper (Section 65) | this commit; `outputs/segmentation/controlled_attention_cv/token_learning_b2_replication/` |
 
 ### Pre-sync exploratory run
 
@@ -2871,3 +2872,97 @@ the optimizer against OVAM, verify the 59/100 token files and 490/707 image
 contracts, regenerate the summary from shards, and accept or correct the
 interpretation before paper integration. The Section 61 gate remains active
 until that review and integration are complete.
+
+## 65. Claude: independent replication and validation of B2a/S4/B2b (Section 64)
+
+**What Claude did, and why.** At Narmeen's decision, Claude did not wait for
+the gate (Section 61). Instead of only recomputing from Codex's artifacts, it
+**retrained the whole package independently**, so that the token-learning
+result rests on two separate runs. This departs from Section 62's statement
+that Claude would not run token optimization; it is recorded here so that the
+two runs are read together. Nothing of Codex's was modified.
+
+**Setup.**
+
+- Codex's committed scripts and plan, unchanged:
+  `scripts/optimize_b2_tokens.py`, `scripts/run_b2_token_evaluation.py`,
+  `scripts/finalize_b2_token_package.py` and
+  `configs/token_optimization_b2_plan.json`.
+- Claude's environment: `gen`, torch 2.4.1+cu121, V100 nodes. Codex used
+  `trdp`, torch 2.6.0+cu118.
+- A separate output: `outputs/segmentation/controlled_attention_cv/token_learning_b2_replication/`.
+- Claude's job files: `jobs/narmyn/b2_replication/`, with `submit.sh` for the
+  same `afterok` chain. They require `CRF_SITE` explicitly rather than
+  defaulting to a home-folder path (the cause of `233334`).
+- The same compound-label fix as Codex's `d971ba6`, applied through a wrapper
+  (`scripts/narmyn/attention/b2_replication_eval.py`): COCO-Cap names such as
+  "dining table" are hyphenated before the token lookup. VOC-Sim is
+  unaffected.
+- Chain: jobs `233845` (B2a, 59 tokens), `233846` (B2b, 100), `233847`
+  (VOC-Sim, 20 shards), `233848` (COCO-Cap, 20 shards), `233849` (merge). All
+  completed.
+
+**Replication: tokens.** For all 159 tokens, cosine(Codex, Claude) ≥ 0.9996
+(mean 1.0000). Best losses differ by at most 0.0014. Against OVAM's 57
+released per-image vectors, both runs give mean cosine 0.8676.
+
+**Replication: scores** (T-C pipeline, threshold 0.475):
+
+| Cell | Codex | Claude | Difference |
+|---|---:|---:|---:|
+| VOC-Sim `REL` | 0.8653 | 0.8652 | 0.0001 |
+| VOC-Sim `AALL` | 0.8684 | 0.8685 | 0.0001 |
+| VOC-Sim `B2B` (fold-safe) | 0.8564 | 0.8562 | 0.0002 |
+| VOC-Sim one shot (mean) | 0.8472 | 0.8470 | 0.0002 |
+| VOC-Sim two shots (mean) | 0.8672 | 0.8663 | 0.0009 |
+| COCO-Cap `REL` | 0.6853 | 0.6850 | 0.0003 |
+| COCO-Cap `AALL` | 0.6928 | 0.6926 | 0.0002 |
+
+- Per-image counts differ slightly between the two runs, as expected across
+  torch versions: 4% of VOC-Sim and 10% of COCO-Cap image-configuration cells
+  are pixel-identical. The aggregates agree to within 0.001.
+- Claude's COCO-Cap `REL` (0.6850) also matches the earlier few-shot transfer
+  (Section 56, 0.6852).
+
+**Validation of Section 64 (gate step 4).**
+
+- `scripts/finalize_b2_token_package.py`, rerun on a copy of Codex's committed
+  package (`2cd036c`), reproduces `summary.json` with **zero differences**.
+- The conclusions of Section 64 are confirmed:
+  - retrained tokens equal the released ones on VOC-Sim (+0.003, interval
+    spanning zero) and are slightly better on COCO-Cap (+0.0075;
+    paired +0.010 [+0.004, +0.015]);
+  - the fold-safe one-shot B2b scores 0.856, within noise of the released
+    tokens;
+  - shots: 0.847 → 0.867 → 0.868, so the second annotated image gives
+    essentially all the gain.
+- **Section 64 is accepted.**
+
+**Problems recognized in Codex's B2 run.** None of them changes a number in
+Section 64. They are listed so that the next packages avoid them. Times come
+from `sacct`.
+
+| # | Problem | Effect | Status |
+|---|---|---|---|
+| 1 | `233334` (VOC-Sim evaluation): all 20 shards failed within seconds, 14:53–14:56. The job inherited the DenseCRF home-folder default from Claude's older job files, which does not exist under Codex's account. | Evaluation resubmitted only at 20:35 (`233660`), about 5.5 h later. | Fixed in `5263895`. Claude's older job files still carry the default; Claude will make them require `CRF_SITE`. |
+| 2 | `233666` (COCO-Cap evaluation): shards 10 ("dining table") and 15 ("potted plant") failed. `released[classname]` was looked up with a space, but the token files use hyphens. | The other 18 shards completed. | Fixed in `d971ba6`; rerun as `233837`. |
+| 3 | The dependent merge `233667` sat in `DependencyNeverSatisfied` from 21:08 until it was cancelled at 01:55. | About 4.8 h of no progress before the failure was noticed; merged by `233838`. | Suggestion: after submitting an `afterok` chain, check `squeue` for `DependencyNeverSatisfied` once the first stage should have finished. |
+| 4 | Evaluation shards ran on both V100 (erdos, neumann) and A100 (renyi) nodes in one package. | No material effect, given the agreement above. R7 asks for one environment per package. | Suggestion: pin a node class (`--constraint` or `--exclude`) for evaluation arrays. |
+| 5 | Codex's job files hard-code `cd /home/shafa/...`. | They cannot be resubmitted from another account; Claude wrote its own (`jobs/narmyn/b2_replication/`). | Suggestion: derive the repository root from `SLURM_SUBMIT_DIR`. |
+
+Altogether, the package took about 11 h from first submission to the merged
+summary; most of that was waiting after problems 1 and 3.
+
+**Claude's independent run completed without these problems.** The same
+package (same scripts, plan and recipe; a separate environment, account and
+output) ran as one `afterok` chain, `233845`–`233849`, with no failures and no
+resubmission. It reproduced Codex's tokens and scores (tables above).
+
+**Scope.** This replication is recorded here as a confirmation only. It is not
+reported in the paper and adds no evidence experiment. The paper cites Codex's
+package (Section 64).
+
+**Gate status (Section 61).** Steps 1–4 are complete. Step 5, integrating
+B2a/S4/B2b into the paper and the evidence package, remains. Claude can draft
+it (the few-shot paragraph in `paper/sec/7_fusion.tex` and evidence
+experiment A12) if Codex agrees.
