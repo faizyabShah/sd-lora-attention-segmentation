@@ -445,6 +445,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | SG5 contrastive CA seed | Claude runs; Codex reviews | Complete and accepted: 490 VOC + 707 COCO; reference won all four screens 5/5, so no seed is promoted (Sections 66, 70--71) | `eb95eb019`; `outputs/segmentation/controlled_attention_cv/sg5_contrastive_seed/` |
 | SG1 absorbing walk + SG3 confidence lock | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; no family frozen; token SG3 has a nonpromoted transfer signal for owner review (Sections 68, 71) | jobs `234264`--`234266`; `outputs/segmentation/controlled_attention_cv/sg1_sg3_graph_refinement/` |
 | B2 optimizer audit against OVAM (Section 64, request 1) | Claude | Complete: B2 uses linear maps where OVAM optimizes token-softmax maps; everything else matches; rerun proposed and paper integration held (Section 69) | this commit; `outputs/segmentation/analysis/b2_recipe_audit/` |
+| Locked token-SG3 confirmation | Codex runs; Claude reviews | Registered before run: fixed `f95_b05_r0_n1`, one/two-pass references, each without/with DenseCRF, VOC OOF and COCO transfer (Section 72) | this commit; `configs/token_sg3_confirmation.json` |
 
 ### Pre-sync exploratory run
 
@@ -3467,3 +3468,43 @@ SG5, SG1/SG3 and the B2 audit before either agent registers or launches
 another experiment family. Claude should review this committed SG1/SG3
 package. Codex will not start the token-softmax rerun, SG2, a contrastive-SG3
 combination or any other experiment until the owners decide.
+
+## 72. Owners' decision: paper proceeds; locked token-SG3 confirmation
+
+**B2 and the paper.** Faiz decides that an exact rerun of every OVAM optimizer
+detail is unnecessary. The token-softmax B2 rerun proposed in Section 69 is
+cancelled before submission. The measured B2 package remains an explicitly
+named linear-objective token variant; the main few-shot system continues to
+use OVAM's released token. Claude should resume the Section 67 paper and
+evidence integration with this accurate scope, remove any exact-reproduction
+claim, and proceed with the manuscript rather than expanding the OVAM audit.
+Codex will review the resulting paper changes after Claude pushes them.
+
+**Next experiment.** The owners authorize the strongest unresolved signal in
+Section 71: a locked confirmation of token SG3. No graph parameter is selected
+or changed. The fixed candidate is `f95_b05_r0_n1`: top 5% foreground anchors,
+bottom 5% background anchors, no border band and one confidence-locked step
+through the mean affinity of frozen SA module 15.
+
+Six cells are recomputed within one environment:
+
+| Cell | Definition |
+|---|---|
+| `T/REF` | released token, observation-wise one SA pass |
+| `T/REF+R2` | `T/REF` plus OVAM DenseCRF |
+| `T/P1` | released token, observation-wise two SA passes |
+| `T/P1+R2` | `T/P1` plus OVAM DenseCRF |
+| `T/SG3` | fixed confidence-locked candidate |
+| `T/SG3+R2` | fixed candidate plus OVAM DenseCRF |
+
+Every cell uses the 17 registered phase-3 thresholds. On VOC-Sim, each fixed
+cell's threshold is selected on four folds and evaluated on the fifth; there
+is no method or graph-parameter selection. COCO-Cap uses the threshold chosen
+on all VOC-Sim and remains transfer-only. Registered comparisons are P1 vs
+REF, P1+R2 vs REF+R2, SG3 vs REF, SG3+R2 vs REF+R2, and SG3+R2 vs P1+R2.
+
+The package generates one image at a time and discards all images, maps and
+affinities after compact counts are written. A one-image smoke must pass
+before the two 20-class resumable arrays are submitted on the V100 node class;
+their CPU finalizer runs only after both arrays complete. Afterward Claude
+reviews the committed package and the owners decide how it is presented.

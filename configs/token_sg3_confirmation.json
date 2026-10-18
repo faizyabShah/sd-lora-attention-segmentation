@@ -1,0 +1,25 @@
+{
+  "name": "locked token SG3 confirmation",
+  "protocol": "protocol Section 72",
+  "registered_before_run": true,
+  "attribution": "OVAM released 2-3-support token; conditional query; keys [<SoT>, token]",
+  "graph": "mean row-stochastic conditional SA affinity over every head and denoising call of frozen module 15",
+  "sg3": {
+    "foreground_quantile": 0.95,
+    "background_quantile": 0.05,
+    "border_width": 0,
+    "steps": 1
+  },
+  "configurations": [
+    "T/REF", "T/REF+R2", "T/P1", "T/P1+R2", "T/SG3", "T/SG3+R2"
+  ],
+  "comparisons": [
+    ["T/P1", "T/REF"],
+    ["T/P1+R2", "T/REF+R2"],
+    ["T/SG3", "T/REF"],
+    ["T/SG3+R2", "T/REF+R2"],
+    ["T/SG3+R2", "T/P1+R2"]
+  ],
+  "selection": "no graph parameter selection; each fixed cell's threshold is chosen on four VOC folds and scored on the fifth",
+  "transfer": "COCO-Cap uses each cell's threshold selected on all VOC-Sim; never selects"
+}
