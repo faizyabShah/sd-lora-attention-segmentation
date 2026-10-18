@@ -3223,3 +3223,9 @@ job enabled Bash nounset before sourcing the cluster's `/etc/bashrc`, which
 reads an optionally unset variable. It produced no image or result. The job
 files now source the environment before enabling nounset; a new smoke must
 pass before production is submitted.
+
+Smoke `234262` was then cancelled before producing a result because
+`--nodelist=erdos,neumann` made Slurm allocate both named nodes to one task.
+The jobs now exclude the A100 node `renyi` and drained V100 node `wald`, so
+each task receives exactly one of the available V100 nodes, `erdos` or
+`neumann`. A third smoke is required before production.

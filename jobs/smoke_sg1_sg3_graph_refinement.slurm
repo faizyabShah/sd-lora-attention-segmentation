@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=smoke-sg1-sg3
 #SBATCH --partition=gpu
-#SBATCH --nodelist=erdos,neumann
+#SBATCH --exclude=renyi,wald
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=48G
