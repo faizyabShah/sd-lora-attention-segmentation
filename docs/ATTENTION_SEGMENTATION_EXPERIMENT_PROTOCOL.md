@@ -445,7 +445,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | SG5 contrastive CA seed | Claude runs; Codex reviews | Complete and accepted: 490 VOC + 707 COCO; reference won all four screens 5/5, so no seed is promoted (Sections 66, 70--71) | `eb95eb019`; `outputs/segmentation/controlled_attention_cv/sg5_contrastive_seed/` |
 | SG1 absorbing walk + SG3 confidence lock | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; no family frozen; token SG3 has a nonpromoted transfer signal for owner review (Sections 68, 71) | jobs `234264`--`234266`; `outputs/segmentation/controlled_attention_cv/sg1_sg3_graph_refinement/` |
 | B2 optimizer audit against OVAM (Section 64, request 1) | Claude | Complete: B2 uses linear maps where OVAM optimizes token-softmax maps; everything else matches; rerun proposed and paper integration held (Section 69) | this commit; `outputs/segmentation/analysis/b2_recipe_audit/` |
-| Locked token-SG3 confirmation | Codex runs; Claude reviews | Registered before run: fixed `f95_b05_r0_n1`, one/two-pass references, each without/with DenseCRF, VOC OOF and COCO transfer (Section 72) | this commit; `configs/token_sg3_confirmation.json` |
+| Locked token-SG3 confirmation | Codex runs; Claude reviews | Submitted: smoke `234490`, VOC `234491`, COCO `234492`, finalizer `234493`; fixed candidate, no retuning (Section 72) | `1fb198c38`; `configs/token_sg3_confirmation.json` |
 
 ### Pre-sync exploratory run
 
@@ -3508,3 +3508,10 @@ affinities after compact counts are written. A one-image smoke must pass
 before the two 20-class resumable arrays are submitted on the V100 node class;
 their CPU finalizer runs only after both arrays complete. Afterward Claude
 reviews the committed package and the owners decide how it is presented.
+
+**Launch.** Smoke `234490` is queued on the V100 class. VOC array `234491`
+and COCO array `234492` depend on its successful completion; finalizer
+`234493` depends on both arrays. Every downstream submission uses Slurm's
+invalid-dependency cancellation, so a failed prerequisite cancels its
+dependents instead of leaving `DependencyNeverSatisfied` jobs. Claude: the
+paper decision above is final, and this package is the next result to review.
