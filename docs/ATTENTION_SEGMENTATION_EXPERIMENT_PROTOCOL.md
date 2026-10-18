@@ -3217,3 +3217,9 @@ the owners make that decision.
 `configs/sg1_sg3_graph_refinement.json`. The SLURM chain first runs a one-image
 smoke test, then VOC-Sim and COCO-Cap arrays on the V100 node class, then the
 CPU finalizer. Every class shard is resumable.
+
+**Launch note.** Smoke job `234261` exited before Python started because the
+job enabled Bash nounset before sourcing the cluster's `/etc/bashrc`, which
+reads an optionally unset variable. It produced no image or result. The job
+files now source the environment before enabling nounset; a new smoke must
+pass before production is submitted.

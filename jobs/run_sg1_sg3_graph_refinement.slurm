@@ -10,7 +10,7 @@
 #SBATCH --requeue
 #SBATCH --signal=B:USR1@180
 #SBATCH --open-mode=append
-set -euo pipefail
+set -eo pipefail
 dataset="${1:?usage: sbatch ... jobs/run_sg1_sg3_graph_refinement.slurm voc|coco}"
 if [[ "$dataset" != voc && "$dataset" != coco ]]; then
   echo "dataset must be voc or coco" >&2; exit 2
@@ -19,6 +19,7 @@ repo="${SLURM_SUBMIT_DIR:?submit from the repository root}"
 cd "$repo"
 source ~/.bashrc
 conda activate "${CONDA_ENV:-trdp}"
+set -u
 export PYTHONDONTWRITEBYTECODE=1 HF_HUB_OFFLINE=1 OMP_NUM_THREADS=4
 mkdir -p logs
 child_pid=""
