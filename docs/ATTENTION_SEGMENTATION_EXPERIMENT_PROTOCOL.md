@@ -444,6 +444,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | B2a/S4/B2b independent replication and validation | Claude | Complete: Codex's recipe retrained end to end in Claude's environment; every token and score reproduced; Section 64 validated; protocol-only confirmation, not reported in the paper (Section 65) | this commit; `outputs/segmentation/controlled_attention_cv/token_learning_b2_replication/` |
 | SG5 contrastive CA seed | Claude runs; Codex reviews | Registered before the run (Section 66); departs from the Section 61 order at Narmeen's decision | this commit; `configs/sg5_contrastive_seed.json` |
 | SG1 absorbing walk + SG3 confidence lock | Codex runs; Claude reviews | Running: smoke passed; VOC `234264`, COCO `234265`, finalizer `234266` (Section 68); SG5/DenseCRF interaction deferred until owner review | `71933337a`; `configs/sg1_sg3_graph_refinement.json` |
+| B2 optimizer audit against OVAM (Section 64, request 1) | Claude | Complete: B2 uses linear maps where OVAM optimizes token-softmax maps; everything else matches; rerun proposed and paper integration held (Section 69) | this commit; `outputs/segmentation/analysis/b2_recipe_audit/` |
 
 ### Pre-sync exploratory run
 
@@ -3240,3 +3241,87 @@ dependency on both complete arrays. Claude should review the code and compact
 package after Codex pushes the results. After SG1/SG3 and SG5 are both
 reviewed, Faiz and Narmeen will jointly analyze them and decide what, if
 anything, runs next; neither agent should independently start another family.
+
+## 69. Claude: audit of the B2 optimizer against OVAM (Section 64, request 1); one recipe deviation
+
+**Correction to Section 65.** Section 64 asked for four checks. Section 65
+did three (file and image contracts, summary regeneration, interpretation)
+but not the first, an audit of the optimizer against OVAM: retraining with
+Codex's code shows that it reproduces itself, not that it matches OVAM.
+Section 65's "Section 64 is accepted" was therefore premature for request 1,
+and Section 67's acceptance rests on it. The audit is now done.
+
+**Method.** OVAM released, for each of its 57 VOC training images, the image,
+the optimized token and the loss of all 800 epochs (`*_losses.npy`). The
+epoch-0 loss depends only on the generation, the initial token and the
+attention-map definition, not on the optimizer, so it identifies the map
+definition exactly. `scripts/narmyn/attention/audit_b2_recipe.py` (diagnostic
+only; job `234259`, then `234260`; env `gen`, V100):
+
+1. regenerates every training image as OVAM's `experiments/voc_simple` scripts
+   do, and computes the epoch-0 loss for 8 map definitions: activation
+   linear or token softmax (softmax over `[<SoT>, token]` per head and call,
+   then summed), unconditional or conditional query, middle block excluded or
+   included;
+2. reruns the full 800-epoch optimization on 6 images spread over the
+   classes, with each activation, and compares the result with OVAM's token.
+
+OVAM's code was read at `github.com/vpulab/ovam` `12afd87` (read-only; not
+installed or run).
+
+**Result.**
+
+| Map definition | Epoch-0 loss vs OVAM, median / max abs. difference (57 images) |
+|---|---|
+| **token softmax, unconditional, no middle block** | **0.0000018 / 0.000075** |
+| linear, unconditional, no middle block (**B2 recipe**) | 0.018 / 0.065 |
+| any other combination | ≥ 0.0008 median |
+
+| 800-epoch rerun (6 images) | Cosine to OVAM's token, mean (min) | Best epoch |
+|---|---|---|
+| token softmax | **0.996** (0.981) | matches OVAM's to within 1 epoch on 3 of 6, including OVAM's unusual epoch 25 on boat |
+| linear (B2) | 0.873 (0.826) | does not match |
+
+- **Matches OVAM:** generation (the epoch-0 match to 10⁻⁶ shows the attention
+  is effectively identical, even though the regenerated images are not
+  bit-identical, median 0.16 grey levels), the initial token, unconditional
+  queries, the excluded middle block, SGD lr 100, StepLR 120 / 0.7, 800
+  epochs, cross-entropy on the global min–max map, and the best pre-update
+  state.
+- **Deviates:** OVAM optimizes **token-softmax** maps (the
+  `heads_epochs_activation="token_softmax"` default of its library), not
+  linear logits. Its released experiment script calls an older, unpublished
+  API (`ovdaam`, `hooker.daam(expand_size=...)`), so the code alone does not
+  show the activation; the released loss records do. The recipe's
+  description, "OVAM linear DAAM" (`configs/token_optimization_b2_plan.json`,
+  and "OVAM's linear two-token maps" in `src/segmentation/token_optimization.py`),
+  is therefore mistaken.
+- This explains the 0.87 cosine between B2a and OVAM's per-image tokens
+  (Sections 64–65).
+
+**Consequences.**
+
+1. **B2a is not a reproduction of OVAM's recipe.** It is OVAM's recipe with a
+   linear-attention objective. Every number in Section 64 stands as measured;
+   only what they are called changes.
+2. S4 (shots) and B2b (fold-safe) inherit the same objective.
+3. The linear variant is itself informative: it matches the released tokens on
+   VOC-Sim and is slightly better on COCO-Cap (+0.0075), so the segmentation
+   result is not sensitive to this choice at the aggregate level.
+4. The Section 64 and 67 wording "reproduce OVAM's optimization recipe" and
+   "successful reproduction" must not enter the paper as such.
+
+**Proposal (for Codex and the owners).**
+
+- **Rerun B2a, S4 and B2b with the token-softmax objective** as the faithful
+  reproduction; change nothing else. It is Codex's package; Claude can run it
+  on the V100s if Codex prefers. The linear package stays as a reported
+  variant.
+- **Paper integration (Section 67) is held** until this is decided. Claude
+  will not draft the few-shot paragraph describing B2a as OVAM's recipe. If
+  the owners prefer to integrate now, the paragraph would name the B2 tokens
+  as "OVAM's recipe with a linear objective" and state this audit.
+
+**Files.** `scripts/narmyn/attention/audit_b2_recipe.py`;
+`outputs/segmentation/analysis/b2_recipe_audit/` (`epoch0_loss.jsonl`,
+`optimize.jsonl`, `summary.json`; 52 KB).
