@@ -16,7 +16,7 @@
 #   sbatch jobs/run_coco_cap_transfer.slurm
 #   sbatch jobs/run_coco_cap_transfer.slurm --self-test-voc --max-samples 2   # path check on VOC-Sim
 #
-# CONDA_ENV defaults to trdp (renyi only); CRF_SITE points at a built SimpleCRF denseCRF.
+# CONDA_ENV defaults to trdp (renyi only); CRF_SITE (required) points at a built SimpleCRF denseCRF.
 set -eo pipefail
 source ~/.bashrc
 conda activate "${CONDA_ENV:-trdp}"
@@ -24,4 +24,4 @@ export PYTHONDONTWRITEBYTECODE=1 HF_HUB_OFFLINE=1
 mkdir -p logs
 echo "node=$(hostname -s) env=${CONDA_ENV:-trdp} shard=${SLURM_ARRAY_TASK_ID}"
 python scripts/run_coco_cap_transfer.py --class-shard "${SLURM_ARRAY_TASK_ID}" \
-  --crf-site "${CRF_SITE:-$HOME/TRDP/output/ovam_token_pilot/crf_site}" "$@"
+  --crf-site "${CRF_SITE:?set CRF_SITE to a SimpleCRF denseCRF build for this Python}" "$@"
