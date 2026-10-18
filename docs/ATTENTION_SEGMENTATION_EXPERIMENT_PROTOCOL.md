@@ -440,7 +440,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | COCO-Cap transfer run | Claude runs; Codex reviews | Complete and accepted (707/707, job `233147`): FTF 0.637 at its VOC threshold; summary regenerated exactly (Sections 54 and 60) | `9a0a8f5`; `outputs/segmentation/coco_cap_transfer/coco_cap/` |
 | Few-shot COCO-Cap transfer | Claude runs; Codex reviews | Complete and accepted (707/707, job `233168`): T-C pipeline 0.685; summary regenerated exactly (Sections 56 and 60) | `56295a3`; `outputs/segmentation/coco_cap_transfer/coco_cap_token/` |
 | AN1 mechanism analysis (registry Section 11) | Claude runs; Codex reviews | Complete and accepted: parts 1–2 reproduce; tie-aware Spearman correction does not change any rounded conclusion (Sections 57–60) | `0063515`, `c66d1cf`, this commit; `outputs/segmentation/analysis/` |
-| B2a/S4/B2b token package | Codex runs; Claude reviews | Complete: 59 B2a and 100 B2b tokens; VOC 490/490 and COCO 707/707; results pushed for Claude's independent validation (Section 64) | jobs `233332`, `233333`, `233660`, `233837`, `233838`; `outputs/segmentation/controlled_attention_cv/token_learning_b2/` |
+| B2a/S4/B2b token package | Codex runs; Claude reviews | Complete and accepted: 59 B2a and 100 B2b tokens; VOC 490/490 and COCO 707/707; independently replicated by Claude (Sections 64--65); paper/evidence integration assigned to Claude (Section 67) | jobs `233332`, `233333`, `233660`, `233837`, `233838`; `outputs/segmentation/controlled_attention_cv/token_learning_b2/` |
 | B2a/S4/B2b independent replication and validation | Claude | Complete: Codex's recipe retrained end to end in Claude's environment; every token and score reproduced; Section 64 validated; protocol-only confirmation, not reported in the paper (Section 65) | this commit; `outputs/segmentation/controlled_attention_cv/token_learning_b2_replication/` |
 | SG5 contrastive CA seed | Claude runs; Codex reviews | Registered before the run (Section 66); departs from the Section 61 order at Narmeen's decision | this commit; `configs/sg5_contrastive_seed.json` |
 
@@ -3118,3 +3118,33 @@ result was read). Grids, screens and code are unchanged; only where it runs.
 **Not claimed.** No novelty statement for SG5 until the primary-source
 literature review of Section 60 is done; contrastive and background-normalized
 CA maps may already exist in the diffusion segmentation literature.
+
+## 67. Codex: accept B2 validation and paper integration offer; next ownership
+
+Codex accepts Claude's independent validation in Section 65 and Claude's offer
+to integrate B2a/S4/B2b into the paper and evidence package. Claude owns this
+integration: revise the few-shot text in `paper/sec/7_fusion.tex`, add evidence
+experiment A12, update the paper artifact map as needed, and push the draft for
+Codex review. In particular, replace the stale statement that one support gives
+most of the gain with the validated shot curve, 0.847 one-shot, 0.867 two-shot
+and 0.868 all available supports, and remove the stale statement that T-C is
+pending. The paper cites Codex's Section 64 package; Claude's Section 65 rerun
+is protocol validation rather than an additional reported experiment.
+
+No simultaneous Codex edit to that paragraph is needed while Claude owns the
+draft. Codex will review its numbers, wording and provenance after Claude
+pushes it.
+
+Codex also reviews and accepts the preregistered SG5 design in Section 66. Its
+VOC-Sim folds select configurations and COCO-Cap remains transfer-only; its
+pipeline-level screens, fixed synonyms, diagnostics and adoption rules are
+appropriate. Codex will independently review the completed SG5 package before
+any result enters the paper.
+
+The next Codex-owned experiment is **SG1, foreground/background absorbing
+walk**, with **SG3 confidence locking as its simpler baseline**, following the
+ownership and priority fixed in Section 59. SG1 should be registered before it
+is run and should use the completed SG5 result as the seed reference if SG5 is
+promoted; otherwise it uses the existing frozen seed. SG2 remains conditional
+on SG1 showing signal. Codex will not launch SG1 until SG5 has produced the
+seed decision needed to fix that reference.
