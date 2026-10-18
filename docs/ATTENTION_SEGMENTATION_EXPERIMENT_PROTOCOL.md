@@ -3075,6 +3075,46 @@ once. With the job lines fixed (runner code unchanged from the registration
 commit), the chain was relaunched as `234249` (VOC-Sim), `234250` (COCO-Cap)
 and `234251` (finalize).
 
+**Amendment: the whole package runs on renyi** (Narmeen's decision; no grid,
+screen, synonym or decision rule changes).
+
+- The V100 chain `234249`–`234251` was cancelled after about 35 min, with
+  4 VOC-Sim shards written (bird complete; aeroplane, bicycle and boat
+  partial). They are **discarded**: moved outside the repository and not
+  used, so that every cell comes from one node class (R7). Only their
+  per-image progress lines were seen; nothing was changed after them.
+- Production: job `234257` (`jobs/narmyn/sg5/run_renyi.slurm`), one job on
+  renyi using both A100 40 GB GPUs, environment `gen` unchanged. Six workers
+  (three per GPU, about 9.4 GB each) take the 40 class shards from one queue,
+  then the job runs finalize. GPUs are mostly idle during DenseCRF, so sharing
+  them changes throughput, not results: every image is generated
+  independently with its own seed.
+- Measured: about 90 s per image per worker, so about 5 h for all 1,197
+  images, within the partition's 12 h limit.
+- The smoke test's bit-identity with the token package (V100) does not carry
+  over to A100. Every comparison is still within this package; Claude will
+  check the reference cells against the earlier packages to numerical
+  tolerance and report it with the results.
+
+**Amendment: environment moved to renyi** (Narmeen's decision, before any
+result was read). Grids, screens and code are unchanged; only where it runs.
+
+- The V100 relaunch (`234249`–`234251`) was cancelled after about 35 min.
+  Its partial VOC-Sim shards (bird complete; aeroplane, bicycle, boat partial)
+  were moved outside the repository and are **not used**, so no V100 shard
+  is mixed into the package (R7).
+- The whole package now runs as one job, `234257`, on renyi only (2× A100
+  40 GB, env `gen`, torch 2.4.1+cu121): six workers, three per GPU (about
+  9.4 GB each), pull the 40 class shards from one queue, then finalize
+  (`jobs/narmyn/sg5/run_renyi.slurm`). Measured about 320 images/h.
+- One environment for both datasets, so every comparison, on VOC-Sim and on
+  COCO-Cap, is within one environment.
+- Consequence: the bit-identity check against the token package (V100) no
+  longer applies to the production shards; the `W` and `TC` cells will be
+  compared with it to within numerical tolerance instead, as in Section 65.
+- Several processes sharing a GPU do not change results: each image is
+  generated from its own seed in its own process.
+
 **Not claimed.** No novelty statement for SG5 until the primary-source
 literature review of Section 60 is done; contrastive and background-normalized
 CA maps may already exist in the diffusion segmentation literature.
