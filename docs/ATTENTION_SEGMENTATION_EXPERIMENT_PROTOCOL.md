@@ -3621,3 +3621,32 @@ an `afterok:234535` dependency; finalizer `234538` has
 `afterok:234536:234537`. Every dependent submission uses invalid-dependency
 cancellation. The jobs are therefore fully submitted, while no production
 image can run unless the numerical and diagnostic smoke succeeds.
+
+## 75. Owners' handoff: SG10 belongs to Claude; Codex must not run it
+
+Faiz supplied SG10, **Seed-Connected Bottleneck Propagation**, and assigns the
+entire experiment to Claude. Claude owns its implementation, normalization
+smoke, job submission, production runs, finalizer, diagnostics and first
+interpretation. Codex must not implement or submit SG10. The complete
+owner-supplied specification is committed verbatim, with its ownership marker,
+in `docs/SG10_SEED_CONNECTED_BOTTLENECK.md`.
+
+The experiment uses the mean 64×64 module-15 SA graph only for connectivity;
+ordinary observation-wise `mean_i(A_i c)` remains the propagated evidence.
+It separately screens word and released-token seeds over foreground source
+quantiles 0.90/0.95, directed mean graph G1 and geometric symmetric mean graph
+G2, and the registered B1 multiplicative, B2 soft-gate (alpha 0.25/0.50), and
+B3 expansion-only operators. VOC-Sim alone selects every setting and threshold
+with the existing five-fold rules; COCO-Cap remains transfer-only.
+
+Claude must freeze either raw or percentile-rank bottleneck normalization from
+a numerical smoke before production and before viewing segmentation results.
+The local 4/8-neighbour graph is diagnostic only. DenseCRF, SG8, SG9, SG3,
+SG1, RGB/features and unregistered top-k pruning are excluded from the first
+screen. If dense widest-path computation forces sparsification, Claude must
+record that as an explicit implementation constraint rather than silently
+changing the graph. Required outputs include normal metrics, AN1 change and
+spatial leakage counts, bottleneck distributions for added TP/FP/distant FP/
+separate-component FP, component-level connectivity summaries, and fixed
+diagnostic visuals. Claude should add its preregistration details and launch
+IDs below this handoff before running production.
