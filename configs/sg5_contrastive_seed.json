@@ -1,0 +1,57 @@
+{
+  "family": "SG5 contrastive CA seed",
+  "protocol": "protocol Section 66; registry Section 11 (SG5); refinements of Section 59",
+  "registered_before_run": true,
+  "attributions": {
+    "W": "class word, frozen convention: mean over class pieces of p, softmax over the 77 padded keys (reference)",
+    "WS": "log p_T - log p_SoT (target against <SoT>)",
+    "WK": "p_T / (p_T + p_SoT) (the class word in OVAM's two-key form)",
+    "WN": "log p_T - log mean_{j not in T} p_j (target against the mean non-target position)",
+    "WE": "log p_T - log mean_{j in EoT and padding} p_j (target against <EoT> and padding)",
+    "WY": "mean of p_T over the class word and its fixed synonyms, each in the same prompt template (synonym ensemble)",
+    "TC": "OVAM released token, keys [<SoT>, token], conditional query (few-shot reference)",
+    "TS": "log p_tok - log p_SoT for the same token and keys"
+  },
+  "pipelines": {
+    "seed": "CA seed alone",
+    "REF": "one pass through SA module 15, mean_i(A_i c)",
+    "P1": "two passes, mean_i(A_i^2 c)",
+    "R2": "OVAM DenseCRF on the REF mask",
+    "P1+R2": "OVAM DenseCRF on the P1 mask (FTF for the class word)"
+  },
+  "synonyms": {
+    "aeroplane": ["airplane", "aircraft"],
+    "bicycle": ["bike"],
+    "bird": [],
+    "boat": ["ship"],
+    "bottle": [],
+    "bus": [],
+    "car": ["automobile"],
+    "cat": [],
+    "chair": [],
+    "cow": ["cattle"],
+    "dining-table": ["table"],
+    "dog": [],
+    "horse": [],
+    "motorbike": ["motorcycle"],
+    "person": ["human"],
+    "potted-plant": ["houseplant"],
+    "sheep": [],
+    "sofa": ["couch"],
+    "train": ["locomotive"],
+    "tv": ["television"]
+  },
+  "screens": [
+    {"name": "SG5-W seed under REF", "reference": "W/REF",
+     "candidates": ["WS/REF", "WK/REF", "WN/REF", "WE/REF", "WY/REF"],
+     "inclusiveness": {"WS/REF": 1, "WK/REF": 1, "WN/REF": 1, "WE/REF": 1, "WY/REF": 0}},
+    {"name": "SG5-W in the training-free pipeline (FTF)", "reference": "W/P1+R2",
+     "candidates": ["WS/P1+R2", "WK/P1+R2", "WN/P1+R2", "WE/P1+R2", "WY/P1+R2"],
+     "inclusiveness": {"WS/P1+R2": 1, "WK/P1+R2": 1, "WN/P1+R2": 1, "WE/P1+R2": 1, "WY/P1+R2": 0}},
+    {"name": "SG5-T seed under REF", "reference": "TC/REF", "candidates": ["TS/REF"]},
+    {"name": "SG5-T in the few-shot pipeline (T-C)", "reference": "TC/R2", "candidates": ["TS/R2"]}
+  ],
+  "adoption": "A seed replaces the class word (or the token) in a frozen pipeline only if the pipeline screen (FTF or T-C) freezes it under protocol v1.2. A REF-screen result alone is reported as a seed finding.",
+  "diagnostics": "seed recall, precision and FP per object pixel at 0.45 (AN1 metrics) for every attribution and pipeline, on VOC-Sim and COCO-Cap",
+  "transfer": "COCO-Cap: every cell at the threshold chosen for it on all of VOC-Sim; each screen's frozen cell against its reference (paired bootstrap); reported, never selected"
+}

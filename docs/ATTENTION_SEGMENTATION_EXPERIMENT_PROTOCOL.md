@@ -442,6 +442,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | AN1 mechanism analysis (registry Section 11) | Claude runs; Codex reviews | Complete and accepted: parts 1–2 reproduce; tie-aware Spearman correction does not change any rounded conclusion (Sections 57–60) | `0063515`, `c66d1cf`, this commit; `outputs/segmentation/analysis/` |
 | B2a/S4/B2b token package | Codex runs; Claude reviews | Complete: 59 B2a and 100 B2b tokens; VOC 490/490 and COCO 707/707; results pushed for Claude's independent validation (Section 64) | jobs `233332`, `233333`, `233660`, `233837`, `233838`; `outputs/segmentation/controlled_attention_cv/token_learning_b2/` |
 | B2a/S4/B2b independent replication and validation | Claude | Complete: Codex's recipe retrained end to end in Claude's environment; every token and score reproduced; Section 64 validated; protocol-only confirmation, not reported in the paper (Section 65) | this commit; `outputs/segmentation/controlled_attention_cv/token_learning_b2_replication/` |
+| SG5 contrastive CA seed | Claude runs; Codex reviews | Registered before the run (Section 66); departs from the Section 61 order at Narmeen's decision | this commit; `configs/sg5_contrastive_seed.json` |
 
 ### Pre-sync exploratory run
 
@@ -2966,3 +2967,106 @@ package (Section 64).
 B2a/S4/B2b into the paper and the evidence package, remains. Claude can draft
 it (the few-shot paragraph in `paper/sec/7_fusion.tex` and evidence
 experiment A12) if Codex agrees.
+
+## 66. Claude: SG5 contrastive CA seed, registration (before any production run)
+
+**Decision.** At Narmeen's decision, Claude registers and runs SG5 now, before
+gate step 5 (Section 61, step 6; Claude's Section 62 commitment). SG5 has no
+dependency on the B2 paper integration:
+
+- it changes only the class-word seed, training-free;
+- its token cells use OVAM's released token, frozen in T-C, and B2 found the
+  retrained tokens equal to it on VOC-Sim (Sections 64–65).
+
+Step 5 is unaffected: Claude's offer to draft it stands. Codex: please review
+this registration; the production run starts after it is pushed, so every
+grid below is fixed before any VOC-Sim result exists (R8).
+
+**Question.** Section 59, finding 2: the token's seed covers 0.94 of the
+object, the class word's 0.84. Does contrasting the class-word logit with the
+prompt's other positions close part of that gap, without annotations and
+without lowering precision?
+
+**Attributions.** Same frozen CA modules, calls and heads and conditional
+query; only the per-head map entering the CA average changes. `l` is the log
+softmax over the 77 padded class-prompt keys, `T` the class pieces,
+`log p_T = log mean_{t in T} p_t`.
+
+| Name | Per-head map | Role |
+|---|---|---|
+| `W` | `p_T` | class word, frozen convention (reference) |
+| `WS` | `log p_T − log p_SoT` | target against `<SoT>` |
+| `WK` | `p_T / (p_T + p_SoT)` | the class word in OVAM's two-key form; separates the effect of the two-key normalization from the effect of the learned token |
+| `WN` | `log p_T − log mean_{j∉T} p_j` | target against the mean non-target position |
+| `WE` | `log p_T − log mean_{j ∈ <EoT>, padding} p_j` | target against `<EoT>` and padding |
+| `WY` | mean of `p_T` over the class word and its fixed synonyms, same prompt template | synonym ensemble |
+| `TC` | OVAM released token, keys `[<SoT>, token]`: `p_tok` | few-shot reference (T-C) |
+| `TS` | `log p_tok − log p_SoT` | token analogue of `WS` |
+
+- **Synonyms** (fixed in `configs/sg5_contrastive_seed.json`, registered
+  before the run, never tuned): true synonyms or spelling variants only, no
+  hyponyms ("kitten", "puppy" excluded). Eight classes have none, so `WY = W`
+  for them; `WY` can therefore improve at most 12 classes.
+- **On COCO-Cap** the class keys come from the class name encoded separately,
+  padded to 77 (the transfers, Sections 48 and 55); synonyms replace the class
+  name in that prompt.
+
+**Pipelines on every seed:** `seed`; `REF` (one pass, SA module 15); `P1`
+(two passes); `R2` and `P1+R2` (OVAM DenseCRF on the REF / P1 mask). 40
+configurations, counts at the 17 phase 3 thresholds.
+
+**Screens** (protocol v1.2 unchanged: promote +0.010; conditional +0.005 with
+≥ 12/20 classes improved and no class loss > 0.05; freeze ≥ 4/5 votes and a
+positive OOF gain; thresholds chosen in the training folds for reference and
+candidates alike):
+
+| Screen | Reference | Candidates |
+|---|---|---|
+| SG5-W seed under REF | `W/REF` | `WS`, `WK`, `WN`, `WE`, `WY` at `REF` |
+| SG5-W in the training-free pipeline | `W/P1+R2` (FTF) | the same five at `P1+R2` |
+| SG5-T seed under REF | `TC/REF` | `TS/REF` |
+| SG5-T in the few-shot pipeline | `TC/R2` (T-C) | `TS/R2` |
+
+- Ties within 0.002 go to the simpler candidate: `WY` (extra prompts) ranks
+  below the four single-prompt contrasts.
+- **Adoption.** A seed replaces the class word (or token) in a frozen
+  pipeline only if that pipeline's screen freezes it. A REF-screen result
+  alone is reported as a seed finding, not a pipeline change.
+- **Diagnostics** (Section 59): seed recall, precision and FP per object
+  pixel at 0.45 for every cell, on both datasets.
+- **COCO-Cap transfer** (reported, never selected, R1): every cell at the
+  threshold chosen for it on all of VOC-Sim; each screen's frozen cell against
+  its reference, paired bootstrap over images.
+
+**Environment (R7).** `gen` (torch 2.4.1+cu121), V100 nodes only (erdos,
+neumann). `W`, `TC` and their pipelines are recomputed inside the package, so
+every comparison is within one environment.
+
+**Files.**
+
+- `configs/sg5_contrastive_seed.json`: attributions, synonyms, screens.
+- `scripts/narmyn/attention/run_sg5_contrastive_seed.py`: one class shard,
+  `--dataset voc|coco`; resumable.
+- `scripts/narmyn/attention/finalize_sg5.py`: selection (`run_screen` of
+  `scripts/select_propagation_cv.py`), diagnostics, transfer.
+- `jobs/narmyn/sg5/`: VOC-Sim and COCO-Cap arrays in parallel, then
+  finalize (`submit.sh`, `afterok`); `CRF_SITE` required.
+- Output: `outputs/segmentation/controlled_attention_cv/sg5_contrastive_seed/`.
+
+**Smoke test** (job `234213`, erdos, 2 images each of VOC-Sim "dining-table"
+and COCO-Cap "aeroplane"; output outside the repository, not used for any
+choice):
+
+- all 40 cells written; about 95 s per image, so the production run is about
+  40–55 min per class shard;
+- VOC-Sim `W/seed`, `W/REF`, `W/P1`, `W/R2` and `W/P1+R2` are
+  **bit-identical** to the token package (Section 50, same environment);
+- the `TC` cells differ from it by at most 1 pixel of 45,333 at some
+  thresholds (floating-point rounding: the token keys are projected in a
+  differently shaped batch); every image IoU agrees to 4 decimals;
+- COCO-Cap `W` and `TC` agree with the transfers (Sections 54, 56; torch
+  2.11 on A100) to within 0.011 image IoU, as expected across environments.
+
+**Not claimed.** No novelty statement for SG5 until the primary-source
+literature review of Section 60 is done; contrastive and background-normalized
+CA maps may already exist in the diffusion segmentation literature.
