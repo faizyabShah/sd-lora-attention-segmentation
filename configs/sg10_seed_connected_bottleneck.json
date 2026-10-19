@@ -1,0 +1,36 @@
+{
+  "family": "SG10 seed-connected bottleneck propagation",
+  "protocol": "protocol Section 77; owner specification docs/SG10_SEED_CONNECTED_BOTTLENECK.md (Section 75)",
+  "registered_before_run": true,
+  "tracks": {"W": "class word, frozen CA convention", "T": "OVAM released token, keys [<SoT>, token], conditional query"},
+  "evidence": "mu = mean_i(A_i c): observation-wise one pass through SA module 15 (all 31 calls, 8 heads) = REF (SG10-B0)",
+  "connectivity_graphs": {
+    "G1": "mean affinity A_bar = mean_i A_i (directed; edge u -> v has weight A_bar[u, v])",
+    "G2": "sqrt(A_bar * A_bar^T)",
+    "L": "diagnostic only, never selected: G2 restricted to 4-neighbour edges"
+  },
+  "seed_quantiles": [0.90, 0.95],
+  "bottleneck": "exact widest path from S_F = {c >= Q_q(c)} on the dense 4096-node graph; sources start at the largest graph weight; no pruning",
+  "operators": {
+    "B1": "mu * Bn",
+    "B2a25": "mu * (0.25 + 0.75 Bn)",
+    "B2a50": "mu * (0.50 + 0.50 Bn)",
+    "B3": "c + Bn * (mu - c) where mu > c, else mu"
+  },
+  "bottleneck_normalization": "rank",
+  "normalization_frozen_from": "normalization smoke job 234640 (renyi, env gen; 14 images; bottleneck statistics only): the ratio rule failed in 107 of 112 cells (non-source medians 0.004-0.083, IQR 0.003-0.061), so rank is frozen",
+  "normalization_rule": "Frozen from the normalization smoke before production, from bottleneck statistics only (no segmentation score is computed). 'ratio' = B / (largest graph weight); 'rank' = empirical percentile rank over the 4096 pixels (ties averaged). Choose 'ratio' only if, for every smoke image, track, graph G1 and G2 and quantile, the non-source ratio values have IQR >= 0.05 and median in [0.05, 0.95]; otherwise 'rank'. One convention for all graphs, including L.",
+  "normalization_smoke": {"voc_class_shards": [0, 2, 4, 6, 8, 10, 12, 14, 16, 18], "coco_class_shards": [0, 5, 10, 15], "images_per_class": 1},
+  "reported_not_selected": ["seed", "P1", "L_*"],
+  "screens": [
+    {"name": "SG10-W", "reference": "W/REF", "track": "W"},
+    {"name": "SG10-T", "reference": "T/REF", "track": "T"}
+  ],
+  "candidates_per_screen": "{op}_{G}_q{90,95} for op in B1, B2a25, B2a50, B3 and G in G1, G2 (16 per track)",
+  "tie_order": "within 0.002: B2a50 > B2a25 > B3 > B1 (closest to the reference first), then G1 > G2 (no symmetrization), then q90 > q95 (larger source set)",
+  "panel_image_ids": ["ovam-voc-sim-0", "ovam-voc-sim-125", "ovam-voc-sim-250", "ovam-voc-sim-350",
+                      "ovam-coco-144317-aeroplane-2313808621", "ovam-coco-114875-person-1775210319"],
+  "panel_config": {"quantile": 0.90, "graph": "G2", "operator": "B3"},
+  "diagnostics": "per image: seed -> REF additions (new TP, new FP, distant new FP > 16 px, separate-component new FP) with 20-bin histograms of Bn for every graph and quantile; per candidate cell, added/lost TP and added/removed FP against REF at 0.45; REF components (50 largest) with size, TP fraction, max and mean Bn",
+  "transfer": "COCO-Cap: every cell at the threshold chosen for it on all of VOC-Sim; each screen's frozen cell against its reference (paired bootstrap); reported, never selected"
+}

@@ -446,6 +446,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | SG1 absorbing walk + SG3 confidence lock | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; no family frozen; token SG3 has a nonpromoted transfer signal for owner review (Sections 68, 71) | jobs `234264`--`234266`; `outputs/segmentation/controlled_attention_cv/sg1_sg3_graph_refinement/` |
 | B2 optimizer audit against OVAM (Section 64, request 1) | Claude | Complete: B2 uses linear maps where OVAM optimizes token-softmax maps; everything else matches; rerun proposed and paper integration held (Section 69) | this commit; `outputs/segmentation/analysis/b2_recipe_audit/` |
 | B2 paper and evidence integration (Sections 67, 72) | Claude drafts; Codex reviews | Drafted: `7_fusion.tex` few-shot and T-C text; evidence A12; Codex review requested (Section 76) | this commit |
+| SG10 seed-connected bottleneck propagation (Section 75 handoff) | Claude runs; Codex reviews | Registered before the run (Section 77); rank normalization frozen from the numerical smoke | this commit; `configs/sg10_seed_connected_bottleneck.json` |
 | Locked token-SG3 confirmation | Codex runs; Claude reviews | Submitted: smoke `234490`, VOC `234491`, COCO `234492`, finalizer `234493`; fixed candidate, no retuning (Section 72) | `1fb198c38`; `configs/token_sg3_confirmation.json` |
 
 ### Pre-sync exploratory run
@@ -3682,3 +3683,123 @@ As assigned in Section 67 and scoped in Section 72:
 
 **Codex:** please review the numbers, wording and provenance. The
 replication (Section 65) is cited as validation only, as agreed in Section 67.
+
+## 77. Claude: SG10 registration (Section 75 handoff), before any production run
+
+Implements the owner specification `docs/SG10_SEED_CONNECTED_BOTTLENECK.md`
+as written; every grid is fixed in `configs/sg10_seed_connected_bottleneck.json`.
+
+**Inputs.** The frozen CA seed `c` and SA module 15 (all 31 calls, 8 heads,
+conditional QK), for two tracks screened separately: `W`, the class word,
+and `T`, OVAM's released token (keys `[<SoT>, token]`, conditional query; no
+token trained). On COCO-Cap the class keys come from the separately encoded
+class name, as in the transfers (Sections 48, 55).
+
+**Evidence and graph.**
+
+- **Evidence:** `μ = mean_i(A_i c)`, the observation-wise one pass, is `REF`
+  (SG10-B0).
+- **Graph:** the mean affinity `Ā = mean_i A_i` is used **only** for
+  connectivity. `Ā²c` is never a prediction.
+- **G1** is `Ā`, directed: edge `u → v` has weight `Ā[u, v]`, the SA
+  transition direction.
+- **G2** is `sqrt(Ā ⊙ Āᵀ)`.
+
+**Bottleneck.**
+
+- Seeds: `S_F = {p : c(p) ≥ Q_q(c)}` with `q ∈ {0.90, 0.95}`. They are
+  sources only, never clamped.
+- `B(q)` is the exact widest path from `S_F`, computed on the dense
+  4096-node graph with the max–min analogue of Dijkstra (sources start at the
+  largest graph weight).
+- **No edge is pruned and no sparsification is needed:** a whole image,
+  including generation and the three dense widest-path runs (G1, G2, L; four
+  source sets each), takes about 20 s on an A100.
+- `sg10_bottleneck.py` checks the algorithm against brute-force relaxation on
+  20 random directed graphs.
+
+**Normalization: frozen as percentile rank** before production and before
+any segmentation score was computed.
+
+- **Rule** (written into the config before the smoke): keep the raw ratio
+  `B / max W` only if, in every smoke image, track, graph (G1, G2) and
+  quantile, its non-source values have IQR ≥ 0.05 and median in
+  [0.05, 0.95].
+- **Smoke:** job `234640` (renyi, env `gen`), 10 VOC-Sim and 4 COCO-Cap
+  images, bottleneck statistics only. The raw ratio failed in 107 of 112
+  cells: medians 0.004–0.083, IQR 0.003–0.061, because one strong path
+  dominates.
+- **Result:** rank (ties averaged) is used for all graphs.
+
+**Operators** (`Bn` = rank-normalized `B`; then per-map min–max and the 17
+phase 3 thresholds, as everywhere):
+
+| Cell | Map |
+|---|---|
+| `B1` | `μ · Bn` |
+| `B2a25`, `B2a50` | `μ · (α + (1 − α) Bn)`, α ∈ {0.25, 0.50} |
+| `B3` | `c + Bn · (μ − c)` where `μ > c`, else `μ` |
+
+Per track, there are 16 candidates (4 operators × G1/G2 × 2 quantiles), plus
+reported-only cells:
+
+- `seed` and `REF`;
+- `P1`, the two-pass map, for the question "better than repeated
+  propagation";
+- 8 `L_*` cells: the local-graph diagnostic (G2 weights on 4-neighbour
+  edges, the same operators). Per the specification, these never select.
+
+That makes 27 cells per track and 54 in total. DenseCRF, SG1/SG3/SG8/SG9,
+RGB/features and pruning are excluded.
+
+**Selection (protocol v1.2).**
+
+- One screen per track (`SG10-W` against `W/REF`, `SG10-T` against `T/REF`),
+  over the 16 candidates. Setting and threshold are chosen on four folds; the
+  candidate must win at least 4/5 folds with a positive OOF gain.
+- **Tie order** within 0.002: `B2a50` > `B2a25` > `B3` > `B1` (closest to the
+  reference first), then G1 > G2, then q90 > q95.
+- Tracks never select for each other. COCO-Cap is transfer only: each cell at
+  its all-VOC threshold, and each frozen cell against its reference with a
+  paired bootstrap.
+
+**Diagnostics** (specification §§12–14; reported, never used to choose):
+
+- seed → REF additions, split into new TP, new FP, distant new FP (> 16 px)
+  and separate-component new FP, with 20-bin `Bn` histograms per graph and
+  quantile;
+- the AUC of `Bn` for new TP against each FP group: the central test of
+  whether recovered object pixels are better connected than the leakage;
+- per cell, new FP per new TP against the seed (the AN1 ratio), and lost TP /
+  removed FP against REF;
+- the 50 largest REF components per image: size, TP fraction, maximum and
+  mean `Bn`;
+- fixed panels for 6 images registered in the config (display setting q90,
+  G2, B3).
+
+**Environment (R7).** renyi only (2× A100, env `gen`, torch 2.4.1+cu121), as
+for SG5, so the SG10 `REF` cells can be checked against SG5's.
+
+**Files.**
+
+- `scripts/narmyn/attention/sg10_bottleneck.py` (operators and self-test)
+- `scripts/narmyn/attention/run_sg10_bottleneck.py` (runner, normalization
+  smoke, panels)
+- `scripts/narmyn/attention/finalize_sg10.py`
+- `jobs/narmyn/sg10/`
+- output: `outputs/segmentation/controlled_attention_cv/sg10_seed_connected_bottleneck/`
+
+**Pipeline smoke** (job `234641`, renyi, one VOC-Sim and one COCO-Cap image,
+both registered panel images; output outside the repository, no choice made
+from it):
+
+- all 54 cells and 17 thresholds written; diagnostics and panels written;
+  about 20 s per image;
+- the frozen 31 calls × 8 heads are asserted;
+- VOC-Sim `W/seed`, `W/REF` and `W/P1` are **bit-identical** to SG5's (same
+  environment). The `T` cells, and the COCO-Cap class-word seed, differ by at
+  most 1 pixel: their keys come from the appended key block, which SG5
+  extended with synonym prompts (the rounding effect noted in Section 66).
+
+**Launch.** One job on renyi: six workers (three per A100) pull the 40 class
+shards from one queue, then finalize (`jobs/narmyn/sg10/run_renyi.slurm`).
