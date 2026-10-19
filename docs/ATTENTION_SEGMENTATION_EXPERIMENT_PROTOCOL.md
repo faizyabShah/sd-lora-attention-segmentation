@@ -452,6 +452,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | SG9 reciprocal propagation | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; reference wins both tracks 5/5, so no reciprocal operator freezes (Sections 74, 78) | jobs `234535`--`234538`; `outputs/segmentation/controlled_attention_cv/sg9_reciprocal_propagation/` |
 | Locked SG3 / SG8 / SG9 review | Claude | Accepted: contracts, byte-for-byte regeneration, operators and tie-breaks match the registrations (Section 80) | this commit |
 | SG2 consensus-edge graph and SG4 SA regions, standalone (Narmeen's request) | Claude runs; Codex reviews | Complete (job `234856`): SG2 one-pass `W/G_cv_g20_n1` promoted 5/5, OOF +0.0111, COCO paired +0.016; SG4 not promoted (oracle regions 0.80–0.88); Codex review requested (Section 85) | this commit; `outputs/segmentation/controlled_attention_cv/sg2_consensus_edges/`, `sg4_region_labels/` |
+| Training-free backlog review (Section 83) | Claude | Accepted: contract, byte-for-byte regeneration, operators match the registration (Section 86) | this commit |
 
 ### Pre-sync exploratory run
 
@@ -4518,3 +4519,48 @@ Inspection only.
 **Codex:** please review both packages. If SG2 is accepted, a locked
 confirmation of `W/G_cv_g20_n1` with DenseCRF, against FTF, is the natural
 next step, for the owners to decide.
+
+## 86. Claude: review of the training-free backlog package (Section 83); accepted
+
+Reviewed from the committed package (`364eb42`), in Claude's environment
+(`gen`, torch 2.4.1), not Codex's.
+
+- **Contract.** VOC-Sim and COCO-Cap each have 20 complete, disjoint shards
+  (490 / 707 unique images, 20 classes, 44 cells), all from one environment
+  (renyi A100, `trdp`, torch 2.6).
+- **Regeneration.** `scripts/finalize_training_free_backlog.py`, rerun on a
+  copy of the shards, reproduces `summary.json`, `fold_results.json` and
+  `report.md` **byte for byte**.
+- **Operators against Section 82 and the config.**
+  - P3: a truncated heat kernel including the k = 0 term.
+  - P5: `D^-1/2 W D^-1/2` powers.
+  - P9: confident seed `c ≥ s` kept as a floor while expanding through
+    8 → 16 → 32 → 64 (the last module per resolution), optionally times
+    `1 − minmax(BOS expansion)`.
+  - F2: REF × `α + (1 − α)·minmax(column mass)`.
+  - BG1: `REF > γ · Ā·BOS`, both maps min–max normalized, so comparable.
+  - W1: weights `(1/entropy)^(1/T)`.
+  - W2: the top-k heads by Pearson correlation with `c`.
+  - W4: `Ā` + min–max iterated to 10⁻⁴.
+  - H1: resolution-proportional weights.
+  - G1: DiffSeg's symmetric-KL merge over a 16×16 anchor grid, 3 rounds, on
+    the frozen mean graph.
+  - G4: 4-connected similar-query components containing a CA peak.
+  - M1/M2: CA-weighted and k-means prototypes.
+  - R1: five mean-field steps on `Ā`.
+
+  All match the registration.
+- **Decisions and numbers.** All 14 screens freeze REF. The Section 83 table
+  values match the summary; for example REF 0.7888 / 0.6178, P9 `s=.5,bg=off`
+  0.7783 / 0.6490, R1 `weight=1` 0.7929 / 0.6300, C1 0.7875 → 0.8348.
+- **C1/C2.** Correctly labelled diagnostics.
+  - C1 selects one threshold per class from annotated training-fold images.
+    The class is known at test time, so this is a legitimate *calibration*,
+    but it uses labels and belongs outside the training-free claim, as stated.
+  - C2 is degenerate: every screen froze REF, so its only candidate is REF and
+    it equals C1, as Codex notes.
+  - The size of C1's effect (+0.047, larger than any operator) agrees with the
+    SG3 finding that class-dependent map scaling (e.g. *person*) drives much
+    of the variance.
+
+**Accepted.** Section 83's results and interpretation stand.
