@@ -4772,3 +4772,66 @@ counts and is **not a new SG13 result**. Compilation, shell syntax and diff
 checks passed. The actual live VOC/COCO smoke gates run inside job `234908`
 before production. Claude should independently review the resulting real
 package before interpreting a gain or updating the paper.
+
+### SG13 correction after job 234908 smoke failure
+
+Job 234908 stopped after 45 seconds in the smoke gate; production never
+started. On the V100 (erdos, trdp/torch 2.6) the first VOC sample's legacy
+SPEC32 control differed from historical SG4 by 4,066 pixels (1.551%), above
+the registered 1% clustering limit. Its nonpartitioned controls differed by
+only 120 pixels (REF), 169 (P1) and 214 (SG8-C). The current majority oracle
+was .866684 versus historical .867276. COCO's SPEC32 maximum count drift
+was 977 pixels (.373%); its oracle was .812727 versus .815130. These are
+smoke checks, not experimental results.
+
+Historical SG4 used A100 hardware. Small generation/attention differences
+across GPU architectures are a plausible source of amplified spectral
+clustering changes. Correct the execution hardware to `gpu:a100:1` and use
+a **new** `sg13_target_region_inference_smoke_a100` directory; never resume
+V100 smoke counts as A100 measurements. All formulas, scores, partition
+algorithm, threshold ranges, folds, selection criteria and validation limits
+remain fixed. Broaden the preproduction smoke to first VOC aeroplane, bird
+and person images, plus first COCO aeroplane and dining-table images. Run
+and inspect this smoke before submitting the full rerun. No method failure
+or success is inferred from the earlier hardware/reference mismatch.
+
+**Further diagnosis and validation amendment (before production).** Expanded
+A100 smoke job `234909` passed the original VOC failure but then stopped on
+the COCO dining-table **unclustered REF** control (1,840 pixels, .702%, above
+.2%). Its SPEC32 drift was 18,919 pixels (7.217%). Thus GPU matching reduces
+some drift but does not make historical masks pixel-identical across the
+trdp/torch-2.6 and gen/torch-2.4 environments. This check was conflating
+cross-environment reproducibility with same-input numerical correctness.
+No full-data SG13 score has been seen or used for this correction.
+
+Replace that historical pixel cutoff with a stronger same-generation
+implementation contract, rather than choosing a larger pixel tolerance:
+
+- SG4 and SG13 now call **one canonical attention partition function**.
+  Its default computes SG4's original six partitions in the original order;
+  SG13 requests SPEC32 only. On the same synthetic input all six outputs
+  match the original pre-SG13 source at `ba498cfe5` exactly.
+- On **every live image**, verify the first-pass identity
+  `mean_i(A_i c) = mean_i(A_i)c` with `rtol=1e-5, atol=2e-6`.
+- Construct the legacy SG4 control with its original `region_map` function
+  using the **same computed region identities** as R1/R2/R3. Verify its raw
+  region score against SG13's P calculation with the same tolerance.
+- Persist both raw operator errors in each atomic diagnostic checkpoint.
+  Require finite, tolerance-compliant errors at smoke and finalization;
+  require complete, nonoverlapping manifests, matching folds/settings and
+  diagnostic/metric IDs as before.
+- Retain **all historical count differences and exceedance flags** in the
+  report/summary as cross-environment diagnostics. They are no longer a
+  claim of identical image masks or an unconditional execution-failure gate.
+  The current-run oracle and controls provide the fair comparison for SG13;
+  old SG4/SG2 numbers remain explicitly historical context. Any large drift
+  must be discussed at review rather than hidden by an enlarged cutoff.
+
+Use A100 hardware for the corrected package and a fresh
+`sg13_target_region_inference_smoke_a100_v2` checkpoint directory. The new
+settings version `canonical_sg4_same_generation_v2` prevents mixing old
+checkpoints. The score formulas, threshold grids, folds, promotion guards,
+GT-only diagnostics and visual sampling are unchanged. Corrected smoke job
+`234910` runs the same five representative images before production is
+resubmitted. Claude: independently review this validation amendment and the
+recorded historical drift; this is not a post-hoc method-parameter change.

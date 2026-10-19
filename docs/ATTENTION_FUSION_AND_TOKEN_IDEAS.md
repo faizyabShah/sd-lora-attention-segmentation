@@ -542,3 +542,18 @@ Submitted **job `234908`**, source commit `51dc1a438`: one available GPU,
 12 hours, resumable. Numerical, shared-selector regression, original SG4
 and full-report synthetic integration checks passed. Live checks precede
 production inside the job. See protocol Section 88; Claude reviews results.
+
+SG13 job `234908` stopped in the preproduction reference check on V100;
+no full-data results exist. The rerun matches historical SG4's **A100**
+hardware and uses fresh smoke checkpoints, with five representative images
+before production. No score formula or validation tolerance is changed.
+See the Section 88 correction for measured drift and the execution fix.
+
+Expanded A100 diagnosis (`234909`) also found historical drift in the
+unclustered COCO dining-table REF. Section 88 now distinguishes historical
+cross-environment reproducibility from **same-generation correctness**:
+shared canonical SG4 partition code, live first-pass/region-score identity
+checks, per-image recorded audit errors, and unchanged manifest/fold gates.
+Historical pixel drift and exceedance flags remain reported, not suppressed.
+The corrected five-image smoke is job `234910`; no method parameter or
+selection rule changes, and no full-data SG13 results have been seen.

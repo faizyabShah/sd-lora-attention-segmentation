@@ -41,11 +41,26 @@ def region_map(labels: torch.Tensor, values: torch.Tensor, how: str) -> torch.Te
 
 
 @torch.inference_mode()
-def spectral_partition(mean: torch.Tensor, regions: int = 32):
-    """Exactly SG4 SPEC32: symmetric normalized affinity, leading eigenvectors, k-means."""
-    s = (mean + mean.T)/2
-    degree = s.sum(1)
-    norm = s/torch.sqrt(degree[:, None]*degree[None, :]).clamp_min(1e-30)
+def attention_partitions(mean: torch.Tensor, ks=(8, 16, 32), include_rows=True):
+    """Canonical SG4 implementation, optionally evaluating only required partitions.
+
+    The default preserves SG4's full order and arithmetic. SG13 requests SPEC32
+    only; the eigenspace and k-means path are exactly the same as SG4 SPEC32.
+    """
+    s = (mean + mean.T) / 2
+    d = s.sum(1)
+    norm = s / torch.sqrt(d[:, None] * d[None, :]).clamp_min(1e-30)
     _, vecs = torch.linalg.eigh(norm.double())
-    features = vecs[:, -regions:].flip(1).float()
-    return kmeans(F.normalize(features, dim=1), regions)
+    lead = vecs[:, -max(ks):].flip(1).float()
+    rows = F.normalize(mean, dim=1) if include_rows else None
+    out = {}
+    for k in ks:
+        out[f"SPEC{k}"] = kmeans(F.normalize(lead[:, :k], dim=1), k)
+        if include_rows:
+            out[f"ROWS{k}"] = kmeans(rows, k)
+    return out
+
+
+@torch.inference_mode()
+def spectral_partition(mean: torch.Tensor, regions: int = 32):
+    return attention_partitions(mean, ks=(regions,), include_rows=False)[f"SPEC{regions}"]

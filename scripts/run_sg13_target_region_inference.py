@@ -16,7 +16,7 @@ if str(ROOT) not in sys.path:
 from scripts.run_sg11_sg12_observation_reliability import WordObservationRecorder, transfer, common
 from src.segmentation import controlled_cv as cv
 from src.segmentation.target_region_inference import observation_statistics, region_quantities, score_regions, oracle_diagnostic
-from src.segmentation.attention_regions import spectral_partition
+from src.segmentation.attention_regions import spectral_partition, region_map
 from src.segmentation.region_diagnostics import RegionDiagnosticWriter
 
 SPEC = ROOT/'configs/sg13_target_region_inference.json'
@@ -54,7 +54,8 @@ def main():
     folds = cv.read_folds(ROOT/'configs/voc_sim_folds.csv') if args.dataset == 'voc' else {r['image_id']: 0 for r in all_rows}
     settings = {'package': 'sg13_target_region_inference_v1', 'spec': spec, 'dataset': args.dataset,
                 'ca_seed': ca_spec, 'selected_sa_module': selected, 'model': args.model,
-                'model_dtype': 'float32', 'qk_storage_dtype': 'float16'}
+                'model_dtype': 'float32', 'qk_storage_dtype': 'float16',
+                'partition_validation': 'canonical_sg4_same_generation_v2'}
     path = args.output_dir/args.dataset/'shards'/f"class_{args.class_shard:02d}_{classname.replace(' ', '_')}.npz"
     writer = cv.ShardWriter(path, names, folds, settings, thresholds)
     diag = RegionDiagnosticWriter(path.with_suffix('.regions.npz'), spec)
@@ -74,18 +75,25 @@ def main():
             if len(calls) != 31 or any(q.shape[0] != 8 for q, k in calls):
                 raise ValueError('expected frozen 31 calls x 8 heads')
             graph, propagated, two, consensus = observation_statistics(calls, seed)
+            # Independently check the linear first-pass identity on this GPU.
+            mean_graph_result = graph @ seed.reshape(-1)
+            torch.testing.assert_close(propagated, mean_graph_result, rtol=1e-5, atol=2e-6)
+            linear_error = float((propagated-mean_graph_result).abs().max())
             labels = spectral_partition(graph, 32)
-            del graph, calls
+            del graph, calls, mean_graph_result
             recorder.sa_qk.clear()
             quantities, scores, area = region_quantities(labels, seed, propagated, consensus)
-            legacy = quantities[:, 1][labels]
+            # Use the canonical SG4 labelling on these exact region identities.
+            legacy = region_map(labels, propagated, 'mean')
+            torch.testing.assert_close(quantities[:, 1][labels], legacy, rtol=1e-5, atol=2e-6)
+            region_error = float((quantities[:, 1][labels]-legacy).abs().max())
             sg8c = torch.where(consensus >= .8, propagated, seed.reshape(-1))
             controls = torch.stack((propagated, two, legacy, sg8c)).reshape(4, 64, 64)
             counts, ap = cv.score_maps(controls, sample.target_mask, 'minmax', thresholds)
             region_counts = score_regions(labels, scores, sample.target_mask, thresholds)
             fraction, oracle_counts = oracle_diagnostic(labels, sample.target_mask)
             region_ap = cv.average_precision_batch(scores[:, labels], cv.target_at_size(sample.target_mask, 64)).numpy()
-            diag.add(row['image_id'], quantities, scores, area, fraction, oracle_counts)
+            diag.add(row['image_id'], quantities, scores, area, fraction, oracle_counts, (linear_error, region_error))
             if args.dataset == 'voc' and classname in spec['visual_classes'] and row['image_id'] == all_rows[0]['image_id']:
                 cache = args.output_dir/'visual_cache'/f'{args.class_shard:02d}.npz'
                 cache.parent.mkdir(parents=True, exist_ok=True)

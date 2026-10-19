@@ -32,7 +32,7 @@ import torch.nn.functional as F
 ROOT = Path(__file__).resolve().parents[3]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from src.segmentation.attention_regions import kmeans, region_map
+from src.segmentation.attention_regions import kmeans, region_map, attention_partitions
 NAME = "sg4"
 CONFIG = ROOT / "configs" / "sg4_region_labels.json"
 OUT = ROOT / "outputs" / "segmentation" / "controlled_attention_cv" / "sg4_region_labels"
@@ -55,19 +55,7 @@ def reference_for(cell: str) -> str:
 
 
 def partitions(mean: torch.Tensor) -> dict[str, torch.Tensor]:
-    s = (mean + mean.T) / 2
-    d = s.sum(1)
-    norm = s / torch.sqrt(d[:, None] * d[None, :]).clamp_min(1e-30)
-    _, vecs = torch.linalg.eigh(norm.double())
-    lead = vecs[:, -max(KS):].flip(1).float()  # leading eigenvectors, largest first
-    rows = F.normalize(mean, dim=1)
-    out = {}
-    for k in KS:
-        out[f"SPEC{k}"] = kmeans(F.normalize(lead[:, :k], dim=1), k)
-        out[f"ROWS{k}"] = kmeans(rows, k)
-    return out
-
-
+    return attention_partitions(mean, ks=KS)
 
 
 @torch.inference_mode()

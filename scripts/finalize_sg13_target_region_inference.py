@@ -36,6 +36,8 @@ def load(directory):
 def validate(directory,dataset,spec,smoke):
     result=load(directory/dataset)
     old=load(BASE/'sg4_region_labels'/dataset)
+    if result.settings.get('partition_validation') != 'canonical_sg4_same_generation_v2':
+        raise ValueError('old or unaudited SG13 checkpoint; use a fresh corrected run directory')
     if result.configurations!=tuple(spec['configurations']) or result.settings['spec']!=spec:
         raise ValueError('SG13 settings/configuration contract differs')
     if result.thresholds!=tuple(round(i*.005,3) for i in range(201)):
@@ -54,12 +56,13 @@ def validate(directory,dataset,spec,smoke):
         a=result.counts[result.index(name)][:,new_indices]
         b=source.counts[source.index(historical),order]
         error=float(np.max(np.abs(a-b)/np.maximum(a.sum(-1)[...,None],1)))
-        checks[name]={'max_count_difference':int(np.abs(a-b).max()),'max_fraction_of_image':error}
-        # Spectral partitions can change at boundary pixels across GPU/library
-        # environments. Report that drift; fail above 1% rather than hiding it.
-        tolerance=.01 if name.startswith('W/SG4') else .002
-        if error>tolerance:
-            raise ValueError(f'{dataset} {name}: reference drift {error:.5f} exceeds {tolerance}')
+        # Across environments spectral clustering is not pixel-stable. Keep
+        # historical drift visible; correctness is enforced on the same live
+        # generation/partition by the canonical operator audits below.
+        previous_limit=.01 if name.startswith('W/SG4') else .002
+        checks[name]={'max_count_difference':int(np.abs(a-b).max()),'max_fraction_of_image':error,
+                      'previous_historical_limit':previous_limit,'previous_limit_exceeded':bool(error>previous_limit),
+                      'role':'cross-environment diagnostic; not a same-input identity check'}
     return result,checks
 
 
@@ -71,8 +74,11 @@ def load_regions(directory,dataset,result,spec):
                 raise ValueError('region specification differs')
             for i,image_id in enumerate(data['image_ids'].tolist()):
                 if image_id in records:raise ValueError('duplicate region record')
-                records[image_id]={k:data[k][i] for k in ('quantities','scores','area64','gt_fraction','oracle_counts')}
+                records[image_id]={k:data[k][i] for k in ('quantities','scores','area64','gt_fraction','oracle_counts','operator_audit_errors')}
     if set(records)!=set(result.image_ids):raise ValueError('metric/region image IDs differ')
+    audit=np.stack([records[n]['operator_audit_errors'] for n in result.image_ids])
+    if not np.isfinite(audit).all() or np.max(audit)>1.2e-5:
+        raise ValueError('same-generation SG4/linear operator audit failed')
     return {k:np.stack([records[n][k] for n in result.image_ids]) for k in next(iter(records.values()))}
 
 
@@ -102,7 +108,7 @@ def main():
     coco,cc=validate(args.output_dir,'coco',spec,args.smoke)
     regions={d:load_regions(args.output_dir,d,r,spec) for d,r in [('voc',voc),('coco',coco)]}
     if args.smoke:
-        dump(args.output_dir/'smoke_validation.json',{'voc':vc,'coco':cc,'passed':True})
+        dump(args.output_dir/'smoke_validation.json',{'voc':vc,'coco':cc,'passed':True, 'same_generation_audit_maxima':{d:regions[d]['operator_audit_errors'].max(0).tolist() for d in regions}})
         print('SG13 live checks passed: reference curves, SPEC32 and region checkpoints')
         return
     candidates=list(voc.configurations[4:])
@@ -175,7 +181,7 @@ def main():
         screen['coco_delta_vs_REF']=cells[frozen]['coco']['delta_vs_REF']
         screen['user_promising_target_met']=bool(frozen!='W/REF' and screen['vote_winner_votes']>=4 and screen['oof_gain']>=.005 and screen['coco_delta_vs_REF']>0)
     summary={'spec':spec,'voc_images':len(voc.image_ids),'coco_images':len(coco.image_ids),
-             'reference_checks':{'voc':vc,'coco':cc},'screens':screens,'cells':cells,'region_diagnostics':region_report,
+             'reference_checks':{'voc':vc,'coco':cc},'same_generation_audit_maxima':{d:regions[d]['operator_audit_errors'].max(0).tolist() for d in regions},'screens':screens,'cells':cells,'region_diagnostics':region_report,
              'historical_selected_SG2':{'source':'Section 85, different package/environment; context only, no SG2 inference added to SG13',
                                       'cell':'W/G_cv_g20_n1','voc_threshold':historical_sg2['voc_threshold'],
                                       'voc_miou':historical_sg2['voc_miou@threshold'],'coco_miou':historical_sg2['coco_miou@voc_threshold']}}
@@ -189,6 +195,7 @@ def main():
            '| Screen | Vote winner | Votes | OOF REF | OOF selection | Gain | Frozen | Promising target |','|---|---|---:|---:|---:|---:|---|---|']
     for key,s in screens.items():
         lines.append(f"| {key} | {s['vote_winner']} | {s['vote_winner_votes']}/5 | {s['oof_miou_reference']:.4f} | {s['oof_miou_selection']:.4f} | {s['oof_gain']:+.4f} | {s['frozen']} | {s['user_promising_target_met']} |")
+    lines += ['', 'Historical pixel-count drift is reported in summary.json. These are cross-environment diagnostics; all methods and the canonical SG4 comparator use the same newly generated inputs and partition. Same-generation linear and region-score identities are enforced for every image.', '']
     lines+=['','| Cell | VOC threshold | VOC mIoU | VOC recall / precision | COCO mIoU | COCO recall / precision |','|---|---:|---:|---:|---:|---:|']
     for name,c in cells.items():
         vr,cr=c['voc']['rates'],c['coco']['rates']
