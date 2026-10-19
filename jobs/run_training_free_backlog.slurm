@@ -3,7 +3,7 @@
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:2
 #SBATCH --cpus-per-task=36
-#SBATCH --mem=128G
+#SBATCH --mem=88G
 #SBATCH --time=12:00:00
 #SBATCH --requeue
 #SBATCH --signal=B:USR1@180
