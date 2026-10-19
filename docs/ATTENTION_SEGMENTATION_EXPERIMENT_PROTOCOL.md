@@ -450,6 +450,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Locked token-SG3 confirmation | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; SG3+R2 is 0.8684/0.7006 but its VOC OOF gain is marginal (+0.0030); Claude review requested (Sections 72, 78) | jobs `234490`--`234493`; `outputs/segmentation/controlled_attention_cv/token_sg3_confirmation/` |
 | SG8 observation consensus | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; W sign consensus rho=.80 and T median freeze; variance and expansion-only gates fail (Sections 73, 78) | jobs `234511`--`234516`; `outputs/segmentation/controlled_attention_cv/sg8_observation_consensus/` |
 | SG9 reciprocal propagation | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; reference wins both tracks 5/5, so no reciprocal operator freezes (Sections 74, 78) | jobs `234535`--`234538`; `outputs/segmentation/controlled_attention_cv/sg9_reciprocal_propagation/` |
+| Locked SG3 / SG8 / SG9 review | Claude | Accepted: contracts, byte-for-byte regeneration, operators and tie-breaks match the registrations (Section 80) | this commit |
 
 ### Pre-sync exploratory run
 
@@ -3974,3 +3975,71 @@ diagnostics (`summary.json` is unchanged by it).
 Codex's later `--visual-dir` option in `run_sg10_bottleneck.py` (`6241f55`,
 for the qualitative audit) is opt-in and leaves the production path
 unchanged; the package above was produced before it, at `67e3bc5`.
+
+## 80. Claude: review of locked token-SG3, SG8 and SG9 (Section 78); accepted
+
+Reviewed from the committed packages (`00927f5`), in Claude's environment
+(`gen`, torch 2.4.1), not Codex's.
+
+**Contracts.**
+
+| Package | VOC-Sim | COCO-Cap | Cells | Environment |
+|---|---|---|---:|---|
+| locked token-SG3 | 20 shards, 490 unique | 20 shards, 707 unique | 6 | `trdp`, torch 2.6; VOC-Sim erdos V100; COCO-Cap 18 shards erdos V100, 2 neumann V100S |
+| SG8 | 20, 490 | 20, 707 | 32 | `trdp`, torch 2.6, renyi A100 |
+| SG9 | 20, 490 | 20, 707 | 8 | `trdp`, torch 2.6, renyi A100 |
+
+All shards are complete and disjoint. Locked SG3's COCO-Cap transfer mixes
+two V100 variants with the same software; this is within the registered
+V100 node class and is noted only.
+
+**Regeneration.** Each finalizer, rerun on a copy of the committed shards,
+reproduces `summary.json` and `report.md` **byte for byte**.
+
+**Code against the registrations.**
+
+- **SG8 operators** (`src/segmentation/observation_consensus.py`) match
+  Section 73:
+  - trimmed means with `floor(0.1·248)` and `floor(0.2·248)` per tail, and a
+    median of the two middle observations;
+  - B: `u·c + (1−u)·μ` with `u = σ/(σ+τ)`, population σ;
+  - C: `μ` where `r_up ≥ ρ` or `r_down ≥ ρ`, else `c`;
+  - D: `max(c, μ)` where `r_up ≥ ρ`, else `c`.
+- **SG9 operators** match Section 74: `sqrt(A ⊙ Aᵀ)`, `min(A, Aᵀ)` and
+  `A ⊙ sqrt(Aᵀ)`, each row-normalized per observation.
+- **Tie-breaks** match the registrations: SG8-A trim10 > trim20 > median;
+  larger τ and ρ; SG9 R3 > R1 > R2.
+
+**Decisions** (recomputed with `run_screen`):
+
+- **SG8, `W/C/rho0p80`:** conditional in all five folds (fold 3 chose ρ =
+  0.70). Every held-out fold improves (+0.003 to +0.015). OOF 0.7875 →
+  0.7970; paired +0.0079 [+0.0040, +0.0119], 261/229.
+- **SG8, `T/A/median`:** 4/5 (fold 2: no eligible candidate). OOF 0.8508 →
+  0.8544; paired +0.0050 [+0.0030, +0.0069], 260/132/98 ties.
+- **Locked SG3:**
+  - `T/SG3` against `T/REF`: OOF +0.0056, paired +0.0059 [+0.0013, +0.0105];
+  - `T/SG3+R2` against `T/REF+R2`: OOF +0.0030, paired +0.0028
+    [−0.0020, +0.0076];
+  - `T/SG3+R2` against `T/P1+R2`: +0.0020, interval crossing zero.
+
+  So the confidence lock helps the token map before DenseCRF, but DenseCRF
+  absorbs most of the gain on VOC-Sim. The COCO-Cap 0.7006 (against 0.6850)
+  remains a transfer signal only.
+- **SG9:** the reference wins 5/5 on both tracks; the operators are as
+  reported.
+- **Cross-package references.** The `REF` cells agree across SG8, SG9, locked
+  SG3, SG5 and SG10 to within 0.0007 mIoU over two software environments
+  (word 0.7886–0.7888; token 0.8501–0.8508).
+
+**One observation for the owners (not a correction).** SG8's class-word
+trimmed aggregation does not freeze, yet it improves more consistently than
+the frozen sign-consensus cell: paired +0.0077 [+0.0056, +0.0099], 349/141.
+It loses the vote only because its five folds split between two
+near-identical variants, `trim20` (3) and `median` (2). The registered rule
+was applied correctly; the split shows that close variants in one family can
+dilute the vote.
+
+**Accepted.** Section 78's results and interpretation stand. Neither frozen
+SG8 cell has been combined with DenseCRF or the few-shot system; that would
+be a new locked confirmation, for the owners to decide.
