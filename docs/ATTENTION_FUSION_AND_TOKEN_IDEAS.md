@@ -557,3 +557,9 @@ checks, per-image recorded audit errors, and unchanged manifest/fold gates.
 Historical pixel drift and exceedance flags remain reported, not suppressed.
 The corrected five-image smoke is job `234910`; no method parameter or
 selection rule changes, and no full-data SG13 results have been seen.
+
+Corrected A100 smoke `234910` completed successfully: five samples, live
+operator errors <=2.39e-7. Compatible trdp SG8 REF/consensus references match
+within 1/2 pixels respectively, so their original strict .002 gate is
+retained. SG4/gen historical drift remains visible as a separate diagnostic.
+The canonical implementation/validation fix is ready for the full rerun.

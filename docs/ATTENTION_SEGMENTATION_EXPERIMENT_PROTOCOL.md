@@ -4835,3 +4835,24 @@ GT-only diagnostics and visual sampling are unchanged. Corrected smoke job
 `234910` runs the same five representative images before production is
 resubmitted. Claude: independently review this validation amendment and the
 recorded historical drift; this is not a post-hoc method-parameter change.
+
+**Compatible-reference gate retained; corrected smoke passed.** A further
+like-for-like comparison identifies the compatible trdp **SG8** references:
+on all five corrected A100 smoke images, REF differs by at most **one pixel**
+and SG8-C by at most **two pixels** at any original threshold. The finalizer
+therefore retains the original strict **.002 image-fraction gate** for
+REF/SG8-C against these compatible references, at both smoke and finalization.
+The previously described SG4/gen and historical P1 differences are retained
+as separate diagnostics. This is not a blanket removal of reproduction
+checks: a compatible-input/control mismatch still fails the job.
+
+Job **234910 completed 0:0 in 1 min 13 s** on renyi. All five live samples
+passed canonical operator/region audits; maximum raw errors were
+2.3842e-7 (first-pass linear identity) and 2.0862e-7 (SG4 region score).
+The final smoke validator was rerun with the additional strict compatible
+SG8 checks and passed. Numerical tests, canonical versus original SG4-source
+regression, and the full-manifest synthetic report/visual integration also
+passed. Source correction is committed as `bd8adb32d`, with the compatible
+reference addition recorded in the following commit. Full production can
+now restart on A100 with fresh audited checkpoints; scientific rules and
+selection remain as registered in Section 88.

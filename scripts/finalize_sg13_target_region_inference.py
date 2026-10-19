@@ -63,6 +63,20 @@ def validate(directory,dataset,spec,smoke):
         checks[name]={'max_count_difference':int(np.abs(a-b).max()),'max_fraction_of_image':error,
                       'previous_historical_limit':previous_limit,'previous_limit_exceeded':bool(error>previous_limit),
                       'role':'cross-environment diagnostic; not a same-input identity check'}
+    # SG8 is the compatible-environment control: the same trdp attribution and
+    # observation maps. Keep the original strict mask check for these two
+    # controls, while SG4/gen and historical two-pass maps remain diagnostics.
+    same_environment = load(BASE/'sg8_observation_consensus'/dataset)
+    order = [same_environment.image_ids.index(n) for n in result.image_ids]
+    indices = [result.thresholds.index(t) for t in same_environment.thresholds]
+    for name in ('W/REF', 'W/C/rho0p80'):
+        a = result.counts[result.index(name)][:,indices]
+        b = same_environment.counts[same_environment.index(name),order]
+        error = float(np.max(np.abs(a-b)/np.maximum(a.sum(-1)[...,None],1)))
+        checks[f'compatible_SG8:{name}'] = {'max_count_difference':int(np.abs(a-b).max()),
+                                          'max_fraction_of_image':error,'limit':.002,'role':'strict compatible-environment control'}
+        if error > .002:
+            raise ValueError(f'{dataset} {name}: compatible SG8 reference mismatch {error:.5f}')
     return result,checks
 
 
