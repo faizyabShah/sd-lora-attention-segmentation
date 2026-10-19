@@ -4628,3 +4628,12 @@ each image; only counts/AP and compact results are retained.
 One node-unconstrained GPU job requests 12 hours, 48 GB host RAM and 8 CPUs;
 it performs the numerical and live smoke gates, then VOC, COCO and finalization.
 It does not depend on or change the running SG11/SG12 experiment.
+
+**Submitted:** job **`234907`**, source registered at commit `0ae0e6d87`.
+The independent SG2 equivalence check passed, as did a synthetic full-manifest
+report integration (six cells, historical-control checks, correct neutral
+candidate decision, fold thresholds, OOF comparisons and 240 per-class CSV
+rows). These synthetic fixtures are not new experimental results. Python
+compilation, Slurm shell syntax and diff checks passed. Live VOC/COCO smoke
+checks execute inside the submitted job before production. Claude should
+review the resulting package before adding any gain to the paper.

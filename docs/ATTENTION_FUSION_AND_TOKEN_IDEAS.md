@@ -507,3 +507,7 @@ learned token. VOC five-fold selection and frozen-threshold COCO transfer
 follow the common framework; the locked FTF @.45 anchor is also explicit.
 Codex submits and reports; Claude verifies before paper integration.
 The SG11/SG12/SG-Diag run continues independently.
+
+Submitted as **job `234907`** (source commit `0ae0e6d87`), one GPU / 12 hours,
+no node constraint. Numerical and report-integration checks passed. The job
+runs live smoke checks before all 40 class shards. Claude reviews results.
