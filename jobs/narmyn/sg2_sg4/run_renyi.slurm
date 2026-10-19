@@ -54,7 +54,9 @@ run_pool() {
   if [ -s "$failed" ]; then echo "FAILED:"; cat "$failed"; exit 1; fi
 }
 echo "node=$(hostname -s) env=${CONDA_ENV:-gen} workers=$WORKERS"
-run_pool run
-for fam in sg2 sg4; do python scripts/narmyn/attention/finalize_claude_sg.py --family "$fam"; done
+if [ "${VISUAL_ONLY:-0}" != 1 ]; then  # VISUAL_ONLY=1: only the comparison pages and their index
+  run_pool run
+  for fam in sg2 sg4; do python scripts/narmyn/attention/finalize_claude_sg.py --family "$fam"; done
+fi
 run_pool visual
 python scripts/narmyn/attention/index_claude_visuals.py

@@ -451,7 +451,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | SG8 observation consensus | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; W sign consensus rho=.80 and T median freeze; variance and expansion-only gates fail (Sections 73, 78) | jobs `234511`--`234516`; `outputs/segmentation/controlled_attention_cv/sg8_observation_consensus/` |
 | SG9 reciprocal propagation | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; reference wins both tracks 5/5, so no reciprocal operator freezes (Sections 74, 78) | jobs `234535`--`234538`; `outputs/segmentation/controlled_attention_cv/sg9_reciprocal_propagation/` |
 | Locked SG3 / SG8 / SG9 review | Claude | Accepted: contracts, byte-for-byte regeneration, operators and tie-breaks match the registrations (Section 80) | this commit |
-| SG2 consensus-edge graph and SG4 SA regions, standalone (Narmeen's request) | Claude runs; Codex reviews | Registered before the run (Section 81) | this commit; `configs/sg2_consensus_edges.json`, `configs/sg4_region_labels.json` |
+| SG2 consensus-edge graph and SG4 SA regions, standalone (Narmeen's request) | Claude runs; Codex reviews | Complete (job `234856`): SG2 one-pass `W/G_cv_g20_n1` promoted 5/5, OOF +0.0111, COCO paired +0.016; SG4 not promoted (oracle regions 0.80–0.88); Codex review requested (Section 85) | this commit; `outputs/segmentation/controlled_attention_cv/sg2_consensus_edges/`, `sg4_region_labels/` |
 
 ### Pre-sync exploratory run
 
@@ -4424,3 +4424,97 @@ cleanup completed; the two report passes were byte-identical. This fixture
 used historical counts and is **not a new SG11/SG12 result**. Python compilation,
 Slurm shell syntax and `git diff --check` passed. Claude: review this
 registration and the eventual real outputs before drawing a conclusion.
+
+## 85. Claude: SG2 and SG4 results; SG2 one-pass consensus graph promoted (Codex review requested)
+
+**Run.** Job `234856` (renyi, 2× A100, env `gen`, torch 2.4.1+cu121; one
+environment): 80/80 class shards (SG2 and SG4 × VOC-Sim and COCO-Cap) and
+both finalizers completed.
+
+- The page step failed: OVAM's released VOC-Sim images that the renderer
+  shows were missing locally for 18 of 20 classes. They were fetched from
+  OVAM's archive (git-ignored dataset folder), and the pages were re-rendered
+  on one renyi GPU (job `234892`, same environment).
+- `run_renyi.slurm` gained `VISUAL_ONLY=1` for this; production is unchanged.
+
+**Reference check.** `W`/`T` `seed` and `REF` are **bit-identical** to SG10's
+on all 490 VOC-Sim and 707 COCO-Cap images. REF OOF is 0.7873 (word) and
+0.8496 (token), the established values.
+
+**Scope (Section 82).** Section 81 was registered before Section 82. Both
+tracks ran as registered, but only the class-word track (`W`) supports the
+training-free conclusions below. The token-track cells are reported
+separately as diagnostics and are not proposed for any pipeline.
+
+### SG2: consensus-edge graph
+
+| Screen | Frozen | Votes | OOF REF → selected | Paired Δ image IoU [95% CI] | COCO-Cap frozen / ref; paired |
+|---|---|---:|---:|---|---|
+| **SG2-W one pass** | **`W/G_cv_g20_n1`** | **5/5** | **0.7873 → 0.7984 (+0.0111)** | **+0.0131 [+0.0102, +0.0160]; 346/144** | **0.6234 / 0.6173; +0.0158 [+0.0129, +0.0187]** |
+| SG2-W two passes | `W/P1` (reference) | 5/5 | 0.7997 → 0.7997 | — | — |
+| *SG2-T one pass (diagnostic)* | *`T/G_cv_g20_n1`* | *5/5* | *0.8496 → 0.8568 (+0.0072)* | *+0.0079 [+0.0058, +0.0102]* | *0.6675 / 0.6680; +0.0072 [+0.0046, +0.0099]* |
+| *SG2-T two passes (diagnostic)* | *`T/P1`* | *5/5* | *0.8534 → 0.8534* | — | — |
+
+**The promoted cell.** `W/G_cv_g20_n1` is one pass through a single
+consensus graph:
+
+- `W = rownorm(Ā · r²)`, with `r = mean_i A_i / sqrt(mean_i A_i²)`. Every edge
+  is reweighted by the square of its observation agreement; none is removed.
+- The gain is in the promotion band (≥ +0.010) and is chosen in every fold.
+- Recall and precision both rise (0.912 / 0.865 → 0.918 / 0.869 at 0.45);
+  new FP per new TP against the seed is 0.35 (REF 0.33).
+- 16 of 20 classes improve: chair +0.065, aeroplane +0.028, person, boat and
+  bird +0.021. The largest loss is tv −0.014.
+- It transfers to COCO-Cap: +0.0061 mIoU, paired +0.016 with an interval
+  above zero.
+
+**Caveats.**
+
+1. **It equals, not beats, the two-pass reference.** P1: VOC 0.8005, COCO
+   0.6244, against the frozen cell's 0.7984 and 0.6234. SG2 gives one-pass
+   cost with two-pass quality. The two-pass SG2 cells do not beat P1 in the
+   folds; the best in-sample is `O_cv_g20_n2`, 0.8015, +0.001.
+2. **The selected γ = 2 is the largest registered value,** and the one-pass
+   gain rises monotonically with γ (0.7918 / 0.7946 / 0.7984 at 0.5 / 1 / 2).
+   Larger γ is untested; testing it would need a new registration.
+3. **Only one environment.** It still needs Codex's review, and a combined
+   confirmation against FTF (P1 + DenseCRF), before any pipeline change.
+
+**Mechanism** (Ā-weighted mean edge reliability; VOC-Sim, COCO-Cap similar):
+
+| Reliability | object → object | background → object (leakage path) | object → background | background → background |
+|---|---:|---:|---:|---:|
+| `cv` | 0.682 | 0.638 | 0.645 | 0.751 |
+| `occ` | 0.713 | 0.289 | 0.285 | 0.673 |
+
+Leakage edges are less consistent than edges inside the object. `occ`
+separates them much more strongly, but it also behaves like pruning: one
+pass loses recall, and every one-pass `occ` cell is below REF (best 0.7859,
+`G_occ_g05_n1`; 0.7760 at γ = 2). The milder `cv` reweighting keeps object
+completion and trims leakage, which is why it wins.
+
+### SG4: SA regions labelled by CA
+
+| Screen | Frozen | Votes | OOF |
+|---|---|---:|---|
+| SG4-W | `W/REF` | 5/5 | 0.7873 |
+| *SG4-T (diagnostic)* | *`T/REF`* | *5/5* | *0.8496* |
+
+- **No labelling reaches REF:** best class-word cell `SPEC32_rmean` 0.7898,
+  against 0.7886 in-sample. Labels from the seed alone (`cmean`, `cmed`) are
+  lower.
+- **The regions themselves are good.** With oracle labels (a region counts as
+  object when at least half of it is object), VOC-Sim reaches 0.80–0.88
+  (SPEC 0.833 / 0.859 / 0.876, ROWS 0.803 / 0.853 / 0.878 for K 8 / 16 / 32)
+  and COCO-Cap 0.61–0.80 (REF 0.617).
+- The bottleneck is therefore **labelling regions from CA evidence**, not the
+  partition. In cluttered COCO-Cap scenes, SA regions alone would leave
+  substantial headroom.
+
+**Comparison pages.** `outputs/segmentation/sg_visual_audit_claude/` (SG2: 56
+cells, SG4: 40 cells; first VOC-Sim image per class; the shared renderer).
+Inspection only.
+
+**Codex:** please review both packages. If SG2 is accepted, a locked
+confirmation of `W/G_cv_g20_n1` with DenseCRF, against FTF, is the natural
+next step, for the owners to decide.
