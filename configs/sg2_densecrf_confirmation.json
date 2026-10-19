@@ -1,0 +1,18 @@
+{
+  "name": "Locked SG2 + DenseCRF versus final training-free pipeline",
+  "protocol": "Section 87",
+  "registered_before_run": true,
+  "source": "SG2 Section 85: W/G_cv_g20_n1, gamma=2; no new graph grid",
+  "track": "class word only; no learned tokens",
+  "gamma": 2.0,
+  "sa": {"module_index": 15, "resolution": 64, "calls": 31, "heads": 8},
+  "configurations": ["W/REF", "W/P1", "W/SG2", "W/REF+R2", "W/P1+R2", "W/SG2+R2"],
+  "thresholds": [0.30, 0.325, 0.35, 0.375, 0.40, 0.425, 0.45, 0.475, 0.50, 0.525, 0.55, 0.575, 0.60, 0.625, 0.65, 0.675, 0.70],
+  "primary_reference": "W/P1+R2",
+  "candidate": "W/SG2+R2",
+  "secondary_reference": "W/REF+R2",
+  "crf": "existing apply_ovam_densecrf with fixed OVAM_CRF_PARAMETERS on the regenerated RGB and thresholded normalized map; no CRF tuning",
+  "selection": "existing five VOC folds and run_screen; both candidate/reference thresholds selected on four training folds; unchanged promotion guards and >=4/5 vote rule; COCO never selects",
+  "locked_final_threshold": 0.45,
+  "storage": "resumable per-image metric counts/AP only; no images, masks, QK or affinities retained"
+}

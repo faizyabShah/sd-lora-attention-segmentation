@@ -4564,3 +4564,67 @@ Reviewed from the committed package (`364eb42`), in Claude's environment
     of the variance.
 
 **Accepted.** Section 83's results and interpretation stand.
+
+## 87. Codex: locked SG2 + DenseCRF confirmation against FTF; Claude reviews
+
+**Owner authorization.** The owners request SG2 with DenseCRF to test whether
+it improves on the final training-free pipeline. Codex runs and reports;
+Claude independently reviews the implementation, reference reproduction,
+fold decisions and transfer before any paper/pipeline change. This is a new
+locked combination confirmation, not a continuation of SG2 parameter search.
+
+**Fixed methods.** Reuse the Section 85 winner `W/G_cv_g20_n1` exactly:
+`r=mean(A_i)/sqrt(mean(A_i^2))`, `G=rownorm(mean(A_i)*r^2)`, map `G c`.
+No new gamma, SA pass, head, call, layer or CRF grid is introduced. Use frozen
+CA C/R, SA module 15, all 31 calls/eight heads, conditional QK and class-word
+attribution only. No learned token is loaded. DenseCRF uses the same
+`apply_ovam_densecrf`, fixed OVAM parameters, regenerated RGB and binary unary
+from each thresholded normalized score map as the established R2 and FTF.
+
+**Six recomputed cells from each single generation:** one-pass `W/REF`,
+ordinary observation-wise two-pass `W/P1`, locked consensus `W/SG2`, and
+`+R2` for each. The primary comparison is **W/SG2+R2 versus W/P1+R2 (FTF)**.
+The secondary comparison versus **W/REF+R2** isolates the SG2 contribution
+when both receive identical postprocessing. The no-CRF cells verify that
+the prior SG2 result reproduces in the current package.
+
+**Selection and reporting.** All 490 VOC-Sim and 707 COCO-Cap images, the
+same fixed five VOC folds and threshold grid .30–.70 by .025. Existing
+`run_screen` rules apply independently to the primary and secondary
+comparison; candidate/reference thresholds are chosen on four training
+folds only. The unchanged promotion/class guards, >=4/5 votes and positive
+OOF guard decide whether to promote. Also report the locked candidate's OOF
+result on **every** held-out fold irrespective of promotion eligibility, so
+a positive but marginal gain is visible rather than replaced by REF in the
+selection summary. Label these two statistics separately.
+
+On full VOC select the threshold of each fixed cell, and transfer those
+thresholds to COCO. COCO never selects. Report full per-class IoUs/deltas,
+macro-class precision/recall, paired image-IoU intervals, fold choices and
+thresholds, plus fixed .35/.45/.55 scores. Explicitly report the established
+FTF at its **locked .45 threshold** alongside the framework-calibrated
+comparison, so its ~.637 COCO number is not confused with the ~.617 one-pass
+control. No claim of beating the final pipeline follows from beating REF
+alone. No continuous AP is defined for the post-CRF binary masks.
+
+**Correctness and storage.** The new locked SG2 helper is checked against
+independent direct equations and Claude's complete SG2 implementation on
+synthetic 31-call/eight-head data. The live smoke runs one image on each
+dataset and checks all thresholds of the three raw controls against Section
+85, and the two existing CRF controls against SG5's committed counts. Report
+maximum pixel drift; require <=.002 of an image. The same checks are repeated
+at finalization across all images. A smoke failure prevents full processing.
+Metric shards are atomic/resumable and record settings, commit and
+environment. Images, scores, QK, graphs and predictions are discarded after
+each image; only counts/AP and compact results are retained.
+
+**Files.** `configs/sg2_densecrf_confirmation.json`,
+`src/segmentation/consensus_graph.py`,
+`scripts/run_sg2_densecrf_confirmation.py`,
+`scripts/finalize_sg2_densecrf_confirmation.py`,
+`tests/test_consensus_graph.py`, and
+`jobs/run_sg2_densecrf_confirmation.slurm`. Outputs:
+`outputs/segmentation/controlled_attention_cv/sg2_densecrf_confirmation/`.
+One node-unconstrained GPU job requests 12 hours, 48 GB host RAM and 8 CPUs;
+it performs the numerical and live smoke gates, then VOC, COCO and finalization.
+It does not depend on or change the running SG11/SG12 experiment.

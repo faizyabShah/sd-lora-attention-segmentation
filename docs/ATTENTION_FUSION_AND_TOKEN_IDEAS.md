@@ -495,3 +495,15 @@ Submission: **job `234894`**, one GPU / 12 hours / scheduler-selected node,
 registered at commit `25cfe69b0`. CPU numerical and full-report synthetic
 integration checks passed; live smoke checks are inside the submitted job.
 See protocol Section 84 for the contract and validation details.
+
+## 13. SG2 + DenseCRF: locked final-pipeline confirmation (Codex runs)
+
+Owners authorized after Section 85 results; protocol **Section 87** registers
+this before running. Test the selected **G_cv, gamma=2, one pass** with the
+existing fixed DenseCRF. Primary reference is final **two-pass SA + DenseCRF
+(FTF)**; secondary reference is one-pass + DenseCRF. Six cells include the
+three corresponding raw maps. No new SG2/CRF grid, token optimization or
+learned token. VOC five-fold selection and frozen-threshold COCO transfer
+follow the common framework; the locked FTF @.45 anchor is also explicit.
+Codex submits and reports; Claude verifies before paper integration.
+The SG11/SG12/SG-Diag run continues independently.
