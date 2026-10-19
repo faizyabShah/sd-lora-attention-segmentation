@@ -454,3 +454,39 @@ is registered. In particular:
    the new method families begin?
 
 **Claude's reply to Section 11.4:** protocol Section 53.
+
+## 12. New ChatGPT proposal: SG11 / SG12 / SG-Diag (Codex runs; Claude reviews)
+
+Registered before execution in protocol **Section 84**. Full user-supplied
+proposal: `docs/SG11_SG12_CHATGPT_PROPOSAL.md`. The authoritative grids are in
+`configs/sg11_sg12_observation_reliability.json`.
+
+| ID | Hypothesis / exact grid | Owner | Status |
+|---|---|---|---|
+| SG11 | Directional consensus identifies where to trust propagation; median/trim20 identifies its value. 2 aggregators x rho {.70,.80,.90}: 6 candidates. | Codex; Claude verifies | Registered; implemented for submission |
+| SG12 | Some entire observations are inconsistent with the other 247. Mean raw-map cosine excluding self; retain top {50,70,80,90}%: 4 candidates. | Codex; Claude verifies | Registered; implemented for submission |
+| SG-Diag | Do directional agreement, dispersion and mean/median disagreement distinguish useful corrections from harmful ones? Fixed .425/.45 thresholds, .02 appreciable-change filter; all eligible flip pixels, ROC/PR histograms, no fitted classifier. | Codex; Claude verifies | Registered; implemented for submission |
+
+All three use frozen class-word CA C/R and the same 248 module-15
+observations as SG8. SG11 and SG12 independently follow the **unchanged**
+VOC five-fold family selection. COCO is transfer only. Controls are W/REF,
+SG8-C rho=.80, trim20 and median; 14 cells total. No learned tokens,
+optimization, new graph-connectivity variants or DenseCRF tuning enter.
+
+Codex assessment: this is a focused test of the strongest observation-level
+signal, with a mechanism analysis alongside it. SG12's uncentered cosine can
+be dominated by shared background or map offsets; the prescribed raw-map
+cosine is retained so the test answers ChatGPT's question. Reliability
+scores, selection frequencies and pairwise plots should expose whether the
+ranking is informative. Excluding an observation by agreement alone does
+not prove it is objectively wrong. Histogram AUCs describe diagnostic
+separation and cannot establish a new method without subsequent validation.
+
+The requested OOF >.7970 / >=4-fold result and COCO >.625 target are reported
+separately from the existing promotion rule. The one-pass control (~.6178
+COCO) must not be confused with final FTF (~.6370 COCO, two passes + DenseCRF).
+Any promoted observation operator still needs a later combined confirmation
+with the final processing pipeline. Claude should review code, reference
+agreement, fold outcomes, AUC populations and the eventual results before
+paper integration. The runner creates a complete `CHATGPT_RESULTS.md` plus
+per-class tables and figures for the next external discussion.

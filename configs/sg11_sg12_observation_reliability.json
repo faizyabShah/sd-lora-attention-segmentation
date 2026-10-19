@@ -1,0 +1,18 @@
+{
+  "name": "SG11 robust consensus, SG12 reliable observations, SG-Diag",
+  "protocol": "Section 84",
+  "registered_before_run": true,
+  "track": "W class word only; no learned tokens",
+  "sa": {"module_index": 15, "resolution": 64, "calls": 31, "heads": 8, "observations": 248},
+  "sg11": {"aggregators": ["median", "trim20"], "rhos": [0.7, 0.8, 0.9]},
+  "sg12": {"fractions": [0.5, 0.7, 0.8, 0.9], "score": "mean raw-map cosine to all other observations, excluding self", "count": "ceil(fraction*248)", "ties": "stable call-major head-minor order"},
+  "diagnostic": {"thresholds": [0.425, 0.45], "change_epsilon": 0.02, "near_seed_epsilon": 0.02, "histogram_bins": 1024, "definition": "binary CA-to-REF flips with abs(normalized_REF-normalized_CA)>epsilon; all features interpolated to annotation resolution; GT for diagnostic labels only", "combination": "directional_consensus/(1+abs(mean-median)/0.02); fixed before run"},
+  "thresholds": [0.30, 0.325, 0.35, 0.375, 0.40, 0.425, 0.45, 0.475, 0.50, 0.525, 0.55, 0.575, 0.60, 0.625, 0.65, 0.675, 0.70],
+  "normalization": "per-map minmax followed by bilinear upsampling, same as SG8",
+  "selection": "unchanged run_screen; independent SG11 and SG12 screens against W/REF; 5 fixed VOC folds; joint method/threshold selected on training folds only; >=4/5 vote and positive OOF guard",
+  "tie_break": "SG11 prefer larger rho then trim20; SG12 prefer more observations",
+  "additional_chatgpt_target": {"oof_strictly_above": 0.7970, "minimum_candidate_fold_votes": 4, "coco_descriptive_target_strictly_above": 0.625},
+  "visual_classes": ["aeroplane", "bird", "person", "chair", "dining-table", "sheep", "train"],
+  "visual_sampling": "first manifest image per named VOC class, chosen before new scores",
+  "storage": "resumable metric counts, per-class feature histograms, per-image reliability scores/selection, per-class pairwise sums; seven tiny temporary visual caches; no full attention or dataset-wide masks/images"
+}

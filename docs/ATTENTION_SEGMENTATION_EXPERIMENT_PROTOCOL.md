@@ -4268,3 +4268,140 @@ COCO transfer claim.
 Claude should independently verify the 40-shard contract, the 14 REF decisions,
 the C1/C2 interpretation and the reported VOC-to-COCO reversals before these
 results enter the paper.
+
+## 84. Codex: SG11, SG12 and SG-Diag; registered before running; Claude reviews
+
+**Owner instruction and handoff.** The owners authorize the new user-supplied
+ChatGPT proposal, preserved in `docs/SG11_SG12_CHATGPT_PROPOSAL.md`. Codex
+implements and runs all three studies in one shared streaming package. Claude
+should review their numerical implementation, input/reference reproduction,
+fold selection, diagnostic definitions and results after completion. These
+studies stay entirely in the class-word training-free track. Token
+optimization and released learned tokens remain paused; no new SG9/SG10 graph
+variant is included. Desired scores in the source proposal are hypotheses.
+
+**Unchanged input and selection.** CA is the frozen `C/R` specification in
+`configs/controlled_sa_seed_frozen.json`: resolutions 8/16/64, the registered
+11 CA modules, calls 0–30, all CA heads, conditional padded-77-token
+attribution, all target word pieces. SA is sorted module 15 (64x64), all 31
+calls and eight heads, giving 248 conditional `softmax(QK^T/sqrt(d))`
+observations. Retain transient vectors `z_i=A_i c`; no large affinity is
+saved. COCO uses the separately encoded class attribution prompt with the
+same padded softmax, as in the accepted transfer implementation.
+
+VOC-Sim's 490 images and existing five folds select. COCO-Cap's 707 images
+transfer only. Each family independently uses the existing `run_screen`
+selection against `W/REF`: select method and mask threshold on four training
+folds, evaluate the held-out fold, use the unchanged Section 5 improvement
+bands/class guards, then >=4/5 votes and a positive OOF guard. Thresholds
+are 0.30–0.70 in steps of .025. Normalization is per-map minmax, followed by
+bilinear upsampling to annotation resolution. COCO uses each cell's threshold
+chosen on full VOC only. All exploratory cell transfers are labelled; COCO
+never chooses a method, parameter, threshold or visual example.
+
+**Reference terminology.** This screen's `W/REF` is one SA pass **without
+DenseCRF** (approximately VOC 0.7888 / COCO 0.6178 at its VOC-best threshold
+.425). It is an internal operator comparison, not our final FTF pipeline.
+The established FTF is two observation-wise SA passes plus DenseCRF, with
+COCO 0.6370. SG8 `W/C/rho0p80` previously passed its own family screen
+(4/5, OOF 0.797014 versus 0.787508); it is included as a control, not silently
+substituted for REF or FTF. A new final-pipeline replacement would require a
+separate combined confirmation.
+
+**SG11: six candidates.** Robust aggregate is the conventional median
+(average of the two central values for 248 observations) or trim20 (remove
+`floor(.2*248)=49` observations from **each** pixel's tails). Define
+`r_up=mean(z_i>c)`, `r_down=mean(z_i<c)` and `r=max(r_up,r_down)`. Use the
+robust aggregate where `r>=rho`, otherwise retain `c`, for
+`rho in {.70,.80,.90}`. No per-observation normalization precedes aggregation.
+Within the existing .002 tie band prefer a higher rho, then trim20.
+
+**SG12: four candidates.** Independently per image/query, flatten raw
+propagated vectors and compute each observation's mean cosine similarity to
+all **other** observations. Exclude the diagonal; zero-vector cosine is
+zero. Keep the top 50/70/80/90%, using ceil(fraction*248), respectively
+124/174/199/224 observations. Average the retained **raw** vectors, then use
+the usual map normalization. Stable score ties follow zero-based call-major,
+head-minor order. The fold tie preference is more observations. No labels,
+learned reliability weights or soft-weight temperature enter this operator.
+
+**Controls and declared targets.** Recompute `W/REF`, `W/C/rho0p80`,
+`W/A/trim20`, `W/A/median` in the same run: 14 cells total. Report the unchanged
+protocol decision and, separately, ChatGPT's requested target of OOF >.7970
+and >=4/5 candidate votes. COCO >.625 is a descriptive transfer target only,
+never a promotion gate. The historical SG8 family outcomes are included for
+context. Four-control agreement with historical per-image counts is checked
+for all thresholds; maximum count drift must be <=.002 of an image on both
+smoke samples and the final full dataset, to allow GPU/environment rounding.
+Raw drift is reported, even when within tolerance.
+
+**SG-Diag; not method selection.** Use fixed mask thresholds .425 and .45;
+.425 is the already-known full-VOC REF optimum, and .45 preserves continuity.
+On annotation-resolution pixels where minmax-REF and minmax-CA differ by
+>.02, classify their binary membership flips as TP additions, FP additions,
+correct foreground removals (GT background) or incorrect foreground removals
+(GT foreground). Report appreciable pixels, all flips, and eligible flips so
+the population is explicit. Flips are required because a continuous change
+that does not change the binary prediction has no binary benefit/harm.
+
+Features are `r_up`, `r_down`, max consensus, direction-specific consensus,
+population std, conventional MAD, IQR, raw median-minus-seed,
+raw mean-minus-seed, absolute mean–median disagreement, fraction within .02
+of the seed, and normalized propagation magnitude. Also report the fixed,
+label-free combination `directional_consensus/(1+abs(mean-median)/.02)`;
+no classifier or fitted combination is trained. Interpolate raw feature maps
+to annotation resolution. For additions, direction-specific consensus is
+`r_up`; for removals it is `r_down`.
+
+Report ROC-AUC and step PR-AUC/AP for TP versus FP additions and for all
+useful versus harmful flips. Accumulate 1024-bin histograms over **all**
+eligible pixels (no sampling), with [0,1] bounds except [-1,1] for signed
+shifts. Report both feature directions explicitly, plus positive prevalence,
+pooled and per-class results on each dataset. AUCs are histogram
+approximations and undefined when either label is absent. GT is used only
+for these diagnostic labels and evaluation; it never enters propagation or
+reliability scoring. The diagnostic comparison to SG10 AUC is qualitative:
+SG10 used a different eligible-pixel definition.
+
+**Observation analysis and requested visuals.** Save per-image 248-element
+reliability and four selection indicators. Report mean reliability and
+selection frequency by module/call/head, head and call averages, score
+histograms, and the 248x248 mean pairwise agreement matrix separately on
+VOC and COCO. This identifies consistently excluded observations without
+claiming ground-truth evidence that a rejected head is intrinsically bad.
+
+Choose the first manifest image of aeroplane, bird, person, chair, dining
+table, sheep and train **before** new scores. Render all six SG11 candidates
+as image | CA seed | SG8-C | corresponding robust-only | SG11 | GT/prediction
+overlay; render SG12 with REF/top50/top70/fold-frozen result plus each
+candidate's mask. Every prediction uses its VOC threshold and shows sample
+IoU; the common image is the regenerated image used by this run. A temporary
+cache holds only these seven RGB/GT examples and 14 low-resolution maps,
+then is removed after sheets are rendered. No dataset-wide image/map/mask
+archive is written.
+
+**Outputs and execution.** Modules live in
+`src/segmentation/observation_reliability.py` and `propagation_diagnostics.py`;
+runner/finalizer are `scripts/run_sg11_sg12_observation_reliability.py` and
+`finalize_sg11_sg12_observation_reliability.py`. Config freezes the grids and
+contract. `jobs/run_sg11_sg12_observation_reliability.slurm` requests one GPU,
+48 GB **host RAM**, 8 CPUs, 12 hours, no node constraint. It performs independent
+CPU numerical checks and one live image on **each dataset**, validates all
+four SG8 controls and sidecars, then runs all 40 resumable class shards and
+finalizes. A smoke failure prevents production from starting. Requeue
+termination checkpoints between images; diagnostic commits are idempotent
+and precede metric commits to avoid partial or double-counted resume state.
+
+The figure-only `scripts/plot_observation_reliability.py` uses the existing
+`ovam_sdxl` CPU environment (overridable with `PLOT_PYTHON`), whose Matplotlib
+is absent from `trdp`; this does not change inference or metrics. Its imports
+are checked before production begins.
+
+Compact outputs go to
+`outputs/segmentation/controlled_attention_cv/sg11_sg12_observation_reliability/`:
+counts/AP, fold winners and decisions, every cell's full VOC/COCO mIoU,
+thresholds, recall/precision, all 20 per-class IoUs/deltas, fixed-threshold
+scores/AP, observation CSVs/figures, diagnostic histograms/AUCs and visual
+sheets. `CHATGPT_RESULTS.md` collects the full report for the owners' next
+ChatGPT discussion. Results enter the paper only after Claude's independent
+review; this registration makes no claim that any new method succeeds.
