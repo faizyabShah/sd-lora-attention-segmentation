@@ -4637,3 +4637,121 @@ rows). These synthetic fixtures are not new experimental results. Python
 compilation, Slurm shell syntax and diff checks passed. Live VOC/COCO smoke
 checks execute inside the submitted job before production. Claude should
 review the resulting package before adding any gain to the paper.
+
+## 88. Codex: SG13 target-conditioned region inference; Claude reviews
+
+**Owner instruction.** Test whether simple target-conditioned region
+labelling can recover the SG4 majority-oracle headroom. Codex implements and
+runs; Claude reviews numerical accuracy, selection and interpretation before
+paper integration. The queried class word remains the sole semantic target.
+This study adds no learned token/classifier, vocabulary assignment, synonyms,
+caption nouns, SG2 spreading, region growing or CRF to the candidate rules.
+
+**Partition fixed before this run.** Use **SPEC32**, the SG4 protocol's
+preferred partition type and its strongest full-VOC class-word cell
+(`W/SPEC32_rmean`, .7898 versus ROWS32_rmean .7892). This is a tuning-set
+choice and is not described as an independently validated partition winner:
+SG4 froze REF overall. No partition choice is made on COCO. Reuse the exact
+SG4 spectral operator (symmetric normalized mean SA graph, 32 leading
+row-normalized eigenvectors, deterministic k-means++ seed 0, 3 restarts,
+30 iterations). The existing k-means and region aggregation functions are
+moved intact to `src/segmentation/attention_regions.py`; SG4 imports those
+same implementations. A regression check compares SPEC32 labels with the
+existing SG4 partition routine on synthetic data.
+
+**Fixed inputs and exactly three candidate rules.** CA C/R, conditional
+padded class-word attribution, all word pieces; SA module 15 at 64x64,
+31 calls/eight heads. Let c be the existing minmax CA seed, mu the **raw**
+one-pass mean_i(A_i c), and q=max(mean_i[z_i>c],mean_i[z_i<c]). Per occupied
+region compute C=mean(c), P=mean(mu), Q=mean(q), M=max(c). The only scores
+are R1=P, R2=P*Q, and R3=.5*M+.5*P*Q. C is recorded for analysis, not used to
+introduce a fourth rule. No normalization is applied to mu before these
+formulas or to the resulting region scores.
+
+**Mask and score scale.** Threshold the raw region score, then expand region
+identities by nearest neighbor to annotation size. This implements the
+requested binary membership exactly and never blends across a region
+boundary. The legacy SG4 comparator keeps its original minmax score-map
+normalization and bilinear upsampling, so R1 is explicitly a literal raw
+region-threshold baseline, not a claim to reproduce SG4's calibration.
+Comparing R2/R3 with R1 diagnoses the added consensus/core evidence under
+the same hard-region convention.
+
+Because raw P, P*Q and M mixtures all lie in [0,1] but can occupy ranges well
+below .30, preregister **0–1 inclusive by .005** for the three candidate
+score thresholds. This is one global threshold per rule; no per-image or
+per-class threshold. The normalized legacy controls retain their original
+**.30–.70 by .025** grid. `best_threshold`/`run_screen` gain an optional
+per-cell threshold-index argument to express these registered ranges; the
+default is unchanged for every existing package and is regression tested.
+The expanded threshold domain is a declared score-calibration requirement,
+not a post-result adjustment or an extra learned decision rule.
+
+**Five-fold selection and transfer.** Reuse the fixed 490-image VOC folds,
+training-fold-only method/threshold choice, unchanged promotion bands/class
+loss guards, >=4/5 votes and positive OOF guard. Screen R1/R2/R3 independently
+against W/REF and jointly as a three-rule family; within .002 prefer R1,
+then R2, then R3. Report fold winners, selected-path OOF/reference mIoU,
+gain, vote counts and frozen winner. Also report every forced rule's OOF
+score and region diagnostics using training-fold-selected thresholds even
+when no rule is promoted. COCO's 707 images use the full-VOC-frozen threshold
+of each cell and never select anything. The owners' >=4 votes, OOF gain
+>=.005 and positive COCO delta are a separately reported **promising target**;
+COCO cannot influence the protocol's freeze decision.
+
+**Controls.** Recompute W/REF, ordinary observation-wise two-pass W/P1,
+legacy W/SPEC32_rmean and SG8-C rho=.80 from the same generation: seven
+cells total including R1/R2/R3. Include Section 85's selected SG2 one-pass
+result as a **historical, matched-dataset comparator**, labelled with its
+source environment and VOC threshold. Do not add its operator to SG13.
+Both datasets' raw reference curves must reproduce within .002 of image
+pixels at all original thresholds. Record legacy SG4 drift separately and
+require <=.01, allowing eigensolver/clustering boundary differences across
+environments; numerical partition equality is checked on synthetic inputs.
+The smoke gate and finalizer both run these checks.
+
+**Region diagnostics and oracle.** Ground truth is used only for metrics.
+Reproduce SG4's diagnostic: nearest-downsample GT to 64x64 and declare an
+occupied region positive at >=50% target pixels. Empty clusters are
+excluded. Record region-level TP/FP/FN, foreground-region counts per image,
+missed oracle-positive and selected oracle-negative regions, pooled region
+precision/recall, and per-class summaries. For VOC provide both full-VOC
+threshold diagnostics and forced-rule OOF diagnostics. COCO uses frozen VOC
+thresholds. Save at most 32 C/P/Q/M values, three score vectors, region areas,
+GT fractions and oracle counts per image; no full maps/masks are archived.
+
+Compare actual **mean-image IoU** with the current-run SPEC32 majority
+oracle and the historical SG4 oracle (.8761 VOC/.7918 COCO). Report current
+partition/oracle drift, absolute oracle gap, and the fraction of the legacy
+SG4 gap closed, keeping negative fractions. These comparisons use the same
+mean-image metric, not class-mIoU. Majority labelling optimizes pixel
+accuracy per region and is **not an IoU-optimal upper bound**. Report it as
+the same GT-assisted SG4 diagnostic, never as a usable prediction method.
+
+**Visual examples.** First manifest image of aeroplane, bird, person, chair,
+dining-table and boat, fixed before this run. Boat is another strong SG2
+improvement class. Each sheet contains all three rules and eight panels:
+image | fixed partition | CA seed | raw propagated CA | SG8 consensus |
+raw per-region score | predicted regions | oracle-positive regions with GT
+boundary. Heatmaps have a fixed 0–1 scale; prediction labels show threshold
+and IoU. Six small temporary caches are deleted after final rendering.
+
+**Code and execution.** Config `configs/sg13_target_region_inference.json`;
+reusable `attention_regions`, `target_region_inference`, `region_diagnostics`
+and `region_visualization` modules; runner/finalizer
+`scripts/run_sg13_target_region_inference.py` and
+`scripts/finalize_sg13_target_region_inference.py`. Runner
+`jobs/run_sg13_target_region_inference.slurm` requests one available GPU,
+48 GB host RAM, eight CPUs and 12 hours, with per-image atomic checkpoints
+and requeue support. Numerical tests and live VOC/COCO smoke checks precede
+40 production class shards and finalization in one job, without external
+dependencies. SG11/SG12 and SG2+CRF continue independently.
+
+Compact outputs go to
+`outputs/segmentation/controlled_attention_cv/sg13_target_region_inference/`:
+report/summary/folds, all 20 class IoUs and REF deltas, macro recall/precision,
+per-image and per-class region errors, current/historical oracle comparisons,
+six sheets, and `CHATGPT_RESULTS.md` for the owners' external discussion.
+Claude should independently review the literal scores, distinct candidate
+and legacy threshold ranges, hard-region masks, selection guards and
+GT-only oracle usage before interpreting the outcome.

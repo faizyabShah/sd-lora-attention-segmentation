@@ -1,0 +1,20 @@
+{
+  "name": "SG13 target-conditioned region inference",
+  "protocol": "Section 88",
+  "registered_before_run": true,
+  "partition": "SPEC32, fixed from VOC SG4 evidence and protocol preference; no partition selection on COCO",
+  "sa": {"module_index": 15, "resolution": 64, "calls": 31, "heads": 8, "observations": 248},
+  "configurations": ["W/REF", "W/P1", "W/SG4/SPEC32_rmean", "W/C/rho0p80", "W/SG13/R1", "W/SG13/R2", "W/SG13/R3"],
+  "rules": {"R1": "P", "R2": "P*Q", "R3": "0.5*M+0.5*P*Q"},
+  "scale": "c is the standard minmax CA seed; mu is raw mean_i A_i*c; Q is raw directional consensus; region scores are not renormalized",
+  "candidate_thresholds": "0 through 1 inclusive by 0.005; one global score threshold selected on VOC training folds",
+  "control_thresholds": [0.30, 0.325, 0.35, 0.375, 0.40, 0.425, 0.45, 0.475, 0.50, 0.525, 0.55, 0.575, 0.60, 0.625, 0.65, 0.675, 0.70],
+  "mask": "threshold each raw region score, then nearest-neighbor expand region identities to annotation resolution; no bilinear boundary blending for SG13",
+  "control_mask": "legacy per-map minmax then bilinear upsampling and thresholding, exactly as existing results",
+  "oracle": "SG4 majority oracle: GT nearest-downsampled to 64x64; occupied region positive at >=50% GT target; oracle mask nearest-expanded to annotation size",
+  "selection": "existing VOC five folds and run_screen promotion/class guards; independent R1/R2/R3 screens plus joint three-rule screen, tie preference R1 then R2 then R3; controls retain original thresholds",
+  "visual_classes": ["aeroplane", "bird", "person", "chair", "dining-table", "boat"],
+  "visual_sampling": "first manifest image per named VOC class; boat is an additional strong SG2-improvement class",
+  "storage": "atomic counts/AP plus per-image at-most-32 region quantities/scores/GT fractions and oracle counts; six tiny temporary visual caches only",
+  "promising_target": {"minimum_candidate_fold_votes": 4, "minimum_oof_gain": 0.005, "positive_coco_delta": true}
+}

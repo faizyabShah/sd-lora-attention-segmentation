@@ -21,13 +21,18 @@ at least half of its 64x64 pixels are object, scored at annotation resolution.
 from __future__ import annotations
 
 import math
+import sys
 from pathlib import Path
 
 import numpy as np
 import torch
 import torch.nn.functional as F
 
+
 ROOT = Path(__file__).resolve().parents[3]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from src.segmentation.attention_regions import kmeans, region_map
 NAME = "sg4"
 CONFIG = ROOT / "configs" / "sg4_region_labels.json"
 OUT = ROOT / "outputs" / "segmentation" / "controlled_attention_cv" / "sg4_region_labels"
@@ -48,28 +53,6 @@ def reference_for(cell: str) -> str:
     return f"{cell.split('/')[0]}/REF"
 
 
-def kmeans(x: torch.Tensor, k: int, restarts: int = 3, iterations: int = 30, seed: int = 0) -> torch.Tensor:
-    """Deterministic k-means (squared Euclidean) with k-means++ initialization; returns labels [N]."""
-    g = torch.Generator(device="cpu").manual_seed(seed)
-    best, best_inertia = None, float("inf")
-    n = x.shape[0]
-    for _ in range(restarts):
-        centers = x[torch.randint(n, (1,), generator=g).item()][None]
-        for _ in range(k - 1):
-            d = torch.cdist(x, centers).min(dim=1).values ** 2
-            probs = (d / d.sum().clamp_min(1e-30)).cpu()
-            centers = torch.cat([centers, x[torch.multinomial(probs, 1, generator=g).item()][None]])
-        for _ in range(iterations):
-            labels = torch.cdist(x, centers).argmin(dim=1)
-            new = torch.zeros_like(centers).index_add_(0, labels, x)
-            counts = torch.bincount(labels, minlength=k).to(x.dtype)[:, None]
-            centers = torch.where(counts > 0, new / counts.clamp_min(1), centers)
-        labels = torch.cdist(x, centers).argmin(dim=1)
-        inertia = float(((x - centers[labels]) ** 2).sum())
-        if inertia < best_inertia:
-            best, best_inertia = labels, inertia
-    return best
-
 
 def partitions(mean: torch.Tensor) -> dict[str, torch.Tensor]:
     s = (mean + mean.T) / 2
@@ -85,18 +68,6 @@ def partitions(mean: torch.Tensor) -> dict[str, torch.Tensor]:
     return out
 
 
-def region_map(labels: torch.Tensor, values: torch.Tensor, how: str) -> torch.Tensor:
-    k = int(labels.max()) + 1
-    if how == "mean":
-        sums = torch.zeros(k, device=values.device).index_add_(0, labels, values)
-        score = sums / torch.bincount(labels, minlength=k).clamp_min(1).to(values.dtype)
-    else:
-        score = torch.zeros(k, device=values.device)
-        for r in range(k):
-            sel = values[labels == r]
-            if sel.numel():
-                score[r] = sel.median() if sel.numel() % 2 else sel.sort().values[sel.numel() // 2 - 1: sel.numel() // 2 + 1].mean()
-    return score[labels]
 
 
 @torch.inference_mode()

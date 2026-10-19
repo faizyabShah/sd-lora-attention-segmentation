@@ -511,3 +511,29 @@ The SG11/SG12/SG-Diag run continues independently.
 Submitted as **job `234907`** (source commit `0ae0e6d87`), one GPU / 12 hours,
 no node constraint. Numerical and report-integration checks passed. The job
 runs live smoke checks before all 40 class shards. Claude reviews results.
+
+## 14. SG13 target-conditioned region inference (Codex runs; Claude reviews)
+
+Owners authorize this follow-up to SG4; **protocol Section 88** and
+`configs/sg13_target_region_inference.json` register the exact contract.
+Fix SPEC32 from prior VOC evidence/protocol preference. Test only R1=P,
+R2=P*Q, R3=.5*M+.5*P*Q, with raw propagated CA P, directional consensus Q
+and maximum CA core M. Threshold whole regions; no SG2 spreading, CRF,
+learned tokens/classifier or generic vocabulary assignment enters a rule.
+
+Candidate raw scores use a preregistered global threshold grid 0–1 by .005;
+legacy normalized controls retain their original .30–.70 by .025 grid.
+All selection uses the same five VOC folds and promotion guards. COCO is
+transfer only. Test three independent families and their joint choice;
+report forced-rule OOF scores as well as the selected path. The requested
+>=4 votes / >=.005 OOF / positive transfer target is descriptive, and never
+lets COCO choose the winner.
+
+Controls: W/REF, W/P1, legacy SPEC32_rmean, SG8-C rho=.80; selected SG2 is a
+historical comparator, not added inference. Report region inclusion/miss
+errors, recall/precision, all class deltas, and actual versus majority-oracle
+**mean-image IoU**, with consistent metrics. Oracle majority labels are GT
+assisted and do not imply an IoU-optimal upper bound. First images of six
+fixed VOC classes supply eight-panel sheets for all three rules. Codex
+submits, then Claude reviews before any paper/pipeline update. A future
+SG2-based region interaction test remains unregistered and is not included.

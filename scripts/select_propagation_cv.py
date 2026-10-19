@@ -31,10 +31,13 @@ def miou(results, configuration, threshold_index, mask):
     return float(np.mean(list(class_ious(results, configuration, threshold_index, mask).values())))
 
 
-def best_threshold(results, configuration, mask):
-    scores = [miou(results, configuration, i, mask) for i in range(len(results.thresholds))]
+def best_threshold(results, configuration, mask, threshold_indices=None):
+    indices = list(range(len(results.thresholds))) if threshold_indices is None else list(threshold_indices)
+    if not indices:
+        raise ValueError("At least one eligible threshold is required")
+    scores = {i: miou(results, configuration, i, mask) for i in indices}
     index = max(
-        range(len(scores)),
+        indices,
         key=lambda i: (scores[i], -abs(results.thresholds[i] - 0.45), -results.thresholds[i]),
     )
     return index, scores[index]
@@ -78,7 +81,11 @@ def image_ious(counts):
     return np.where(union > 0, counts[:, 0] / np.maximum(union, 1), 1.0)
 
 
-def run_screen(results, reference_name, candidates, inclusiveness):
+def run_screen(results, reference_name, candidates, inclusiveness, threshold_indices=None):
+    # Optional preregistered per-cell grids; the default reproduces all existing screens.
+    allowed = threshold_indices or {}
+    def choose_threshold(index, mask):
+        return best_threshold(results, index, mask, allowed.get(results.configurations[index]))
     reference = results.index(reference_name)
     folds = []
     oof = np.zeros((len(results.image_ids), 4), dtype=np.int64)
@@ -86,11 +93,11 @@ def run_screen(results, reference_name, candidates, inclusiveness):
     for fold in range(base.FOLD_COUNT):
         held = results.folds == fold
         train = ~held
-        ref_t, ref_train = best_threshold(results, reference, train)
+        ref_t, ref_train = choose_threshold(reference, train)
         assessments = []
         for name in candidates:
             index = results.index(name)
-            cand_t, cand_train = best_threshold(results, index, train)
+            cand_t, cand_train = choose_threshold(index, train)
             item = assess(results, reference, index, ref_t, cand_t, train)
             assessments.append(
                 {"name": name, "index": index, "threshold_index": cand_t,
@@ -147,8 +154,8 @@ def run_screen(results, reference_name, candidates, inclusiveness):
         why = "fold vote and OOF guard passed"
     full_mask = np.ones(len(results.image_ids), dtype=bool)
     frozen_index = results.index(frozen)
-    frozen_t, frozen_full = best_threshold(results, frozen_index, full_mask)
-    reference_t, reference_full = best_threshold(results, reference, full_mask)
+    frozen_t, frozen_full = choose_threshold(frozen_index, full_mask)
+    reference_t, reference_full = choose_threshold(reference, full_mask)
     return {
         "reference": reference_name,
         "candidates": candidates,
