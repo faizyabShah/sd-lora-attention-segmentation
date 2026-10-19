@@ -4161,3 +4161,46 @@ cell, each at its all-VOC threshold. They go to
 - `index_claude_visuals.py`
 - `jobs/narmyn/sg2_sg4/run_renyi.slurm`: one job runs production, both
   finalizers, then the pages
+
+## 82. Owners' direction: training-free Track-A backlog; Codex runs, Claude reviews
+
+The owners now pause token optimization, released optimized tokens, few-shot
+support selection, LoRA and other trained variants. New method work uses only
+frozen SD 1.5 class-word cross-attention and its native self-attention. Track B
+is excluded from this phase. SAM (`X1`) is also excluded because it is an
+externally trained segmenter. Earlier few-shot evidence remains in the record,
+but it cannot select or condition this package.
+
+Claude already owns SG2 and SG4 under Section 81, so Codex will not duplicate
+them. In particular, Claude's SG4 contains the registered row-clustering and
+spectral-clustering ideas (`G3` and `G2`). Codex's combined package contains
+the remaining executable Track-A backlog families: `P3`, `P5`, `P9`, `F2`,
+`BG1`, `W1`, `W2`, `W4`, `H1`, `G1`, `G4`, `M1`, `M2`, and `R1`. Exact
+definitions and grids are frozen in `configs/training_free_backlog.json`.
+The official DiffSeg merging rule (16x16 anchors, three symmetric-KL merge
+rounds, thresholds 0.9/1.1, no k-means refinement) is transcribed for `G1`,
+but it operates on the frozen pair's mean module-15 graph so it remains a
+controlled comparison.
+
+`C1` and `C2` are computed from the same stored counts without another model
+run. Because they select thresholds or operators using VOC annotations, they
+are labelled diagnostics and cannot be promoted as label-free methods.
+External-method reproduction `Q7`, and the unregistered `SG6/SG7` sketches,
+are outside this package. The single-class prompts do not provide the
+competing concepts needed to define `SG7` without a new prompt intervention.
+
+The common reference is the frozen class-word pair: CA `C/R`, SA module 15 at
+64x64, all 31 calls, all eight heads, conditional QK probabilities, one pass
+`mean_i(A_i c)`. Each family independently selects its parameter and mask
+threshold inside the five fixed VOC-Sim folds under the existing 4/5 vote and
+OOF guard. COCO-Cap is transfer-only and uses settings and thresholds frozen
+on VOC-Sim. The runner writes only resumable per-image counts/AP and compact
+summaries; images, attention maps, Q/K, affinities, masks and clusters are
+released after each image.
+
+Codex implements, smoke-tests, submits and reports this package in one Slurm
+job without a node constraint, allowing the scheduler to choose an available
+GPU node. Claude should independently review the committed registration,
+implementation, reference reproduction, fold decisions and transfer report
+after results are pushed. Neither agent should mix optimized-token results
+into this package or the training-free paper table.
