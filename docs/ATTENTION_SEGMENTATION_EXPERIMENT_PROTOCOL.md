@@ -451,6 +451,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | SG8 observation consensus | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; W sign consensus rho=.80 and T median freeze; variance and expansion-only gates fail (Sections 73, 78) | jobs `234511`--`234516`; `outputs/segmentation/controlled_attention_cv/sg8_observation_consensus/` |
 | SG9 reciprocal propagation | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; reference wins both tracks 5/5, so no reciprocal operator freezes (Sections 74, 78) | jobs `234535`--`234538`; `outputs/segmentation/controlled_attention_cv/sg9_reciprocal_propagation/` |
 | Locked SG3 / SG8 / SG9 review | Claude | Accepted: contracts, byte-for-byte regeneration, operators and tie-breaks match the registrations (Section 80) | this commit |
+| SG2 consensus-edge graph and SG4 SA regions, standalone (Narmeen's request) | Claude runs; Codex reviews | Registered before the run (Section 81) | this commit; `configs/sg2_consensus_edges.json`, `configs/sg4_region_labels.json` |
 
 ### Pre-sync exploratory run
 
@@ -4043,3 +4044,120 @@ dilute the vote.
 **Accepted.** Section 78's results and interpretation stand. Neither frozen
 SG8 cell has been combined with DenseCRF or the few-shot system; that would
 be a new locked confirmation, for the owners to decide.
+
+## 81. Claude: SG2 and SG4 as standalone families, registration (before any production run)
+
+**Decision.** At Narmeen's request, Claude runs SG2 and SG4, the two
+remaining unrun graph families of registry Section 11, each **independently of
+every other SG family**.
+
+- SG2 is no longer conditional on SG1 (Section 59).
+- No SG3, SG5, SG8, SG9 or SG10 operation, and no DenseCRF, enters either
+  family.
+- Hyperparameters draw only on what earlier packages showed worked or failed
+  (stated per family).
+- Under Section 68, Faiz is the other owner. Codex: please review, and
+  Faiz's agreement is recorded when given.
+
+**Common setup.**
+
+- The frozen CA seed `c`, SA module 15 (all 31 calls × 8 heads, conditional
+  QK), class-word `W` and released-token `T` tracks, screened separately.
+- VOC-Sim selects (protocol v1.2, fold-chosen thresholds, at least 4/5 votes
+  and a positive OOF gain); COCO-Cap is transfer only, each cell at its
+  all-VOC threshold.
+- The inputs and recorder are SG10's: the smoke test shows `seed`, `REF` and
+  `P1` bit-identical to SG10's on both datasets.
+- Environment (R7): renyi only, env `gen`, torch 2.4.1+cu121.
+
+### SG2: consensus-edge SA graph (`configs/sg2_consensus_edges.json`)
+
+**Reliability of every edge** (p, q), exact and dense, streamed over the 248
+observations; no top-k:
+
+- `cv` = `mean_i A_i / sqrt(mean_i A_i²)` = `1/sqrt(1 + CV²)`: 1 when all
+  observations agree, small when a few dominate;
+- `occ` = `(#{i : A_i(p, q) > 1/4096} + 0.5) / 249`: the share of
+  observations in which the edge is above uniform. It never reaches 0, so no
+  edge is removed.
+
+**Edges are reweighted, never pruned** (top-k pruning hurt monotonically,
+P6): weights `A · r^γ`, γ ∈ {0.5, 1, 2}, in two forms:
+
+| Form | One pass | Two passes |
+|---|---|---|
+| `G`: one consensus graph `W = rownorm(Ā · r^γ)` | `W c` | `W (W c)` |
+| `O`: per observation `Ã_i = rownorm(A_i · r^γ)` | `mean_i Ã_i c` | `mean_i Ã_i² c` |
+
+The `O` form is included because observation-wise propagation beat
+mean-graph propagation (P1 against W3).
+
+**Cells and screens.**
+
+- 12 one-pass and 12 two-pass candidates per track, plus `seed`, `REF`, `P1`
+  and the diagnostic `MG2` (`Ā² c`): 28 per track, 56 in total.
+- Four screens: one-pass candidates against `REF`, two-pass against `P1`,
+  per track.
+- **Tie order** within 0.002: γ 0.5 > 1 > 2, then `cv` > `occ`, then `G` > `O`.
+
+**Mechanism diagnostic.** The `Ā`-weighted mean reliability of
+object→object, object→background, background→object and
+background→background edges (GT at 64×64). SG2's premise is that leakage
+edges (background → object) are less reliable than object → object edges.
+
+### SG4: segment with SA, label with CA (`configs/sg4_region_labels.json`)
+
+**Partitions** (from SA only, shared by both tracks):
+
+- `SPEC`: k-means on the K leading, row-normalized eigenvectors of
+  `D^-1/2 S D^-1/2`, `S = (Ā + Āᵀ)/2`;
+- `ROWS`: k-means on the L2-normalized rows of `Ā`;
+- K ∈ {8, 16, 32}. Deterministic k-means: k-means++ from seed 0, 3 restarts,
+  30 iterations, lowest inertia kept.
+
+**Labels.** Each region takes one score: `cmean` (mean of `c`), `cmed`
+(median of `c`) or `rmean` (mean of `REF`). The map is piecewise constant.
+
+- K spans coarse to fine because the visual audit shows region-scale errors
+  (filled gaps; context such as chairs).
+- `rmean` is included because one-pass SA is the frozen evidence.
+
+**Cells and screens.**
+
+- 18 candidates per track, plus `seed` and `REF`: 40 cells.
+- One screen per track, against `REF`.
+- **Tie order:** `cmean` > `cmed` > `rmean`, then `SPEC` > `ROWS`, then
+  K 8 > 16 > 32.
+
+**Mechanism diagnostic.** The oracle-region IoU per partition: a region is
+labelled object when at least half its 64×64 pixels are object, scored at
+annotation resolution. This bounds what any region labelling can reach.
+
+**Both families' diagnostics:** new TP / new FP against the seed (the AN1
+ratio) and against each cell's reference, at 0.45.
+
+**Comparison pages.** As in the shared audit (`src/segmentation/sg_visual_audit.py`,
+Codex's renderer, unchanged): the first VOC-Sim image of every class, every
+cell, each at its all-VOC threshold. They go to
+`outputs/segmentation/sg_visual_audit_claude/` with their own index
+(`index_claude_visuals.py`), so the shared audit index is not modified.
+
+**Smoke.**
+
+- Job `234854` (renyi, 1 VOC-Sim and 1 COCO-Cap image per family): all 56 / 40
+  cells written; about 16–22 s per image.
+- `W`/`T` `seed`, `REF` (and `P1` for SG2) are bit-identical to SG10's.
+- Diagnostics present and plausible: on the COCO-Cap person, the coarse
+  partitions have oracle IoU 0 because the object is smaller than any region.
+- Visual smoke `234855` renders both families' pages.
+- Output outside the repository; no choice made from it.
+
+**Files.**
+
+- `scripts/narmyn/attention/sg2_consensus_edges.py` and
+  `sg4_region_labels.py` (operators and self-tests)
+- `run_claude_sg.py` (runner)
+- `finalize_claude_sg.py`
+- `index_claude_visuals.py`
+- `jobs/narmyn/sg2_sg4/run_renyi.slurm`: one job runs production, both
+  finalizers, then the pages

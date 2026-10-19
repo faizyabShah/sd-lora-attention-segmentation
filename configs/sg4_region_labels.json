@@ -1,0 +1,119 @@
+{
+  "family": "SG4 segment with SA, label with CA (standalone)",
+  "protocol": "protocol Section 81; registry Section 11 (SG4)",
+  "registered_before_run": true,
+  "independent_of": "every other SG family; uses only the frozen CA seed, frozen SA module 15 and the released token",
+  "partitions": {
+    "SPEC": "k-means on the K leading, row-normalized eigenvectors of D^-1/2 S D^-1/2, S = (A_bar + A_bar^T)/2",
+    "ROWS": "k-means on the L2-normalized rows of A_bar"
+  },
+  "K": [
+    8,
+    16,
+    32
+  ],
+  "kmeans": "k-means++ from seed 0, 3 restarts, 30 iterations, lowest inertia",
+  "labels": {
+    "cmean": "mean CA seed in the region",
+    "cmed": "median CA seed",
+    "rmean": "mean REF (mean_i A_i c) in the region"
+  },
+  "informed_by": "no DenseCRF, no other SG; K spans coarse to fine because the visuals show region-scale errors (filled gaps, context such as chairs); region labels from the frozen seed, as registered, and from REF because one-pass SA is the frozen evidence",
+  "reported_not_selected": [
+    "seed",
+    "oracle region labels (diagnostic)"
+  ],
+  "screens": [
+    {
+      "name": "SG4-W",
+      "reference": "W/REF",
+      "candidates": [
+        "W/SPEC8_cmean",
+        "W/SPEC8_cmed",
+        "W/SPEC8_rmean",
+        "W/SPEC16_cmean",
+        "W/SPEC16_cmed",
+        "W/SPEC16_rmean",
+        "W/SPEC32_cmean",
+        "W/SPEC32_cmed",
+        "W/SPEC32_rmean",
+        "W/ROWS8_cmean",
+        "W/ROWS8_cmed",
+        "W/ROWS8_rmean",
+        "W/ROWS16_cmean",
+        "W/ROWS16_cmed",
+        "W/ROWS16_rmean",
+        "W/ROWS32_cmean",
+        "W/ROWS32_cmed",
+        "W/ROWS32_rmean"
+      ],
+      "inclusiveness": {
+        "W/SPEC8_cmean": 323,
+        "W/SPEC8_cmed": 223,
+        "W/SPEC8_rmean": 123,
+        "W/SPEC16_cmean": 322,
+        "W/SPEC16_cmed": 222,
+        "W/SPEC16_rmean": 122,
+        "W/SPEC32_cmean": 321,
+        "W/SPEC32_cmed": 221,
+        "W/SPEC32_rmean": 121,
+        "W/ROWS8_cmean": 313,
+        "W/ROWS8_cmed": 213,
+        "W/ROWS8_rmean": 113,
+        "W/ROWS16_cmean": 312,
+        "W/ROWS16_cmed": 212,
+        "W/ROWS16_rmean": 112,
+        "W/ROWS32_cmean": 311,
+        "W/ROWS32_cmed": 211,
+        "W/ROWS32_rmean": 111
+      }
+    },
+    {
+      "name": "SG4-T",
+      "reference": "T/REF",
+      "candidates": [
+        "T/SPEC8_cmean",
+        "T/SPEC8_cmed",
+        "T/SPEC8_rmean",
+        "T/SPEC16_cmean",
+        "T/SPEC16_cmed",
+        "T/SPEC16_rmean",
+        "T/SPEC32_cmean",
+        "T/SPEC32_cmed",
+        "T/SPEC32_rmean",
+        "T/ROWS8_cmean",
+        "T/ROWS8_cmed",
+        "T/ROWS8_rmean",
+        "T/ROWS16_cmean",
+        "T/ROWS16_cmed",
+        "T/ROWS16_rmean",
+        "T/ROWS32_cmean",
+        "T/ROWS32_cmed",
+        "T/ROWS32_rmean"
+      ],
+      "inclusiveness": {
+        "T/SPEC8_cmean": 323,
+        "T/SPEC8_cmed": 223,
+        "T/SPEC8_rmean": 123,
+        "T/SPEC16_cmean": 322,
+        "T/SPEC16_cmed": 222,
+        "T/SPEC16_rmean": 122,
+        "T/SPEC32_cmean": 321,
+        "T/SPEC32_cmed": 221,
+        "T/SPEC32_rmean": 121,
+        "T/ROWS8_cmean": 313,
+        "T/ROWS8_cmed": 213,
+        "T/ROWS8_rmean": 113,
+        "T/ROWS16_cmean": 312,
+        "T/ROWS16_cmed": 212,
+        "T/ROWS16_rmean": 112,
+        "T/ROWS32_cmean": 311,
+        "T/ROWS32_cmed": 211,
+        "T/ROWS32_rmean": 111
+      }
+    }
+  ],
+  "tie_order": "within 0.002: cmean > cmed > rmean, then SPEC > ROWS, then K 8 > 16 > 32 (fewer regions first)",
+  "diagnostics": "per image: oracle-region IoU for every partition (region = object when >= half its 64x64 pixels are object), non-empty region count, new TP / new FP against the seed and REF at 0.45",
+  "transfer": "COCO-Cap: every cell at its all-VOC threshold; frozen cells against their references (paired bootstrap); never selects"
+}

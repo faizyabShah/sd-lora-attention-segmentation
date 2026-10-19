@@ -1,0 +1,161 @@
+{
+  "family": "SG2 consensus-edge SA graph (standalone)",
+  "protocol": "protocol Section 81; registry Section 11 (SG2)",
+  "registered_before_run": true,
+  "independent_of": "every other SG family; uses only the frozen CA seed, frozen SA module 15 and the released token",
+  "reliability": {
+    "cv": "mean_i A_i / sqrt(mean_i A_i^2) per edge (exact, dense, streamed over the 248 observations)",
+    "occ": "(#{i: A_i(p,q) > 1/4096} + 0.5) / (248 + 1)"
+  },
+  "gammas": [
+    0.5,
+    1.0,
+    2.0
+  ],
+  "forms": {
+    "G": "one consensus graph rownorm(A_bar * r^gamma)",
+    "O": "per observation rownorm(A_i * r^gamma), averaged after propagation"
+  },
+  "passes": [
+    1,
+    2
+  ],
+  "informed_by": "edges are reweighted, never removed (top-k pruning hurt monotonically, P6); the per-observation form is included because observation-wise propagation beat mean-graph propagation (P1 vs W3); 'occ' never reaches 0 so no edge is removed",
+  "reported_not_selected": [
+    "seed",
+    "MG2"
+  ],
+  "screens": [
+    {
+      "name": "SG2-W-1pass",
+      "reference": "W/REF",
+      "candidates": [
+        "W/G_cv_g05_n1",
+        "W/G_cv_g10_n1",
+        "W/G_cv_g20_n1",
+        "W/G_occ_g05_n1",
+        "W/G_occ_g10_n1",
+        "W/G_occ_g20_n1",
+        "W/O_cv_g05_n1",
+        "W/O_cv_g10_n1",
+        "W/O_cv_g20_n1",
+        "W/O_occ_g05_n1",
+        "W/O_occ_g10_n1",
+        "W/O_occ_g20_n1"
+      ],
+      "inclusiveness": {
+        "W/G_cv_g05_n1": 322,
+        "W/G_cv_g10_n1": 222,
+        "W/G_cv_g20_n1": 122,
+        "W/G_occ_g05_n1": 312,
+        "W/G_occ_g10_n1": 212,
+        "W/G_occ_g20_n1": 112,
+        "W/O_cv_g05_n1": 321,
+        "W/O_cv_g10_n1": 221,
+        "W/O_cv_g20_n1": 121,
+        "W/O_occ_g05_n1": 311,
+        "W/O_occ_g10_n1": 211,
+        "W/O_occ_g20_n1": 111
+      }
+    },
+    {
+      "name": "SG2-W-2pass",
+      "reference": "W/P1",
+      "candidates": [
+        "W/G_cv_g05_n2",
+        "W/G_cv_g10_n2",
+        "W/G_cv_g20_n2",
+        "W/G_occ_g05_n2",
+        "W/G_occ_g10_n2",
+        "W/G_occ_g20_n2",
+        "W/O_cv_g05_n2",
+        "W/O_cv_g10_n2",
+        "W/O_cv_g20_n2",
+        "W/O_occ_g05_n2",
+        "W/O_occ_g10_n2",
+        "W/O_occ_g20_n2"
+      ],
+      "inclusiveness": {
+        "W/G_cv_g05_n2": 322,
+        "W/G_cv_g10_n2": 222,
+        "W/G_cv_g20_n2": 122,
+        "W/G_occ_g05_n2": 312,
+        "W/G_occ_g10_n2": 212,
+        "W/G_occ_g20_n2": 112,
+        "W/O_cv_g05_n2": 321,
+        "W/O_cv_g10_n2": 221,
+        "W/O_cv_g20_n2": 121,
+        "W/O_occ_g05_n2": 311,
+        "W/O_occ_g10_n2": 211,
+        "W/O_occ_g20_n2": 111
+      }
+    },
+    {
+      "name": "SG2-T-1pass",
+      "reference": "T/REF",
+      "candidates": [
+        "T/G_cv_g05_n1",
+        "T/G_cv_g10_n1",
+        "T/G_cv_g20_n1",
+        "T/G_occ_g05_n1",
+        "T/G_occ_g10_n1",
+        "T/G_occ_g20_n1",
+        "T/O_cv_g05_n1",
+        "T/O_cv_g10_n1",
+        "T/O_cv_g20_n1",
+        "T/O_occ_g05_n1",
+        "T/O_occ_g10_n1",
+        "T/O_occ_g20_n1"
+      ],
+      "inclusiveness": {
+        "T/G_cv_g05_n1": 322,
+        "T/G_cv_g10_n1": 222,
+        "T/G_cv_g20_n1": 122,
+        "T/G_occ_g05_n1": 312,
+        "T/G_occ_g10_n1": 212,
+        "T/G_occ_g20_n1": 112,
+        "T/O_cv_g05_n1": 321,
+        "T/O_cv_g10_n1": 221,
+        "T/O_cv_g20_n1": 121,
+        "T/O_occ_g05_n1": 311,
+        "T/O_occ_g10_n1": 211,
+        "T/O_occ_g20_n1": 111
+      }
+    },
+    {
+      "name": "SG2-T-2pass",
+      "reference": "T/P1",
+      "candidates": [
+        "T/G_cv_g05_n2",
+        "T/G_cv_g10_n2",
+        "T/G_cv_g20_n2",
+        "T/G_occ_g05_n2",
+        "T/G_occ_g10_n2",
+        "T/G_occ_g20_n2",
+        "T/O_cv_g05_n2",
+        "T/O_cv_g10_n2",
+        "T/O_cv_g20_n2",
+        "T/O_occ_g05_n2",
+        "T/O_occ_g10_n2",
+        "T/O_occ_g20_n2"
+      ],
+      "inclusiveness": {
+        "T/G_cv_g05_n2": 322,
+        "T/G_cv_g10_n2": 222,
+        "T/G_cv_g20_n2": 122,
+        "T/G_occ_g05_n2": 312,
+        "T/G_occ_g10_n2": 212,
+        "T/G_occ_g20_n2": 112,
+        "T/O_cv_g05_n2": 321,
+        "T/O_cv_g10_n2": 221,
+        "T/O_cv_g20_n2": 121,
+        "T/O_occ_g05_n2": 311,
+        "T/O_occ_g10_n2": 211,
+        "T/O_occ_g20_n2": 111
+      }
+    }
+  ],
+  "tie_order": "within 0.002: gamma 0.5 > 1 > 2 (closest to the reference), then cv > occ, then G > O",
+  "diagnostics": "per image: new TP / new FP against the seed and against the cell's reference at 0.45; A_bar-weighted mean edge reliability for object->object, object->background, background->object, background->background edges",
+  "transfer": "COCO-Cap: every cell at its all-VOC threshold; frozen cells against their references (paired bootstrap); never selects"
+}
