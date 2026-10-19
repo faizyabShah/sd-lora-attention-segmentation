@@ -45,6 +45,10 @@ import scripts.run_sa_package_b as sa_common  # noqa: E402
 from scripts.run_token_package import crf_counts, propagate  # noqa: E402
 from src.segmentation import controlled_cv as cv  # noqa: E402
 from src.segmentation.attention_aggregation import find_token_subsequence  # noqa: E402
+from src.segmentation.ovam_full import apply_ovam_densecrf  # noqa: E402
+from src.segmentation.sg_visual_audit import (  # noqa: E402
+    best_thresholds, released_image, render_variant_pages, resize_map,
+)
 
 THRESHOLDS = transfer.THRESHOLDS
 WORD = ("W", "WS", "WK", "WN", "WE", "WY")
@@ -148,6 +152,8 @@ def main() -> None:
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--crf-site", type=Path, required=True)
     parser.add_argument("--max-samples", type=int)
+    parser.add_argument("--visual-dir", type=Path,
+                        help="Render the first image and every registered cell; do not write metric shards")
     args = parser.parse_args()
     spec = json.loads(CONFIG.read_text(encoding="utf-8"))
     seed_json = json.loads(args.ca_seed.read_text(encoding="utf-8"))
@@ -155,7 +161,7 @@ def main() -> None:
         raise SystemExit(f"{args.ca_seed} is not a frozen CA seed")
     voc = args.dataset == "voc"
     classname, rows = (transfer.voc_rows if voc else transfer.coco_rows)(args.class_shard)
-    rows = rows[: args.max_samples] if args.max_samples else rows
+    rows = rows[:1] if args.visual_dir else (rows[: args.max_samples] if args.max_samples else rows)
     manifest_dir = transfer.EVAL / ("ovam/voc_sim" if voc else "ovam/coco_captions")
     pipe = StableDiffusionPipeline.from_pretrained(args.model, torch_dtype=torch.float32, local_files_only=True).to(args.device)
     pipe.set_progress_bar_config(disable=True)
@@ -182,11 +188,13 @@ def main() -> None:
         "configurations": list(CONFIGURATIONS), "model": args.model, "model_dtype": "float32", "qk_storage_dtype": "float16",
     }
     folds = cv.read_folds(args.folds) if voc else {r["image_id"]: 0 for r in rows}
-    writer = cv.ShardWriter(args.output_dir / args.dataset / "shards" / f"class_{args.class_shard:02d}_{classname.replace(' ', '_')}.npz",
-                            CONFIGURATIONS, folds, settings, thresholds=THRESHOLDS)
+    writer = None if args.visual_dir else cv.ShardWriter(
+        args.output_dir / args.dataset / "shards" / f"class_{args.class_shard:02d}_{classname.replace(' ', '_')}.npz",
+        CONFIGURATIONS, folds, settings, thresholds=THRESHOLDS)
+    visual_thresholds = best_thresholds(OUT) if args.visual_dir else {}
     t45 = THRESHOLDS.index(0.45)
     for row in rows:
-        if row["image_id"] in writer.completed:
+        if writer is not None and row["image_id"] in writer.completed:
             continue
         sa_common._RECORDERS.clear()
         sample = sa_common.live.generate_attention_sample(pipe, row, manifest_dir, "float16", cross_map_kind="conditional")
@@ -202,6 +210,24 @@ def main() -> None:
             seeds = torch.stack(seeds)
             one, two = propagate(recorder, selected, seeds, args.device)
             recorder.sa_qk.clear()
+            if args.visual_dir:
+                visual_maps, ca_maps, mask_overrides = [], [], {}
+                for i, attribution in enumerate(ATTRIBUTIONS):
+                    for pipeline_name in PIPELINES:
+                        name = f"{attribution}/{pipeline_name}"
+                        score = seeds[i] if pipeline_name == "seed" else one[i] if pipeline_name in ("REF", "R2") else two[i]
+                        visual_maps.append(score); ca_maps.append(seeds[i])
+                        if pipeline_name in ("R2", "P1+R2"):
+                            threshold = visual_thresholds.get(name, 0.45)
+                            initial = resize_map(score, np.asarray(sample.target_mask).shape) >= threshold
+                            mask_overrides[name] = apply_ovam_densecrf(sample.generated_image, initial, args.crf_site)
+                render_variant_pages(
+                    args.visual_dir, "sg5", classname, row["image_id"],
+                    released_image(row, manifest_dir), np.asarray(sample.target_mask, bool),
+                    CONFIGURATIONS, ca_maps, visual_maps, visual_thresholds, mask_overrides,
+                )
+                print(f"[visual:{classname}] {row['image_id']} cells={len(CONFIGURATIONS)}", flush=True)
+                continue
             counts, ap = cv.score_maps(torch.cat([seeds, one, two]), sample.target_mask, "minmax", thresholds=THRESHOLDS)
             n = len(ATTRIBUTIONS)
             crf = {(i, p): crf_counts(m[i], sample.target_mask, sample.generated_image, args.crf_site)[0]
@@ -229,7 +255,7 @@ def main() -> None:
             del sample, recorder
             gc.collect()
             torch.cuda.empty_cache()
-    if args.max_samples is None:
+    if writer is not None and args.max_samples is None:
         writer.finish()
 
 

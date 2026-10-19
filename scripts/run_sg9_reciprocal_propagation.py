@@ -30,6 +30,9 @@ from src.segmentation.graph_refinement import minmax_vector  # noqa: E402
 from src.segmentation.reciprocal_propagation import (  # noqa: E402
     OPERATORS, configuration_names, reciprocal_affinity, row_normalize,
 )
+from src.segmentation.sg_visual_audit import (  # noqa: E402
+    best_thresholds, released_image, render_variant_pages,
+)
 
 WORK = 64
 SPEC_PATH = ROOT / "configs/sg9_reciprocal_propagation.json"
@@ -200,6 +203,8 @@ def main() -> None:
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--max-samples", type=int)
     parser.add_argument("--smoke-diagnostics", action="store_true")
+    parser.add_argument("--visual-dir", type=Path,
+                        help="Render the first image and every registered cell; do not write metric shards")
     args = parser.parse_args()
 
     spec = json.loads(SPEC_PATH.read_text(encoding="utf-8"))
@@ -208,7 +213,7 @@ def main() -> None:
         raise SystemExit(f"{args.ca_seed} is not a frozen CA seed")
     voc = args.dataset == "voc"
     classname, rows = (transfer.voc_rows if voc else transfer.coco_rows)(args.class_shard)
-    rows = rows[:args.max_samples] if args.max_samples else rows
+    rows = rows[:1] if args.visual_dir else (rows[:args.max_samples] if args.max_samples else rows)
     manifest_dir = transfer.EVAL / ("ovam/voc_sim" if voc else "ovam/coco_captions")
     pipe = StableDiffusionPipeline.from_pretrained(args.model, torch_dtype=torch.float32, local_files_only=True).to(args.device)
     pipe.set_progress_bar_config(disable=True)
@@ -231,11 +236,12 @@ def main() -> None:
                 "thresholds": list(thresholds), "model": args.model, "model_dtype": "float32",
                 "qk_storage_dtype": "float16", "computation": "one call/head affinity at a time"}
     base = args.output_dir / args.dataset / "shards" / f"class_{args.class_shard:02d}_{classname.replace(' ', '_')}"
-    writer = cv.ShardWriter(base.with_suffix(".npz"), names, folds, settings, thresholds=thresholds)
-    diag = DiagnosticWriter(base.with_suffix(".diagnostics.npz"), names, thresholds)
+    writer = None if args.visual_dir else cv.ShardWriter(base.with_suffix(".npz"), names, folds, settings, thresholds=thresholds)
+    diag = None if args.visual_dir else DiagnosticWriter(base.with_suffix(".diagnostics.npz"), names, thresholds)
+    visual_thresholds = best_thresholds(OUT) if args.visual_dir else {}
     t45 = thresholds.index(0.45)
     for row in rows:
-        if row["image_id"] in writer.completed:
+        if writer is not None and row["image_id"] in writer.completed:
             continue
         sa_common._RECORDERS.clear()
         sample = sa_common.live.generate_attention_sample(pipe, row, manifest_dir, "float16", cross_map_kind="conditional")
@@ -258,10 +264,20 @@ def main() -> None:
                     if error > 5e-5:
                         raise RuntimeError(f"{prefix}/REF mismatch against existing implementation: {error}")
             recorder.sa_qk.clear()
+            if args.visual_dir:
+                ca_maps = [seeds[0] if name.startswith("W/") else seeds[1] for name in names]
+                render_variant_pages(
+                    args.visual_dir, "sg9", classname, row["image_id"],
+                    released_image(row, manifest_dir), np.asarray(sample.target_mask, bool),
+                    names, ca_maps, list(maps), visual_thresholds,
+                )
+                print(f"[visual:{classname}] {row['image_id']} cells={len(names)}", flush=True)
+                continue
             counts, ap = cv.score_maps(maps, sample.target_mask, "minmax", thresholds=thresholds)
             changes, spatial, mechanism, full = compact_diagnostics(
                 maps, seeds, names, np.asarray(sample.target_mask, bool), thresholds, asymmetry, cycle
             )
+            assert diag is not None and writer is not None
             diag.add(row["image_id"], changes, spatial, mechanism)
             writer.add(row["image_id"], classname, counts, ap)
             if args.smoke_diagnostics:
@@ -276,7 +292,7 @@ def main() -> None:
             recorder.ca_calls.clear(); recorder.sa_qk.clear(); recorder.token_calls.clear()
             sample.clear(); del sample, recorder
             gc.collect(); torch.cuda.empty_cache()
-    if args.max_samples is None:
+    if writer is not None and args.max_samples is None:
         writer.finish()
 
 

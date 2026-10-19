@@ -43,6 +43,9 @@ from scripts.narmyn.attention import sg10_bottleneck as sg  # noqa: E402
 from scripts.run_fusion_calibration import upsampled  # noqa: E402
 from src.segmentation import controlled_cv as cv  # noqa: E402
 from src.segmentation.fusion_variants import minmax  # noqa: E402
+from src.segmentation.sg_visual_audit import (  # noqa: E402
+    best_thresholds, released_image, render_variant_pages,
+)
 
 CONFIG = ROOT / "configs" / "sg10_seed_connected_bottleneck.json"
 OUT = ROOT / "outputs" / "segmentation" / "controlled_attention_cv" / "sg10_seed_connected_bottleneck"
@@ -257,6 +260,10 @@ def main() -> None:
     parser.add_argument("--model", default="stable-diffusion-v1-5/stable-diffusion-v1-5")
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--max-samples", type=int)
+    parser.add_argument("--visual-dir", type=Path,
+                        help="Render the first image and every registered cell; do not write metric shards")
+    parser.add_argument("--threshold-results", type=Path, default=OUT,
+                        help="SG10 result directory used to recover full-VOC display thresholds")
     args = parser.parse_args()
     spec = json.loads(CONFIG.read_text(encoding="utf-8"))
     if args.normalization_smoke:
@@ -267,7 +274,7 @@ def main() -> None:
         raise SystemExit("bottleneck_normalization is not frozen in the config; run the normalization smoke first")
     voc = args.dataset == "voc"
     classname, rows = (transfer.voc_rows if voc else transfer.coco_rows)(args.class_shard)
-    rows = rows[: args.max_samples] if args.max_samples else rows
+    rows = rows[:1] if args.visual_dir else (rows[: args.max_samples] if args.max_samples else rows)
     manifest_dir = transfer.EVAL / ("ovam/voc_sim" if voc else "ovam/coco_captions")
     pipe, ca_modules, selected, seed_spec = setup(args)
     prompts = {r["attribution_prompt"] for r in rows}
@@ -280,13 +287,15 @@ def main() -> None:
                 "configurations": list(CONFIGURATIONS), "model": args.model, "model_dtype": "float32", "qk_storage_dtype": "float16"}
     folds = cv.read_folds(ROOT / "configs/voc_sim_folds.csv") if voc else {r["image_id"]: 0 for r in rows}
     stem = f"class_{args.class_shard:02d}_{classname.replace(' ', '_')}"
-    writer = cv.ShardWriter(args.output_dir / args.dataset / "shards" / f"{stem}.npz", CONFIGURATIONS, folds, settings, thresholds=THRESHOLDS)
+    writer = None if args.visual_dir else cv.ShardWriter(args.output_dir / args.dataset / "shards" / f"{stem}.npz", CONFIGURATIONS, folds, settings, thresholds=THRESHOLDS)
     diag_path = args.output_dir / args.dataset / "diagnostics" / f"{stem}.jsonl"
-    diag_path.parent.mkdir(parents=True, exist_ok=True)
-    diag_done = {json.loads(l)["image_id"] for l in diag_path.open()} if diag_path.exists() else set()
+    if writer is not None:
+        diag_path.parent.mkdir(parents=True, exist_ok=True)
+    diag_done = {json.loads(l)["image_id"] for l in diag_path.open()} if writer is not None and diag_path.exists() else set()
+    visual_thresholds = best_thresholds(args.threshold_results) if args.visual_dir else {}
     panel_ids = set(spec["panel_image_ids"])
     for row in rows:
-        if row["image_id"] in writer.completed:
+        if writer is not None and row["image_id"] in writer.completed:
             continue
         seeds, one, two, raw, sources, tops, sample = live_maps(pipe, row, manifest_dir, ca_modules, selected, seed_spec, args.device)
         try:
@@ -305,9 +314,18 @@ def main() -> None:
                 names = cell_names(t)
                 cand = {n.split("/", 1)[1]: m for n, m in zip(names, track_maps) if n.split("/", 1)[1] not in ("seed", "REF", "P1")}
                 diag["tracks"][t] = diagnostics(seeds[ti], one[ti], cand, conn_full, truth)
-                if row["image_id"] in panel_ids:
+                if not args.visual_dir and row["image_id"] in panel_ids:
                     save_panel(args.output_dir / args.dataset / "panels" / f"{row['image_id']}_{t}.png", sample, seeds[ti], one[ti],
                                conn, cand, truth, spec["panel_config"])
+            if args.visual_dir:
+                ca_maps = [seeds[0] if name.startswith("W/") else seeds[1] for name in CONFIGURATIONS]
+                render_variant_pages(
+                    args.visual_dir, "sg10", classname, row["image_id"],
+                    released_image(row, manifest_dir), truth, CONFIGURATIONS,
+                    ca_maps, maps, visual_thresholds,
+                )
+                print(f"[visual:{classname}] {row['image_id']} cells={len(CONFIGURATIONS)}", flush=True)
+                continue
             counts, ap = cv.score_maps(torch.stack(maps).reshape(-1, 64, 64), sample.target_mask, "minmax", thresholds=THRESHOLDS)
             if row["image_id"] not in diag_done:
                 with diag_path.open("a") as log:
@@ -316,7 +334,7 @@ def main() -> None:
             print(f"[{classname}] {row['image_id']} ({len(writer.completed)}/{len(rows)})", flush=True)
         finally:
             sample.clear(); del sample; gc.collect(); torch.cuda.empty_cache()
-    if args.max_samples is None:
+    if writer is not None and args.max_samples is None:
         writer.finish()
 
 

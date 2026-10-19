@@ -24,6 +24,9 @@ from src.segmentation import controlled_cv as cv  # noqa: E402
 from src.segmentation.graph_refinement import (  # noqa: E402
     absorbing_walk, anchor_masks, confidence_locked_trajectory, minmax_vector,
 )
+from src.segmentation.sg_visual_audit import (  # noqa: E402
+    best_thresholds, released_image, render_variant_pages,
+)
 
 WORK = 64
 THRESHOLDS = transfer.THRESHOLDS
@@ -154,6 +157,8 @@ def main() -> None:
     parser.add_argument("--model", default="stable-diffusion-v1-5/stable-diffusion-v1-5")
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--max-samples", type=int)
+    parser.add_argument("--visual-dir", type=Path,
+                        help="Render the first image and every registered cell; do not write metric shards")
     args = parser.parse_args()
     spec = json.loads(SPEC_PATH.read_text(encoding="utf-8"))
     seed_spec_json = json.loads(args.ca_seed.read_text(encoding="utf-8"))
@@ -161,7 +166,7 @@ def main() -> None:
         raise SystemExit(f"{args.ca_seed} is not a frozen CA seed")
     voc = args.dataset == "voc"
     classname, rows = (transfer.voc_rows if voc else transfer.coco_rows)(args.class_shard)
-    rows = rows[:args.max_samples] if args.max_samples else rows
+    rows = rows[:1] if args.visual_dir else (rows[:args.max_samples] if args.max_samples else rows)
     manifest_dir = transfer.EVAL / ("ovam/voc_sim" if voc else "ovam/coco_captions")
     pipe = StableDiffusionPipeline.from_pretrained(
         args.model, torch_dtype=torch.float32, local_files_only=True
@@ -188,10 +193,11 @@ def main() -> None:
         "model_dtype": "float32", "qk_storage_dtype": "float16",
     }
     shard = args.output_dir / args.dataset / "shards" / f"class_{args.class_shard:02d}_{classname.replace(' ', '_')}.npz"
-    writer = cv.ShardWriter(shard, names, folds, settings, thresholds=THRESHOLDS)
+    writer = None if args.visual_dir else cv.ShardWriter(shard, names, folds, settings, thresholds=THRESHOLDS)
+    visual_thresholds = best_thresholds(OUT) if args.visual_dir else {}
     t45 = THRESHOLDS.index(0.45)
     for row in rows:
-        if row["image_id"] in writer.completed:
+        if writer is not None and row["image_id"] in writer.completed:
             continue
         sa_common._RECORDERS.clear()
         sample = sa_common.live.generate_attention_sample(
@@ -208,6 +214,15 @@ def main() -> None:
                 recorder, selected, torch.stack((word_seed, token_seed)), spec, args.device
             )
             recorder.sa_qk.clear()
+            if args.visual_dir:
+                ca_maps = [word_seed if name.startswith("W/") else token_seed for name in names]
+                render_variant_pages(
+                    args.visual_dir, "sg1_sg3", classname, row["image_id"],
+                    released_image(row, manifest_dir), np.asarray(sample.target_mask, bool),
+                    names, ca_maps, list(maps), visual_thresholds,
+                )
+                print(f"[visual:{classname}] {row['image_id']} cells={len(names)}", flush=True)
+                continue
             counts, ap = cv.score_maps(maps, sample.target_mask, "minmax", thresholds=THRESHOLDS)
             writer.add(row["image_id"], classname, counts, ap)
             print(f"[{args.dataset}:{classname}] {row['image_id']} ({len(writer.completed)}/{len(rows)}) "
@@ -218,7 +233,7 @@ def main() -> None:
             recorder.ca_calls.clear(); recorder.sa_qk.clear(); recorder.token_calls.clear()
             sample.clear(); del sample, recorder
             gc.collect(); torch.cuda.empty_cache()
-    if args.max_samples is None:
+    if writer is not None and args.max_samples is None:
         writer.finish()
 
 

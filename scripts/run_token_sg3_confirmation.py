@@ -25,6 +25,10 @@ from src.segmentation import controlled_cv as cv  # noqa: E402
 from src.segmentation.graph_refinement import (  # noqa: E402
     anchor_masks, confidence_locked_trajectory, minmax_vector,
 )
+from src.segmentation.ovam_full import apply_ovam_densecrf  # noqa: E402
+from src.segmentation.sg_visual_audit import (  # noqa: E402
+    best_thresholds, released_image, render_variant_pages, resize_map,
+)
 
 WORK = 64
 THRESHOLDS = transfer.THRESHOLDS
@@ -73,6 +77,8 @@ def main() -> None:
     parser.add_argument("--model", default="stable-diffusion-v1-5/stable-diffusion-v1-5")
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--max-samples", type=int)
+    parser.add_argument("--visual-dir", type=Path,
+                        help="Render the first image and every registered cell; do not write metric shards")
     args = parser.parse_args()
     spec = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
     ca_json = json.loads(args.ca_seed.read_text(encoding="utf-8"))
@@ -80,7 +86,7 @@ def main() -> None:
         raise SystemExit(f"{args.ca_seed} is not a frozen CA seed")
     voc = args.dataset == "voc"
     classname, rows = (transfer.voc_rows if voc else transfer.coco_rows)(args.class_shard)
-    rows = rows[:args.max_samples] if args.max_samples else rows
+    rows = rows[:1] if args.visual_dir else (rows[:args.max_samples] if args.max_samples else rows)
     manifest_dir = transfer.EVAL / ("ovam/voc_sim" if voc else "ovam/coco_captions")
     pipe = StableDiffusionPipeline.from_pretrained(
         args.model, torch_dtype=torch.float32, local_files_only=True
@@ -111,10 +117,11 @@ def main() -> None:
         "model": args.model, "model_dtype": "float32", "qk_storage_dtype": "float16",
     }
     shard = args.output_dir / args.dataset / "shards" / f"class_{args.class_shard:02d}_{classname.replace(' ', '_')}.npz"
-    writer = cv.ShardWriter(shard, names, folds, settings, thresholds=THRESHOLDS)
+    writer = None if args.visual_dir else cv.ShardWriter(shard, names, folds, settings, thresholds=THRESHOLDS)
+    visual_thresholds = best_thresholds(OUT) if args.visual_dir else {}
     t45 = THRESHOLDS.index(0.45)
     for row in rows:
-        if row["image_id"] in writer.completed:
+        if writer is not None and row["image_id"] in writer.completed:
             continue
         sa_common._RECORDERS.clear()
         sample = sa_common.live.generate_attention_sample(
@@ -129,6 +136,22 @@ def main() -> None:
             one, two, locked = fixed_maps(recorder, selected, token_seed, spec, args.device)
             recorder.sa_qk.clear()
             raw = (one, two, locked)
+            if args.visual_dir:
+                visual_maps = (one, one, two, two, locked, locked)
+                ca_maps = (token_seed,) * len(names)
+                mask_overrides = {}
+                for name, score in zip(names, visual_maps):
+                    if name.endswith("+R2"):
+                        threshold = visual_thresholds.get(name, 0.45)
+                        initial = resize_map(score, np.asarray(sample.target_mask).shape) >= threshold
+                        mask_overrides[name] = apply_ovam_densecrf(sample.generated_image, initial, args.crf_site)
+                render_variant_pages(
+                    args.visual_dir, "sg3_locked", classname, row["image_id"],
+                    released_image(row, manifest_dir), np.asarray(sample.target_mask, bool),
+                    names, ca_maps, visual_maps, visual_thresholds, mask_overrides,
+                )
+                print(f"[visual:{classname}] {row['image_id']} cells={len(names)}", flush=True)
+                continue
             raw_counts, raw_ap = cv.score_maps(
                 torch.stack(raw), sample.target_mask, "minmax", thresholds=THRESHOLDS
             )
@@ -146,7 +169,7 @@ def main() -> None:
             recorder.ca_calls.clear(); recorder.sa_qk.clear(); recorder.token_calls.clear()
             sample.clear(); del sample, recorder
             gc.collect(); torch.cuda.empty_cache()
-    if args.max_samples is None:
+    if writer is not None and args.max_samples is None:
         writer.finish()
 
 
