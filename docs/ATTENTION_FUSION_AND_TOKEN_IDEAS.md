@@ -537,3 +537,8 @@ assisted and do not imply an IoU-optimal upper bound. First images of six
 fixed VOC classes supply eight-panel sheets for all three rules. Codex
 submits, then Claude reviews before any paper/pipeline update. A future
 SG2-based region interaction test remains unregistered and is not included.
+
+Submitted **job `234908`**, source commit `51dc1a438`: one available GPU,
+12 hours, resumable. Numerical, shared-selector regression, original SG4
+and full-report synthetic integration checks passed. Live checks precede
+production inside the job. See protocol Section 88; Claude reviews results.

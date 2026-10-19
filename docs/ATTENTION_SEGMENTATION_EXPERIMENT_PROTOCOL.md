@@ -4755,3 +4755,20 @@ six sheets, and `CHATGPT_RESULTS.md` for the owners' external discussion.
 Claude should independently review the literal scores, distinct candidate
 and legacy threshold ranges, hard-region masks, selection guards and
 GT-only oracle usage before interpreting the outcome.
+
+**Submitted:** job **`234908`**, registered source commit `51dc1a438`, one
+GPU/12 hours, no node constraint. Numerical checks passed for literal
+C/P/Q/M and R1/R2/R3 scores, exact region-mask counts against explicit masks,
+the >=50% oracle convention, SPEC32 equivalence, streaming reference
+algebra, restricted threshold grids and atomic/idempotent diagnostic resume.
+The original SG4 self-test still passes after moving its helpers. The
+extended shared selector reproduces the committed real SG2 W-one-pass
+screen exactly, including all five folds and bootstrap intervals.
+
+A synthetic full-manifest integration passed the four screens, unchanged
+historical reference checks, all region/oracle reports, 280 class-table rows
+and six eight-panel sheets/cache cleanup. This fixture uses historical
+counts and is **not a new SG13 result**. Compilation, shell syntax and diff
+checks passed. The actual live VOC/COCO smoke gates run inside job `234908`
+before production. Claude should independently review the resulting real
+package before interpreting a gain or updating the paper.
