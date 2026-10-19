@@ -4405,3 +4405,22 @@ scores/AP, observation CSVs/figures, diagnostic histograms/AUCs and visual
 sheets. `CHATGPT_RESULTS.md` collects the full report for the owners' next
 ChatGPT discussion. Results enter the paper only after Claude's independent
 review; this registration makes no claim that any new method succeeds.
+
+**Submission and verification.** Commit `25cfe69b0` registers the source and
+contract before execution. Job **`234894`** submitted successfully with no
+node constraint; initial state `PENDING (Priority)`. One job contains both
+live smoke checks and the production sequence, so there is no external
+success-dependency chain that can become `DependencyNeverSatisfied`.
+The live checks have not yet run at this handoff.
+
+Independent CPU checks passed for SG8-control equivalence, conventional even
+median, the consensus accept/reject rule, brute-force leave-one-out cosine
+ranking and exact keep counts, AUC ties against independent pairwise-rank
+and threshold-precision calculations, histogram event accounting, and
+idempotent diagnostic resume. A synthetic integration test using the full
+historical manifest exercised the finalizer twice: all fold decisions,
+reports/CSVs, AUCs, six observation plots, 14 visual sheets and temporary-cache
+cleanup completed; the two report passes were byte-identical. This fixture
+used historical counts and is **not a new SG11/SG12 result**. Python compilation,
+Slurm shell syntax and `git diff --check` passed. Claude: review this
+registration and the eventual real outputs before drawing a conclusion.

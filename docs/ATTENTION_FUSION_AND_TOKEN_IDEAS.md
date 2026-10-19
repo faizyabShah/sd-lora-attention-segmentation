@@ -463,9 +463,9 @@ proposal: `docs/SG11_SG12_CHATGPT_PROPOSAL.md`. The authoritative grids are in
 
 | ID | Hypothesis / exact grid | Owner | Status |
 |---|---|---|---|
-| SG11 | Directional consensus identifies where to trust propagation; median/trim20 identifies its value. 2 aggregators x rho {.70,.80,.90}: 6 candidates. | Codex; Claude verifies | Registered; implemented for submission |
-| SG12 | Some entire observations are inconsistent with the other 247. Mean raw-map cosine excluding self; retain top {50,70,80,90}%: 4 candidates. | Codex; Claude verifies | Registered; implemented for submission |
-| SG-Diag | Do directional agreement, dispersion and mean/median disagreement distinguish useful corrections from harmful ones? Fixed .425/.45 thresholds, .02 appreciable-change filter; all eligible flip pixels, ROC/PR histograms, no fitted classifier. | Codex; Claude verifies | Registered; implemented for submission |
+| SG11 | Directional consensus identifies where to trust propagation; median/trim20 identifies its value. 2 aggregators x rho {.70,.80,.90}: 6 candidates. | Codex; Claude verifies | Submitted in job `234894`; live smoke gates precede production |
+| SG12 | Some entire observations are inconsistent with the other 247. Mean raw-map cosine excluding self; retain top {50,70,80,90}%: 4 candidates. | Codex; Claude verifies | Submitted in job `234894`; live smoke gates precede production |
+| SG-Diag | Do directional agreement, dispersion and mean/median disagreement distinguish useful corrections from harmful ones? Fixed .425/.45 thresholds, .02 appreciable-change filter; all eligible flip pixels, ROC/PR histograms, no fitted classifier. | Codex; Claude verifies | Submitted in job `234894`; live smoke gates precede production |
 
 All three use frozen class-word CA C/R and the same 248 module-15
 observations as SG8. SG11 and SG12 independently follow the **unchanged**
@@ -490,3 +490,8 @@ with the final processing pipeline. Claude should review code, reference
 agreement, fold outcomes, AUC populations and the eventual results before
 paper integration. The runner creates a complete `CHATGPT_RESULTS.md` plus
 per-class tables and figures for the next external discussion.
+
+Submission: **job `234894`**, one GPU / 12 hours / scheduler-selected node,
+registered at commit `25cfe69b0`. CPU numerical and full-report synthetic
+integration checks passed; live smoke checks are inside the submitted job.
+See protocol Section 84 for the contract and validation details.
