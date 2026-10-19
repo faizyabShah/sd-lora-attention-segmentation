@@ -1,0 +1,2367 @@
+{
+  "protocol": "ATTENTION_SEGMENTATION_EXPERIMENT_PROTOCOL Section 82",
+  "images": 490,
+  "classes": 20,
+  "configurations": 44,
+  "thresholds": [
+    0.3,
+    0.325,
+    0.35,
+    0.375,
+    0.4,
+    0.425,
+    0.45,
+    0.475,
+    0.5,
+    0.525,
+    0.55,
+    0.575,
+    0.6,
+    0.625,
+    0.65,
+    0.675,
+    0.7
+  ],
+  "screens": {
+    "P3": {
+      "reference": "REF/one_pass",
+      "candidates": [
+        "P3/t050",
+        "P3/t100",
+        "P3/t200",
+        "P3/t400"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7901779895362109,
+          "train_miou_reference": 0.7901779895362109,
+          "heldout_miou_chosen": 0.7855257003325254,
+          "heldout_miou_reference": 0.7855257003325254
+        },
+        {
+          "fold": 1,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7826954567861266,
+          "train_miou_reference": 0.7826954567861266,
+          "heldout_miou_chosen": 0.811317784200029,
+          "heldout_miou_reference": 0.811317784200029
+        },
+        {
+          "fold": 2,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7902207711472634,
+          "train_miou_reference": 0.7902207711472634,
+          "heldout_miou_chosen": 0.7860865149002703,
+          "heldout_miou_reference": 0.7860865149002703
+        },
+        {
+          "fold": 3,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7911980667734382,
+          "train_miou_reference": 0.7911980667734382,
+          "heldout_miou_chosen": 0.7805150807239315,
+          "heldout_miou_reference": 0.7805150807239315
+        },
+        {
+          "fold": 4,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7909699209110543,
+          "train_miou_reference": 0.7909699209110543,
+          "heldout_miou_chosen": 0.7756694112164053,
+          "heldout_miou_reference": 0.7756694112164053
+        }
+      ],
+      "selection_counts": {
+        "REF/one_pass": 5
+      },
+      "vote_winner": "REF/one_pass",
+      "vote_winner_votes": 5,
+      "frozen": "REF/one_pass",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.7875084925836053,
+      "oof_miou_reference": 0.7875084925836053,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.425,
+      "full_threshold_reference": 0.425,
+      "full_miou_frozen": 0.7887910648095133,
+      "full_miou_reference": 0.7887910648095133,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "P5": {
+      "reference": "REF/one_pass",
+      "candidates": [
+        "P5/n1",
+        "P5/n2",
+        "P5/n3",
+        "P5/n4"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7901779895362109,
+          "train_miou_reference": 0.7901779895362109,
+          "heldout_miou_chosen": 0.7855257003325254,
+          "heldout_miou_reference": 0.7855257003325254
+        },
+        {
+          "fold": 1,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7826954567861266,
+          "train_miou_reference": 0.7826954567861266,
+          "heldout_miou_chosen": 0.811317784200029,
+          "heldout_miou_reference": 0.811317784200029
+        },
+        {
+          "fold": 2,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7902207711472634,
+          "train_miou_reference": 0.7902207711472634,
+          "heldout_miou_chosen": 0.7860865149002703,
+          "heldout_miou_reference": 0.7860865149002703
+        },
+        {
+          "fold": 3,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7911980667734382,
+          "train_miou_reference": 0.7911980667734382,
+          "heldout_miou_chosen": 0.7805150807239315,
+          "heldout_miou_reference": 0.7805150807239315
+        },
+        {
+          "fold": 4,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7909699209110543,
+          "train_miou_reference": 0.7909699209110543,
+          "heldout_miou_chosen": 0.7756694112164053,
+          "heldout_miou_reference": 0.7756694112164053
+        }
+      ],
+      "selection_counts": {
+        "REF/one_pass": 5
+      },
+      "vote_winner": "REF/one_pass",
+      "vote_winner_votes": 5,
+      "frozen": "REF/one_pass",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.7875084925836053,
+      "oof_miou_reference": 0.7875084925836053,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.425,
+      "full_threshold_reference": 0.425,
+      "full_miou_frozen": 0.7887910648095133,
+      "full_miou_reference": 0.7887910648095133,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "P9": {
+      "reference": "REF/one_pass",
+      "candidates": [
+        "P9/s050_bg0",
+        "P9/s050_bg1",
+        "P9/s070_bg0",
+        "P9/s070_bg1",
+        "P9/s090_bg0",
+        "P9/s090_bg1"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7901779895362109,
+          "train_miou_reference": 0.7901779895362109,
+          "heldout_miou_chosen": 0.7855257003325254,
+          "heldout_miou_reference": 0.7855257003325254
+        },
+        {
+          "fold": 1,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7826954567861266,
+          "train_miou_reference": 0.7826954567861266,
+          "heldout_miou_chosen": 0.811317784200029,
+          "heldout_miou_reference": 0.811317784200029
+        },
+        {
+          "fold": 2,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7902207711472634,
+          "train_miou_reference": 0.7902207711472634,
+          "heldout_miou_chosen": 0.7860865149002703,
+          "heldout_miou_reference": 0.7860865149002703
+        },
+        {
+          "fold": 3,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7911980667734382,
+          "train_miou_reference": 0.7911980667734382,
+          "heldout_miou_chosen": 0.7805150807239315,
+          "heldout_miou_reference": 0.7805150807239315
+        },
+        {
+          "fold": 4,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7909699209110543,
+          "train_miou_reference": 0.7909699209110543,
+          "heldout_miou_chosen": 0.7756694112164053,
+          "heldout_miou_reference": 0.7756694112164053
+        }
+      ],
+      "selection_counts": {
+        "REF/one_pass": 5
+      },
+      "vote_winner": "REF/one_pass",
+      "vote_winner_votes": 5,
+      "frozen": "REF/one_pass",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.7875084925836053,
+      "oof_miou_reference": 0.7875084925836053,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.425,
+      "full_threshold_reference": 0.425,
+      "full_miou_frozen": 0.7887910648095133,
+      "full_miou_reference": 0.7887910648095133,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "F2": {
+      "reference": "REF/one_pass",
+      "candidates": [
+        "F2/a000",
+        "F2/a025",
+        "F2/a050",
+        "F2/a075"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7901779895362109,
+          "train_miou_reference": 0.7901779895362109,
+          "heldout_miou_chosen": 0.7855257003325254,
+          "heldout_miou_reference": 0.7855257003325254
+        },
+        {
+          "fold": 1,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7826954567861266,
+          "train_miou_reference": 0.7826954567861266,
+          "heldout_miou_chosen": 0.811317784200029,
+          "heldout_miou_reference": 0.811317784200029
+        },
+        {
+          "fold": 2,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7902207711472634,
+          "train_miou_reference": 0.7902207711472634,
+          "heldout_miou_chosen": 0.7860865149002703,
+          "heldout_miou_reference": 0.7860865149002703
+        },
+        {
+          "fold": 3,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7911980667734382,
+          "train_miou_reference": 0.7911980667734382,
+          "heldout_miou_chosen": 0.7805150807239315,
+          "heldout_miou_reference": 0.7805150807239315
+        },
+        {
+          "fold": 4,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7909699209110543,
+          "train_miou_reference": 0.7909699209110543,
+          "heldout_miou_chosen": 0.7756694112164053,
+          "heldout_miou_reference": 0.7756694112164053
+        }
+      ],
+      "selection_counts": {
+        "REF/one_pass": 5
+      },
+      "vote_winner": "REF/one_pass",
+      "vote_winner_votes": 5,
+      "frozen": "REF/one_pass",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.7875084925836053,
+      "oof_miou_reference": 0.7875084925836053,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.425,
+      "full_threshold_reference": 0.425,
+      "full_miou_frozen": 0.7887910648095133,
+      "full_miou_reference": 0.7887910648095133,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "BG1": {
+      "reference": "REF/one_pass",
+      "candidates": [
+        "BG1/g050",
+        "BG1/g075",
+        "BG1/g100",
+        "BG1/g125",
+        "BG1/g150"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7901779895362109,
+          "train_miou_reference": 0.7901779895362109,
+          "heldout_miou_chosen": 0.7855257003325254,
+          "heldout_miou_reference": 0.7855257003325254
+        },
+        {
+          "fold": 1,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7826954567861266,
+          "train_miou_reference": 0.7826954567861266,
+          "heldout_miou_chosen": 0.811317784200029,
+          "heldout_miou_reference": 0.811317784200029
+        },
+        {
+          "fold": 2,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7902207711472634,
+          "train_miou_reference": 0.7902207711472634,
+          "heldout_miou_chosen": 0.7860865149002703,
+          "heldout_miou_reference": 0.7860865149002703
+        },
+        {
+          "fold": 3,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7911980667734382,
+          "train_miou_reference": 0.7911980667734382,
+          "heldout_miou_chosen": 0.7805150807239315,
+          "heldout_miou_reference": 0.7805150807239315
+        },
+        {
+          "fold": 4,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7909699209110543,
+          "train_miou_reference": 0.7909699209110543,
+          "heldout_miou_chosen": 0.7756694112164053,
+          "heldout_miou_reference": 0.7756694112164053
+        }
+      ],
+      "selection_counts": {
+        "REF/one_pass": 5
+      },
+      "vote_winner": "REF/one_pass",
+      "vote_winner_votes": 5,
+      "frozen": "REF/one_pass",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.7875084925836053,
+      "oof_miou_reference": 0.7875084925836053,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.425,
+      "full_threshold_reference": 0.425,
+      "full_miou_frozen": 0.7887910648095133,
+      "full_miou_reference": 0.7887910648095133,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "W1": {
+      "reference": "REF/one_pass",
+      "candidates": [
+        "W1/T050",
+        "W1/T100",
+        "W1/T200"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7901779895362109,
+          "train_miou_reference": 0.7901779895362109,
+          "heldout_miou_chosen": 0.7855257003325254,
+          "heldout_miou_reference": 0.7855257003325254
+        },
+        {
+          "fold": 1,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7826954567861266,
+          "train_miou_reference": 0.7826954567861266,
+          "heldout_miou_chosen": 0.811317784200029,
+          "heldout_miou_reference": 0.811317784200029
+        },
+        {
+          "fold": 2,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7902207711472634,
+          "train_miou_reference": 0.7902207711472634,
+          "heldout_miou_chosen": 0.7860865149002703,
+          "heldout_miou_reference": 0.7860865149002703
+        },
+        {
+          "fold": 3,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7911980667734382,
+          "train_miou_reference": 0.7911980667734382,
+          "heldout_miou_chosen": 0.7805150807239315,
+          "heldout_miou_reference": 0.7805150807239315
+        },
+        {
+          "fold": 4,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7909699209110543,
+          "train_miou_reference": 0.7909699209110543,
+          "heldout_miou_chosen": 0.7756694112164053,
+          "heldout_miou_reference": 0.7756694112164053
+        }
+      ],
+      "selection_counts": {
+        "REF/one_pass": 5
+      },
+      "vote_winner": "REF/one_pass",
+      "vote_winner_votes": 5,
+      "frozen": "REF/one_pass",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.7875084925836053,
+      "oof_miou_reference": 0.7875084925836053,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.425,
+      "full_threshold_reference": 0.425,
+      "full_miou_frozen": 0.7887910648095133,
+      "full_miou_reference": 0.7887910648095133,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "W2": {
+      "reference": "REF/one_pass",
+      "candidates": [
+        "W2/k2",
+        "W2/k4",
+        "W2/k6"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7901779895362109,
+          "train_miou_reference": 0.7901779895362109,
+          "heldout_miou_chosen": 0.7855257003325254,
+          "heldout_miou_reference": 0.7855257003325254
+        },
+        {
+          "fold": 1,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7826954567861266,
+          "train_miou_reference": 0.7826954567861266,
+          "heldout_miou_chosen": 0.811317784200029,
+          "heldout_miou_reference": 0.811317784200029
+        },
+        {
+          "fold": 2,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7902207711472634,
+          "train_miou_reference": 0.7902207711472634,
+          "heldout_miou_chosen": 0.7860865149002703,
+          "heldout_miou_reference": 0.7860865149002703
+        },
+        {
+          "fold": 3,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7911980667734382,
+          "train_miou_reference": 0.7911980667734382,
+          "heldout_miou_chosen": 0.7805150807239315,
+          "heldout_miou_reference": 0.7805150807239315
+        },
+        {
+          "fold": 4,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7909699209110543,
+          "train_miou_reference": 0.7909699209110543,
+          "heldout_miou_chosen": 0.7756694112164053,
+          "heldout_miou_reference": 0.7756694112164053
+        }
+      ],
+      "selection_counts": {
+        "REF/one_pass": 5
+      },
+      "vote_winner": "REF/one_pass",
+      "vote_winner_votes": 5,
+      "frozen": "REF/one_pass",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.7875084925836053,
+      "oof_miou_reference": 0.7875084925836053,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.425,
+      "full_threshold_reference": 0.425,
+      "full_miou_frozen": 0.7887910648095133,
+      "full_miou_reference": 0.7887910648095133,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "W4": {
+      "reference": "REF/one_pass",
+      "candidates": [
+        "W4/converged"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7901779895362109,
+          "train_miou_reference": 0.7901779895362109,
+          "heldout_miou_chosen": 0.7855257003325254,
+          "heldout_miou_reference": 0.7855257003325254
+        },
+        {
+          "fold": 1,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7826954567861266,
+          "train_miou_reference": 0.7826954567861266,
+          "heldout_miou_chosen": 0.811317784200029,
+          "heldout_miou_reference": 0.811317784200029
+        },
+        {
+          "fold": 2,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7902207711472634,
+          "train_miou_reference": 0.7902207711472634,
+          "heldout_miou_chosen": 0.7860865149002703,
+          "heldout_miou_reference": 0.7860865149002703
+        },
+        {
+          "fold": 3,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7911980667734382,
+          "train_miou_reference": 0.7911980667734382,
+          "heldout_miou_chosen": 0.7805150807239315,
+          "heldout_miou_reference": 0.7805150807239315
+        },
+        {
+          "fold": 4,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7909699209110543,
+          "train_miou_reference": 0.7909699209110543,
+          "heldout_miou_chosen": 0.7756694112164053,
+          "heldout_miou_reference": 0.7756694112164053
+        }
+      ],
+      "selection_counts": {
+        "REF/one_pass": 5
+      },
+      "vote_winner": "REF/one_pass",
+      "vote_winner_votes": 5,
+      "frozen": "REF/one_pass",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.7875084925836053,
+      "oof_miou_reference": 0.7875084925836053,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.425,
+      "full_threshold_reference": 0.425,
+      "full_miou_frozen": 0.7887910648095133,
+      "full_miou_reference": 0.7887910648095133,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "H1": {
+      "reference": "REF/one_pass",
+      "candidates": [
+        "H1/proportional"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7901779895362109,
+          "train_miou_reference": 0.7901779895362109,
+          "heldout_miou_chosen": 0.7855257003325254,
+          "heldout_miou_reference": 0.7855257003325254
+        },
+        {
+          "fold": 1,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7826954567861266,
+          "train_miou_reference": 0.7826954567861266,
+          "heldout_miou_chosen": 0.811317784200029,
+          "heldout_miou_reference": 0.811317784200029
+        },
+        {
+          "fold": 2,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7902207711472634,
+          "train_miou_reference": 0.7902207711472634,
+          "heldout_miou_chosen": 0.7860865149002703,
+          "heldout_miou_reference": 0.7860865149002703
+        },
+        {
+          "fold": 3,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7911980667734382,
+          "train_miou_reference": 0.7911980667734382,
+          "heldout_miou_chosen": 0.7805150807239315,
+          "heldout_miou_reference": 0.7805150807239315
+        },
+        {
+          "fold": 4,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7909699209110543,
+          "train_miou_reference": 0.7909699209110543,
+          "heldout_miou_chosen": 0.7756694112164053,
+          "heldout_miou_reference": 0.7756694112164053
+        }
+      ],
+      "selection_counts": {
+        "REF/one_pass": 5
+      },
+      "vote_winner": "REF/one_pass",
+      "vote_winner_votes": 5,
+      "frozen": "REF/one_pass",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.7875084925836053,
+      "oof_miou_reference": 0.7875084925836053,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.425,
+      "full_threshold_reference": 0.425,
+      "full_miou_frozen": 0.7887910648095133,
+      "full_miou_reference": 0.7887910648095133,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "G1": {
+      "reference": "REF/one_pass",
+      "candidates": [
+        "G1/tau090",
+        "G1/tau110"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7901779895362109,
+          "train_miou_reference": 0.7901779895362109,
+          "heldout_miou_chosen": 0.7855257003325254,
+          "heldout_miou_reference": 0.7855257003325254
+        },
+        {
+          "fold": 1,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7826954567861266,
+          "train_miou_reference": 0.7826954567861266,
+          "heldout_miou_chosen": 0.811317784200029,
+          "heldout_miou_reference": 0.811317784200029
+        },
+        {
+          "fold": 2,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7902207711472634,
+          "train_miou_reference": 0.7902207711472634,
+          "heldout_miou_chosen": 0.7860865149002703,
+          "heldout_miou_reference": 0.7860865149002703
+        },
+        {
+          "fold": 3,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7911980667734382,
+          "train_miou_reference": 0.7911980667734382,
+          "heldout_miou_chosen": 0.7805150807239315,
+          "heldout_miou_reference": 0.7805150807239315
+        },
+        {
+          "fold": 4,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7909699209110543,
+          "train_miou_reference": 0.7909699209110543,
+          "heldout_miou_chosen": 0.7756694112164053,
+          "heldout_miou_reference": 0.7756694112164053
+        }
+      ],
+      "selection_counts": {
+        "REF/one_pass": 5
+      },
+      "vote_winner": "REF/one_pass",
+      "vote_winner_votes": 5,
+      "frozen": "REF/one_pass",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.7875084925836053,
+      "oof_miou_reference": 0.7875084925836053,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.425,
+      "full_threshold_reference": 0.425,
+      "full_miou_frozen": 0.7887910648095133,
+      "full_miou_reference": 0.7887910648095133,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "G4": {
+      "reference": "REF/one_pass",
+      "candidates": [
+        "G4/s050",
+        "G4/s070",
+        "G4/s090"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7901779895362109,
+          "train_miou_reference": 0.7901779895362109,
+          "heldout_miou_chosen": 0.7855257003325254,
+          "heldout_miou_reference": 0.7855257003325254
+        },
+        {
+          "fold": 1,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7826954567861266,
+          "train_miou_reference": 0.7826954567861266,
+          "heldout_miou_chosen": 0.811317784200029,
+          "heldout_miou_reference": 0.811317784200029
+        },
+        {
+          "fold": 2,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7902207711472634,
+          "train_miou_reference": 0.7902207711472634,
+          "heldout_miou_chosen": 0.7860865149002703,
+          "heldout_miou_reference": 0.7860865149002703
+        },
+        {
+          "fold": 3,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7911980667734382,
+          "train_miou_reference": 0.7911980667734382,
+          "heldout_miou_chosen": 0.7805150807239315,
+          "heldout_miou_reference": 0.7805150807239315
+        },
+        {
+          "fold": 4,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7909699209110543,
+          "train_miou_reference": 0.7909699209110543,
+          "heldout_miou_chosen": 0.7756694112164053,
+          "heldout_miou_reference": 0.7756694112164053
+        }
+      ],
+      "selection_counts": {
+        "REF/one_pass": 5
+      },
+      "vote_winner": "REF/one_pass",
+      "vote_winner_votes": 5,
+      "frozen": "REF/one_pass",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.7875084925836053,
+      "oof_miou_reference": 0.7875084925836053,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.425,
+      "full_threshold_reference": 0.425,
+      "full_miou_frozen": 0.7887910648095133,
+      "full_miou_reference": 0.7887910648095133,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "M1": {
+      "reference": "REF/one_pass",
+      "candidates": [
+        "M1/ca_prototype"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7901779895362109,
+          "train_miou_reference": 0.7901779895362109,
+          "heldout_miou_chosen": 0.7855257003325254,
+          "heldout_miou_reference": 0.7855257003325254
+        },
+        {
+          "fold": 1,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7826954567861266,
+          "train_miou_reference": 0.7826954567861266,
+          "heldout_miou_chosen": 0.811317784200029,
+          "heldout_miou_reference": 0.811317784200029
+        },
+        {
+          "fold": 2,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7902207711472634,
+          "train_miou_reference": 0.7902207711472634,
+          "heldout_miou_chosen": 0.7860865149002703,
+          "heldout_miou_reference": 0.7860865149002703
+        },
+        {
+          "fold": 3,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7911980667734382,
+          "train_miou_reference": 0.7911980667734382,
+          "heldout_miou_chosen": 0.7805150807239315,
+          "heldout_miou_reference": 0.7805150807239315
+        },
+        {
+          "fold": 4,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7909699209110543,
+          "train_miou_reference": 0.7909699209110543,
+          "heldout_miou_chosen": 0.7756694112164053,
+          "heldout_miou_reference": 0.7756694112164053
+        }
+      ],
+      "selection_counts": {
+        "REF/one_pass": 5
+      },
+      "vote_winner": "REF/one_pass",
+      "vote_winner_votes": 5,
+      "frozen": "REF/one_pass",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.7875084925836053,
+      "oof_miou_reference": 0.7875084925836053,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.425,
+      "full_threshold_reference": 0.425,
+      "full_miou_frozen": 0.7887910648095133,
+      "full_miou_reference": 0.7887910648095133,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "M2": {
+      "reference": "REF/one_pass",
+      "candidates": [
+        "M2/k2",
+        "M2/k3",
+        "M2/k4"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7901779895362109,
+          "train_miou_reference": 0.7901779895362109,
+          "heldout_miou_chosen": 0.7855257003325254,
+          "heldout_miou_reference": 0.7855257003325254
+        },
+        {
+          "fold": 1,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7826954567861266,
+          "train_miou_reference": 0.7826954567861266,
+          "heldout_miou_chosen": 0.811317784200029,
+          "heldout_miou_reference": 0.811317784200029
+        },
+        {
+          "fold": 2,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7902207711472634,
+          "train_miou_reference": 0.7902207711472634,
+          "heldout_miou_chosen": 0.7860865149002703,
+          "heldout_miou_reference": 0.7860865149002703
+        },
+        {
+          "fold": 3,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7911980667734382,
+          "train_miou_reference": 0.7911980667734382,
+          "heldout_miou_chosen": 0.7805150807239315,
+          "heldout_miou_reference": 0.7805150807239315
+        },
+        {
+          "fold": 4,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7909699209110543,
+          "train_miou_reference": 0.7909699209110543,
+          "heldout_miou_chosen": 0.7756694112164053,
+          "heldout_miou_reference": 0.7756694112164053
+        }
+      ],
+      "selection_counts": {
+        "REF/one_pass": 5
+      },
+      "vote_winner": "REF/one_pass",
+      "vote_winner_votes": 5,
+      "frozen": "REF/one_pass",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.7875084925836053,
+      "oof_miou_reference": 0.7875084925836053,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.425,
+      "full_threshold_reference": 0.425,
+      "full_miou_frozen": 0.7887910648095133,
+      "full_miou_reference": 0.7887910648095133,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "R1": {
+      "reference": "REF/one_pass",
+      "candidates": [
+        "R1/w100",
+        "R1/w300",
+        "R1/w1000"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7901779895362109,
+          "train_miou_reference": 0.7901779895362109,
+          "heldout_miou_chosen": 0.7855257003325254,
+          "heldout_miou_reference": 0.7855257003325254
+        },
+        {
+          "fold": 1,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7826954567861266,
+          "train_miou_reference": 0.7826954567861266,
+          "heldout_miou_chosen": 0.811317784200029,
+          "heldout_miou_reference": 0.811317784200029
+        },
+        {
+          "fold": 2,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7902207711472634,
+          "train_miou_reference": 0.7902207711472634,
+          "heldout_miou_chosen": 0.7860865149002703,
+          "heldout_miou_reference": 0.7860865149002703
+        },
+        {
+          "fold": 3,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7911980667734382,
+          "train_miou_reference": 0.7911980667734382,
+          "heldout_miou_chosen": 0.7805150807239315,
+          "heldout_miou_reference": 0.7805150807239315
+        },
+        {
+          "fold": 4,
+          "chosen": "REF/one_pass",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7909699209110543,
+          "train_miou_reference": 0.7909699209110543,
+          "heldout_miou_chosen": 0.7756694112164053,
+          "heldout_miou_reference": 0.7756694112164053
+        }
+      ],
+      "selection_counts": {
+        "REF/one_pass": 5
+      },
+      "vote_winner": "REF/one_pass",
+      "vote_winner_votes": 5,
+      "frozen": "REF/one_pass",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.7875084925836053,
+      "oof_miou_reference": 0.7875084925836053,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.425,
+      "full_threshold_reference": 0.425,
+      "full_miou_frozen": 0.7887910648095133,
+      "full_miou_reference": 0.7887910648095133,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    }
+  },
+  "diagnostics": {
+    "C1_per_class_threshold": {
+      "label_using_diagnostic": true,
+      "oof_miou_per_class_threshold": 0.8348471177431612,
+      "oof_miou_global_threshold": 0.7875084925836053,
+      "gain": 0.04733862515955589,
+      "choices": [
+        {
+          "fold": 0,
+          "class": "aeroplane",
+          "threshold": 0.475
+        },
+        {
+          "fold": 0,
+          "class": "bicycle",
+          "threshold": 0.475
+        },
+        {
+          "fold": 0,
+          "class": "bird",
+          "threshold": 0.475
+        },
+        {
+          "fold": 0,
+          "class": "boat",
+          "threshold": 0.55
+        },
+        {
+          "fold": 0,
+          "class": "bottle",
+          "threshold": 0.5
+        },
+        {
+          "fold": 0,
+          "class": "bus",
+          "threshold": 0.525
+        },
+        {
+          "fold": 0,
+          "class": "car",
+          "threshold": 0.5
+        },
+        {
+          "fold": 0,
+          "class": "cat",
+          "threshold": 0.3
+        },
+        {
+          "fold": 0,
+          "class": "chair",
+          "threshold": 0.6
+        },
+        {
+          "fold": 0,
+          "class": "cow",
+          "threshold": 0.325
+        },
+        {
+          "fold": 0,
+          "class": "dining-table",
+          "threshold": 0.6
+        },
+        {
+          "fold": 0,
+          "class": "dog",
+          "threshold": 0.4
+        },
+        {
+          "fold": 0,
+          "class": "horse",
+          "threshold": 0.45
+        },
+        {
+          "fold": 0,
+          "class": "motorbike",
+          "threshold": 0.525
+        },
+        {
+          "fold": 0,
+          "class": "person",
+          "threshold": 0.3
+        },
+        {
+          "fold": 0,
+          "class": "potted-plant",
+          "threshold": 0.325
+        },
+        {
+          "fold": 0,
+          "class": "sheep",
+          "threshold": 0.325
+        },
+        {
+          "fold": 0,
+          "class": "sofa",
+          "threshold": 0.5
+        },
+        {
+          "fold": 0,
+          "class": "train",
+          "threshold": 0.65
+        },
+        {
+          "fold": 0,
+          "class": "tv",
+          "threshold": 0.3
+        },
+        {
+          "fold": 1,
+          "class": "aeroplane",
+          "threshold": 0.5
+        },
+        {
+          "fold": 1,
+          "class": "bicycle",
+          "threshold": 0.475
+        },
+        {
+          "fold": 1,
+          "class": "bird",
+          "threshold": 0.475
+        },
+        {
+          "fold": 1,
+          "class": "boat",
+          "threshold": 0.55
+        },
+        {
+          "fold": 1,
+          "class": "bottle",
+          "threshold": 0.5
+        },
+        {
+          "fold": 1,
+          "class": "bus",
+          "threshold": 0.525
+        },
+        {
+          "fold": 1,
+          "class": "car",
+          "threshold": 0.475
+        },
+        {
+          "fold": 1,
+          "class": "cat",
+          "threshold": 0.3
+        },
+        {
+          "fold": 1,
+          "class": "chair",
+          "threshold": 0.6
+        },
+        {
+          "fold": 1,
+          "class": "cow",
+          "threshold": 0.325
+        },
+        {
+          "fold": 1,
+          "class": "dining-table",
+          "threshold": 0.625
+        },
+        {
+          "fold": 1,
+          "class": "dog",
+          "threshold": 0.375
+        },
+        {
+          "fold": 1,
+          "class": "horse",
+          "threshold": 0.5
+        },
+        {
+          "fold": 1,
+          "class": "motorbike",
+          "threshold": 0.525
+        },
+        {
+          "fold": 1,
+          "class": "person",
+          "threshold": 0.3
+        },
+        {
+          "fold": 1,
+          "class": "potted-plant",
+          "threshold": 0.3
+        },
+        {
+          "fold": 1,
+          "class": "sheep",
+          "threshold": 0.3
+        },
+        {
+          "fold": 1,
+          "class": "sofa",
+          "threshold": 0.5
+        },
+        {
+          "fold": 1,
+          "class": "train",
+          "threshold": 0.675
+        },
+        {
+          "fold": 1,
+          "class": "tv",
+          "threshold": 0.3
+        },
+        {
+          "fold": 2,
+          "class": "aeroplane",
+          "threshold": 0.475
+        },
+        {
+          "fold": 2,
+          "class": "bicycle",
+          "threshold": 0.475
+        },
+        {
+          "fold": 2,
+          "class": "bird",
+          "threshold": 0.475
+        },
+        {
+          "fold": 2,
+          "class": "boat",
+          "threshold": 0.55
+        },
+        {
+          "fold": 2,
+          "class": "bottle",
+          "threshold": 0.5
+        },
+        {
+          "fold": 2,
+          "class": "bus",
+          "threshold": 0.525
+        },
+        {
+          "fold": 2,
+          "class": "car",
+          "threshold": 0.5
+        },
+        {
+          "fold": 2,
+          "class": "cat",
+          "threshold": 0.3
+        },
+        {
+          "fold": 2,
+          "class": "chair",
+          "threshold": 0.625
+        },
+        {
+          "fold": 2,
+          "class": "cow",
+          "threshold": 0.325
+        },
+        {
+          "fold": 2,
+          "class": "dining-table",
+          "threshold": 0.625
+        },
+        {
+          "fold": 2,
+          "class": "dog",
+          "threshold": 0.4
+        },
+        {
+          "fold": 2,
+          "class": "horse",
+          "threshold": 0.45
+        },
+        {
+          "fold": 2,
+          "class": "motorbike",
+          "threshold": 0.525
+        },
+        {
+          "fold": 2,
+          "class": "person",
+          "threshold": 0.3
+        },
+        {
+          "fold": 2,
+          "class": "potted-plant",
+          "threshold": 0.3
+        },
+        {
+          "fold": 2,
+          "class": "sheep",
+          "threshold": 0.325
+        },
+        {
+          "fold": 2,
+          "class": "sofa",
+          "threshold": 0.5
+        },
+        {
+          "fold": 2,
+          "class": "train",
+          "threshold": 0.65
+        },
+        {
+          "fold": 2,
+          "class": "tv",
+          "threshold": 0.3
+        },
+        {
+          "fold": 3,
+          "class": "aeroplane",
+          "threshold": 0.5
+        },
+        {
+          "fold": 3,
+          "class": "bicycle",
+          "threshold": 0.5
+        },
+        {
+          "fold": 3,
+          "class": "bird",
+          "threshold": 0.475
+        },
+        {
+          "fold": 3,
+          "class": "boat",
+          "threshold": 0.575
+        },
+        {
+          "fold": 3,
+          "class": "bottle",
+          "threshold": 0.475
+        },
+        {
+          "fold": 3,
+          "class": "bus",
+          "threshold": 0.55
+        },
+        {
+          "fold": 3,
+          "class": "car",
+          "threshold": 0.475
+        },
+        {
+          "fold": 3,
+          "class": "cat",
+          "threshold": 0.3
+        },
+        {
+          "fold": 3,
+          "class": "chair",
+          "threshold": 0.6
+        },
+        {
+          "fold": 3,
+          "class": "cow",
+          "threshold": 0.325
+        },
+        {
+          "fold": 3,
+          "class": "dining-table",
+          "threshold": 0.6
+        },
+        {
+          "fold": 3,
+          "class": "dog",
+          "threshold": 0.375
+        },
+        {
+          "fold": 3,
+          "class": "horse",
+          "threshold": 0.475
+        },
+        {
+          "fold": 3,
+          "class": "motorbike",
+          "threshold": 0.525
+        },
+        {
+          "fold": 3,
+          "class": "person",
+          "threshold": 0.3
+        },
+        {
+          "fold": 3,
+          "class": "potted-plant",
+          "threshold": 0.325
+        },
+        {
+          "fold": 3,
+          "class": "sheep",
+          "threshold": 0.325
+        },
+        {
+          "fold": 3,
+          "class": "sofa",
+          "threshold": 0.525
+        },
+        {
+          "fold": 3,
+          "class": "train",
+          "threshold": 0.65
+        },
+        {
+          "fold": 3,
+          "class": "tv",
+          "threshold": 0.3
+        },
+        {
+          "fold": 4,
+          "class": "aeroplane",
+          "threshold": 0.475
+        },
+        {
+          "fold": 4,
+          "class": "bicycle",
+          "threshold": 0.5
+        },
+        {
+          "fold": 4,
+          "class": "bird",
+          "threshold": 0.5
+        },
+        {
+          "fold": 4,
+          "class": "boat",
+          "threshold": 0.55
+        },
+        {
+          "fold": 4,
+          "class": "bottle",
+          "threshold": 0.5
+        },
+        {
+          "fold": 4,
+          "class": "bus",
+          "threshold": 0.525
+        },
+        {
+          "fold": 4,
+          "class": "car",
+          "threshold": 0.5
+        },
+        {
+          "fold": 4,
+          "class": "cat",
+          "threshold": 0.3
+        },
+        {
+          "fold": 4,
+          "class": "chair",
+          "threshold": 0.6
+        },
+        {
+          "fold": 4,
+          "class": "cow",
+          "threshold": 0.35
+        },
+        {
+          "fold": 4,
+          "class": "dining-table",
+          "threshold": 0.6
+        },
+        {
+          "fold": 4,
+          "class": "dog",
+          "threshold": 0.4
+        },
+        {
+          "fold": 4,
+          "class": "horse",
+          "threshold": 0.425
+        },
+        {
+          "fold": 4,
+          "class": "motorbike",
+          "threshold": 0.5
+        },
+        {
+          "fold": 4,
+          "class": "person",
+          "threshold": 0.3
+        },
+        {
+          "fold": 4,
+          "class": "potted-plant",
+          "threshold": 0.325
+        },
+        {
+          "fold": 4,
+          "class": "sheep",
+          "threshold": 0.3
+        },
+        {
+          "fold": 4,
+          "class": "sofa",
+          "threshold": 0.5
+        },
+        {
+          "fold": 4,
+          "class": "train",
+          "threshold": 0.65
+        },
+        {
+          "fold": 4,
+          "class": "tv",
+          "threshold": 0.3
+        }
+      ]
+    },
+    "C2_per_class_operator": {
+      "label_using_diagnostic": true,
+      "candidate_cells": [
+        "REF/one_pass"
+      ],
+      "oof_miou_per_class_operator": 0.8348471177431612,
+      "oof_miou_reference": 0.7875084925836053,
+      "gain": 0.04733862515955589,
+      "choices": [
+        {
+          "fold": 0,
+          "class": "aeroplane",
+          "configuration": "REF/one_pass",
+          "threshold": 0.475
+        },
+        {
+          "fold": 0,
+          "class": "bicycle",
+          "configuration": "REF/one_pass",
+          "threshold": 0.475
+        },
+        {
+          "fold": 0,
+          "class": "bird",
+          "configuration": "REF/one_pass",
+          "threshold": 0.475
+        },
+        {
+          "fold": 0,
+          "class": "boat",
+          "configuration": "REF/one_pass",
+          "threshold": 0.55
+        },
+        {
+          "fold": 0,
+          "class": "bottle",
+          "configuration": "REF/one_pass",
+          "threshold": 0.5
+        },
+        {
+          "fold": 0,
+          "class": "bus",
+          "configuration": "REF/one_pass",
+          "threshold": 0.525
+        },
+        {
+          "fold": 0,
+          "class": "car",
+          "configuration": "REF/one_pass",
+          "threshold": 0.5
+        },
+        {
+          "fold": 0,
+          "class": "cat",
+          "configuration": "REF/one_pass",
+          "threshold": 0.3
+        },
+        {
+          "fold": 0,
+          "class": "chair",
+          "configuration": "REF/one_pass",
+          "threshold": 0.6
+        },
+        {
+          "fold": 0,
+          "class": "cow",
+          "configuration": "REF/one_pass",
+          "threshold": 0.325
+        },
+        {
+          "fold": 0,
+          "class": "dining-table",
+          "configuration": "REF/one_pass",
+          "threshold": 0.6
+        },
+        {
+          "fold": 0,
+          "class": "dog",
+          "configuration": "REF/one_pass",
+          "threshold": 0.4
+        },
+        {
+          "fold": 0,
+          "class": "horse",
+          "configuration": "REF/one_pass",
+          "threshold": 0.45
+        },
+        {
+          "fold": 0,
+          "class": "motorbike",
+          "configuration": "REF/one_pass",
+          "threshold": 0.525
+        },
+        {
+          "fold": 0,
+          "class": "person",
+          "configuration": "REF/one_pass",
+          "threshold": 0.3
+        },
+        {
+          "fold": 0,
+          "class": "potted-plant",
+          "configuration": "REF/one_pass",
+          "threshold": 0.325
+        },
+        {
+          "fold": 0,
+          "class": "sheep",
+          "configuration": "REF/one_pass",
+          "threshold": 0.325
+        },
+        {
+          "fold": 0,
+          "class": "sofa",
+          "configuration": "REF/one_pass",
+          "threshold": 0.5
+        },
+        {
+          "fold": 0,
+          "class": "train",
+          "configuration": "REF/one_pass",
+          "threshold": 0.65
+        },
+        {
+          "fold": 0,
+          "class": "tv",
+          "configuration": "REF/one_pass",
+          "threshold": 0.3
+        },
+        {
+          "fold": 1,
+          "class": "aeroplane",
+          "configuration": "REF/one_pass",
+          "threshold": 0.5
+        },
+        {
+          "fold": 1,
+          "class": "bicycle",
+          "configuration": "REF/one_pass",
+          "threshold": 0.475
+        },
+        {
+          "fold": 1,
+          "class": "bird",
+          "configuration": "REF/one_pass",
+          "threshold": 0.475
+        },
+        {
+          "fold": 1,
+          "class": "boat",
+          "configuration": "REF/one_pass",
+          "threshold": 0.55
+        },
+        {
+          "fold": 1,
+          "class": "bottle",
+          "configuration": "REF/one_pass",
+          "threshold": 0.5
+        },
+        {
+          "fold": 1,
+          "class": "bus",
+          "configuration": "REF/one_pass",
+          "threshold": 0.525
+        },
+        {
+          "fold": 1,
+          "class": "car",
+          "configuration": "REF/one_pass",
+          "threshold": 0.475
+        },
+        {
+          "fold": 1,
+          "class": "cat",
+          "configuration": "REF/one_pass",
+          "threshold": 0.3
+        },
+        {
+          "fold": 1,
+          "class": "chair",
+          "configuration": "REF/one_pass",
+          "threshold": 0.6
+        },
+        {
+          "fold": 1,
+          "class": "cow",
+          "configuration": "REF/one_pass",
+          "threshold": 0.325
+        },
+        {
+          "fold": 1,
+          "class": "dining-table",
+          "configuration": "REF/one_pass",
+          "threshold": 0.625
+        },
+        {
+          "fold": 1,
+          "class": "dog",
+          "configuration": "REF/one_pass",
+          "threshold": 0.375
+        },
+        {
+          "fold": 1,
+          "class": "horse",
+          "configuration": "REF/one_pass",
+          "threshold": 0.5
+        },
+        {
+          "fold": 1,
+          "class": "motorbike",
+          "configuration": "REF/one_pass",
+          "threshold": 0.525
+        },
+        {
+          "fold": 1,
+          "class": "person",
+          "configuration": "REF/one_pass",
+          "threshold": 0.3
+        },
+        {
+          "fold": 1,
+          "class": "potted-plant",
+          "configuration": "REF/one_pass",
+          "threshold": 0.3
+        },
+        {
+          "fold": 1,
+          "class": "sheep",
+          "configuration": "REF/one_pass",
+          "threshold": 0.3
+        },
+        {
+          "fold": 1,
+          "class": "sofa",
+          "configuration": "REF/one_pass",
+          "threshold": 0.5
+        },
+        {
+          "fold": 1,
+          "class": "train",
+          "configuration": "REF/one_pass",
+          "threshold": 0.675
+        },
+        {
+          "fold": 1,
+          "class": "tv",
+          "configuration": "REF/one_pass",
+          "threshold": 0.3
+        },
+        {
+          "fold": 2,
+          "class": "aeroplane",
+          "configuration": "REF/one_pass",
+          "threshold": 0.475
+        },
+        {
+          "fold": 2,
+          "class": "bicycle",
+          "configuration": "REF/one_pass",
+          "threshold": 0.475
+        },
+        {
+          "fold": 2,
+          "class": "bird",
+          "configuration": "REF/one_pass",
+          "threshold": 0.475
+        },
+        {
+          "fold": 2,
+          "class": "boat",
+          "configuration": "REF/one_pass",
+          "threshold": 0.55
+        },
+        {
+          "fold": 2,
+          "class": "bottle",
+          "configuration": "REF/one_pass",
+          "threshold": 0.5
+        },
+        {
+          "fold": 2,
+          "class": "bus",
+          "configuration": "REF/one_pass",
+          "threshold": 0.525
+        },
+        {
+          "fold": 2,
+          "class": "car",
+          "configuration": "REF/one_pass",
+          "threshold": 0.5
+        },
+        {
+          "fold": 2,
+          "class": "cat",
+          "configuration": "REF/one_pass",
+          "threshold": 0.3
+        },
+        {
+          "fold": 2,
+          "class": "chair",
+          "configuration": "REF/one_pass",
+          "threshold": 0.625
+        },
+        {
+          "fold": 2,
+          "class": "cow",
+          "configuration": "REF/one_pass",
+          "threshold": 0.325
+        },
+        {
+          "fold": 2,
+          "class": "dining-table",
+          "configuration": "REF/one_pass",
+          "threshold": 0.625
+        },
+        {
+          "fold": 2,
+          "class": "dog",
+          "configuration": "REF/one_pass",
+          "threshold": 0.4
+        },
+        {
+          "fold": 2,
+          "class": "horse",
+          "configuration": "REF/one_pass",
+          "threshold": 0.45
+        },
+        {
+          "fold": 2,
+          "class": "motorbike",
+          "configuration": "REF/one_pass",
+          "threshold": 0.525
+        },
+        {
+          "fold": 2,
+          "class": "person",
+          "configuration": "REF/one_pass",
+          "threshold": 0.3
+        },
+        {
+          "fold": 2,
+          "class": "potted-plant",
+          "configuration": "REF/one_pass",
+          "threshold": 0.3
+        },
+        {
+          "fold": 2,
+          "class": "sheep",
+          "configuration": "REF/one_pass",
+          "threshold": 0.325
+        },
+        {
+          "fold": 2,
+          "class": "sofa",
+          "configuration": "REF/one_pass",
+          "threshold": 0.5
+        },
+        {
+          "fold": 2,
+          "class": "train",
+          "configuration": "REF/one_pass",
+          "threshold": 0.65
+        },
+        {
+          "fold": 2,
+          "class": "tv",
+          "configuration": "REF/one_pass",
+          "threshold": 0.3
+        },
+        {
+          "fold": 3,
+          "class": "aeroplane",
+          "configuration": "REF/one_pass",
+          "threshold": 0.5
+        },
+        {
+          "fold": 3,
+          "class": "bicycle",
+          "configuration": "REF/one_pass",
+          "threshold": 0.5
+        },
+        {
+          "fold": 3,
+          "class": "bird",
+          "configuration": "REF/one_pass",
+          "threshold": 0.475
+        },
+        {
+          "fold": 3,
+          "class": "boat",
+          "configuration": "REF/one_pass",
+          "threshold": 0.575
+        },
+        {
+          "fold": 3,
+          "class": "bottle",
+          "configuration": "REF/one_pass",
+          "threshold": 0.475
+        },
+        {
+          "fold": 3,
+          "class": "bus",
+          "configuration": "REF/one_pass",
+          "threshold": 0.55
+        },
+        {
+          "fold": 3,
+          "class": "car",
+          "configuration": "REF/one_pass",
+          "threshold": 0.475
+        },
+        {
+          "fold": 3,
+          "class": "cat",
+          "configuration": "REF/one_pass",
+          "threshold": 0.3
+        },
+        {
+          "fold": 3,
+          "class": "chair",
+          "configuration": "REF/one_pass",
+          "threshold": 0.6
+        },
+        {
+          "fold": 3,
+          "class": "cow",
+          "configuration": "REF/one_pass",
+          "threshold": 0.325
+        },
+        {
+          "fold": 3,
+          "class": "dining-table",
+          "configuration": "REF/one_pass",
+          "threshold": 0.6
+        },
+        {
+          "fold": 3,
+          "class": "dog",
+          "configuration": "REF/one_pass",
+          "threshold": 0.375
+        },
+        {
+          "fold": 3,
+          "class": "horse",
+          "configuration": "REF/one_pass",
+          "threshold": 0.475
+        },
+        {
+          "fold": 3,
+          "class": "motorbike",
+          "configuration": "REF/one_pass",
+          "threshold": 0.525
+        },
+        {
+          "fold": 3,
+          "class": "person",
+          "configuration": "REF/one_pass",
+          "threshold": 0.3
+        },
+        {
+          "fold": 3,
+          "class": "potted-plant",
+          "configuration": "REF/one_pass",
+          "threshold": 0.325
+        },
+        {
+          "fold": 3,
+          "class": "sheep",
+          "configuration": "REF/one_pass",
+          "threshold": 0.325
+        },
+        {
+          "fold": 3,
+          "class": "sofa",
+          "configuration": "REF/one_pass",
+          "threshold": 0.525
+        },
+        {
+          "fold": 3,
+          "class": "train",
+          "configuration": "REF/one_pass",
+          "threshold": 0.65
+        },
+        {
+          "fold": 3,
+          "class": "tv",
+          "configuration": "REF/one_pass",
+          "threshold": 0.3
+        },
+        {
+          "fold": 4,
+          "class": "aeroplane",
+          "configuration": "REF/one_pass",
+          "threshold": 0.475
+        },
+        {
+          "fold": 4,
+          "class": "bicycle",
+          "configuration": "REF/one_pass",
+          "threshold": 0.5
+        },
+        {
+          "fold": 4,
+          "class": "bird",
+          "configuration": "REF/one_pass",
+          "threshold": 0.5
+        },
+        {
+          "fold": 4,
+          "class": "boat",
+          "configuration": "REF/one_pass",
+          "threshold": 0.55
+        },
+        {
+          "fold": 4,
+          "class": "bottle",
+          "configuration": "REF/one_pass",
+          "threshold": 0.5
+        },
+        {
+          "fold": 4,
+          "class": "bus",
+          "configuration": "REF/one_pass",
+          "threshold": 0.525
+        },
+        {
+          "fold": 4,
+          "class": "car",
+          "configuration": "REF/one_pass",
+          "threshold": 0.5
+        },
+        {
+          "fold": 4,
+          "class": "cat",
+          "configuration": "REF/one_pass",
+          "threshold": 0.3
+        },
+        {
+          "fold": 4,
+          "class": "chair",
+          "configuration": "REF/one_pass",
+          "threshold": 0.6
+        },
+        {
+          "fold": 4,
+          "class": "cow",
+          "configuration": "REF/one_pass",
+          "threshold": 0.35
+        },
+        {
+          "fold": 4,
+          "class": "dining-table",
+          "configuration": "REF/one_pass",
+          "threshold": 0.6
+        },
+        {
+          "fold": 4,
+          "class": "dog",
+          "configuration": "REF/one_pass",
+          "threshold": 0.4
+        },
+        {
+          "fold": 4,
+          "class": "horse",
+          "configuration": "REF/one_pass",
+          "threshold": 0.425
+        },
+        {
+          "fold": 4,
+          "class": "motorbike",
+          "configuration": "REF/one_pass",
+          "threshold": 0.5
+        },
+        {
+          "fold": 4,
+          "class": "person",
+          "configuration": "REF/one_pass",
+          "threshold": 0.3
+        },
+        {
+          "fold": 4,
+          "class": "potted-plant",
+          "configuration": "REF/one_pass",
+          "threshold": 0.325
+        },
+        {
+          "fold": 4,
+          "class": "sheep",
+          "configuration": "REF/one_pass",
+          "threshold": 0.3
+        },
+        {
+          "fold": 4,
+          "class": "sofa",
+          "configuration": "REF/one_pass",
+          "threshold": 0.5
+        },
+        {
+          "fold": 4,
+          "class": "train",
+          "configuration": "REF/one_pass",
+          "threshold": 0.65
+        },
+        {
+          "fold": 4,
+          "class": "tv",
+          "configuration": "REF/one_pass",
+          "threshold": 0.3
+        }
+      ]
+    }
+  }
+}

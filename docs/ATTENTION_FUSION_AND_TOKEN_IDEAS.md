@@ -65,9 +65,9 @@ These make each conclusion reportable with the same evidence as CA-C and SA-C.
 | W3 | Average-before power | `Āⁿ c` | n = 1–4 (n = 1 must equal REF) | — | Codex | 1 | Complete: REF retained; protocol Section 43 |
 | P2 | Restart (personalized PageRank) | `x ← (1−β) A x + β c` from `x₀ = c`, both aggregation orders | β ∈ {0.10, 0.25, 0.50, 0.75}; iterations ∈ {2, 4, 8} | over-focus and leaking | Codex | 1 | Complete: REF retained for both orders; protocol Section 43 |
 | P6 | Sparse affinity | row-wise top-k of `A_i`, renormalized, one pass | k ∈ {16, 32, 64, 128, 256, 512, 1024} | leaking | Codex | 1 | Complete: REF retained; protocol Section 43 |
-| P3 | Heat kernel | `Σ_{k=0}^{8} e^{−t} tᵏ/k! Āᵏ c` (truncated at 8 terms) | t ∈ {0.5, 1, 2, 4} | removes the hard choice of n | Codex | 2 | Registered in protocol Section 82; combined training-free run |
-| P5 | Symmetric affinity | `(D^{−½} W D^{−½})ⁿ c`, `W = (Ā + Āᵀ)/2` | n = 1–4 | — | Codex | 2 | Registered in protocol Section 82; combined training-free run |
-| P9 | Seeded progressive expansion (SeeDiff-style *(to verify)*) | threshold `c` into confident seeds, expand through SA from coarse to fine modules, then a background expansion stage | seed threshold ∈ {0.5, 0.7, 0.9}; module path; background stage on/off | over-focus and leaking | Codex | 3 | Exact path/operator frozen in Section 82 config; combined training-free run |
+| P3 | Heat kernel | `Σ_{k=0}^{8} e^{−t} tᵏ/k! Āᵏ c` (truncated at 8 terms) | t ∈ {0.5, 1, 2, 4} | removes the hard choice of n | Codex | 2 | Complete, Section 83: REF retained 5/5; best VOC 0.7872 (`t=4`) |
+| P5 | Symmetric affinity | `(D^{−½} W D^{−½})ⁿ c`, `W = (Ā + Āᵀ)/2` | n = 1–4 | — | Codex | 2 | Complete, Section 83: REF retained 5/5; best VOC 0.7895 (`n=2`, +0.0007) |
+| P9 | Seeded progressive expansion (SeeDiff-style *(to verify)*) | threshold `c` into confident seeds, expand through SA from coarse to fine modules, then a background expansion stage | seed threshold ∈ {0.5, 0.7, 0.9}; module path; background stage on/off | over-focus and leaking | Codex | 3 | Complete, Section 83: REF retained 5/5; `s=.5,bg=off` VOC 0.7783, COCO 0.6490 |
 | P7 | Rollout across modules | `A_L ⋯ A₁ c` | module order | — | — | — | Superseded: SA-C froze a single module |
 | P8 | Column propagation | `Aᵀ c` | — | — | — | — | Done (SA package B): far worse |
 
@@ -80,21 +80,21 @@ All take the min–max normalized `c` and `y = REF` as inputs.
 | P4 | Residual mix | `λ y + (1−λ) c` | λ ∈ {0.25, 0.50, 0.75, 0.90} (λ = 1 is REF) | leaking | Claude | 1 | Done (protocol Section 44): not promoted |
 | F3 | Gating | `c ⊙ y` | — | leaking | Claude | 1 | Done (Section 44): not promoted (0.514 at 0.45) |
 | F4 | Geometric mean | `√(c ⊙ y)` | — | leaking | Claude | 1 | Done (Section 44): not promoted |
-| F2 | Column-mass gate | `y ⊙ norm_[α,1](Σ_i A_{ij})` | α ∈ {0, 0.25, 0.50, 0.75} | background suppression | Codex; Claude reviews | 2 | Registered in protocol Section 82; combined training-free run |
+| F2 | Column-mass gate | `y ⊙ norm_[α,1](Σ_i A_{ij})` | α ∈ {0, 0.25, 0.50, 0.75} | background suppression | Codex; Claude reviews | 2 | Complete, Section 83: REF retained 5/5; all candidates below REF |
 | N2 | Percentile normalization | percentile 1–99 clip, then rescale, before thresholding | — | calibration | Claude | 1 | Done (Section 44): not promoted |
 | N3 | Max normalization (OVAM) | `y / max(y)` | — | calibration | Claude | 1 | Done (Section 44): not promoted (class losses > 0.05) |
 | N4 | Per-image adaptive threshold | Otsu threshold per image instead of a global one | — | calibration; per-image scale | Claude | 1 | Done (Section 44): conditional-band gain, rejected by the class-loss rule (`sheep` −0.07) |
-| BG1 | Background map | propagate the start-token CA map the same way; foreground where `y > γ · bg` | γ ∈ {0.50, 0.75, 1.0, 1.25, 1.5} | background handling (Faiz's plan) | Codex; Claude reviews | 2 | Registered in protocol Section 82; combined training-free run |
+| BG1 | Background map | propagate the start-token CA map the same way; foreground where `y > γ · bg` | γ ∈ {0.50, 0.75, 1.0, 1.25, 1.5} | background handling (Faiz's plan) | Codex; Claude reviews | 2 | Complete, Section 83: REF retained 5/5; direct BOS comparison fails badly |
 | F1 | Upstream OVAM fusion | `c ⊙ norm_[α,1](S₁)` with the all-ones value tensor | α | — | — | — | Reference-fidelity baseline only (`ovam_full.py`) |
 
 ### 1.3 Label-free weighting of observations
 
 | ID | Method | Definition | Registered grid | Owner | Tier | Status |
 |---|---|---|---|---|---|---|
-| W1 | Entropy weighting (NERVE-style *(to verify)*) | weight each `A_i c` by `1 / entropy(A_i c)` | temperature ∈ {0.5, 1, 2} | Codex; Claude reviews | 2 | Exact weighting frozen in Section 82 config; combined training-free run |
-| W2 | Agreement-based heads | per image, keep the heads whose `A_i c` correlates most with `c` | keep ∈ {2, 4, 6} heads | Codex; Claude reviews | 2 | Registered in protocol Section 82; combined training-free run |
-| W4 | Iterate to convergence | alternate `Ā` and min–max until the change is < 10⁻⁴ | max iterations 50 | Codex | 3 | Registered in protocol Section 82; combined training-free run |
-| H1 | Hierarchical multi-resolution CA/SA fusion (FA-Seg-style *(to verify)*) | learned-free weighted sum over resolutions | weights by resolution | Codex | 3 | Exact proportional weighting frozen in Section 82 config; combined training-free run |
+| W1 | Entropy weighting (NERVE-style *(to verify)*) | weight each `A_i c` by `1 / entropy(A_i c)` | temperature ∈ {0.5, 1, 2} | Codex; Claude reviews | 2 | Complete, Section 83: REF retained 5/5; effectively identical (+0.0002 max) |
+| W2 | Agreement-based heads | per image, keep the heads whose `A_i c` correlates most with `c` | keep ∈ {2, 4, 6} heads | Codex; Claude reviews | 2 | Complete, Section 83: REF retained 5/5; selecting fewer heads hurts |
+| W4 | Iterate to convergence | alternate `Ā` and min–max until the change is < 10⁻⁴ | max iterations 50 | Codex | 3 | Complete, Section 83: REF retained 5/5; convergence collapses VOC to 0.6113 |
+| H1 | Hierarchical multi-resolution CA/SA fusion (FA-Seg-style *(to verify)*) | learned-free weighted sum over resolutions | weights by resolution | Codex | 3 | Complete, Section 83: REF retained 5/5; VOC 0.7813, COCO 0.6270 |
 
 ### 1.4 Segment then label (object-aligned boundaries)
 
@@ -102,25 +102,25 @@ All take the min–max normalized `c` and `y = REF` as inputs.
 |---|---|---|---|---|---|---|
 | G3 | k-means on SA rows | cluster the 4096 rows of `Ā`; a segment is foreground if its mean `y` ≥ threshold | K ∈ {4, 8, 16} | Claude | 2 | Covered by standalone SG4, protocol Section 81 |
 | G2 | Spectral clustering | eigenvectors of the symmetric `Ā` graph, then as G3 | K ∈ {4, 8, 16} | Claude | 2 | Covered by standalone SG4, protocol Section 81 |
-| G1 | Attention-map merging (DiffSeg **[OVAM 48]**) | KL-based merging of SA rows, label by mean `y` | DiffSeg's merge threshold and anchors | Codex; Claude reviews | 3 | Official merge rule and fixed-pair adaptation registered in Section 82 |
-| G4 | Seeded region growing | grow from the peaks of `c` while SA similarity stays high | similarity ∈ {0.5, 0.7, 0.9} | Codex | 3 | Exact 4-connected query-feature operator frozen in Section 82 config |
-| M1 | CA-weighted prototype | `p = Σⱼ cⱼ fⱼ / Σⱼ cⱼ`, mask from `cos(fᵢ, p)`, `f` = SA queries | — | Codex | 3 | Registered in protocol Section 82; combined training-free run |
-| M2 | Multiple prototypes | k-means inside high-`c` pixels, max similarity | k ∈ {2, 3, 4} | Codex | 3 | Registered in protocol Section 82; combined training-free run |
+| G1 | Attention-map merging (DiffSeg **[OVAM 48]**) | KL-based merging of SA rows, label by mean `y` | DiffSeg's merge threshold and anchors | Codex; Claude reviews | 3 | Complete, Section 83: REF retained 5/5; best VOC 0.6963 |
+| G4 | Seeded region growing | grow from the peaks of `c` while SA similarity stays high | similarity ∈ {0.5, 0.7, 0.9} | Codex | 3 | Complete, Section 83: REF retained 5/5; best VOC 0.3729 |
+| M1 | CA-weighted prototype | `p = Σⱼ cⱼ fⱼ / Σⱼ cⱼ`, mask from `cos(fᵢ, p)`, `f` = SA queries | — | Codex | 3 | Complete, Section 83: REF retained 5/5; VOC 0.3913 |
+| M2 | Multiple prototypes | k-means inside high-`c` pixels, max similarity | k ∈ {2, 3, 4} | Codex | 3 | Complete, Section 83: REF retained 5/5; best VOC 0.5822 |
 
 ### 1.5 Refinement
 
 | ID | Method | Definition | Registered grid | Track | Owner | Tier | Status |
 |---|---|---|---|---|---|---|---|
 | R2 | DenseCRF on RGB (OVAM's) | SimpleCRF with OVAM's parameters on the regenerated image, unary from the map | OVAM's parameters fixed | training-free | Claude | 1 | **Promoted to P3-C** (Section 44): OOF 0.7875 → 0.8049, 5/5 |
-| R1 | CRF with SA edges | `y` as unary, `Ā` as pairwise affinity | pairwise weight ∈ {1, 3, 10} | training-free | Codex | 3 | Five-step mean-field operator frozen in Section 82 config |
+| R1 | CRF with SA edges | `y` as unary, `Ā` as pairwise affinity | pairwise weight ∈ {1, 3, 10} | training-free | Codex | 3 | Complete, Section 83: REF retained 5/5; `w=1` VOC 0.7929 (+0.0041), COCO 0.6300 |
 | X1 | SAM refinement (Faiz's plan) | prompts from `y`: top points, box, coarse mask | prompt type × number of points | external segmenter (R10) | unassigned | 3 | Not run |
 
 ### 1.6 Class-adaptive choices (protocol Section 8; Faiz's plan)
 
 | ID | Method | Definition | Owner | Tier | Status |
 |---|---|---|---|---|---|
-| C1 | Per-class threshold | each class picks its own threshold on the training folds | Codex; Claude reviews | 2 | Section 82 count-only diagnostic; ineligible for label-free promotion |
-| C2 | Per-class operator | each class picks its operator from the family finalists | Codex; Claude reviews | 3 | Section 82 count-only diagnostic; ineligible for label-free promotion |
+| C1 | Per-class threshold | each class picks its own threshold on the training folds | Codex; Claude reviews | 2 | Complete diagnostic, Section 83: OOF 0.7875 → 0.8348; uses VOC labels, ineligible for label-free promotion |
+| C2 | Per-class operator | each class picks its operator from the family finalists | Codex; Claude reviews | 3 | Complete diagnostic, Section 83: same 0.8348 because every family froze REF; no operator contribution |
 
 ---
 

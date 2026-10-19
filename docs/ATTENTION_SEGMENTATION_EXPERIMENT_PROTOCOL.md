@@ -4204,3 +4204,67 @@ GPU node. Claude should independently review the committed registration,
 implementation, reference reproduction, fold decisions and transfer report
 after results are pushed. Neither agent should mix optimized-token results
 into this package or the training-free paper table.
+
+## 83. Codex: training-free Track-A backlog results; no family promoted
+
+**Run and contract.** Node-unconstrained job `234857` was assigned to renyi
+and completed in 46 min 25 s at commit `70a8243ef`. The package contains 20
+complete, disjoint VOC-Sim shards (490 images), 20 complete COCO-Cap shards
+(707 images), 44 cells and no failed task. A clean finalizer rerun reproduces
+`summary.json`, `fold_results.json` and `report.md` byte for byte. The new REF
+matches SG8/SG9 at 0.7888 VOC and 0.6178 COCO; the largest per-image,
+per-threshold confusion-count difference is four pixels.
+
+**Registered decision.** REF wins all five folds in every one of the 14
+independent screens. No P3, P5, P9, F2, BG1, W1, W2, W4, H1, G1, G4, M1,
+M2 or R1 cell is promoted. Thus none is added to the frozen training-free
+pipeline.
+
+| Family | Best full-VOC cell | VOC mIoU (delta from 0.7888) | Best COCO cell at its VOC threshold | COCO mIoU (delta from 0.6178) |
+|---|---|---:|---|---:|
+| P3 | `t=4` | 0.7872 (-0.0016) | `t=2` | 0.6245 (+0.0068) |
+| P5 | `n=2` | 0.7895 (+0.0007) | `n=1` | 0.6144 (-0.0034) |
+| P9 | `s=.5,bg=off` | 0.7783 (-0.0105) | same | 0.6490 (+0.0312) |
+| F2 | `alpha=.75` | 0.7818 (-0.0070) | same | 0.6140 (-0.0037) |
+| BG1 | `gamma=.5` | 0.7339 (-0.0549) | `gamma=.75` | 0.5783 (-0.0395) |
+| W1 | `T=.5` | 0.7889 (+0.0002) | same | 0.6181 (+0.0003) |
+| W2 | `k=6` | 0.7848 (-0.0040) | same | 0.6183 (+0.0005) |
+| W4 | converged | 0.6113 (-0.1775) | same | 0.3670 (-0.2508) |
+| H1 | proportional | 0.7813 (-0.0075) | same | 0.6270 (+0.0092) |
+| G1 | `tau=.9` | 0.6963 (-0.0925) | same | 0.5356 (-0.0822) |
+| G4 | `sim=.7` | 0.3729 (-0.4159) | same | 0.2554 (-0.3624) |
+| M1 | CA prototype | 0.3913 (-0.3975) | same | 0.2729 (-0.3448) |
+| M2 | `k=2` | 0.5822 (-0.2066) | same | 0.4146 (-0.2032) |
+| R1 | `weight=1` | 0.7929 (+0.0041) | same | 0.6300 (+0.0122) |
+
+The VOC and COCO maxima in this table are descriptive and sometimes belong
+to different cells. COCO never selects. The two transfer signals worth
+retaining as hypotheses are P9 without background suppression (+0.0312) and
+weak R1 mean field (+0.0122); both fail the registered VOC rule, so either
+would require a new preregistered cross-dataset question rather than
+post-hoc promotion. Strong background suppression, convergence, hard region
+growing and query prototypes fail decisively. Entropy weighting is effectively
+the arithmetic mean, and selecting only the most CA-correlated heads does not
+beat using all observations.
+
+**Class behaviour.** P9 `s=.5,bg=off` is strongly dataset dependent: on VOC
+it gains train (+0.156) and person (+0.097) but loses sheep (-0.151) and TV
+(-0.097); on COCO it gains person (+0.188), car (+0.168) and aeroplane
+(+0.140), while losing sheep (-0.119). R1 `weight=1` gains chair (+0.029),
+boat (+0.027) and train (+0.019) on VOC but loses person (-0.034); on COCO it
+gains aeroplane (+0.037), bottle (+0.026) and potted plant (+0.024), while
+losing dining table (-0.035). These mixed class effects explain why neither
+passes the all-class fold rule.
+
+**Label-using diagnostic.** Fold-safe per-class threshold calibration (C1)
+raises OOF mIoU from 0.7875 to 0.8348 (+0.0473). C2 gives exactly the same
+result because all family screens freeze REF, so its candidate set contains
+no alternative operator. This is evidence of class-dependent calibration,
+not a label-free improvement, and it is excluded from the main pipeline and
+COCO transfer claim.
+
+**Files and handoff.** Compact outputs are in
+`outputs/segmentation/controlled_attention_cv/training_free_backlog/` (8 MB).
+Claude should independently verify the 40-shard contract, the 14 REF decisions,
+the C1/C2 interpretation and the reported VOC-to-COCO reversals before these
+results enter the paper.
