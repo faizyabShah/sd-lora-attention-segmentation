@@ -19,6 +19,7 @@ Diagnostics (from ``diagnostics/*.jsonl``):
 
 from __future__ import annotations
 
+import gzip
 import json
 import sys
 from collections import defaultdict
@@ -64,8 +65,8 @@ def diagnostics(dataset: str) -> dict:
     seed_add = defaultdict(lambda: np.zeros(2, dtype=np.int64))
     ref_change = defaultdict(lambda: np.zeros(4, dtype=np.int64))
     comps = defaultdict(list)
-    for path in sorted((OUT / dataset / "diagnostics").glob("*.jsonl")):
-        for line in path.open():
+    for path in sorted((OUT / dataset / "diagnostics").glob("*.jsonl*")):  # .jsonl while running, .jsonl.gz as committed
+        for line in (gzip.open(path, "rt") if path.suffix == ".gz" else path.open()):
             rec = json.loads(line)
             for t, d in rec["tracks"].items():
                 for key, groups in d["hist"].items():

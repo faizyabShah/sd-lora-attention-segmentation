@@ -446,7 +446,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | SG1 absorbing walk + SG3 confidence lock | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; no family frozen; token SG3 has a nonpromoted transfer signal for owner review (Sections 68, 71) | jobs `234264`--`234266`; `outputs/segmentation/controlled_attention_cv/sg1_sg3_graph_refinement/` |
 | B2 optimizer audit against OVAM (Section 64, request 1) | Claude | Complete: B2 uses linear maps where OVAM optimizes token-softmax maps; everything else matches; rerun proposed and paper integration held (Section 69) | this commit; `outputs/segmentation/analysis/b2_recipe_audit/` |
 | B2 paper and evidence integration (Sections 67, 72) | Claude drafts; Codex reviews | Accepted: all A12 values and provenance reproduce; wording correctly calls B2 a linear-objective variant and keeps the released token (Sections 76, 78) | `7bc2c776a`; `paper/sec/7_fusion.tex` |
-| SG10 seed-connected bottleneck propagation (Section 75 handoff) | Claude runs; Codex reviews | Production job `234642` completed in Claude's worktree: no candidate eligible in either track (reference 5/5); Claude result push and formal Codex package review remain (Sections 77--78) | `67e3bc546`; `configs/sg10_seed_connected_bottleneck.json` |
+| SG10 seed-connected bottleneck propagation (Section 75 handoff) | Claude runs; Codex reviews | Complete (VOC 490/490, COCO 707/707, job `234642`): reference won 5/5 on both tracks; bottleneck does not separate added TP from FP (AUC 0.35–0.56); stop per the specification; Codex review requested (Section 79) | this commit; `outputs/segmentation/controlled_attention_cv/sg10_seed_connected_bottleneck/` |
 | Locked token-SG3 confirmation | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; SG3+R2 is 0.8684/0.7006 but its VOC OOF gain is marginal (+0.0030); Claude review requested (Sections 72, 78) | jobs `234490`--`234493`; `outputs/segmentation/controlled_attention_cv/token_sg3_confirmation/` |
 | SG8 observation consensus | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; W sign consensus rho=.80 and T median freeze; variance and expansion-only gates fail (Sections 73, 78) | jobs `234511`--`234516`; `outputs/segmentation/controlled_attention_cv/sg8_observation_consensus/` |
 | SG9 reciprocal propagation | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; reference wins both tracks 5/5, so no reciprocal operator freezes (Sections 74, 78) | jobs `234535`--`234538`; `outputs/segmentation/controlled_attention_cv/sg9_reciprocal_propagation/` |
@@ -3870,3 +3870,107 @@ interpretation; Codex will then perform the formal committed-package review.
 SG8 and SG9 packages. SG8's two frozen cells are evidence within their
 separate screens; neither is automatically combined with DenseCRF or the
 few-shot final system. No SG9 or SG10 operator is promoted.
+
+## 79. Claude: SG10 results; not promoted, and the central hypothesis fails (Codex review requested)
+
+**Run.** Job `234642` (renyi, 2× A100, env `gen`, torch 2.4.1+cu121; one
+environment): 40/40 class shards, VOC-Sim 490 and COCO-Cap 707 images, no
+failure, 61 min including finalize.
+
+**Reference check.**
+
+- Against SG5 (Section 70; same environment), on every image:
+  - VOC-Sim `W/seed`, `W/REF` and `W/P1` are bit-identical on all 490 images;
+  - every other reference cell agrees within 0.0001 image IoU (the
+    key-block rounding noted in Section 77).
+- `W/REF` OOF 0.7873 and `T/REF` OOF 0.8496 equal the established values.
+
+**Screens (protocol v1.2).** The reference won all five folds in both
+screens; nothing is frozen.
+
+| Screen | Reference OOF | Votes for the reference | Frozen |
+|---|---:|---:|---|
+| SG10-W | 0.7873 | 5/5 | `W/REF` |
+| SG10-T | 0.8496 | 5/5 | `T/REF` |
+
+**Cells** (q90, G2; G1 is within 0.002 and q95 within 0.008 of these throughout; VOC-Sim
+mIoU at each cell's all-VOC threshold; recall / precision at 0.45; COCO-Cap
+transfer only):
+
+| Cell | W VOC | W R / P | W COCO | T VOC | T R / P | T COCO |
+|---|---:|---:|---:|---:|---:|---:|
+| `REF` | 0.7886 | 0.912 / 0.865 | 0.6173 | 0.8501 | 0.960 / 0.881 | 0.6680 |
+| `P1` (two passes) | 0.8005 | 0.924 / 0.865 | 0.6244 | 0.8534 | 0.961 / 0.883 | 0.6606 |
+| `B1` | 0.6642 | 0.744 / 0.852 | 0.5103 | 0.7072 | 0.768 / 0.877 | 0.5325 |
+| `B2a25` | 0.6955 | 0.768 / 0.862 | 0.5274 | 0.7437 | 0.805 / 0.884 | 0.5596 |
+| `B2a50` | 0.7336 | 0.809 / 0.870 | 0.5555 | 0.7929 | 0.865 / 0.889 | 0.6015 |
+| `B3` | 0.7824 | 0.966 / 0.779 | 0.6151 | 0.8450 | 0.983 / 0.814 | 0.6674 |
+| `L_B3` (diagnostic) | 0.7819 | 0.965 / 0.783 | 0.6182 | 0.8448 | 0.984 / 0.815 | 0.6697 |
+
+- The gates (`B1`, `B2`) cut recall far more than they raise precision.
+  `B3` does the opposite: higher recall, lower precision. No cell reaches
+  `REF`, on either track or dataset.
+
+**Central diagnostic** (specification §12): is the bottleneck score `Bn`
+higher for the pixels propagation correctly adds than for the false positives
+it adds? AUC of `Bn`, new TP against new FP (0.5 = no separation; below 0.5 =
+false positives better connected):
+
+| | W, VOC | T, VOC | W, COCO | T, COCO |
+|---|---:|---:|---:|---:|
+| against all new FP (G1/G2, both quantiles) | 0.437–0.440 | 0.469–0.474 | 0.518–0.529 | 0.420–0.437 |
+| against distant new FP (> 16 px) | 0.518–0.519 | 0.542–0.556 | 0.546–0.561 | 0.427–0.448 |
+| against separate-component new FP | 0.416–0.431 | 0.348–0.411 | 0.466–0.500 | 0.346–0.419 |
+
+**Answers to the specification's questions (§16).**
+
+1. **Recovered object pixels are not better connected than new false
+   positives.** The AUCs are at or below chance; on VOC-Sim and for the token
+   on COCO-Cap, the false positives are slightly *better* connected.
+2. **Distant false positives are not associated with weak bottlenecks**
+   (AUC 0.43–0.56).
+3. **Separate predicted components look weakly connected only at the
+   component level.** Their mean maximum `Bn` is 0.64–0.76, against
+   0.87–0.91 for components touching the object. But this is confounded:
+   components touching the object contain the seed sources, whose rank is 1.
+   At the pixel level, separate-component false positives are *better*
+   connected than new TP (AUC 0.35–0.50). Only the local graph, for the
+   class word, separates them above chance (0.56–0.63; token 0.40–0.47), and
+   it is diagnostic only.
+4. **No bottleneck operator preserves completion while reducing leakage.**
+   New FP per new TP against the seed rises in every SG10 cell. For example,
+   class word, VOC-Sim: REF 0.33, `B2a50` 0.39, `B1` 0.56, `B3` 0.83.
+5. **Directed and symmetric graphs are equivalent** (within 0.003 everywhere).
+6. **Both tracks fail the same way:** the best cell, `B3`, is −0.006 (word)
+   and −0.005 (token) below `REF` on VOC-Sim.
+7. **The token's additions sit in the same `Bn` range as the class word's**
+   (mean `Bn` of new TP 0.58–0.64 for both), so the token does not make the
+   foreground more strongly connected.
+8. **SG10 does not improve precision without reverting toward the seed:** the
+   class-word gates lower recall to or below the seed's (0.82; `B1` 0.74)
+   for at most +0.005 precision (token: +0.008), and `B3` lowers precision.
+9. The AN1 FP/TP ratio is not reduced (question 4).
+10. **No selectable cell transfers better to COCO-Cap than `REF`.** Only the
+    diagnostic `L_B3` is marginally above it: +0.001 (class word) and +0.002
+    (token).
+
+**Interpretation.** On the dense mean SA graph, a strong path from the seed
+reaches almost every pixel. Coherent background regions (sky, ground, water)
+are internally strongly connected and touch the object somewhere, so the
+widest path does not separate object completion from leakage. By the
+specification's own rule (§17, "bottleneck scores fail to separate TP and FP
+additions"), **SG10 should be stopped rather than expanded into a larger
+grid**. The only lead is the local-graph diagnostic, which separates the
+class word's separate-component leakage somewhat better than chance. It
+would need its own registration.
+
+**Codex:** please review the package before any SG10 result enters the paper.
+
+**Files.** `outputs/segmentation/controlled_attention_cv/sg10_seed_connected_bottleneck/`
+(`voc/`, `coco/`: shards, gzipped diagnostics and fixed panels;
+`summary.json`, `report.md`; 19 MB); `finalize_sg10.py` now reads gzipped
+diagnostics (`summary.json` is unchanged by it).
+
+Codex's later `--visual-dir` option in `run_sg10_bottleneck.py` (`6241f55`,
+for the qualitative audit) is opt-in and leaves the production path
+unchanged; the package above was produced before it, at `67e3bc5`.
