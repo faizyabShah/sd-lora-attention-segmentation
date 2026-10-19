@@ -42,6 +42,7 @@ Full data: `all_configurations.csv.gz` (one row per configuration, all experimen
 | A10 | Released baselines scored with OVAM's procedures | VOC-Sim (490 images, 20 classes); COCO-Cap (707 images, 20 classes) (each method's own images) | reproduction of published values | 19 | — | every printed OVAM-notebook value reproduced |
 | AN1 | Why a second SA pass helps (analysis, nothing selected) | VOC-Sim (490 images, 20 classes); COCO-Cap (707 images, 20 classes) | analysis of committed counts | — | — | second pass fills under-covered objects; the token seed already covers them; COCO-Cap leakage cancels the gain |
 | A11 | Token track B1/B1b: OVAM's optimized tokens on the frozen pipeline | VOC-Sim (490 images, 20 classes) | controlled, 5-fold cross-validated; few-shot track (2-3 annotated images per class) | 27 | 0.8507 | token promoted on every pipeline: REF 0.787 -> 0.851 (conditional query) |
+| A12 | Token learning B2a/S4/B2b (Codex): retrained tokens, shots, fold-safe token | VOC-Sim (490 images, 20 classes); COCO-Cap (707 images, 20 classes) | controlled, fixed T-C pipeline and threshold 0.475; linear-objective variant of OVAM's recipe (audit) | 9 | 0.8689 | retrained all-support token = released on VOC-Sim (0.868 vs 0.865), +0.0075 on COCO-Cap; second support gives the gain; released token kept |
 
 ## 2. Where each setting came from
 
@@ -54,13 +55,13 @@ Full data: `all_configurations.csv.gz` (one row per configuration, all experimen
 | CA resolutions | all four (8, 16, 32, 64) | B1/B8 resolution screens | 99 dev / 490 | Table a2_ca_r; Fig. a2_ca_r_subsets | A2 CA-R (CV): keep 8+16+64; A3 CA-C: frozen (4/5 votes, OOF +0.026) |
 | CA normalization, threshold | percentile 1–99, ≥ 0.45 | B5 | 99 dev images | ledger B5 | protocol fixes min–max, 0.45 for the CA phase |
 | SA module | U3.2 (up_blocks.3.attentions.2 attn1, 64×64) | B8 SA screens | 490 (in-sample) | ledger B8 | A4 SA-L (CV): only module 15 (U3.2); A6 SA-C: frozen (5/5, OOF +0.033) |
-| SA passes | 4 (revised: 1) | B10; revised from B11/B13 | 490; 1-pass informed by COCO-Cap | Fig. b_joint_passes_time | A8 P1 (CV): two passes promoted (OOF +0.012); P3-C pending |
+| SA passes | 4 (revised: 1) | B10; revised from B11/B13 | 490; 1-pass informed by COCO-Cap | Fig. b_joint_passes_time | A8 P1 (CV): two passes promoted (OOF +0.012); P3-C: frozen with DenseCRF (FTF) |
 | SA heads | {0,1,2,4,5,6} | B10 | 490 (in-sample) | Fig. b_joint_heads_threshold | A4 SA-H (CV): heads {1, 4, 6}; A6 SA-C: does not survive, all 8 heads frozen |
 | SA calls | 15–30 | B10 | 490 (in-sample) | Fig. b_joint_passes_time | A5 SA-T (CV): call 30 only; A6 SA-C: does not survive, all calls 0–30 frozen |
 | Mask threshold | 0.45 | B5, B9, B10 | 99 dev / 490 | Fig. b_joint_heads_threshold | CA/SA phases: fixed at 0.45; phase 3: chosen in the folds (0.30-0.70), REF picks 0.425-0.45 |
 | Cleanup | remove components < 1% | B10 | 490 (in-sample) | Table b_component_ablations | deferred phase |
-| DenseCRF | not in the final method | B17 (nothing selected) | — | Table b_token_crf | A9 R2 (CV): promoted (OOF +0.017, 20/20 classes); P3-C pending |
-| Optimized token | not in the final method | B17 (nothing selected; tokens trained by OVAM on separate images) | — | Table b_token_crf | A11 B1 (CV): released token promoted, OOF +0.063 (few-shot track); T-C pending |
+| DenseCRF | not in the final method | B17 (nothing selected) | — | Table b_token_crf | A9 R2 (CV): promoted (OOF +0.017, 20/20 classes); P3-C: frozen with two passes (FTF, OOF 0.813) |
+| Optimized token | not in the final method | B17 (nothing selected; tokens trained by OVAM on separate images) | — | Table b_token_crf | A11 B1 (CV): released token promoted, OOF +0.063 (few-shot track); T-C: token + one pass + DenseCRF frozen (OOF 0.864); A12: retrained tokens do not replace it |
 
 ## 3. Development of the method and its baselines
 
@@ -497,7 +498,7 @@ Every CA-C seed crossed with every SA-C cell and a no-SA control (78 configurati
 
 *Fig. 15. Joint CA×SA audit: mIoU of all 78 cells (in-sample); the box is the frozen pair.*
 
-## 6. Phase 3 controlled packages and comparisons (tiers A8–A11)
+## 6. Phase 3 controlled packages and comparisons (tiers A8–A12)
 
 Same folds and decision rule as the CA and SA phases, with one change: each method parameter **and** the mask threshold (0.30–0.70, step 0.025) are chosen on the training folds, for the reference (REF, one pass) as well (registry R3). Winners go to the combined confirmation P3-C, which Codex is running (protocol Section 45).
 
@@ -593,7 +594,39 @@ The second pass is pure filling: recall rises and precision stays flat; from the
 *Fig. 19. AN1 part 2: new object pixels, new false positives (attached or separate) and removed false positives, per new object pixel.*
 
 
-### 6.5 Released baselines (A10)
+### 6.5 Token learning (A12, Codex's package; few-shot track)
+
+Codex retrained one token per support image on OVAM's 57 annotated training images (B2a), averaged 1, 2 or all supports (S4), and learned one fold-safe token per class from a single training-fold image (B2b), all scored in the frozen T-C pipeline (protocol Sections 63–64; replicated independently in Section 65). An audit against OVAM's released loss records shows that OVAM optimizes the token-softmax attention map, whereas B2 optimizes the linear map; everything else matches. B2 is therefore a linear-objective variant of OVAM's recipe, not an exact reproduction (Section 69). The main few-shot system keeps OVAM's released token (Section 72).
+
+| Token | Cell | VOC-Sim mIoU (T-C, 0.475) | Images |
+|---|---|---:|---:|
+| released (OVAM, 2-3 supports) | REL | 0.8653 | 490 |
+| support 1 | A1 | 0.8333 | 490 |
+| support 2 | A2 | 0.8630 | 490 |
+| support 3 (19 classes) | A3 | 0.8451 | 468 |
+| supports 1+2 | A12 | 0.8689 | 490 |
+| supports 1+3 (19 classes) | A13 | 0.8589 | 468 |
+| supports 2+3 (19 classes) | A23 | 0.8713 | 468 |
+| all supports | AALL | 0.8684 | 490 |
+| fold-safe one-support (B2b) | B2B | 0.8564 | 490 |
+
+| Comparison | Δ mIoU | Paired Δ image IoU | 95% CI | Classes improved |
+|---|---:|---:|---|---:|
+| all supports vs released, VOC-Sim | 0.0032 | 0.0018 | [-0.0033, +0.0064] | 14 |
+| fold-safe one-support vs released, VOC-Sim | -0.0089 | -0.0035 | [-0.0119, +0.0042] | 5 |
+| all supports vs released, COCO-Cap | 0.0075 | 0.0096 | [+0.0039, +0.0154] | 14 |
+
+![Fig. 20. A12: VOC-Sim mIoU against the number of annotated support images per class (T-C pipeline).](figures/a12_shots.png)
+
+*Fig. 20. A12: VOC-Sim mIoU against the number of annotated support images per class (T-C pipeline).*
+
+
+| Attention objective (unconditional, no middle block) | Epoch-0 loss vs OVAM, median abs. diff. (57 images) | Token cosine to OVAM after 800 epochs (6 images) |
+|---|---|---:|
+| token softmax (OVAM's library default) | 1.8e-06 | 0.9961 |
+| linear (B2 recipe) | 1.8e-02 | 0.8731 |
+
+### 6.6 Released baselines (A10)
 
 | Method | VOC-Sim word (images) | VOC-Sim token | COCO-Cap word (images) | COCO-Cap token |
 |---|---|---|---|---|
@@ -648,7 +681,8 @@ Best configuration of every family in the large VOC-Sim experiments: `tables/b_f
 ## 9. Limits of this evidence
 
 - Tier B settings were chosen on the reported images; only COCO-Cap is untouched by the earlier final method, and the revised one-pass system was informed by COCO-Cap.
-- Tier A is complete for CA and SA and for the Tier 1 phase 3 screens (propagation, fusion and calibration, tokens B1/B1b). The combined confirmations P3-C and T-C and the COCO-Cap transfer are still to run.
+- Tier A is complete for CA and SA, the Tier 1 phase 3 screens (propagation, fusion and calibration, tokens B1/B1b), the combined confirmations P3-C (FTF) and T-C, and token learning (A12); the COCO-Cap transfers are in protocol Sections 54–56.
+- A12's retrained tokens optimize a linear attention objective; OVAM's released tokens were optimized with the token-softmax objective (protocol Section 69).
 - The token track uses OVAM's released tokens, each the mean of 2–3 per-image tokens trained on hand-annotated images outside the evaluation sets; it is a few-shot result, reported separately from the training-free track.
 - The phase 3 packages run in two environments on the same GPU type (torch 2.6 and 2.11); their REF rows agree within 0.00003 mIoU, and every package compares only with its own REF.
 - The frozen SA (module 15 only) lowers `person` IoU by 0.055; SA-T and SA-R were calibration-dependent and do not survive SA-C.

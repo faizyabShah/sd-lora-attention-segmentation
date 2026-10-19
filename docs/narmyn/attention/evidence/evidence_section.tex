@@ -32,6 +32,9 @@
 \input{evidence/tables/an1_by_pass.tex}
 \input{evidence/tables/an1_coverage.tex}
 \input{evidence/tables/an1_spatial.tex}
+\input{evidence/tables/a12_token_learning.tex}
+\input{evidence/tables/a12_comparisons.tex}
+\input{evidence/tables/a12_recipe_audit.tex}
 \begin{figure}[H]\centering
 \includegraphics[width=1.0\linewidth]{evidence/figures/b_progression.pdf}
 \caption{Each step of the method and the baselines. VOC-Sim values are in-sample; COCO-Cap was never used to choose the earlier final method.}\label{fig:b_progression}
@@ -119,6 +122,10 @@
 \begin{figure}[H]\centering
 \includegraphics[width=1.0\linewidth]{evidence/figures/an1_spatial.pdf}
 \caption{AN1 part 2: new object pixels, new false positives (attached or separate) and removed false positives, per new object pixel.}\label{fig:an1_spatial}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=0.6\linewidth]{evidence/figures/a12_shots.pdf}
+\caption{A12: VOC-Sim mIoU against the number of annotated support images per class (T-C pipeline).}\label{fig:a12_shots}
 \end{figure}
 \begin{figure}[H]\centering
 \includegraphics[width=1.0\linewidth]{evidence/figures/a4_sa_l_single_leave1.pdf}

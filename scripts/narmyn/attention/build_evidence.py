@@ -55,6 +55,8 @@ BASELINES = SEG / "comparisons" / "released_baselines" / "summary.json"
 PKG_TOKENS = SEG / "controlled_attention_cv" / "tokens"
 AN1 = SEG / "analysis" / "an1_propagation_depth" / "summary.json"
 AN1_SPATIAL = SEG / "analysis" / "an1_spatial" / "summary.json"
+B2 = SEG / "controlled_attention_cv" / "token_learning_b2" / "summary.json"
+B2_AUDIT = SEG / "analysis" / "b2_recipe_audit" / "summary.json"
 
 # Reference palette (dataviz skill, light mode; static figures for print).
 SURFACE, INK, INK2, MUTED, GRID, AXIS = "#fcfcfb", "#0b0b0b", "#52514e", "#898781", "#e1e0d9", "#c3c2b7"
@@ -192,6 +194,11 @@ EXPERIMENTS = [
      "controlled, 5-fold cross-validated; few-shot track (2-3 annotated images per class)",
      "released token (two query forms) and each per-image token, on 5 pipelines", "frozen pair; class word as reference",
      "controlled_attention_cv/tokens", None, "token promoted on every pipeline: REF 0.787 -> 0.851 (conditional query)"),
+    ("A12", "Token learning B2a/S4/B2b (Codex): retrained tokens, shots, fold-safe token", f"{VOC}; {COCO}",
+     "controlled, fixed T-C pipeline and threshold 0.475; linear-objective variant of OVAM's recipe (audit)",
+     "retrained per-support tokens, 1/2/all-support averages, fold-safe one-support token", "T-C: conditional token, one SA pass, DenseCRF",
+     "controlled_attention_cv/token_learning_b2", None,
+     "retrained all-support token = released on VOC-Sim (0.868 vs 0.865), +0.0075 on COCO-Cap; second support gives the gain; released token kept"),
 ]
 
 
@@ -1096,6 +1103,55 @@ def fusion_figure(plt, figures: list, fus: dict) -> None:
     plt.close(fig)
 
 
+def b2_token_learning(plt, figures: list) -> dict | None:
+    """A12: Codex's B2a/S4/B2b package (protocol Sections 63-65) and Claude's recipe audit (Section 69)."""
+    if not B2.exists():
+        return None
+    d = load_json(B2)
+    v, c, s4 = d["voc"]["configurations"], d["coco"], d["voc"]["s4"]
+    labels = {"REL": "released (OVAM, 2-3 supports)", "A1": "support 1", "A2": "support 2", "A3": "support 3 (19 classes)",
+              "A12": "supports 1+2", "A13": "supports 1+3 (19 classes)", "A23": "supports 2+3 (19 classes)",
+              "AALL": "all supports", "B2B": "fold-safe one-support (B2b)"}
+    rows = [[labels[k], k, v[k]["miou"], v[k]["images"]] for k in labels]
+    table = write_table("a12_token_learning", ["Token", "Cell", "VOC-Sim mIoU (T-C, 0.475)", "Images"], rows,
+                        "A12: retrained tokens in the frozen T-C pipeline (linear-objective variant of OVAM's recipe)")
+    paired = d["voc"]["paired"]
+    cmp_rows = [["all supports vs released, VOC-Sim", d["voc"]["comparisons"]["AALL"]["miou_gain"], paired["AALL_vs_REL"]["mean"],
+                 f"[{paired['AALL_vs_REL']['ci_low']:+.4f}, {paired['AALL_vs_REL']['ci_high']:+.4f}]", d["voc"]["comparisons"]["AALL"]["classes_improved"]],
+                ["fold-safe one-support vs released, VOC-Sim", d["voc"]["comparisons"]["B2B"]["miou_gain"], paired["B2B_vs_REL"]["mean"],
+                 f"[{paired['B2B_vs_REL']['ci_low']:+.4f}, {paired['B2B_vs_REL']['ci_high']:+.4f}]", d["voc"]["comparisons"]["B2B"]["classes_improved"]],
+                ["all supports vs released, COCO-Cap", c["comparison"]["miou_gain"], c["paired_AALL_vs_REL"]["mean"],
+                 f"[{c['paired_AALL_vs_REL']['ci_low']:+.4f}, {c['paired_AALL_vs_REL']['ci_high']:+.4f}]", c["comparison"]["classes_improved"]]]
+    cmp_table = write_table("a12_comparisons", ["Comparison", "Δ mIoU", "Paired Δ image IoU", "95% CI", "Classes improved"], cmp_rows,
+                            "A12: retrained against released tokens (paired bootstrap over images)")
+    fig, ax = plt.subplots(figsize=(5.2, 3.2))
+    xs = [1, 2, 3]
+    ys = [s4["one_shot_expected_miou"], s4["two_shot_expected_miou"], s4["all_available"]]
+    lo = [s4["one_shot_common19_range"][0], s4["two_shot_common19_range"][0], s4["all_available"]]
+    hi = [s4["one_shot_common19_range"][1], s4["two_shot_common19_range"][1], s4["all_available"]]
+    ax.fill_between(xs, lo, hi, color=BLUE, alpha=0.15, linewidth=0, label="range over support choices (19 classes)")
+    ax.plot(xs, ys, color=BLUE, marker="o", markersize=5, label="retrained tokens, mean over choices")
+    ax.axhline(v["REL"]["miou"], color=ORANGE, linewidth=1.2, linestyle="--", label="released token (OVAM)")
+    ax.set_xticks(xs, ["1 support", "2 supports", "all (2-3)"])
+    ax.set_ylabel("VOC-Sim mIoU (T-C)")
+    ax.set_title("A12: how many annotated images the token needs")
+    ax.legend(fontsize=7, loc="lower right")
+    fig.tight_layout()
+    save(fig, "a12_shots", figures)
+    plt.close(fig)
+    out = {"table": table, "comparison_table": cmp_table, "s4": s4, "rows": rows}
+    if B2_AUDIT.exists():
+        a = load_json(B2_AUDIT)
+        e0 = a["epoch0_abs_diff_to_ovam"]
+        audit_rows = [["token softmax (OVAM's library default)", f'{e0["token_softmax/uncond/no_mid"]["median"]:.1e}', a["optimized"]["token_softmax"]["mean"]],
+                      ["linear (B2 recipe)", f'{e0["linear/uncond/no_mid"]["median"]:.1e}', a["optimized"]["linear"]["mean"]]]
+        out["audit_table"] = write_table("a12_recipe_audit", ["Attention objective (unconditional, no middle block)",
+                                                              f"Epoch-0 loss vs OVAM, median abs. diff. ({a['images']} images)",
+                                                              f"Token cosine to OVAM after 800 epochs ({len(a['optimized']['linear']['images'])} images)"],
+                                         audit_rows, "A12: which attention objective reproduces OVAM's released optimization (protocol Section 69)")
+    return out
+
+
 def an1_analysis(plt, figures: list) -> dict | None:
     if not AN1.exists():
         return None
@@ -1469,13 +1525,13 @@ DECISIONS = [
      "A2 CA-R (CV): keep 8+16+64; A3 CA-C: frozen (4/5 votes, OOF +0.026)"),
     ("CA normalization, threshold", "percentile 1–99, ≥ 0.45", "B5", "99 dev images", "ledger B5", "protocol fixes min–max, 0.45 for the CA phase"),
     ("SA module", "U3.2 (up_blocks.3.attentions.2 attn1, 64×64)", "B8 SA screens", "490 (in-sample)", "ledger B8", "A4 SA-L (CV): only module 15 (U3.2); A6 SA-C: frozen (5/5, OOF +0.033)"),
-    ("SA passes", "4 (revised: 1)", "B10; revised from B11/B13", "490; 1-pass informed by COCO-Cap", "Fig. b_joint_passes_time", "A8 P1 (CV): two passes promoted (OOF +0.012); P3-C pending"),
+    ("SA passes", "4 (revised: 1)", "B10; revised from B11/B13", "490; 1-pass informed by COCO-Cap", "Fig. b_joint_passes_time", "A8 P1 (CV): two passes promoted (OOF +0.012); P3-C: frozen with DenseCRF (FTF)"),
     ("SA heads", "{0,1,2,4,5,6}", "B10", "490 (in-sample)", "Fig. b_joint_heads_threshold", "A4 SA-H (CV): heads {1, 4, 6}; A6 SA-C: does not survive, all 8 heads frozen"),
     ("SA calls", "15–30", "B10", "490 (in-sample)", "Fig. b_joint_passes_time", "A5 SA-T (CV): call 30 only; A6 SA-C: does not survive, all calls 0–30 frozen"),
     ("Mask threshold", "0.45", "B5, B9, B10", "99 dev / 490", "Fig. b_joint_heads_threshold", "CA/SA phases: fixed at 0.45; phase 3: chosen in the folds (0.30-0.70), REF picks 0.425-0.45"),
     ("Cleanup", "remove components < 1%", "B10", "490 (in-sample)", "Table b_component_ablations", "deferred phase"),
-    ("DenseCRF", "not in the final method", "B17 (nothing selected)", "—", "Table b_token_crf", "A9 R2 (CV): promoted (OOF +0.017, 20/20 classes); P3-C pending"),
-    ("Optimized token", "not in the final method", "B17 (nothing selected; tokens trained by OVAM on separate images)", "—", "Table b_token_crf", "A11 B1 (CV): released token promoted, OOF +0.063 (few-shot track); T-C pending"),
+    ("DenseCRF", "not in the final method", "B17 (nothing selected)", "—", "Table b_token_crf", "A9 R2 (CV): promoted (OOF +0.017, 20/20 classes); P3-C: frozen with two passes (FTF, OOF 0.813)"),
+    ("Optimized token", "not in the final method", "B17 (nothing selected; tokens trained by OVAM on separate images)", "—", "Table b_token_crf", "A11 B1 (CV): released token promoted, OOF +0.063 (few-shot track); T-C: token + one pass + DenseCRF frozen (OOF 0.864); A12: retrained tokens do not replace it"),
 ]
 
 
@@ -1705,7 +1761,7 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
         ]
     if p3.get("prop") or p3.get("fusion"):
         lines += [
-            "## 6. Phase 3 controlled packages and comparisons (tiers A8–A11)",
+            "## 6. Phase 3 controlled packages and comparisons (tiers A8–A12)",
             "",
             "Same folds and decision rule as the CA and SA phases, with one change: each method parameter **and** the mask threshold "
             "(0.30–0.70, step 0.025) are chosen on the training folds, for the reference (REF, one pass) as well (registry R3). "
@@ -1748,7 +1804,19 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
                               "farther from the object and twice as often in separate regions (protocol Section 58).", "",
                               p3["an1"]["spatial_table"], "",
                               fig("an1_spatial", "Fig. 19. AN1 part 2: new object pixels, new false positives (attached or separate) and removed false positives, per new object pixel."), ""]
-            lines += ["### 6.5 Released baselines (A10)", "", p3["baselines"]["table"], "",
+            if p3.get("b2"):
+                b2 = p3["b2"]
+                lines += ["### 6.5 Token learning (A12, Codex's package; few-shot track)", "",
+                          "Codex retrained one token per support image on OVAM's 57 annotated training images (B2a), averaged 1, 2 or all supports (S4), "
+                          "and learned one fold-safe token per class from a single training-fold image (B2b), all scored in the frozen T-C pipeline (protocol Sections 63–64; "
+                          "replicated independently in Section 65). An audit against OVAM's released loss records shows that OVAM optimizes the token-softmax "
+                          "attention map, whereas B2 optimizes the linear map; everything else matches. B2 is therefore a linear-objective variant of OVAM's "
+                          "recipe, not an exact reproduction (Section 69). The main few-shot system keeps OVAM's released token (Section 72).", "",
+                          b2["table"], "", b2["comparison_table"], "",
+                          fig("a12_shots", "Fig. 20. A12: VOC-Sim mIoU against the number of annotated support images per class (T-C pipeline)."), ""]
+                if b2.get("audit_table"):
+                    lines += [b2["audit_table"], ""]
+            lines += ["### 6.6 Released baselines (A10)", "", p3["baselines"]["table"], "",
                       "Every value printed in OVAM's evaluation notebooks is reproduced (protocol Section 41). Only DAAM and OVAM share our "
                       "images and annotations; the other methods are scored on their own released sets, as in OVAM's comparison.", ""]
     lines += [
@@ -1767,7 +1835,8 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
         "## 9. Limits of this evidence",
         "",
         "- Tier B settings were chosen on the reported images; only COCO-Cap is untouched by the earlier final method, and the revised one-pass system was informed by COCO-Cap.",
-        "- Tier A is complete for CA and SA and for the Tier 1 phase 3 screens (propagation, fusion and calibration, tokens B1/B1b). The combined confirmations P3-C and T-C and the COCO-Cap transfer are still to run.",
+        "- Tier A is complete for CA and SA, the Tier 1 phase 3 screens (propagation, fusion and calibration, tokens B1/B1b), the combined confirmations P3-C (FTF) and T-C, and token learning (A12); the COCO-Cap transfers are in protocol Sections 54–56.",
+        "- A12's retrained tokens optimize a linear attention objective; OVAM's released tokens were optimized with the token-softmax objective (protocol Section 69).",
         "- The token track uses OVAM's released tokens, each the mean of 2–3 per-image tokens trained on hand-annotated images outside the evaluation sets; it is a few-shot result, reported separately from the training-free track.",
         "- The phase 3 packages run in two environments on the same GPU type (torch 2.6 and 2.11); their REF rows agree within 0.00003 mIoU, and every package compares only with its own REF.",
         "- The frozen SA (module 15 only) lowers `person` IoU by 0.055; SA-T and SA-R were calibration-dependent and do not survive SA-C.",
@@ -1790,6 +1859,7 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
         "a8_propagation": ("Propagation: passes under both aggregation orders, restart, and top-k sparsity (in-sample).", 1.0),
         "an1_spatial": ("AN1 part 2: new object pixels, new false positives (attached or separate) and removed false positives, per new object pixel.", 1.0),
         "an1_propagation_depth": ("AN1: what each pass changes, and the second-pass gain by seed coverage.", 1.0),
+        "a12_shots": ("A12: VOC-Sim mIoU against the number of annotated support images per class (T-C pipeline).", 0.6),
         "a9_fusion": ("Fusion and calibration: change against REF, each at its best threshold (in-sample).", 0.7),
         "a6_sa_c_thresholds": ("SA-C: change in mIoU of every combination against the SA reference at thresholds 0.35, 0.45 and 0.55 (blue = frozen).", 1.0),
         "a5_sa_t_calls": ("SA-T: SA from a single UNet call, and all calls except one.", 1.0),
@@ -1849,6 +1919,11 @@ def compose_report(b: dict | None, tb: dict, a: dict | None = None, overview: di
         if p3["an1"].get("spatial_table"):
             tex += [r"\input{evidence/tables/an1_spatial.tex}"]
             figs += ["an1_spatial"]
+    if p3.get("b2"):
+        tex += [r"\input{evidence/tables/a12_token_learning.tex}", r"\input{evidence/tables/a12_comparisons.tex}"]
+        if p3["b2"].get("audit_table"):
+            tex += [r"\input{evidence/tables/a12_recipe_audit.tex}"]
+        figs += ["a12_shots"]
         figs += ["a4_sa_l_single_leave1", "a4_sa_h"]
     figs += ["b_joint_passes_time", "b_joint_heads_threshold", "b_component_ablation"]
     for name in figs:
@@ -1941,6 +2016,7 @@ def main() -> None:
           "fusion": selected_package(plt, figures, PKG_FUSION, "A9", "Phase 3 fusion and calibration package", "controlled_fusion_calibration.csv"),
           "baselines": released_baselines(),
           "an1": an1_analysis(plt, figures),
+          "b2": b2_token_learning(plt, figures),
           "tokens": selected_package(plt, figures, PKG_TOKENS, "A11", "Token track B1 (released token vs class word on REF)", "controlled_token_package.csv")}
     if p3["prop"]:
         propagation_figure(plt, figures, p3["prop"])
@@ -1960,6 +2036,13 @@ def main() -> None:
         entry = next(e for e in ledger if e["id"] == "A7")
         entry.update({"configurations": p3["joint"]["configurations"], "best_configuration": p3["joint"]["screen"]["frozen"],
                       "best_miou": round(p3["joint"]["screen"]["out_of_fold_miou_selection"], 4)})
+    if p3["b2"]:
+        entry = next(e for e in ledger if e["id"] == "A12")
+        entry.update({"configurations": len(p3["b2"]["rows"]), "best_configuration": "released token kept",
+                      "best_miou": round(max(r[2] for r in p3["b2"]["rows"] if r[3] == 490), 4)})
+        for r in p3["b2"]["rows"]:
+            a_rows.append({"experiment_id": "A12", "dataset": VOC, "family": "B2", "configuration": r[1], "images": r[3],
+                           "miou": r[2], "mean_image_iou": "", "note": "T-C pipeline, threshold 0.475; Codex's package"})
     if p3["an1"]:
         entry = next(e for e in ledger if e["id"] == "AN1")
         entry.update({"configurations": "—", "best_configuration": "analysis", "best_miou": "—"})

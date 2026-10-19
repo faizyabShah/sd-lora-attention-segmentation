@@ -1,0 +1,11 @@
+\begin{table}[H]\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{3.33cm}>{\raggedright\arraybackslash}p{3.28cm}r}
+\toprule
+Attention objective (unconditional, no middle block) & Epoch-0 loss vs OVAM, median abs. diff. (57 images) & Token cosine to OVAM after 800 epochs (6 images) \\
+\midrule
+token softmax (OVAM's library default) & 1.8e-06 & 0.9961 \\
+linear (B2 recipe) & 1.8e-02 & 0.8731 \\
+\bottomrule
+\end{tabular}
+\caption{A12: which attention objective reproduces OVAM's released optimization (protocol Section 69)}\label{tab:a12_recipe_audit}
+\end{table}

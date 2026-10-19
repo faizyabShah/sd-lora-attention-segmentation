@@ -1,5 +1,5 @@
 {\scriptsize\setlength{\tabcolsep}{3pt}
-\begin{longtable}{>{\raggedright\arraybackslash}p{1.40cm}>{\raggedright\arraybackslash}p{1.98cm}>{\raggedright\arraybackslash}p{2.53cm}>{\raggedright\arraybackslash}p{2.32cm}rr>{\raggedright\arraybackslash}p{2.83cm}}
+\begin{longtable}{>{\raggedright\arraybackslash}p{1.40cm}>{\raggedright\arraybackslash}p{1.96cm}>{\raggedright\arraybackslash}p{2.29cm}>{\raggedright\arraybackslash}p{2.41cm}rr>{\raggedright\arraybackslash}p{3.02cm}}
 \caption{Every experiment run so far}\label{tab:ledger}\\
 \toprule
 ID & Experiment & Dataset & Status & Configurations & Best mIoU & Decision /\allowbreak{} role \\
@@ -38,5 +38,6 @@ A9 & Phase 3 fusion and calibration package: P4, F3, F4, N2-N4, R2 & VOC-Sim (49
 A10 & Released baselines scored with OVAM's procedures & VOC-Sim (490 images, 20 classes); COCO-Cap (707 images, 20 classes) (each method's own images) & reproduction of published values & 19 & --- & every printed OVAM-notebook value reproduced \\
 AN1 & Why a second SA pass helps (analysis, nothing selected) & VOC-Sim (490 images, 20 classes); COCO-Cap (707 images, 20 classes) & analysis of committed counts & --- & --- & second pass fills under-covered objects; the token seed already covers them; COCO-Cap leakage cancels the gain \\
 A11 & Token track B1/\allowbreak{}B1b: OVAM's optimized tokens on the frozen pipeline & VOC-Sim (490 images, 20 classes) & controlled, 5-fold cross-validated; few-shot track (2-3 annotated images per class) & 27 & 0.8507 & token promoted on every pipeline: REF 0.787 -> 0.851 (conditional query) \\
+A12 & Token learning B2a/\allowbreak{}S4/\allowbreak{}B2b (Codex): retrained tokens, shots, fold-safe token & VOC-Sim (490 images, 20 classes); COCO-Cap (707 images, 20 classes) & controlled, fixed T-C pipeline and threshold 0.475; linear-objective variant of OVAM's recipe (audit) & 9 & 0.8689 & retrained all-support token = released on VOC-Sim (0.868 vs 0.865), +0.0075 on COCO-Cap; second support gives the gain; released token kept \\
 \bottomrule
 \end{longtable}}

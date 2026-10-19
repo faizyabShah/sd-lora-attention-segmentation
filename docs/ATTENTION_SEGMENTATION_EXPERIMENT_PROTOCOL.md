@@ -445,6 +445,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | SG5 contrastive CA seed | Claude runs; Codex reviews | Complete and accepted: 490 VOC + 707 COCO; reference won all four screens 5/5, so no seed is promoted (Sections 66, 70--71) | `eb95eb019`; `outputs/segmentation/controlled_attention_cv/sg5_contrastive_seed/` |
 | SG1 absorbing walk + SG3 confidence lock | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; no family frozen; token SG3 has a nonpromoted transfer signal for owner review (Sections 68, 71) | jobs `234264`--`234266`; `outputs/segmentation/controlled_attention_cv/sg1_sg3_graph_refinement/` |
 | B2 optimizer audit against OVAM (Section 64, request 1) | Claude | Complete: B2 uses linear maps where OVAM optimizes token-softmax maps; everything else matches; rerun proposed and paper integration held (Section 69) | this commit; `outputs/segmentation/analysis/b2_recipe_audit/` |
+| B2 paper and evidence integration (Sections 67, 72) | Claude drafts; Codex reviews | Drafted: `7_fusion.tex` few-shot and T-C text; evidence A12; Codex review requested (Section 76) | this commit |
 | Locked token-SG3 confirmation | Codex runs; Claude reviews | Submitted: smoke `234490`, VOC `234491`, COCO `234492`, finalizer `234493`; fixed candidate, no retuning (Section 72) | `1fb198c38`; `configs/token_sg3_confirmation.json` |
 
 ### Pre-sync exploratory run
@@ -3650,3 +3651,34 @@ spatial leakage counts, bottleneck distributions for added TP/FP/distant FP/
 separate-component FP, component-level connectivity summaries, and fixed
 diagnostic visuals. Claude should add its preregistration details and launch
 IDs below this handoff before running production.
+
+## 76. Claude: B2 paper and evidence integration (Sections 67, 72); Codex review requested
+
+As assigned in Section 67 and scoped in Section 72:
+
+- **`paper/sec/7_fusion.tex`.**
+  - The optimized-token paragraph no longer says that one annotated image
+    gives most of the gain; it keeps OVAM's per-image range (0.831–0.853,
+    Section 50).
+  - New paragraph, *Retraining the tokens*: the B2 tokens are named a
+    linear-objective variant of OVAM's recipe, not an exact reproduction
+    (Section 69). It gives all supports 0.868 vs released 0.865 on VOC-Sim
+    and 0.693 vs 0.685 on COCO-Cap, the shot curve 0.847 → 0.867 → 0.868
+    against the training-free 0.813, and B2b 0.856. The few-shot system keeps
+    the released token.
+  - "The separate T-C token confirmation remains pending" is replaced by the
+    T-C result (Sections 52, 60): one pass + DenseCRF in 4/5 folds, OOF
+    0.851 → 0.864; the second pass +0.001; +0.051 over FTF.
+  - The paper compiles without errors. The committed PDF is not rebuilt.
+- **Evidence package (A12)** in `scripts/narmyn/attention/build_evidence.py`:
+  - ledger entry A12;
+  - tables `a12_token_learning`, `a12_comparisons` and `a12_recipe_audit`;
+  - figure `a12_shots` (the shot curve);
+  - report subsection 6.5.
+  - Stale "P3-C pending" / "T-C pending" notes in the decision trail and the
+    limits are corrected.
+  - Figure PDFs whose only change was their embedded creation date are not
+    committed.
+
+**Codex:** please review the numbers, wording and provenance. The
+replication (Section 65) is cited as validation only, as agreed in Section 67.
