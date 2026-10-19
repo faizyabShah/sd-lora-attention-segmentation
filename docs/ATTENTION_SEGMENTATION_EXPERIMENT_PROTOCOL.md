@@ -445,9 +445,11 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | SG5 contrastive CA seed | Claude runs; Codex reviews | Complete and accepted: 490 VOC + 707 COCO; reference won all four screens 5/5, so no seed is promoted (Sections 66, 70--71) | `eb95eb019`; `outputs/segmentation/controlled_attention_cv/sg5_contrastive_seed/` |
 | SG1 absorbing walk + SG3 confidence lock | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; no family frozen; token SG3 has a nonpromoted transfer signal for owner review (Sections 68, 71) | jobs `234264`--`234266`; `outputs/segmentation/controlled_attention_cv/sg1_sg3_graph_refinement/` |
 | B2 optimizer audit against OVAM (Section 64, request 1) | Claude | Complete: B2 uses linear maps where OVAM optimizes token-softmax maps; everything else matches; rerun proposed and paper integration held (Section 69) | this commit; `outputs/segmentation/analysis/b2_recipe_audit/` |
-| B2 paper and evidence integration (Sections 67, 72) | Claude drafts; Codex reviews | Drafted: `7_fusion.tex` few-shot and T-C text; evidence A12; Codex review requested (Section 76) | this commit |
-| SG10 seed-connected bottleneck propagation (Section 75 handoff) | Claude runs; Codex reviews | Registered before the run (Section 77); rank normalization frozen from the numerical smoke | this commit; `configs/sg10_seed_connected_bottleneck.json` |
-| Locked token-SG3 confirmation | Codex runs; Claude reviews | Submitted: smoke `234490`, VOC `234491`, COCO `234492`, finalizer `234493`; fixed candidate, no retuning (Section 72) | `1fb198c38`; `configs/token_sg3_confirmation.json` |
+| B2 paper and evidence integration (Sections 67, 72) | Claude drafts; Codex reviews | Accepted: all A12 values and provenance reproduce; wording correctly calls B2 a linear-objective variant and keeps the released token (Sections 76, 78) | `7bc2c776a`; `paper/sec/7_fusion.tex` |
+| SG10 seed-connected bottleneck propagation (Section 75 handoff) | Claude runs; Codex reviews | Production job `234642` completed in Claude's worktree: no candidate eligible in either track (reference 5/5); Claude result push and formal Codex package review remain (Sections 77--78) | `67e3bc546`; `configs/sg10_seed_connected_bottleneck.json` |
+| Locked token-SG3 confirmation | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; SG3+R2 is 0.8684/0.7006 but its VOC OOF gain is marginal (+0.0030); Claude review requested (Sections 72, 78) | jobs `234490`--`234493`; `outputs/segmentation/controlled_attention_cv/token_sg3_confirmation/` |
+| SG8 observation consensus | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; W sign consensus rho=.80 and T median freeze; variance and expansion-only gates fail (Sections 73, 78) | jobs `234511`--`234516`; `outputs/segmentation/controlled_attention_cv/sg8_observation_consensus/` |
+| SG9 reciprocal propagation | Codex runs; Claude reviews | Complete: 490 VOC + 707 COCO; reference wins both tracks 5/5, so no reciprocal operator freezes (Sections 74, 78) | jobs `234535`--`234538`; `outputs/segmentation/controlled_attention_cv/sg9_reciprocal_propagation/` |
 
 ### Pre-sync exploratory run
 
@@ -3803,3 +3805,68 @@ from it):
 
 **Launch.** One job on renyi: six workers (three per A100) pull the 40 class
 shards from one queue, then finalize (`jobs/narmyn/sg10/run_renyi.slurm`).
+
+## 78. Codex: locked SG3, SG8 and SG9 results; B2 paper review; SG10 status
+
+**Validation.** Locked SG3, SG8 and SG9 each contain 20 complete, disjoint
+class shards for 490 VOC-Sim and 707 COCO-Cap images. All jobs and finalizers
+completed with exit 0. Rerunning all three finalizers reproduces their
+`summary.json` and `report.md` files byte for byte. Their REF values agree to
+rounding (word 0.7888/0.6178; token 0.8507--0.8508/0.6681--0.6683).
+
+**Locked token-SG3.** The fixed top/bottom 5%, no-border, one-step confidence
+lock gives 0.8562 VOC and 0.6920 COCO without CRF. With DenseCRF it reaches
+0.8684 VOC and **0.7006 COCO**, the best cell in the package. Against
+`T/REF+R2`, however, its OOF gain is only +0.0030 and paired image-IoU is
++0.0028 with CI [-0.0020, +0.0076]. The substantial transfer gain
+(0.7006 vs 0.6850) remains promising evidence, but VOC does not promote it.
+
+**SG8.** Two independent families freeze under the registered fold rule:
+
+| Screen | Fold winner | Votes | OOF REF → selected | Gain | Frozen | COCO frozen / REF |
+|---|---|---:|---:|---:|---|---:|
+| word sign consensus | `W/C/rho0p80` | 4/5 | 0.7875 → 0.7970 | +0.0095 | `W/C/rho0p80` | 0.6213 / 0.6178 |
+| token robust aggregation | `T/A/median` | 4/5 | 0.8508 → 0.8544 | +0.0036 | `T/A/median` | 0.6742 / 0.6683 |
+
+Word trimmed aggregation has a positive OOF path (+0.0067) but only 3/5
+votes, so it does not freeze. Variance-guided CA retention and
+expansion-only consensus lose decisively; token sign consensus also retains
+REF. Mechanistically, direction agreement on VOC is higher for newly added
+TP than FP (word 0.864 vs 0.833; token 0.876 vs 0.826), supporting SG8's
+local hypothesis. It is not a universal leakage score: on COCO word FP,
+especially distant FP, has higher agreement than added TP. That explains the
+small transfer gain and argues against expanding the consensus grid now.
+
+**SG9.** REF wins 5/5 folds in both tracks; no reciprocal operator is
+eligible. Geometric/minimum reciprocity gives only small full-set changes
+(word 0.7913/0.7904 vs 0.7888; token 0.8528/0.8524 vs 0.8508), and the soft
+gate lowers VOC to 0.7743/0.8439. Harmful added FP does have slightly higher
+seed-weighted edge asymmetry than recovered TP across both datasets, but the
+separation is too weak for reciprocity to improve selection. Two-step return
+probability is actually higher on FP than TP. SG9 stops; two-pass reciprocal
+follow-up is not triggered.
+
+**Claude's B2 paper/evidence commit `7bc2c776a`.** Codex reproduces the A12
+source values and accepts the integration. The paper correctly reports the
+linear-objective scope, all-support VOC 0.868 vs released 0.865 (paired CI
+crosses zero), COCO 0.693 vs 0.685 (paired CI positive), the 1/2/all-support
+curve 0.847/0.867/0.868, and fold-safe B2b 0.856. Keeping OVAM's released
+token as the few-shot system is consistent with the registered evidence.
+
+**SG10 status.** Claude's normalization smoke `234640`, pipeline smoke
+`234641`, and production/finalizer job `234642` completed in Claude's
+worktree. Inspection there shows 20 complete shards and 490/707 unique images
+for each dataset. REF wins both SG10 screens 5/5. Dense bottleneck candidates
+mostly suppress useful evidence; B3 is closest but remains below REF (word
+0.7827 vs 0.7886; token 0.8451 vs 0.8501). Connectivity does not provide the
+registered discriminator: on VOC and on the COCO token track, AUC for added
+TP versus FP is generally below 0.5, meaning FP is often at least as strongly
+connected. The local word diagnostic on COCO is the only modest positive
+signal (AUC about 0.56--0.60), but it was diagnostic-only and does not alter
+the rejection. Claude still needs to push the SG10 result package and its own
+interpretation; Codex will then perform the formal committed-package review.
+
+**Handoff.** Claude should independently review the committed locked-SG3,
+SG8 and SG9 packages. SG8's two frozen cells are evidence within their
+separate screens; neither is automatically combined with DenseCRF or the
+few-shot final system. No SG9 or SG10 operator is promoted.

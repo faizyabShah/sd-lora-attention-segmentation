@@ -1,0 +1,542 @@
+{
+  "protocol": "Section 74",
+  "spec": {
+    "name": "SG9 reciprocal self-attention propagation",
+    "protocol": "protocol Section 74",
+    "registered_before_run": true,
+    "tracks": [
+      "W",
+      "T"
+    ],
+    "sa": {
+      "module_index": 15,
+      "resolution": 64,
+      "calls": 31,
+      "heads": 8,
+      "observations": 248
+    },
+    "epsilon": 1e-12,
+    "operators": [
+      "REF",
+      "R1_geometric",
+      "R2_minimum",
+      "R3_soft_gate"
+    ],
+    "tie_break": "within 0.002 prefer the operator closest to REF: R3 soft gate, then R1 geometric, then R2 minimum",
+    "normalization": "per-map minmax, identical to reference",
+    "thresholds": [
+      0.3,
+      0.325,
+      0.35,
+      0.375,
+      0.4,
+      0.425,
+      0.45,
+      0.475,
+      0.5,
+      0.525,
+      0.55,
+      0.575,
+      0.6,
+      0.625,
+      0.65,
+      0.675,
+      0.7
+    ],
+    "selection": "operator and threshold selected independently for W and T on four VOC-Sim folds and scored on the held-out fold",
+    "transfer": "COCO-Cap uses the operator and threshold chosen on VOC-Sim and never selects",
+    "excluded_initially": [
+      "two_pass",
+      "DenseCRF",
+      "SG8",
+      "SG3",
+      "RGB",
+      "top_k",
+      "head_selection",
+      "call_selection"
+    ],
+    "storage": "compact counts and per-image reciprocal diagnostics only; generated images, maps, affinities, and propagated values are discarded"
+  },
+  "voc_images": 490,
+  "coco_images": 707,
+  "screens": {
+    "W": {
+      "reference": "W/REF",
+      "candidates": [
+        "W/R1_geometric",
+        "W/R2_minimum",
+        "W/R3_soft_gate"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "W/REF",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7901779260843951,
+          "train_miou_reference": 0.7901779260843951,
+          "heldout_miou_chosen": 0.7855256551762075,
+          "heldout_miou_reference": 0.7855256551762075
+        },
+        {
+          "fold": 1,
+          "chosen": "W/REF",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7826954203220221,
+          "train_miou_reference": 0.7826954203220221,
+          "heldout_miou_chosen": 0.8113177118699145,
+          "heldout_miou_reference": 0.8113177118699145
+        },
+        {
+          "fold": 2,
+          "chosen": "W/REF",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7902206982681047,
+          "train_miou_reference": 0.7902206982681047,
+          "heldout_miou_chosen": 0.7860865499509113,
+          "heldout_miou_reference": 0.7860865499509113
+        },
+        {
+          "fold": 3,
+          "chosen": "W/REF",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7911979920530935,
+          "train_miou_reference": 0.7911979920530935,
+          "heldout_miou_chosen": 0.7805150003010092,
+          "heldout_miou_reference": 0.7805150003010092
+        },
+        {
+          "fold": 4,
+          "chosen": "W/REF",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7909700256987433,
+          "train_miou_reference": 0.7909700256987433,
+          "heldout_miou_chosen": 0.7756696271670742,
+          "heldout_miou_reference": 0.7756696271670742
+        }
+      ],
+      "selection_counts": {
+        "W/REF": 5
+      },
+      "vote_winner": "W/REF",
+      "vote_winner_votes": 5,
+      "frozen": "W/REF",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.7875085275972367,
+      "oof_miou_reference": 0.7875085275972367,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.425,
+      "full_threshold_reference": 0.425,
+      "full_miou_frozen": 0.7887910162539647,
+      "full_miou_reference": 0.7887910162539647,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "T": {
+      "reference": "T/REF",
+      "candidates": [
+        "T/R1_geometric",
+        "T/R2_minimum",
+        "T/R3_soft_gate"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "T/REF",
+          "chosen_threshold": 0.475,
+          "reference_threshold": 0.475,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.853877359344661,
+          "train_miou_reference": 0.853877359344661,
+          "heldout_miou_chosen": 0.8366792754968964,
+          "heldout_miou_reference": 0.8366792754968964
+        },
+        {
+          "fold": 1,
+          "chosen": "T/REF",
+          "chosen_threshold": 0.475,
+          "reference_threshold": 0.475,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8449788661192826,
+          "train_miou_reference": 0.8449788661192826,
+          "heldout_miou_chosen": 0.8694213284984859,
+          "heldout_miou_reference": 0.8694213284984859
+        },
+        {
+          "fold": 2,
+          "chosen": "T/REF",
+          "chosen_threshold": 0.475,
+          "reference_threshold": 0.475,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8501373859926374,
+          "train_miou_reference": 0.8501373859926374,
+          "heldout_miou_chosen": 0.8530034715502628,
+          "heldout_miou_reference": 0.8530034715502628
+        },
+        {
+          "fold": 3,
+          "chosen": "T/REF",
+          "chosen_threshold": 0.475,
+          "reference_threshold": 0.475,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8526313994191248,
+          "train_miou_reference": 0.8526313994191248,
+          "heldout_miou_chosen": 0.8427282727217419,
+          "heldout_miou_reference": 0.8427282727217419
+        },
+        {
+          "fold": 4,
+          "chosen": "T/REF",
+          "chosen_threshold": 0.475,
+          "reference_threshold": 0.475,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8515124122295035,
+          "train_miou_reference": 0.8515124122295035,
+          "heldout_miou_chosen": 0.8422225719538499,
+          "heldout_miou_reference": 0.8422225719538499
+        }
+      ],
+      "selection_counts": {
+        "T/REF": 5
+      },
+      "vote_winner": "T/REF",
+      "vote_winner_votes": 5,
+      "frozen": "T/REF",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.8507615164263921,
+      "oof_miou_reference": 0.8507615164263921,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.475,
+      "full_threshold_reference": 0.475,
+      "full_miou_frozen": 0.8507615164263921,
+      "full_miou_reference": 0.8507615164263921,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    }
+  },
+  "transfer": {
+    "W": {
+      "frozen": "W/REF",
+      "reference": "W/REF",
+      "coco_miou_frozen": 0.6177643713348178,
+      "coco_miou_reference": 0.6177643713348178,
+      "paired_image_iou": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 707
+      },
+      "changes_from_seed": {
+        "fields": [
+          "added_tp",
+          "added_fp",
+          "removed_tp",
+          "removed_fp"
+        ],
+        "voc": [
+          4604215,
+          1880888,
+          513194,
+          2691929
+        ],
+        "coco": [
+          6866157,
+          9383845,
+          404275,
+          2351408
+        ]
+      },
+      "spatial_new_fp": {
+        "fields": [
+          "distant_gt16",
+          "attached",
+          "separate_component"
+        ],
+        "voc": [
+          961266,
+          1821439,
+          59449
+        ],
+        "coco": [
+          7375538,
+          8470635,
+          913210
+        ]
+      }
+    },
+    "T": {
+      "frozen": "T/REF",
+      "reference": "T/REF",
+      "coco_miou_frozen": 0.6683049980851254,
+      "coco_miou_reference": 0.6683049980851254,
+      "paired_image_iou": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 707
+      },
+      "changes_from_seed": {
+        "fields": [
+          "added_tp",
+          "added_fp",
+          "removed_tp",
+          "removed_fp"
+        ],
+        "voc": [
+          2057775,
+          1226821,
+          430887,
+          2344807
+        ],
+        "coco": [
+          2591766,
+          3612941,
+          542497,
+          3005051
+        ]
+      },
+      "spatial_new_fp": {
+        "fields": [
+          "distant_gt16",
+          "attached",
+          "separate_component"
+        ],
+        "voc": [
+          528945,
+          1203405,
+          23416
+        ],
+        "coco": [
+          2566699,
+          3319146,
+          293795
+        ]
+      }
+    }
+  },
+  "cells": {
+    "W/REF": {
+      "voc_threshold": 0.425,
+      "voc_miou": 0.7887910162539647,
+      "voc_rates": {
+        "recall": 0.90627827913445,
+        "precision": 0.8530773556827154
+      },
+      "coco_miou": 0.6177643713348178,
+      "coco_rates": {
+        "recall": 0.8701404519209429,
+        "precision": 0.6603435453120632
+      }
+    },
+    "W/R1_geometric": {
+      "voc_threshold": 0.425,
+      "voc_miou": 0.7913493103025568,
+      "voc_rates": {
+        "recall": 0.9068828632687661,
+        "precision": 0.8554338766374435
+      },
+      "coco_miou": 0.6187079523300718,
+      "coco_rates": {
+        "recall": 0.8669348604880063,
+        "precision": 0.6635027130385193
+      }
+    },
+    "W/R2_minimum": {
+      "voc_threshold": 0.425,
+      "voc_miou": 0.7903767710262224,
+      "voc_rates": {
+        "recall": 0.9032596245332672,
+        "precision": 0.8568429690659106
+      },
+      "coco_miou": 0.6196695824795133,
+      "coco_rates": {
+        "recall": 0.8597896880409055,
+        "precision": 0.6700529888069129
+      }
+    },
+    "W/R3_soft_gate": {
+      "voc_threshold": 0.4,
+      "voc_miou": 0.7742949217001789,
+      "voc_rates": {
+        "recall": 0.9041659438339259,
+        "precision": 0.8383143123385521
+      },
+      "coco_miou": 0.6079170487850958,
+      "coco_rates": {
+        "recall": 0.8527697148839131,
+        "precision": 0.6622681637775591
+      }
+    },
+    "T/REF": {
+      "voc_threshold": 0.475,
+      "voc_miou": 0.8507615164263921,
+      "voc_rates": {
+        "recall": 0.9424831997209191,
+        "precision": 0.8958287416165088
+      },
+      "coco_miou": 0.6683049980851254,
+      "coco_rates": {
+        "recall": 0.8885096124960735,
+        "precision": 0.7257110331074402
+      }
+    },
+    "T/R1_geometric": {
+      "voc_threshold": 0.475,
+      "voc_miou": 0.8528044315765435,
+      "voc_rates": {
+        "recall": 0.9423401917945393,
+        "precision": 0.898113574868308
+      },
+      "coco_miou": 0.670322435062594,
+      "coco_rates": {
+        "recall": 0.88835417419679,
+        "precision": 0.7280884446300513
+      }
+    },
+    "T/R2_minimum": {
+      "voc_threshold": 0.475,
+      "voc_miou": 0.8523890657078722,
+      "voc_rates": {
+        "recall": 0.9411349113240527,
+        "precision": 0.8988075705709471
+      },
+      "coco_miou": 0.6712707743722497,
+      "coco_rates": {
+        "recall": 0.886444756792452,
+        "precision": 0.7300103266155036
+      }
+    },
+    "T/R3_soft_gate": {
+      "voc_threshold": 0.475,
+      "voc_miou": 0.843873420619323,
+      "voc_rates": {
+        "recall": 0.933841843320684,
+        "precision": 0.8969626404692945
+      },
+      "coco_miou": 0.6717280697316239,
+      "coco_rates": {
+        "recall": 0.8773902368847507,
+        "precision": 0.7364897006732382
+      }
+    }
+  },
+  "mechanism": {
+    "voc": {
+      "W": {
+        "added_tp": {
+          "mean_seed_weighted_edge_asymmetry": 0.33034189464306113,
+          "mean_two_step_return_probability": 0.006185991507715424,
+          "pixels": 5513709
+        },
+        "added_fp": {
+          "mean_seed_weighted_edge_asymmetry": 0.34812758687109724,
+          "mean_two_step_return_probability": 0.008055245703296252,
+          "pixels": 1821464
+        },
+        "distant_added_fp_gt16": {
+          "mean_seed_weighted_edge_asymmetry": 0.3470059923358368,
+          "mean_two_step_return_probability": 0.007241351627969286,
+          "pixels": 883248
+        },
+        "unchanged_membership": {
+          "mean_seed_weighted_edge_asymmetry": 0.3219409377083626,
+          "mean_two_step_return_probability": 0.004483901743059678,
+          "pixels": 118316901
+        }
+      },
+      "T": {
+        "added_tp": {
+          "mean_seed_weighted_edge_asymmetry": 0.3365015702877315,
+          "mean_two_step_return_probability": 0.007390281315112391,
+          "pixels": 1611260
+        },
+        "added_fp": {
+          "mean_seed_weighted_edge_asymmetry": 0.34758282925002665,
+          "mean_two_step_return_probability": 0.008443999104293939,
+          "pixels": 1243169
+        },
+        "distant_added_fp_gt16": {
+          "mean_seed_weighted_edge_asymmetry": 0.3383791136660543,
+          "mean_two_step_return_probability": 0.008153316211695011,
+          "pixels": 552715
+        },
+        "unchanged_membership": {
+          "mean_seed_weighted_edge_asymmetry": 0.32389429569554584,
+          "mean_two_step_return_probability": 0.004537654746794217,
+          "pixels": 122490188
+        }
+      }
+    },
+    "coco": {
+      "W": {
+        "added_tp": {
+          "mean_seed_weighted_edge_asymmetry": 0.3253622285357675,
+          "mean_two_step_return_probability": 0.007653335785493774,
+          "pixels": 7871235
+        },
+        "added_fp": {
+          "mean_seed_weighted_edge_asymmetry": 0.3414666617267697,
+          "mean_two_step_return_probability": 0.007856446998262412,
+          "pixels": 9053972
+        },
+        "distant_added_fp_gt16": {
+          "mean_seed_weighted_edge_asymmetry": 0.3412522374650177,
+          "mean_two_step_return_probability": 0.00735252911394067,
+          "pixels": 7035923
+        },
+        "unchanged_membership": {
+          "mean_seed_weighted_edge_asymmetry": 0.3216308520382488,
+          "mean_two_step_return_probability": 0.004689296710035384,
+          "pixels": 166115760
+        }
+      },
+      "T": {
+        "added_tp": {
+          "mean_seed_weighted_edge_asymmetry": 0.32614597111477545,
+          "mean_two_step_return_probability": 0.0074284970166618195,
+          "pixels": 2087215
+        },
+        "added_fp": {
+          "mean_seed_weighted_edge_asymmetry": 0.33175092168162107,
+          "mean_two_step_return_probability": 0.008654008833911105,
+          "pixels": 3753508
+        },
+        "distant_added_fp_gt16": {
+          "mean_seed_weighted_edge_asymmetry": 0.3281726600419714,
+          "mean_two_step_return_probability": 0.008469584913297107,
+          "pixels": 2746776
+        },
+        "unchanged_membership": {
+          "mean_seed_weighted_edge_asymmetry": 0.3231470352719932,
+          "mean_two_step_return_probability": 0.00487016297000913,
+          "pixels": 175472739
+        }
+      }
+    }
+  }
+}

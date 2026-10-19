@@ -1,0 +1,249 @@
+{
+  "protocol": "Section 72",
+  "voc_images": 490,
+  "coco_images": 707,
+  "comparisons": {
+    "T/P1_vs_T/REF": {
+      "candidate": "T/P1",
+      "reference": "T/REF",
+      "folds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.475
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.475
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.475
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.475
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.475
+        }
+      ],
+      "oof_candidate": 0.854304907978783,
+      "oof_reference": 0.8506758015322495,
+      "oof_gain": 0.00362910644653347,
+      "paired_image_iou": {
+        "mean": 0.004819833627243557,
+        "ci_low": 0.0020706216096126493,
+        "ci_high": 0.007417883204369742,
+        "better": 309,
+        "worse": 181,
+        "ties": 0
+      }
+    },
+    "T/P1+R2_vs_T/REF+R2": {
+      "candidate": "T/P1+R2",
+      "reference": "T/REF+R2",
+      "folds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.45,
+          "reference_threshold": 0.45
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.45,
+          "reference_threshold": 0.45
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.475
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.475
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.475
+        }
+      ],
+      "oof_candidate": 0.865410078210006,
+      "oof_reference": 0.8643319758364736,
+      "oof_gain": 0.0010781023735324524,
+      "paired_image_iou": {
+        "mean": 0.0011641732547103922,
+        "ci_low": -0.002103102248057217,
+        "ci_high": 0.004151153429641133,
+        "better": 273,
+        "worse": 217,
+        "ties": 0
+      }
+    },
+    "T/SG3_vs_T/REF": {
+      "candidate": "T/SG3",
+      "reference": "T/REF",
+      "folds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.45,
+          "reference_threshold": 0.475
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.45,
+          "reference_threshold": 0.475
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.45,
+          "reference_threshold": 0.475
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.45,
+          "reference_threshold": 0.475
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.45,
+          "reference_threshold": 0.475
+        }
+      ],
+      "oof_candidate": 0.8562277035472435,
+      "oof_reference": 0.8506758015322495,
+      "oof_gain": 0.0055519020149940035,
+      "paired_image_iou": {
+        "mean": 0.00591617490273362,
+        "ci_low": 0.001301045156871365,
+        "ci_high": 0.01054037345257235,
+        "better": 290,
+        "worse": 200,
+        "ties": 0
+      }
+    },
+    "T/SG3+R2_vs_T/REF+R2": {
+      "candidate": "T/SG3+R2",
+      "reference": "T/REF+R2",
+      "folds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.45
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.45
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.475
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.45,
+          "reference_threshold": 0.475
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.475
+        }
+      ],
+      "oof_candidate": 0.8673674277038209,
+      "oof_reference": 0.8643319758364736,
+      "oof_gain": 0.0030354518673473274,
+      "paired_image_iou": {
+        "mean": 0.0028442303968688343,
+        "ci_low": -0.001957167975954229,
+        "ci_high": 0.007571680133447824,
+        "better": 223,
+        "worse": 267,
+        "ties": 0
+      }
+    },
+    "T/SG3+R2_vs_T/P1+R2": {
+      "candidate": "T/SG3+R2",
+      "reference": "T/P1+R2",
+      "folds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.45
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.45
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.475
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.45,
+          "reference_threshold": 0.475
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.475
+        }
+      ],
+      "oof_candidate": 0.8673674277038209,
+      "oof_reference": 0.865410078210006,
+      "oof_gain": 0.001957349493814875,
+      "paired_image_iou": {
+        "mean": 0.0016800571421584426,
+        "ci_low": -0.004251292639122328,
+        "ci_high": 0.007667652958316793,
+        "better": 193,
+        "worse": 297,
+        "ties": 0
+      }
+    }
+  },
+  "cells": {
+    "T/REF": {
+      "voc_threshold": 0.475,
+      "voc_miou": 0.8506758015322495,
+      "coco_miou_at_voc_threshold": 0.6680748194226357
+    },
+    "T/REF+R2": {
+      "voc_threshold": 0.475,
+      "voc_miou": 0.8651666208248832,
+      "coco_miou_at_voc_threshold": 0.6849730962707458
+    },
+    "T/P1": {
+      "voc_threshold": 0.475,
+      "voc_miou": 0.854304907978783,
+      "coco_miou_at_voc_threshold": 0.660630885422386
+    },
+    "T/P1+R2": {
+      "voc_threshold": 0.475,
+      "voc_miou": 0.8668637173981933,
+      "coco_miou_at_voc_threshold": 0.674276952358569
+    },
+    "T/SG3": {
+      "voc_threshold": 0.45,
+      "voc_miou": 0.8562277035472435,
+      "coco_miou_at_voc_threshold": 0.692009953390651
+    },
+    "T/SG3+R2": {
+      "voc_threshold": 0.425,
+      "voc_miou": 0.8683967942196336,
+      "coco_miou_at_voc_threshold": 0.7006124237333612
+    }
+  }
+}
