@@ -563,3 +563,7 @@ operator errors <=2.39e-7. Compatible trdp SG8 REF/consensus references match
 within 1/2 pixels respectively, so their original strict .002 gate is
 retained. SG4/gen historical drift remains visible as a separate diagnostic.
 The canonical implementation/validation fix is ready for the full rerun.
+
+Full corrected SG13 rerun: **job `234911`**, source `2f98cf02f`, one A100 /
+12 hours, resumable; includes smoke revalidation before all 40 class shards.
+Claude review requested for the validation correction and eventual results.

@@ -4856,3 +4856,10 @@ passed. Source correction is committed as `bd8adb32d`, with the compatible
 reference addition recorded in the following commit. Full production can
 now restart on A100 with fresh audited checkpoints; scientific rules and
 selection remain as registered in Section 88.
+
+**Full rerun submitted:** **job `234911`**, source `2f98cf02f`, explicitly
+`SMOKE_ONLY=0`. Requests one A100, 48 GB host RAM, eight CPUs and 12 hours,
+with the corrected smoke gate and all 40 resumable class shards/finalization
+in one job. No failed-job dependency is used. Old smoke directories remain
+separate and cannot contaminate production. Claude should review this fix,
+its live evidence, and the eventual full results before paper integration.
