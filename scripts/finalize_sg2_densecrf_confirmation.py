@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from src.segmentation import controlled_cv as cv
+from src.segmentation.reference_recovery import verify_recovery_evidence
 from scripts.select_propagation_cv import best_threshold, class_ious, pooled_miou, image_ious, run_screen
 from scripts.narmyn.attention.an1_propagation_depth import rates
 from scripts.narmyn.attention.finalize_sg5 import load as load_sg5
@@ -25,7 +26,7 @@ def load(directory):
     return cv.load_results(sorted((directory/'shards').glob('class_*.npz')))
 
 
-def validate(directory, dataset, spec, smoke):
+def validate(directory, dataset, spec, smoke, recovery=None):
     result = load(directory/dataset)
     old = load(BASE/'sg2_consensus_edges'/dataset)
     if result.configurations != tuple(spec['configurations']) or result.thresholds != tuple(spec['thresholds']):
@@ -49,7 +50,8 @@ def validate(directory, dataset, spec, smoke):
         a, b = result.counts[result.index(new)], source.counts[source.index(historical), order]
         maximum = float(np.max(np.abs(a-b)/np.maximum(a.sum(-1)[..., None], 1)))
         checks[new] = {'historical_cell': historical, 'max_pixel_difference': int(np.abs(a-b).max()), 'max_fraction_of_image': maximum}
-        if maximum > .002:
+        checks[new]['historical_limit_exceeded'] = bool(maximum > .002)
+        if maximum > .002 and recovery is None:
             raise ValueError(f'{dataset} {new}: historical-reference mismatch {maximum:.5f}')
     return result, checks
 
@@ -77,10 +79,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output-dir', type=Path, default=OUT)
     parser.add_argument('--smoke', action='store_true')
+    parser.add_argument('--recovery-evidence', type=Path, help='verified full-package reproduction audit; historical mask drift remains reported')
     args = parser.parse_args()
     spec = json.loads(SPEC.read_text())
-    voc, vc = validate(args.output_dir, 'voc', spec, args.smoke)
-    coco, cc = validate(args.output_dir, 'coco', spec, args.smoke)
+    recovery = verify_recovery_evidence(args.recovery_evidence, args.output_dir, 'sg2_densecrf_confirmation')
+    voc, vc = validate(args.output_dir, 'voc', spec, args.smoke, recovery)
+    coco, cc = validate(args.output_dir, 'coco', spec, args.smoke, recovery)
     if args.smoke:
         (args.output_dir/'smoke_validation.json').write_text(json.dumps({'voc': vc, 'coco': cc, 'passed': True}, indent=2)+'\n')
         print('LIVE SMOKE PASSED: SG2, one/two-pass and DenseCRF historical controls on VOC and COCO')
@@ -118,7 +122,7 @@ def main():
         transfer[key] = {'candidate': candidate, 'reference': reference, 'candidate_miou': pooled_miou(a, coco.classes),
                          'reference_miou': pooled_miou(b, coco.classes), 'delta': pooled_miou(a, coco.classes)-pooled_miou(b, coco.classes),
                          'paired_image_iou': cv.paired_bootstrap(image_ious(a), image_ious(b)), 'protocol_frozen': screen['frozen']}
-    summary = {'spec': spec, 'voc_images': len(voc.image_ids), 'coco_images': len(coco.image_ids),
+    summary = {'validation_recovery': recovery, 'spec': spec, 'voc_images': len(voc.image_ids), 'coco_images': len(coco.image_ids),
                'reference_checks': {'voc': vc, 'coco': cc}, 'screens': screens, 'forced_candidate_oof': paired_oof,
                'cells': cells, 'transfer': transfer,
                'note': 'No parameter or threshold chosen on COCO. Existing FTF at its locked .45 threshold is reported alongside the framework-selected thresholds. CRF cells have no continuous-map AP.'}
@@ -127,7 +131,7 @@ def main():
     with (args.output_dir/'per_class_results.csv').open('w', newline='') as handle:
         writer = csv.DictWriter(handle, fieldnames=list(class_rows[0]))
         writer.writeheader(); writer.writerows(class_rows)
-    lines = ['# Locked SG2 + DenseCRF confirmation', '', summary['note'], '',
+    lines = ['# Locked SG2 + DenseCRF confirmation', '', ('AUDITED RECOVERY: historical pixel-level reproduction failed across hardware; these are internally consistent V100 comparisons. See validation_recovery and count_audit.json; independent review required.' if recovery else 'Historical reference checks passed.'), '', summary['note'], '',
              '| Comparison | OOF reference | Locked candidate OOF | Delta | Protocol frozen | Candidate fold votes |',
              '|---|---:|---:|---:|---|---:|']
     for key, s in screens.items():

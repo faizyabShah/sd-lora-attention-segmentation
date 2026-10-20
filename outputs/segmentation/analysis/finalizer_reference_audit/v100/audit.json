@@ -1,0 +1,107 @@
+{
+  "environment": {
+    "python": "3.10.20",
+    "torch": "2.6.0+cu118",
+    "torch_cuda": "11.8",
+    "cudnn": "90100",
+    "diffusers": "0.36.0",
+    "transformers": "4.44.2",
+    "numpy": "1.26.4",
+    "gpu": "Tesla V100S-PCIE-32GB",
+    "node": "neumann",
+    "conda_env": "trdp",
+    "slurm_job": "234952"
+  },
+  "samples": [
+    {
+      "dataset": "voc",
+      "class": "sofa",
+      "image_id": "ovam-voc-sim-441",
+      "old_new_SG2_max_abs_by_REF_P1_SG2": [
+        2.980232238769531e-07,
+        1.7285346984863281e-06,
+        2.384185791015625e-07
+      ],
+      "count_delta_sg11_saved_max": 0,
+      "count_delta_dense_raw_saved_max": 0,
+      "count_delta_sg8_REF_max": 8185,
+      "image_sha256": "bb8eefe10d571f711094dd9ac76d4e5b1a040b836e1e9419fce9b6f9db194304",
+      "raw_ranges": {
+        "seed": 1.0,
+        "REF": 0.5279684066772461,
+        "P1": 0.4038928747177124,
+        "SG2": 0.5568389296531677
+      },
+      "normalization_amplification_REF": 1.8940527439117432,
+      "small_arrays": "voc_ovam-voc-sim-441.npz"
+    },
+    {
+      "dataset": "voc",
+      "class": "tv",
+      "image_id": "ovam-voc-sim-482",
+      "old_new_SG2_max_abs_by_REF_P1_SG2": [
+        2.980232238769531e-07,
+        1.7881393432617188e-06,
+        2.980232238769531e-07
+      ],
+      "count_delta_sg11_saved_max": 0,
+      "count_delta_dense_raw_saved_max": 0,
+      "count_delta_sg8_REF_max": 293,
+      "image_sha256": "cb02f89773f537bed39f35d3d787fcb40e95eaf99c693acbf5e57955ec0933a1",
+      "raw_ranges": {
+        "seed": 1.0,
+        "REF": 0.4601912498474121,
+        "P1": 0.3559572100639343,
+        "SG2": 0.45847153663635254
+      },
+      "normalization_amplification_REF": 2.1730096340179443,
+      "count_delta_dense_CRF_saved_max": 0,
+      "small_arrays": "voc_ovam-voc-sim-482.npz"
+    },
+    {
+      "dataset": "coco",
+      "class": "person",
+      "image_id": "ovam-coco-472976-person-4017470167",
+      "old_new_SG2_max_abs_by_REF_P1_SG2": [
+        2.682209014892578e-07,
+        1.4007091522216797e-06,
+        1.4901161193847656e-07
+      ],
+      "count_delta_sg11_saved_max": 0,
+      "count_delta_dense_raw_saved_max": 0,
+      "count_delta_sg8_REF_max": 39917,
+      "image_sha256": "4500a8739a9d6e8395e8ec8c16eefe16d39858dff60b53b85fbe2eb883405f13",
+      "raw_ranges": {
+        "seed": 1.0,
+        "REF": 0.3079160451889038,
+        "P1": 0.2239200323820114,
+        "SG2": 0.3349200487136841
+      },
+      "normalization_amplification_REF": 3.247638463973999,
+      "count_delta_dense_CRF_saved_max": 0,
+      "small_arrays": "coco_ovam-coco-472976-person-4017470167.npz"
+    },
+    {
+      "dataset": "coco",
+      "class": "person",
+      "image_id": "ovam-coco-117816-person-2575768907",
+      "old_new_SG2_max_abs_by_REF_P1_SG2": [
+        1.1920928955078125e-07,
+        6.854534149169922e-07,
+        1.4901161193847656e-07
+      ],
+      "count_delta_sg11_saved_max": 0,
+      "count_delta_dense_raw_saved_max": 0,
+      "count_delta_sg8_REF_max": 841,
+      "image_sha256": "6bb9c174acd48d165b2500f759df280fa6e75d04918a7e5b716026d624c69fac",
+      "raw_ranges": {
+        "seed": 1.0,
+        "REF": 0.21523377299308777,
+        "P1": 0.14133448898792267,
+        "SG2": 0.21720923483371735
+      },
+      "normalization_amplification_REF": 4.646111011505127,
+      "small_arrays": "coco_ovam-coco-117816-person-2575768907.npz"
+    }
+  ]
+}

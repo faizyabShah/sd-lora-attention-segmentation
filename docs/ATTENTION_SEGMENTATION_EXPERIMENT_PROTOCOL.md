@@ -4863,3 +4863,46 @@ with the corrected smoke gate and all 40 resumable class shards/finalization
 in one job. No failed-job dependency is used. Old smoke directories remain
 separate and cannot contaminate production. Claude should review this fix,
 its live evidence, and the eventual full results before paper integration.
+
+## 89. Codex: SG11/SG12 and SG2+CRF failure investigation and audited report recovery
+
+Owners requested investigation after jobs 234894 and 234907 failed. Both
+completed 20 VOC and 20 COCO shards (490/707 images) and stopped only at the
+historical-reference pixel-count gate; no data were lost. Full evidence,
+limitations, commands and numbers are in
+`docs/SG11_SG12_DENSECRF_INVESTIGATION.md`.
+
+**Evidence before recovery.** Independent V100S/V100 REF counts agree within
+1 pixel (VOC) / 2 (COCO) over all images and thresholds. A100 SG13/SG8 REF
+counts agree within four pixels. Counts, folds, settings, AP and target/image
+area invariants pass; every SG12 ranking/top-K indicator, pairwise-score
+identity, histogram population and sidecar image set passes. Diagnostic GPU
+job 234952 reproduced all SG11/SG12 and raw SG2 counts exactly on four worst
+samples, and post-CRF counts exactly on two of those. The locked SG2 operator
+matches Narmeen's original selected formula on identical captured QK within
+raw float32 tolerances. No learned token is loaded. Supplementary A100 job
+234953 was cancelled pending, since completed SG13 supplies full A100 control
+evidence. There was no full-data rerun.
+
+**Explicit validation amendment, not a method change.** Original finalizer
+historical gates remain the default. An explicit `--recovery-evidence` option
+permits finalizing the audited **within-package V100 comparisons** while
+retaining every historical mismatch and labelling the report as recovered.
+`reference_recovery.py` binds both audit records and all 120 original shards
+by SHA256; modified evidence/data are rejected. No original measurements,
+threshold ranges, folds, family candidates, promotion guards or transfer
+rules were changed. This does not certify identical historical A100 masks,
+and does not automatically update the paper or final pipeline. Claude must
+independently review the evidence and recovered selections.
+
+**Recovered outcomes.** SG11 freezes trim20/rho=.80 in 5/5 folds, OOF
+.787280 -> .798400, COCO .621916 vs REF .617163. SG12 freezes top50 in 5/5,
+OOF .787280 -> .796658, COCO .627174. SG2+CRF does not beat FTF: locked
+candidate OOF .811095 vs .813209, COCO .626111 vs .637141. The primary screen
+retains FTF in all five folds. These are recovered package results pending
+Claude's independent acceptance. No new method-combination run is submitted.
+
+The recovered SG11/SG12 package includes all diagnostics, class tables, seven
+class visual examples (14 sheets) and six observation plots. The CRF package
+includes full/reference/fixed-threshold comparisons and class tables. Raw
+shard fingerprints still match the pre-recovery snapshot exactly.

@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from src.segmentation import controlled_cv as cv
+from src.segmentation.reference_recovery import verify_recovery_evidence
 from scripts.select_propagation_cv import best_threshold, pooled_miou, run_screen
 from src.segmentation.observation_reliability import configuration_names
 from src.segmentation.propagation_diagnostics import FEATURES, EVENTS, BOUNDS, histogram_auc
@@ -33,7 +34,7 @@ def write_csv(path, rows):
         writer.writerows(rows)
 
 
-def load_result(directory, dataset, spec, smoke=False):
+def load_result(directory, dataset, spec, smoke=False, recovery=None):
     paths = [p for p in sorted((directory/dataset/'shards').glob('class_*.npz')) if '.diagnostics.' not in p.name]
     result = cv.load_results(paths)
     if result.configurations != configuration_names(spec) or result.thresholds != tuple(spec['thresholds']):
@@ -55,7 +56,8 @@ def load_result(directory, dataset, spec, smoke=False):
         pixels = a.sum(-1)
         relative_error = float(np.max(np.abs(a-b)/np.maximum(pixels[..., None], 1)))
         checks[name] = {'max_count_difference': int(np.max(np.abs(a-b))), 'max_fraction_of_image': relative_error}
-        if relative_error > .002:
+        checks[name]['historical_limit_exceeded'] = bool(relative_error > .002)
+        if relative_error > .002 and recovery is None:
             raise ValueError(f'{dataset}: {name} SG8 counts differ by {relative_error:.5f} of image')
     return result, checks
 
@@ -225,11 +227,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output-dir', type=Path, default=DEFAULT)
     parser.add_argument('--smoke', action='store_true', help='validate partial VOC/COCO and SG8 controls without selecting')
+    parser.add_argument('--recovery-evidence', type=Path, help='verified full-package reproduction audit; historical mask drift remains reported')
     args = parser.parse_args()
     directory = args.output_dir
     spec = json.loads(SPEC.read_text())
-    voc, vc = load_result(directory, 'voc', spec, args.smoke)
-    coco, cc = load_result(directory, 'coco', spec, args.smoke)
+    recovery = verify_recovery_evidence(args.recovery_evidence, directory, 'sg11_sg12_observation_reliability')
+    voc, vc = load_result(directory, 'voc', spec, args.smoke, recovery)
+    coco, cc = load_result(directory, 'coco', spec, args.smoke, recovery)
     if args.smoke:
         # Also validate diagnostic population alignment on the tiny live runs.
         for dataset, results in [('voc', voc), ('coco', coco)]:
@@ -271,7 +275,7 @@ def main():
                 class_rows.append({'dataset': dataset, 'cell': name, 'class': c, 'threshold': voc.thresholds[ti],
                                    'iou': values[c], 'reference_iou': base[c], 'delta': values[c]-base[c]})
         cells[name] = cell
-    summary = {'spec': spec, 'voc_images': len(voc.image_ids), 'coco_images': len(coco.image_ids),
+    summary = {'validation_recovery': recovery, 'spec': spec, 'voc_images': len(voc.image_ids), 'coco_images': len(coco.image_ids),
                'reference_validation_against_sg8': {'voc': vc, 'coco': cc}, 'screens': screens, 'cells': cells,
                'historical_sg8_screens': {k: v for k, v in json.loads((SG8/'summary.json').read_text())['screens'].items() if k in ('W-A', 'W-C')},
                'reference_context': 'W/REF is one-pass without DenseCRF. Existing final FTF is two passes + DenseCRF (COCO 0.6370). This screen does not replace FTF.',
@@ -283,7 +287,7 @@ def main():
     dump(directory/'fold_results.json', screens)
     write_csv(directory/'per_class_results.csv', class_rows)
     write_csv(directory/'fold_winners.csv', [{'family': family, **row} for family, screen in screens.items() for row in screen['folds']])
-    lines = ['# SG11 / SG12 / SG-Diag', '', summary['reference_context'], '',
+    lines = ['# SG11 / SG12 / SG-Diag', '', ('AUDITED RECOVERY: historical pixel-level reproduction failed across hardware; these are internally consistent V100 comparisons. See validation_recovery and count_audit.json; independent review required.' if recovery else 'Historical reference checks passed.'), '', summary['reference_context'], '',
              'VOC-Sim selects; COCO-Cap transfers only. Class words, no optimized tokens.', '',
              '| Family | Vote winner | Votes | OOF REF | OOF selection | Delta | Frozen | ChatGPT VOC target |',
              '|---|---|---:|---:|---:|---:|---|---|']

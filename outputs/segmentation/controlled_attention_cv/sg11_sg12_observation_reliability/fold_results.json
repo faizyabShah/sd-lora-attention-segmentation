@@ -1,0 +1,186 @@
+{
+  "SG11": {
+    "reference": "W/REF",
+    "candidates": [
+      "W/SG11/median/rho0p70",
+      "W/SG11/median/rho0p80",
+      "W/SG11/median/rho0p90",
+      "W/SG11/trim20/rho0p70",
+      "W/SG11/trim20/rho0p80",
+      "W/SG11/trim20/rho0p90"
+    ],
+    "folds": [
+      {
+        "fold": 0,
+        "chosen": "W/SG11/trim20/rho0p80",
+        "chosen_threshold": 0.425,
+        "reference_threshold": 0.425,
+        "reason": "conditional",
+        "train_miou_chosen": 0.7988334127115324,
+        "train_miou_reference": 0.7899826822564588,
+        "heldout_miou_chosen": 0.7981035044997601,
+        "heldout_miou_reference": 0.7854325094473272
+      },
+      {
+        "fold": 1,
+        "chosen": "W/SG11/trim20/rho0p80",
+        "chosen_threshold": 0.425,
+        "reference_threshold": 0.425,
+        "reason": "promote",
+        "train_miou_chosen": 0.7938446893296913,
+        "train_miou_reference": 0.7824392230693771,
+        "heldout_miou_chosen": 0.8152177748924299,
+        "heldout_miou_reference": 0.8114630875761657
+      },
+      {
+        "fold": 2,
+        "chosen": "W/SG11/trim20/rho0p80",
+        "chosen_threshold": 0.425,
+        "reference_threshold": 0.425,
+        "reason": "conditional",
+        "train_miou_chosen": 0.798978351866665,
+        "train_miou_reference": 0.7900353499208056,
+        "heldout_miou_chosen": 0.7983786747748505,
+        "heldout_miou_reference": 0.7859289428172378
+      },
+      {
+        "fold": 3,
+        "chosen": "W/SG11/trim20/rho0p80",
+        "chosen_threshold": 0.425,
+        "reference_threshold": 0.425,
+        "reason": "conditional",
+        "train_miou_chosen": 0.7999777499621435,
+        "train_miou_reference": 0.7910934555087368,
+        "heldout_miou_chosen": 0.7925278595866733,
+        "heldout_miou_reference": 0.7802224546432177
+      },
+      {
+        "fold": 4,
+        "chosen": "W/SG11/trim20/rho0p80",
+        "chosen_threshold": 0.425,
+        "reference_threshold": 0.45,
+        "reason": "conditional",
+        "train_miou_chosen": 0.8001730637613649,
+        "train_miou_reference": 0.7908405743685762,
+        "heldout_miou_chosen": 0.7859481776989832,
+        "heldout_miou_reference": 0.7751596960962914
+      }
+    ],
+    "selection_counts": {
+      "W/SG11/trim20/rho0p80": 5
+    },
+    "vote_winner": "W/SG11/trim20/rho0p80",
+    "vote_winner_votes": 5,
+    "frozen": "W/SG11/trim20/rho0p80",
+    "freeze_reason": "fold vote and OOF guard passed",
+    "oof_miou_selection": 0.798400027953512,
+    "oof_miou_reference": 0.7872797008862745,
+    "oof_gain": 0.011120327067237423,
+    "full_threshold_frozen": 0.425,
+    "full_threshold_reference": 0.425,
+    "full_miou_frozen": 0.798400027953512,
+    "full_miou_reference": 0.7886099033007808,
+    "paired_oof": {
+      "mean": 0.009201382470732647,
+      "ci_low": 0.005272862849234696,
+      "ci_high": 0.013165300665173005,
+      "better": 276,
+      "worse": 214,
+      "ties": 0
+    },
+    "chatgpt_voc_target_met": true,
+    "coco_frozen": 0.6219155223421355,
+    "chatgpt_coco_target_met_descriptive_only": false
+  },
+  "SG12": {
+    "reference": "W/REF",
+    "candidates": [
+      "W/SG12/top50",
+      "W/SG12/top70",
+      "W/SG12/top80",
+      "W/SG12/top90"
+    ],
+    "folds": [
+      {
+        "fold": 0,
+        "chosen": "W/SG12/top50",
+        "chosen_threshold": 0.45,
+        "reference_threshold": 0.425,
+        "reason": "conditional",
+        "train_miou_chosen": 0.7993483891359897,
+        "train_miou_reference": 0.7899826822564588,
+        "heldout_miou_chosen": 0.7980079201556065,
+        "heldout_miou_reference": 0.7854325094473272
+      },
+      {
+        "fold": 1,
+        "chosen": "W/SG12/top50",
+        "chosen_threshold": 0.45,
+        "reference_threshold": 0.425,
+        "reason": "promote",
+        "train_miou_chosen": 0.792573796601294,
+        "train_miou_reference": 0.7824392230693771,
+        "heldout_miou_chosen": 0.8210694391882276,
+        "heldout_miou_reference": 0.8114630875761657
+      },
+      {
+        "fold": 2,
+        "chosen": "W/SG12/top50",
+        "chosen_threshold": 0.45,
+        "reference_threshold": 0.425,
+        "reason": "promote",
+        "train_miou_chosen": 0.8000770040354752,
+        "train_miou_reference": 0.7900353499208056,
+        "heldout_miou_chosen": 0.7957113805320305,
+        "heldout_miou_reference": 0.7859289428172378
+      },
+      {
+        "fold": 3,
+        "chosen": "W/SG12/top50",
+        "chosen_threshold": 0.45,
+        "reference_threshold": 0.425,
+        "reason": "promote",
+        "train_miou_chosen": 0.8011205136263397,
+        "train_miou_reference": 0.7910934555087368,
+        "heldout_miou_chosen": 0.7904002140640006,
+        "heldout_miou_reference": 0.7802224546432177
+      },
+      {
+        "fold": 4,
+        "chosen": "W/SG12/top50",
+        "chosen_threshold": 0.475,
+        "reference_threshold": 0.45,
+        "reason": "conditional",
+        "train_miou_chosen": 0.8000199383633966,
+        "train_miou_reference": 0.7908405743685762,
+        "heldout_miou_chosen": 0.7811817777136335,
+        "heldout_miou_reference": 0.7751596960962914
+      }
+    ],
+    "selection_counts": {
+      "W/SG12/top50": 5
+    },
+    "vote_winner": "W/SG12/top50",
+    "vote_winner_votes": 5,
+    "frozen": "W/SG12/top50",
+    "freeze_reason": "fold vote and OOF guard passed",
+    "oof_miou_selection": 0.796657782422708,
+    "oof_miou_reference": 0.7872797008862745,
+    "oof_gain": 0.009378081536433491,
+    "full_threshold_frozen": 0.45,
+    "full_threshold_reference": 0.425,
+    "full_miou_frozen": 0.7985584168680424,
+    "full_miou_reference": 0.7886099033007808,
+    "paired_oof": {
+      "mean": 0.011055939830004266,
+      "ci_low": 0.008415566487768339,
+      "ci_high": 0.013674811070246182,
+      "better": 371,
+      "worse": 119,
+      "ties": 0
+    },
+    "chatgpt_voc_target_met": false,
+    "coco_frozen": 0.6271735100277616,
+    "chatgpt_coco_target_met_descriptive_only": true
+  }
+}

@@ -567,3 +567,20 @@ The canonical implementation/validation fix is ready for the full rerun.
 Full corrected SG13 rerun: **job `234911`**, source `2f98cf02f`, one A100 /
 12 hours, resumable; includes smoke revalidation before all 40 class shards.
 Claude review requested for the validation correction and eventual results.
+
+## 15. Investigated finalization failures; recovered V100 reports (Claude review)
+
+Protocol **Section 89** and `docs/SG11_SG12_DENSECRF_INVESTIGATION.md` document
+completed-data recovery for SG11/SG12 (234894) and SG2+CRF (234907). Failure
+was at the cross-hardware historical-mask gate, after all 490/707 images.
+Structural checks, independent complete V100 REF agreement, four-case live
+reproduction and direct selected-SG2/CRF checks passed. Recovery is explicit,
+SHA256-bound, visibly labelled, and preserves original counts and selection.
+Historical A100 pixel reproduction remains failed, not silently accepted.
+
+SG11 trim20/rho=.80: 5/5, OOF .798400 (+.011120), COCO .621916.
+SG12 top50: 5/5, OOF .796658 (+.009378), COCO .627174.
+SG2+CRF: OOF .811095 versus FTF .813209; COCO .626111 versus .637141;
+no final-pipeline replacement. Claude should verify these recovery grounds
+and results before paper integration. Further SG11/SG12 + CRF confirmation
+would be a separate future registration; it is not submitted here.
