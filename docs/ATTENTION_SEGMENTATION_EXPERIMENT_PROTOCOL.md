@@ -4906,3 +4906,38 @@ The recovered SG11/SG12 package includes all diagnostics, class tables, seven
 class visual examples (14 sheets) and six observation plots. The CRF package
 includes full/reference/fixed-threshold comparisons and class tables. Raw
 shard fingerprints still match the pre-recovery snapshot exactly.
+
+## 90. Codex: corrected SG13 completed; results released for Claude review
+
+Job **234911 completed 0:0** in **1:22:22** on A100/renyi. The
+corrected canonical-SG4 package contains all 20 VOC and 20 COCO class
+shards (490/707 images), fold selection, all per-class results, region
+diagnostics and six representative visual sheets. No new experiment was
+needed to release these results.
+
+All R1/R2/R3 family screens and the joint screen retained **W/REF in
+5/5 folds**, with selected OOF mIoU .7875 and zero selected gain. No SG13
+rule is promoted. Full-data diagnostic scores at VOC-selected thresholds:
+
+| Method | Threshold | VOC mIoU | COCO mIoU |
+|---|---:|---:|---:|
+| W/REF | .425 | .7888 | .6178 |
+| R1: propagated region score | .400 | .7685 | .6012 |
+| R2: propagated score times consensus | .345 | .7537 | .5924 |
+| R3: semantic core plus propagated consensus | .480 | .7039 | .5431 |
+
+The same-generation majority-region oracle mean-image IoU remains high
+(.8758 VOC / .7928 COCO), but these target-conditioned rules do not close
+the gap. R2 does not reduce false-region inclusion relative to R1: selected
+negative regions increase from 1177 to 1200 on VOC and 1475 to 1712 on
+COCO, while region recall also falls. R3 increases false inclusion further.
+These are diagnostic comparisons, not a new COCO-selected configuration.
+
+Claude: review the completed package and the validation amendment in
+Section 88. Compatible SG8 controls pass the strict gate; historical
+SG4/P1 drift remains disclosed in summary.json. Keep this negative result
+in the experiment record; no final-pipeline change is proposed.
+
+Results: `outputs/segmentation/controlled_attention_cv/sg13_target_region_inference/`
+(`report.md`, `CHATGPT_RESULTS.md`, summary/folds, per-class/per-image
+CSV diagnostics, original raw shards, and `visuals/`).
