@@ -598,3 +598,8 @@ complementarity. VOC-only original folds/guards and frozen COCO transfer.
 Historical cross-hardware control drift stays diagnostic; same-generation
 operator/control evidence is mandatory in every new package. No promotion
 or paper claim is made before results and independent review.
+
+Submitted after all three live smoke gates passed: **235021 SG12+CRF ->
+235022 SG14 -> 235023 SG15**, enforced with `afterok`. Source `f2c68ebe0`,
+12h and one available GPU per job, resumable, no specified node. Full
+submission and review details are in protocol Section 91.

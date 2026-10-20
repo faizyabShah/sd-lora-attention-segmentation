@@ -5069,3 +5069,21 @@ Smoke metrics/sidecars are retained in `sg12_crf_smoke_v1`, `sg14_smoke_v1`
 and `sg15_smoke_v1`. `scripts/submit_locked_refinement_package.sh` verifies
 those three smoke gates and submits the ordered 12-hour jobs. No full-data
 result has been used to alter the registered package.
+
+**Full production submitted:** source **`f2c68ebe0`**, submission runner
+`bash scripts/submit_locked_refinement_package.sh`:
+
+| Order | Stage | Slurm job | Dependency | Allocation |
+|---:|---|---:|---|---|
+| 1 | Frozen SG12 top50 + fixed DenseCRF vs current FTF | **235021** | none | 1 GPU, 8 CPUs, 48 GB host RAM, 12h |
+| 2 | SG14 top50 + trim20 + rho=.80 | **235022** | afterok:235021 | same |
+| 3 | SG15 prior-driven SPEC32 projection/snapping | **235023** | afterok:235022 | same |
+
+No node or GPU type constraint; Slurm assigns available GPUs. Each full job
+rechecks its existing live smoke gate before production and requeues before
+timeout. Reports go to `outputs/segmentation/controlled_attention_cv/sg12_crf/`,
+`sg14/` and `sg15/`. All use 490 VOC and 707 COCO images. Source settings and
+method/threshold selection are frozen as above. Claude: these experiments
+are now submitted by Codex; please review the code and later verify their
+results before promotion or paper integration. No full-job monitoring or
+result-dependent change is planned in this submission turn.
