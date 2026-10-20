@@ -48,6 +48,30 @@ def load(directory,dataset,stage,spec,smoke=False):
         c=result.counts[:,i]
         if np.any(c<0) or not np.all(c.sum(-1)==c[0,0].sum()):raise ValueError('area invariant failed')
         if not np.all(c[:,:,0]+c[:,:,2]==c[0,0,0]+c[0,0,2]):raise ValueError('GT invariant failed')
+        def expected_delta(change):
+            x=np.asarray(change)
+            return np.stack((x[...,0]-x[...,2],x[...,3]-x[...,1],x[...,2]-x[...,0],x[...,1]-x[...,3]),-1)
+        if stage=='sg12_crf':
+            delta=c[result.index(lr.CRF_CAND)]-c[result.index(lr.SG12)]
+            if not np.array_equal(delta,expected_delta(d['crf_changes'])):
+                raise ValueError('CRF pixel-transition accounting differs from measured masks')
+        elif stage=='sg14':
+            if not np.all(d['binary_group_pixels'].sum(1)==c[0,0].sum()):
+                raise ValueError('complementarity groups do not partition image')
+            for j,name in enumerate((lr.SG11,lr.SG12,lr.SG14)):
+                delta=c[result.index(name)]-c[result.index(lr.REF)]
+                for field in ('binary_group_changes','continuous_group_changes'):
+                    if not np.array_equal(delta,expected_delta(d[field][:,:,j].sum(1))):
+                        raise ValueError('complementarity transition accounting differs')
+        else:
+            for j,name in enumerate(result.configurations[4:]):
+                prior=lr.PRIORS[j//4]
+                delta=c[result.index(name)]-c[result.index(prior)]
+                changes=d['region_changes'][j]
+                if not np.array_equal(delta,expected_delta(changes[:,0])):
+                    raise ValueError('region change counts differ from actual masks')
+                if not np.array_equal(changes[:,0],changes[:,1:].sum(1)):
+                    raise ValueError('high-FG/high-BG/mixed changes do not partition totals')
     return result,diagnostics
 
 
@@ -224,6 +248,24 @@ def main():
              'screens':screens,'forced_cell_oof':oof,'forced_oof_comparisons':comparisons,'cells':cells,'mechanism':diagnostics,
              'validation':'Same-generation audited controls; historical cross-hardware discrepancies are diagnostic only. Does not certify historical bit-identical reproduction.',
              'selection_note':'VOC only selects. SG15 source thresholds selected on four training folds; refined outputs inherit them. Full-VOC choices frozen before COCO metrics are interpreted. Diagnostic variants never promoted on COCO.'}
+    summary['screen_frozen_transfer']={key:{'reference':screen['reference'],'frozen':screen['frozen'],
+        'reference_threshold':cells[screen['reference']]['voc_threshold'],
+        'frozen_threshold':cells[screen['frozen']]['voc_threshold'],
+        'reference_coco_miou':cells[screen['reference']]['coco']['metrics']['miou'],
+        'frozen_coco_miou':cells[screen['frozen']]['coco']['metrics']['miou']} for key,screen in screens.items()}
+    summary['heldout_fold_win_counts']={key:{candidate:sum(
+        a['heldout_miou']>b['heldout_miou'] for a,b in zip(oof[candidate]['folds'],oof[screen['reference']]['folds']))
+        for candidate in screen['candidates']} for key,screen in screens.items()}
+    if args.stage=='sg12_crf':
+        primary=screens['primary']
+        summary['registered_success']={'VOC_protocol_promotes_candidate':primary['frozen']==lr.CRF_CAND,
+            'candidate_fold_votes':primary['selection_counts'].get(lr.CRF_CAND,0),
+            'COCO_descriptive_at_least_0p637':cells[lr.CRF_CAND]['coco']['metrics']['miou']>=.637,
+            'COCO_positive_vs_current_final':cells[lr.CRF_CAND]['coco']['metrics']['miou']>cells[lr.CRF_REF]['coco']['metrics']['miou']}
+    if args.stage=='sg14':
+        summary['registered_success']={'OOF_above_historical_0p7984':oof[lr.SG14]['miou']>.7984,
+            'promotes_against_both_parents':all(screens[f'versus_{p}']['frozen']==lr.SG14 for p in (lr.SG11,lr.SG12)),
+            'positive_COCO_vs_both_parents':all(cells[lr.SG14]['coco']['metrics']['miou']>cells[p]['coco']['metrics']['miou'] for p in (lr.SG11,lr.SG12))}
     if args.stage=='sg14':
         summary['full_dataset_pairwise']={ds:{p:comparison(r.counts[r.index(lr.SG14),:,thresholds[lr.SG14]],r.counts[r.index(p),:,thresholds[p]],r.classes) for p in (lr.REF,lr.SG11,lr.SG12)} for ds,r in [('voc',voc),('coco',coco)]}
     for filename,value in [('summary.json',summary),('fold_results.json',{'screens':screens,'forced_cell_oof':oof,'forced_oof_comparisons':comparisons})]:
@@ -237,7 +279,7 @@ def main():
     lines+=['','Forced candidate OOF and protocol-selected OOF are distinct. All five fold winners, thresholds, class IoUs, deltas, paired 20k-bootstrap intervals and improved/worsened/tied counts are in summary.json and fold_results.json.','',
             '## Mechanism diagnostics','', '```json',json.dumps(diagnostics,indent=2,allow_nan=False),'```','']
     report='\n'.join(lines)
-    (directory/'report.md').write_text(report);(directory/'CHATGPT_RESULTS.md').write_text(report+'\n## All class results\n\n'+(directory/'per_class_results.csv').read_text())
+    (directory/'report.md').write_text(report);(directory/'CHATGPT_RESULTS.md').write_text(report+'\n## Five folds and forced OOF comparisons\n\n```json\n'+json.dumps({'screens':screens,'forced_cell_oof':oof,'forced_oof_comparisons':comparisons,'screen_frozen_transfer':summary['screen_frozen_transfer']},indent=2)+'\n```\n\n## All class results\n\n'+(directory/'per_class_results.csv').read_text())
     print('\n'.join(lines[:len(cells)+8]),flush=True)
 
 if __name__=='__main__':main()

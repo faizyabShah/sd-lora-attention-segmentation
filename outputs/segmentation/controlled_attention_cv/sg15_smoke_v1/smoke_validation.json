@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "voc_images": 2,
+  "coco_images": 1,
+  "historical_drift": {
+    "voc": {
+      "sg11_sg12_observation_reliability": {
+        "max_pixels": 0,
+        "max_fraction": 0.0,
+        "diagnostic_only": true,
+        "not_claiming_identical_historical_masks": true
+      },
+      "sg13_target_region_inference": {
+        "max_pixels": 426,
+        "max_fraction": 0.00162506103515625,
+        "diagnostic_only": true,
+        "not_claiming_identical_historical_masks": true
+      }
+    },
+    "coco": {
+      "sg11_sg12_observation_reliability": {
+        "max_pixels": 0,
+        "max_fraction": 0.0,
+        "diagnostic_only": true,
+        "not_claiming_identical_historical_masks": true
+      },
+      "sg13_target_region_inference": {
+        "max_pixels": 8132,
+        "max_fraction": 0.0310211181640625,
+        "diagnostic_only": true,
+        "not_claiming_identical_historical_masks": true
+      }
+    }
+  },
+  "same_generation_audits": "passed; frozen original parent operators and top50 identities checked on live inputs"
+}

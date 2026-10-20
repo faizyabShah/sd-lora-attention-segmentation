@@ -5049,3 +5049,23 @@ change-accounting identities, inherited-threshold CV and atomic resume.
 Claude: please review these preregistered details and later verify all three
 result packages before any paper/pipeline promotion. No result is available
 at registration, and no method change is authorized by inspecting COCO.
+
+**Live smoke evidence:** jobs **235018** (SG12+CRF, erdos/V100,
+1:46), **235019** (SG14, erdos/V100, 1:14) and **235020** (SG15,
+neumann/V100S, 1:03) all completed **0:0**. Each covered VOC aeroplane,
+VOC person and COCO dining table. Frozen original SG11/SG12 raw maps and
+stable top50 identities passed; new REF count curves match the historical
+V100 package exactly on these samples. A100 historical differences remain
+labelled diagnostic. The final validators were also rerun successfully
+with exact mask-count/transition reconciliation for CRF, complementarity
+and all region variants.
+
+Independent formula/resume/CV tests and the existing SG13 regression tests
+passed. The full finalization path was exercised for each stage on artificial
+490/707-image fixtures in an automatically removed temporary directory;
+all report fields, fold selection, JSON/CSV export and SG15 sheet rendering /
+cache removal passed. These synthetic fixtures are tests, not measurements.
+Smoke metrics/sidecars are retained in `sg12_crf_smoke_v1`, `sg14_smoke_v1`
+and `sg15_smoke_v1`. `scripts/submit_locked_refinement_package.sh` verifies
+those three smoke gates and submits the ordered 12-hour jobs. No full-data
+result has been used to alter the registered package.
