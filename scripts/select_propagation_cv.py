@@ -81,11 +81,17 @@ def image_ious(counts):
     return np.where(union > 0, counts[:, 0] / np.maximum(union, 1), 1.0)
 
 
-def run_screen(results, reference_name, candidates, inclusiveness, threshold_indices=None):
+def run_screen(results, reference_name, candidates, inclusiveness, threshold_indices=None, threshold_sources=None):
     # Optional preregistered per-cell grids; the default reproduces all existing screens.
     allowed = threshold_indices or {}
+    sources = threshold_sources or {}
     def choose_threshold(index, mask):
-        return best_threshold(results, index, mask, allowed.get(results.configurations[index]))
+        name = results.configurations[index]
+        source = results.index(sources[name]) if name in sources else index
+        chosen, _ = best_threshold(results, source, mask, allowed.get(results.configurations[source]))
+        # A refinement inherits its source prior threshold; its own score at
+        # that threshold still determines eligibility and fold selection.
+        return chosen, miou(results, index, chosen, mask)
     reference = results.index(reference_name)
     folds = []
     oof = np.zeros((len(results.image_ids), 4), dtype=np.int64)

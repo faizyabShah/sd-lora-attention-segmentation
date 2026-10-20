@@ -584,3 +584,17 @@ SG2+CRF: OOF .811095 versus FTF .813209; COCO .626111 versus .637141;
 no final-pipeline replacement. Claude should verify these recovery grounds
 and results before paper integration. Further SG11/SG12 + CRF confirmation
 would be a separate future registration; it is not submitted here.
+
+## 16. Owner-approved next locked package: SG12+CRF, SG14, SG15 (Codex)
+
+ChatGPT's exact request is archived in `docs/SG12_CRF_SG14_SG15_REQUEST.md`;
+implementation/selection/diagnostic conventions are preregistered in protocol
+Section 91. Codex owns all three stages and will submit them in the order
+SG12+fixedCRF -> SG14 -> SG15 after live smoke tests. Claude reviews results.
+This is not a new grid: frozen top50+existing CRF; one top50/trim20/rho=.80
+combination; and fixed SPEC32 region majority/snapping on three frozen priors.
+SG15 must beat its own source prior; SG14 must beat both parents to establish
+complementarity. VOC-only original folds/guards and frozen COCO transfer.
+Historical cross-hardware control drift stays diagnostic; same-generation
+operator/control evidence is mandatory in every new package. No promotion
+or paper claim is made before results and independent review.

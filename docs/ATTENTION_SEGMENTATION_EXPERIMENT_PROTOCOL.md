@@ -4941,3 +4941,111 @@ in the experiment record; no final-pipeline change is proposed.
 Results: `outputs/segmentation/controlled_attention_cv/sg13_target_region_inference/`
 (`report.md`, `CHATGPT_RESULTS.md`, summary/folds, per-class/per-image
 CSV diagnostics, original raw shards, and `visuals/`).
+
+## 91. Codex ownership: locked SG12+CRF -> SG14 -> SG15 package; Claude reviews
+
+The owner authorized the attached ChatGPT package, archived without changes
+in `docs/SG12_CRF_SG14_SG15_REQUEST.md`. **Codex implements and submits all
+three stages; Claude independently reviews methods, diagnostics and results.**
+This does not transfer any new experiments to Claude. No new token training,
+optimized/released tokens or COCO selection is permitted.
+
+### Frozen methods and execution order
+
+1. **SG12 + DenseCRF confirmation:** current final `W/P1+R2` versus
+   `W/SG12/top50+R2`, with unrefined SG12 reported diagnostically. P1 means
+   `mean_i(A_i^2 c)`, not `(mean_i A_i)^2 c`. Fixed existing SimpleCRF wrapper
+   and `OVAM_CRF_PARAMETERS=(10,80,13,3,3,5)`. Original 17 thresholds
+   .30–.70/.025, original five VOC folds and promotion guards. No CRF tuning.
+2. **SG14:** only top50 (124/248), trim20 **per tail** (24 removed per tail
+   among 124), rho=.80. Directional counts and trimmed mean both use the
+   same 124 selected observations. Comparators are same-generation REF,
+   frozen SG11 trim20/rho=.80 and frozen SG12 top50; no CRF. Individual
+   SG14-versus-parent screens and a descriptive joint fold vote are reported;
+   complementary success requires positive OOF versus both parents and >=4/5
+   votes, rather than declaring success by beating REF alone.
+3. **SG15:** canonical SG4/SG13 SPEC32, with each P1 / frozen SG11 /
+   frozen SG12 prior separately. A uses q=.25/.50/.75, selected within VOC
+   training folds; B fixes .75 FG / .25 BG and retains mixed-region pixels.
+   Every family is screened against its own input prior. No CRF, SG2 growing,
+   classifier, vocabulary expansion, partition tuning or new prior tuning.
+
+### Threshold and region conventions fixed before execution
+
+SG15 uses each unrefined prior's **training-fold-selected** threshold on
+that fold's four training folds and inherits it unchanged in all its
+refinements. Full VOC selects the final prior threshold for frozen COCO
+transfer. Q is selected only in A. Refinements cannot optimize a second
+mask threshold. Ties prefer q=.50 then .75 then .25 under existing tie rules.
+`run_screen` gains an optional `threshold_sources` mapping; the default
+behavior is unchanged, tested against its existing behavior.
+
+Occupancy fractions are measured at annotation resolution: prior minmax at
+64, bilinear upsample, threshold, nearest-expand SPEC32 labels, then count
+predicted foreground pixels per region. A output is a hard region assignment;
+B retains the original full-resolution prior in mixed regions. Ground truth
+never enters prediction. Region GT-positive means at least 50% target pixels
+of that annotation-resolution region. The mathematically matching full-size
+majority oracle is primary; the old SG13 nearest64-GT oracle is also retained
+as a clearly labelled diagnostic. Mixed B output is summarized as a selected
+region when at least half its output pixels are foreground; actual masks
+remain pixelwise. Empty regions are excluded from region counts.
+
+### Required evidence and diagnostics
+
+Each stage independently generates its own REF and relevant parents on the
+same sample/attention. Mandatory streaming algebraic audits and live smoke
+comparisons to original frozen SG11/12 operators verify raw maps and the
+exact stable top50 identities. Historical A100/V100 count differences are
+recorded as diagnostics, never an unconditional cross-hardware failure gate;
+no earlier recovered result is silently substituted for new controls.
+
+Full output: fold winners/thresholds, forced candidate OOF separately from
+protocol-selected OOF, full VOC/frozen COCO macro class mIoU, all 20 class
+IoUs/deltas, mean image IoU, pixel IoU, macro and pooled recall/precision,
+20,000-resample paired image-IoU CI and improved/worsened/tied counts.
+
+SG12+CRF records raw-to-CRF FN->TP / FP->TN / TP->FN / TN->FP at every input
+threshold, 4px GT boundary-band errors, AN1 added-FP attached/detached
+components and distances >16/>64px. Report same-input-threshold comparisons
+separately from each method's individual VOC-selected threshold. Timings
+synchronize CUDA and measure shared generation/CA, independent ordinary
+two-pass propagation, candidate observation propagation, ranking, selected
+averaging and threshold-specific CRF. Inclusive latency charges the shared
+generation in full to each method but is **not** an independent full-job
+benchmark; no speedup claim is permitted from it.
+
+SG14 records binary mask modification groups and continuous raw-direction
+groups separately. Opposite binary flips relative to the same binary REF
+are mathematically impossible, and are reported as exactly zero; continuous
+opposition can occur and is retained. GT-labelled gains/removals are counted
+by both group definitions, with consensus abstention/gate-membership changes
+and observation reliability versus useful/harmful-change correlations.
+
+SG15 records all prior/refinement region precision/recall/F1, missed positive
+and selected negative counts, oracle gaps before/after (unclipped), pixel
+changes in all/high-FG/high-BG/mixed regions, and all class results including
+person. Five fixed first-manifest VOC classes (aeroplane, bird, person,
+chair, dining table) plus largest/smallest VOC image-IoU-change examples
+across variants at fixed .45 are retained for illustration. Visual extremes
+never select configurations. Sheets show all eight requested columns.
+
+### Jobs, storage and review
+
+Three sequential full jobs, each 12h, one GPU and no node constraint; use
+`afterok` dependencies in the requested order after separate live smoke
+jobs pass. Each stage is per-image resumable; USR1 requeues before timeout.
+Raw generation, QK/affinity and masks are removed after scoring. Only metric
+counts, compact numeric sidecars and a bounded temporary visual cache are
+stored; the SG15 plotter deletes its caches after rendering the small set
+of sheets. GPU inference runs only in Slurm allocations.
+
+Sources: `configs/sg12_crf_sg14_sg15.json`, reusable `locked_refinements.py`
+and `experiment_records.py`, generic streaming/finalizer/plot scripts, and
+`jobs/run_locked_refinement_package.slurm`. Tests independently cover the
+formulas, original two-pass semantics, stable ties, exact q/boundary rules,
+change-accounting identities, inherited-threshold CV and atomic resume.
+
+Claude: please review these preregistered details and later verify all three
+result packages before any paper/pipeline promotion. No result is available
+at registration, and no method change is authorized by inspecting COCO.
