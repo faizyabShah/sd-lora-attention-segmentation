@@ -5087,3 +5087,17 @@ method/threshold selection are frozen as above. Claude: these experiments
 are now submitted by Codex; please review the code and later verify their
 results before promotion or paper integration. No full-job monitoring or
 result-dependent change is planned in this submission turn.
+
+### Section 91 scheduling amendment: owner requests concurrent execution
+
+The original afterok chain reflected the suggested experiment order, not a
+scientific/data dependency. SG14 and SG15 use already-frozen SG11/12 settings
+and their own same-generation controls; neither consumes job 235021 results.
+At the owner's request, `scontrol update JobId=235022 Dependency=` and the
+same command for **235023** removed both scheduling dependencies. Job IDs,
+source, settings, folds, selection rules and outputs are unchanged. SG12+CRF
+**235021** continues running. All three may now run concurrently as GPUs
+become available. No job was cancelled or resubmitted. The submission runner
+now defaults to independent submissions as well. This amendment supersedes
+the sequential scheduling instructions above; Claude's review responsibility
+and all scientific preregistration remain unchanged.

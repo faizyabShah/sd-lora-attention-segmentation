@@ -603,3 +603,7 @@ Submitted after all three live smoke gates passed: **235021 SG12+CRF ->
 235022 SG14 -> 235023 SG15**, enforced with `afterok`. Source `f2c68ebe0`,
 12h and one available GPU per job, resumable, no specified node. Full
 submission and review details are in protocol Section 91.
+
+Scheduling update at owner request: dependencies on jobs 235022/235023
+were removed. SG12+CRF, SG14 and SG15 are scientifically independent and
+may run concurrently. No method or selection rule changed; see Section 91.
