@@ -5101,3 +5101,61 @@ become available. No job was cancelled or resubmitted. The submission runner
 now defaults to independent submissions as well. This amendment supersedes
 the sequential scheduling instructions above; Claude's review responsibility
 and all scientific preregistration remain unchanged.
+
+## 92. Codex: completed SG12+CRF, SG14 and SG15 results; Claude reviews
+
+All three jobs completed **0:0**: **235021** in **6:00:27**, **235022** in
+**4:15:21**, **235023** in **4:56:52**. Each has all 490 VOC and 707 COCO
+images and 20 complete metric shards per dataset. Raw operator audits max
+2.980232238769531e-7; the final validators and independent result review
+confirm manifest/fold IDs, sidecars, ranks, area invariants and exact
+changed-pixel/count reconciliation. Independent REF count curves and all
+per-image top50 index lists are **identical across the three runs** on both
+datasets. Historical A100 drift is retained as diagnostic. These are newly
+controlled runs, not unlabelled reuse of an audited historical recovery.
+Original raw shards have SHA256 fingerprints in
+`outputs/segmentation/analysis/sg12_crf_sg14_sg15_validation.json`.
+
+**SG12+CRF:** forced OOF .811526 versus FTF .813209, delta -.001683;
+0/5 promotion votes (2/5 positive raw held-out deltas). Full VOC .813126
+versus .813209; frozen COCO .631503 versus .637141. CRF helps SG12 itself
+and reduces boundary errors, predominantly by removing false positives,
+but does not beat two-pass+CRF. The OOF paired mean-image CI spans zero;
+COCO paired mean-image CI is negative. No candidate promotion or speed claim.
+
+**SG14:** OOF .798651 versus SG11 .798400 (+.000251), SG12 .796658
+(+.001993), REF .787280. It passes against REF in 5/5, but gets 0/5 promotion
+votes against either parent. Raw held-out improvements occur in 3/5 folds
+versus SG11 and 4/5 versus SG12; these are not protocol eligibility votes.
+Joint screen retains SG11 5/5. COCO .621678 versus SG11 .621916 and SG12
+.627174. Selection reduces consensus abstention (~23.5% -> 14.4% VOC,
+21.9% -> 13.9% COCO), but reliable agreement does not guarantee useful
+pixel changes. Complementarity success criterion is not met.
+
+**SG15:** all six A/B family screens retain their own prior in 5/5 folds.
+All A025/A050/A075 variants hurt OOF. B with SG11 has only +.000534 OOF
+(.798400 -> .798934), no eligible promotion vote, CI spanning zero, and
++.000108 COCO (.621916 -> .622023); mean-image COCO falls. P1+B and SG12+B
+hurt both datasets. SG11+B closes only .348% of the matching VOC mean-image
+oracle gap and widens the COCO gap. B preserves person quality much better
+than SG13 but does not establish an overall benefit. Do not continue this
+tested hard-region projection/snapping direction solely because of oracle
+headroom. Full oracle values use annotation-resolution fractions; legacy
+nearest64-GT SG13 oracle is labelled separately.
+
+**Decision:** final training-free system remains ordinary two-pass SA +
+fixed DenseCRF (OOF .813209, COCO .637141). No component promoted, no new
+method experiment submitted, no paper/final-pipeline claim changed here.
+Claude: independently review completed raw results, selection and mechanism
+analyses before paper integration. Especially distinguish OOF vs full VOC,
+protocol votes vs raw held-out wins, mean-image CI vs macro class mIoU,
+and annotation-resolution vs legacy oracle definitions.
+
+Full analysis: `docs/SG12_CRF_SG14_SG15_RESULTS.md`. Stage directories
+`sg12_crf`, `sg14`, `sg15` contain full handoffs, summaries, fold tables,
+all class/image results and raw metric/diagnostic shards. SG15 has seven
+8-column visual sheets; temporary visual caches were removed after plotting.
+Its visual index now explicitly distinguishes fixed first-manifest examples
+from diagnostic best/worst examples (metadata-only correction; no scores or
+images changed). ChatGPT upload archive:
+`outputs/segmentation/analysis/SG12_CRF_SG14_SG15_CHATGPT.zip`.

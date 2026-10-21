@@ -1,0 +1,1271 @@
+{
+  "spec": {
+    "name": "Locked SG12+DenseCRF, SG14 complementarity and SG15 prior-driven SPEC32 refinement",
+    "protocol": "Section 91",
+    "version": 1,
+    "track": "W class-word only; no learned or released optimized tokens",
+    "order": [
+      "sg12_crf",
+      "sg14",
+      "sg15"
+    ],
+    "sa": {
+      "module_index": 15,
+      "resolution": 64,
+      "calls": 31,
+      "heads": 8,
+      "observations": 248
+    },
+    "top_fraction": 0.5,
+    "selected_observations": 124,
+    "reliability": "leave-one-out cosine of raw propagation vectors; stable call-major/head-minor tie order",
+    "trim_fraction_per_tail": 0.2,
+    "consensus_rho": 0.8,
+    "thresholds": [
+      0.3,
+      0.325,
+      0.35,
+      0.375,
+      0.4,
+      0.425,
+      0.45,
+      0.475,
+      0.5,
+      0.525,
+      0.55,
+      0.575,
+      0.6,
+      0.625,
+      0.65,
+      0.675,
+      0.7
+    ],
+    "partition": "canonical SG13/SG4 SPEC32; no partition tuning",
+    "majority_q": [
+      0.25,
+      0.5,
+      0.75
+    ],
+    "snapping": {
+      "foreground_at_least": 0.75,
+      "background_at_most": 0.25
+    },
+    "prior_threshold_policy": "SG15 uses each unrefined prior's training-fold optimum; full VOC optimum frozen for COCO. Refinements never choose a new prior threshold.",
+    "region_fraction_resolution": "annotation resolution; native SPEC32 labels expanded nearest; prior map minmax at64 then bilinear; no boundary blur after refinement",
+    "bootstrap_resamples": 20000,
+    "visual_classes": [
+      "aeroplane",
+      "bird",
+      "person",
+      "chair",
+      "dining-table"
+    ],
+    "diagnostic_threshold": 0.45,
+    "diagnostic_change_tolerance": 1e-06,
+    "boundary_band_pixels": 4,
+    "selection": "unchanged training-only promotion guards; >=4/5 votes and positive selected OOF; paired forced-candidate OOF also reported",
+    "validation": "same-generation algebraic/control checks required; historical counts retained as drift diagnostics, never an unconditional cross-hardware gate",
+    "storage": "atomic per-image counts and reduced diagnostic sidecars; small representative visual caches only; no dataset-wide masks or attention"
+  },
+  "stage": "sg12_crf",
+  "voc_images": 490,
+  "coco_images": 707,
+  "environments": {
+    "voc": [
+      {
+        "commit": "91b56075fad597c10a2bbb4eb2d11f69bceac0d2",
+        "conda_env": "trdp",
+        "cudnn": "90100",
+        "diffusers": "0.36.0",
+        "gpu": "Tesla V100-PCIE-16GB",
+        "node": "erdos",
+        "numpy": "1.26.4",
+        "python": "3.10.20",
+        "slurm_job": "235021",
+        "torch": "2.6.0+cu118",
+        "torch_cuda": "11.8",
+        "transformers": "4.44.2"
+      }
+    ],
+    "coco": [
+      {
+        "commit": "91b56075fad597c10a2bbb4eb2d11f69bceac0d2",
+        "conda_env": "trdp",
+        "cudnn": "90100",
+        "diffusers": "0.36.0",
+        "gpu": "Tesla V100-PCIE-16GB",
+        "node": "erdos",
+        "numpy": "1.26.4",
+        "python": "3.10.20",
+        "slurm_job": "235021",
+        "torch": "2.6.0+cu118",
+        "torch_cuda": "11.8",
+        "transformers": "4.44.2"
+      },
+      {
+        "commit": "5deabc655fb1d4a403474490f12d62d06a348b9b",
+        "conda_env": "trdp",
+        "cudnn": "90100",
+        "diffusers": "0.36.0",
+        "gpu": "Tesla V100-PCIE-16GB",
+        "node": "erdos",
+        "numpy": "1.26.4",
+        "python": "3.10.20",
+        "slurm_job": "235021",
+        "torch": "2.6.0+cu118",
+        "torch_cuda": "11.8",
+        "transformers": "4.44.2"
+      }
+    ]
+  },
+  "historical_drift": {
+    "voc": {
+      "sg11_sg12_observation_reliability": {
+        "max_pixels": 0,
+        "max_fraction": 0.0,
+        "diagnostic_only": true,
+        "not_claiming_identical_historical_masks": true
+      },
+      "sg13_target_region_inference": {
+        "max_pixels": 8185,
+        "max_fraction": 0.031223297119140625,
+        "diagnostic_only": true,
+        "not_claiming_identical_historical_masks": true
+      }
+    },
+    "coco": {
+      "sg11_sg12_observation_reliability": {
+        "max_pixels": 0,
+        "max_fraction": 0.0,
+        "diagnostic_only": true,
+        "not_claiming_identical_historical_masks": true
+      },
+      "sg13_target_region_inference": {
+        "max_pixels": 39917,
+        "max_fraction": 0.15227127075195312,
+        "diagnostic_only": true,
+        "not_claiming_identical_historical_masks": true
+      }
+    }
+  },
+  "screens": {
+    "primary": {
+      "reference": "W/P1+R2",
+      "candidates": [
+        "W/SG12/top50+R2"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "W/P1+R2",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8124570594443471,
+          "train_miou_reference": 0.8124570594443471,
+          "heldout_miou_chosen": 0.8206285684612318,
+          "heldout_miou_reference": 0.8206285684612318
+        },
+        {
+          "fold": 1,
+          "chosen": "W/P1+R2",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8064126586745404,
+          "train_miou_reference": 0.8064126586745404,
+          "heldout_miou_chosen": 0.8412213472653388,
+          "heldout_miou_reference": 0.8412213472653388
+        },
+        {
+          "fold": 2,
+          "chosen": "W/P1+R2",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8138403926993096,
+          "train_miou_reference": 0.8138403926993096,
+          "heldout_miou_chosen": 0.8138492414093419,
+          "heldout_miou_reference": 0.8138492414093419
+        },
+        {
+          "fold": 3,
+          "chosen": "W/P1+R2",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8178784564240132,
+          "train_miou_reference": 0.8178784564240132,
+          "heldout_miou_chosen": 0.7986398595222017,
+          "heldout_miou_reference": 0.7986398595222017
+        },
+        {
+          "fold": 4,
+          "chosen": "W/P1+R2",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8158292413468764,
+          "train_miou_reference": 0.8158292413468764,
+          "heldout_miou_chosen": 0.7994051136990514,
+          "heldout_miou_reference": 0.7994051136990514
+        }
+      ],
+      "selection_counts": {
+        "W/P1+R2": 5
+      },
+      "vote_winner": "W/P1+R2",
+      "vote_winner_votes": 5,
+      "frozen": "W/P1+R2",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.8132087583619251,
+      "oof_miou_reference": 0.8132087583619251,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.45,
+      "full_threshold_reference": 0.45,
+      "full_miou_frozen": 0.8132087583619251,
+      "full_miou_reference": 0.8132087583619251,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    }
+  },
+  "forced_cell_oof": {
+    "W/REF": {
+      "miou": 0.7872797008862745,
+      "folds": [
+        {
+          "fold": 0,
+          "threshold": 0.425,
+          "heldout_miou": 0.7854325094473272
+        },
+        {
+          "fold": 1,
+          "threshold": 0.425,
+          "heldout_miou": 0.8114630875761657
+        },
+        {
+          "fold": 2,
+          "threshold": 0.425,
+          "heldout_miou": 0.7859289428172378
+        },
+        {
+          "fold": 3,
+          "threshold": 0.425,
+          "heldout_miou": 0.7802224546432177
+        },
+        {
+          "fold": 4,
+          "threshold": 0.45,
+          "heldout_miou": 0.7751596960962914
+        }
+      ],
+      "mean_image_iou": 0.7882113942364494
+    },
+    "W/P1": {
+      "miou": 0.7996523496064184,
+      "folds": [
+        {
+          "fold": 0,
+          "threshold": 0.45,
+          "heldout_miou": 0.8043717755713968
+        },
+        {
+          "fold": 1,
+          "threshold": 0.45,
+          "heldout_miou": 0.8236552709257694
+        },
+        {
+          "fold": 2,
+          "threshold": 0.45,
+          "heldout_miou": 0.8023293971713426
+        },
+        {
+          "fold": 3,
+          "threshold": 0.45,
+          "heldout_miou": 0.7905416055541602
+        },
+        {
+          "fold": 4,
+          "threshold": 0.475,
+          "heldout_miou": 0.7818058154631513
+        }
+      ],
+      "mean_image_iou": 0.8025622117538839
+    },
+    "W/SG12/top50": {
+      "miou": 0.796657782422708,
+      "folds": [
+        {
+          "fold": 0,
+          "threshold": 0.45,
+          "heldout_miou": 0.7980079201556065
+        },
+        {
+          "fold": 1,
+          "threshold": 0.45,
+          "heldout_miou": 0.8210694391882276
+        },
+        {
+          "fold": 2,
+          "threshold": 0.45,
+          "heldout_miou": 0.7957113805320305
+        },
+        {
+          "fold": 3,
+          "threshold": 0.45,
+          "heldout_miou": 0.7904002140640006
+        },
+        {
+          "fold": 4,
+          "threshold": 0.475,
+          "heldout_miou": 0.7811817777136335
+        }
+      ],
+      "mean_image_iou": 0.7992673340664536
+    },
+    "W/P1+R2": {
+      "miou": 0.8132087583619251,
+      "folds": [
+        {
+          "fold": 0,
+          "threshold": 0.45,
+          "heldout_miou": 0.8206285684612318
+        },
+        {
+          "fold": 1,
+          "threshold": 0.45,
+          "heldout_miou": 0.8412213472653388
+        },
+        {
+          "fold": 2,
+          "threshold": 0.45,
+          "heldout_miou": 0.8138492414093419
+        },
+        {
+          "fold": 3,
+          "threshold": 0.45,
+          "heldout_miou": 0.7986398595222017
+        },
+        {
+          "fold": 4,
+          "threshold": 0.45,
+          "heldout_miou": 0.7994051136990514
+        }
+      ],
+      "mean_image_iou": 0.8189078805804186
+    },
+    "W/SG12/top50+R2": {
+      "miou": 0.8115260973784355,
+      "folds": [
+        {
+          "fold": 0,
+          "threshold": 0.425,
+          "heldout_miou": 0.8104248152238318
+        },
+        {
+          "fold": 1,
+          "threshold": 0.425,
+          "heldout_miou": 0.8398491268834439
+        },
+        {
+          "fold": 2,
+          "threshold": 0.425,
+          "heldout_miou": 0.8083708573123968
+        },
+        {
+          "fold": 3,
+          "threshold": 0.425,
+          "heldout_miou": 0.8000845826039586
+        },
+        {
+          "fold": 4,
+          "threshold": 0.45,
+          "heldout_miou": 0.8044536298238001
+        }
+      ],
+      "mean_image_iou": 0.81681450511936
+    }
+  },
+  "forced_oof_comparisons": {
+    "primary": {
+      "W/SG12/top50+R2": {
+        "candidate_miou": 0.8115260973784355,
+        "reference_miou": 0.8132087583619251,
+        "delta": -0.00168266098348957,
+        "paired_mean_image_iou": {
+          "mean": -0.002093375461058518,
+          "ci_low": -0.005592523360350158,
+          "ci_high": 0.0017953603302772938,
+          "better": 178,
+          "worse": 312,
+          "ties": 0
+        }
+      }
+    }
+  },
+  "cells": {
+    "W/REF": {
+      "voc_threshold": 0.425,
+      "reference": "W/P1+R2",
+      "voc": {
+        "metrics": {
+          "miou": 0.7886099033007808,
+          "recall": 0.9279917388856422,
+          "precision": 0.8504366200491565,
+          "fp_per_object_pixel": 0.2081891470446599,
+          "mean_image_iou": 0.7888733880454271,
+          "pixel_iou": 0.783735920700623,
+          "pixel_recall": 0.9062819988115947,
+          "pixel_precision": 0.8528561553714064
+        },
+        "per_class_iou": {
+          "aeroplane": 0.8352635722287826,
+          "bicycle": 0.737438165800942,
+          "bird": 0.8403247874482437,
+          "boat": 0.8124661032715629,
+          "bottle": 0.8561283615303112,
+          "bus": 0.9089213701956407,
+          "car": 0.8254276616207066,
+          "cat": 0.8131546400743833,
+          "chair": 0.629114721949853,
+          "cow": 0.8426602356685133,
+          "dining-table": 0.45270798975063226,
+          "dog": 0.9028583590477207,
+          "horse": 0.8655564550590958,
+          "motorbike": 0.839833950438049,
+          "person": 0.7057082886035627,
+          "potted-plant": 0.7310806715606982,
+          "sheep": 0.8001454640174295,
+          "sofa": 0.9368351592460529,
+          "train": 0.6433302895856994,
+          "tv": 0.7932418189177365
+        },
+        "per_class_delta": {
+          "aeroplane": -0.0609579926782724,
+          "bicycle": -0.024962087471930405,
+          "bird": -0.04340981949147582,
+          "boat": -0.02718817139690677,
+          "bottle": -0.020593507602690297,
+          "bus": 0.0031402277858093575,
+          "car": -0.0016719599785737227,
+          "cat": -0.019946789285609223,
+          "chair": -0.14688015064266524,
+          "cow": -0.012676202641250356,
+          "dining-table": 0.00230870776918507,
+          "dog": -0.012124890453722004,
+          "horse": -0.030146246416355438,
+          "motorbike": -0.008830557902045677,
+          "person": -0.032171841909516496,
+          "potted-plant": -0.020518895855951902,
+          "sheep": -0.010097270225231214,
+          "sofa": -0.021117851699374746,
+          "train": -0.02114798221285974,
+          "tv": 0.01701618108655345
+        },
+        "versus_matching_reference": {
+          "candidate_miou": 0.7886099033007808,
+          "reference_miou": 0.8132087583619251,
+          "delta": -0.02459885506114423,
+          "paired_mean_image_iou": {
+            "mean": -0.03003449253499147,
+            "ci_low": -0.03566411628580617,
+            "ci_high": -0.02446649095841536,
+            "better": 114,
+            "worse": 376,
+            "ties": 0
+          }
+        }
+      },
+      "coco": {
+        "metrics": {
+          "miou": 0.6171634284640197,
+          "recall": 0.8938745094115278,
+          "precision": 0.6779032198782886,
+          "fp_per_object_pixel": 0.528256269522628,
+          "mean_image_iou": 0.6371482895742552,
+          "pixel_iou": 0.6006436621057298,
+          "pixel_recall": 0.8698198764574439,
+          "pixel_precision": 0.6599713364827928
+        },
+        "per_class_iou": {
+          "aeroplane": 0.5639089672172332,
+          "bicycle": 0.5813415797451317,
+          "bird": 0.7128468945430074,
+          "boat": 0.5174657041725186,
+          "bottle": 0.45657259822166135,
+          "bus": 0.9200937035017466,
+          "car": 0.5682754030772628,
+          "cat": 0.8286793983910459,
+          "chair": 0.4190301468853303,
+          "cow": 0.8005908527741239,
+          "dining table": 0.3742098228693574,
+          "dog": 0.7450744893666833,
+          "horse": 0.6354861139057686,
+          "motorbike": 0.6175213013121482,
+          "person": 0.21896664030149351,
+          "potted plant": 0.6430209450112684,
+          "sheep": 0.8455591644890148,
+          "sofa": 0.5901932607758212,
+          "train": 0.6075123829233591,
+          "tv": 0.6969191997964193
+        },
+        "per_class_delta": {
+          "aeroplane": -0.06997800867906012,
+          "bicycle": 0.005729524193867852,
+          "bird": -0.04304546769218176,
+          "boat": -0.009120730462067073,
+          "bottle": -0.021790733190009404,
+          "bus": 0.014094357308840677,
+          "car": 0.009931867950716655,
+          "cat": -0.03083006150571388,
+          "chair": -0.031363935257959275,
+          "cow": -0.041444783694107645,
+          "dining table": 0.008892366057342838,
+          "dog": -0.011099648008357055,
+          "horse": -0.037518531130501964,
+          "motorbike": -0.011601368524056466,
+          "person": -0.01241808444235687,
+          "potted plant": -0.05348045520654332,
+          "sheep": -0.02921567519684154,
+          "sofa": -0.01483803407405937,
+          "train": -0.017608657417982565,
+          "tv": -0.0028413336817765256
+        },
+        "versus_matching_reference": {
+          "candidate_miou": 0.6171634284640197,
+          "reference_miou": 0.6371407980966601,
+          "delta": -0.019977369632640407,
+          "paired_mean_image_iou": {
+            "mean": -0.039392185673945354,
+            "ci_low": -0.04526246948060302,
+            "ci_high": -0.033734883711271424,
+            "better": 204,
+            "worse": 502,
+            "ties": 1
+          }
+        }
+      }
+    },
+    "W/P1": {
+      "voc_threshold": 0.45,
+      "reference": "W/P1+R2",
+      "voc": {
+        "metrics": {
+          "miou": 0.8005846665606157,
+          "recall": 0.9240249502632849,
+          "precision": 0.8652288780812791,
+          "fp_per_object_pixel": 0.18255673091836758,
+          "mean_image_iou": 0.8032513708155546,
+          "pixel_iou": 0.794655787707827,
+          "pixel_recall": 0.9046708532298409,
+          "pixel_precision": 0.8672785499826035
+        },
+        "per_class_iou": {
+          "aeroplane": 0.8667233064113781,
+          "bicycle": 0.7479688100389947,
+          "bird": 0.8393990307429229,
+          "boat": 0.8364798244241098,
+          "bottle": 0.8641614408977321,
+          "bus": 0.9048342755779042,
+          "car": 0.825555626602769,
+          "cat": 0.8257994172400851,
+          "chair": 0.7090314096326927,
+          "cow": 0.8438618425543178,
+          "dining-table": 0.44906475758614767,
+          "dog": 0.9021220885212011,
+          "horse": 0.8745240110314191,
+          "motorbike": 0.8506338393185044,
+          "person": 0.7336328856928452,
+          "potted-plant": 0.7489042955027874,
+          "sheep": 0.7993203646184205,
+          "sofa": 0.9482479174015093,
+          "train": 0.6625303839241307,
+          "tv": 0.7788978034924409
+        },
+        "per_class_delta": {
+          "aeroplane": -0.029498258495676888,
+          "bicycle": -0.014431443233877683,
+          "bird": -0.04433557619679662,
+          "boat": -0.0031744502443598055,
+          "bottle": -0.012560428235269483,
+          "bus": -0.000946866831927129,
+          "car": -0.0015439949965112554,
+          "cat": -0.007302012119907442,
+          "chair": -0.06696346295982547,
+          "cow": -0.011474595755445849,
+          "dining-table": -0.001334524395299519,
+          "dog": -0.012861160980241593,
+          "horse": -0.0211786904440322,
+          "motorbike": 0.001969330978409789,
+          "person": -0.004247244820233975,
+          "potted-plant": -0.0026952719138627623,
+          "sheep": -0.010922369624240202,
+          "sofa": -0.009705093543918353,
+          "train": -0.0019478878744284556,
+          "tv": 0.0026721656612578304
+        },
+        "versus_matching_reference": {
+          "candidate_miou": 0.8005846665606157,
+          "reference_miou": 0.8132087583619251,
+          "delta": -0.012624091801309412,
+          "paired_mean_image_iou": {
+            "mean": -0.01565650976486395,
+            "ci_low": -0.019084911452381663,
+            "ci_high": -0.012333225484140169,
+            "better": 139,
+            "worse": 351,
+            "ties": 0
+          }
+        }
+      },
+      "coco": {
+        "metrics": {
+          "miou": 0.6244708871408149,
+          "recall": 0.8993788358015363,
+          "precision": 0.6830368373169657,
+          "fp_per_object_pixel": 0.5201825744011376,
+          "mean_image_iou": 0.6510521253313133,
+          "pixel_iou": 0.6057750356205985,
+          "pixel_recall": 0.8763828605482512,
+          "pixel_precision": 0.662372714390329
+        },
+        "per_class_iou": {
+          "aeroplane": 0.587178187123291,
+          "bicycle": 0.5689240406859062,
+          "bird": 0.7223834216586578,
+          "boat": 0.5171934129200428,
+          "bottle": 0.46406995987944305,
+          "bus": 0.9054070266712473,
+          "car": 0.5581137523767445,
+          "cat": 0.8463892629151284,
+          "chair": 0.43568564859445374,
+          "cow": 0.8143433950195997,
+          "dining table": 0.3862348871920122,
+          "dog": 0.7434133452977393,
+          "horse": 0.6454537308929894,
+          "motorbike": 0.6184382855637731,
+          "person": 0.23539629463971476,
+          "potted plant": 0.6699416478955144,
+          "sheep": 0.8627351702470436,
+          "sofa": 0.6020553643144004,
+          "train": 0.614498858788715,
+          "tv": 0.691562050139881
+        },
+        "per_class_delta": {
+          "aeroplane": -0.04670878877300233,
+          "bicycle": -0.006688014865357639,
+          "bird": -0.03350894057653142,
+          "boat": -0.009393021714542815,
+          "bottle": -0.014293371532227706,
+          "bus": -0.000592319521658613,
+          "car": -0.00022978274980156588,
+          "cat": -0.01312019698163136,
+          "chair": -0.014708433548835831,
+          "cow": -0.027692241448631805,
+          "dining table": 0.02091743037999766,
+          "dog": -0.012760792077301075,
+          "horse": -0.027550914143281147,
+          "motorbike": -0.010684384272431569,
+          "person": 0.004011569895864375,
+          "potted plant": -0.026559752322297348,
+          "sheep": -0.012039669438812739,
+          "sofa": -0.0029759305354801757,
+          "train": -0.01062218155262662,
+          "tv": -0.008198483338314744
+        },
+        "versus_matching_reference": {
+          "candidate_miou": 0.6244708871408149,
+          "reference_miou": 0.6371407980966601,
+          "delta": -0.012669910955845243,
+          "paired_mean_image_iou": {
+            "mean": -0.025488349916887164,
+            "ci_low": -0.029556914786658395,
+            "ci_high": -0.021680054913903762,
+            "better": 189,
+            "worse": 517,
+            "ties": 1
+          }
+        }
+      }
+    },
+    "W/SG12/top50": {
+      "voc_threshold": 0.45,
+      "reference": "W/P1+R2",
+      "voc": {
+        "metrics": {
+          "miou": 0.7985584168680424,
+          "recall": 0.9232390572459458,
+          "precision": 0.8646363937784916,
+          "fp_per_object_pixel": 0.1832900430001156,
+          "mean_image_iou": 0.8005040675344561,
+          "pixel_iou": 0.7921568498608254,
+          "pixel_recall": 0.9019097389868923,
+          "pixel_precision": 0.8668381767438734
+        },
+        "per_class_iou": {
+          "aeroplane": 0.8551831673256742,
+          "bicycle": 0.7452900929578082,
+          "bird": 0.8564873864040521,
+          "boat": 0.8349081845199188,
+          "bottle": 0.8650743004251582,
+          "bus": 0.9149153182349083,
+          "car": 0.8331636144818277,
+          "cat": 0.8088836400489084,
+          "chair": 0.6774630278879507,
+          "cow": 0.8456211706998886,
+          "dining-table": 0.4615386029282244,
+          "dog": 0.9021113160917039,
+          "horse": 0.8775036538322383,
+          "motorbike": 0.8500637872967285,
+          "person": 0.7225903577327976,
+          "potted-plant": 0.7340156136998037,
+          "sheep": 0.7844944353009128,
+          "sofa": 0.9477164299458083,
+          "train": 0.669341712707643,
+          "tv": 0.7848025248388913
+        },
+        "per_class_delta": {
+          "aeroplane": -0.041038397581380726,
+          "bicycle": -0.017110160315064182,
+          "bird": -0.027247220535667416,
+          "boat": -0.004746090148550874,
+          "bottle": -0.011647568707843337,
+          "bus": 0.009134175825077029,
+          "car": 0.006063992882547442,
+          "cat": -0.024217789311084092,
+          "chair": -0.09853184470456755,
+          "cow": -0.009715267609875067,
+          "dining-table": 0.01113932094677722,
+          "dog": -0.0128719334097388,
+          "horse": -0.018199047643213007,
+          "motorbike": 0.0013992789566338315,
+          "person": -0.015289772780281652,
+          "potted-plant": -0.0175839537168464,
+          "sheep": -0.025748298941747905,
+          "sofa": -0.010236580999619327,
+          "train": 0.00486344090908386,
+          "tv": 0.008576887007708311
+        },
+        "versus_matching_reference": {
+          "candidate_miou": 0.7985584168680424,
+          "reference_miou": 0.8132087583619251,
+          "delta": -0.014650341493882668,
+          "paired_mean_image_iou": {
+            "mean": -0.018403813045962513,
+            "ci_low": -0.023080991139194193,
+            "ci_high": -0.013674653066388412,
+            "better": 144,
+            "worse": 346,
+            "ties": 0
+          }
+        }
+      },
+      "coco": {
+        "metrics": {
+          "miou": 0.6271735100277616,
+          "recall": 0.8936188355532382,
+          "precision": 0.6894390045800286,
+          "fp_per_object_pixel": 0.502397220462424,
+          "mean_image_iou": 0.6514281579666902,
+          "pixel_iou": 0.6091593447317756,
+          "pixel_recall": 0.8715485825586851,
+          "pixel_precision": 0.6692438667640315
+        },
+        "per_class_iou": {
+          "aeroplane": 0.5900271553321144,
+          "bicycle": 0.5803237423280837,
+          "bird": 0.7159952205631942,
+          "boat": 0.530093329622414,
+          "bottle": 0.4730029835566697,
+          "bus": 0.9178582139706918,
+          "car": 0.5629056930097877,
+          "cat": 0.8387175174664953,
+          "chair": 0.42745203301870277,
+          "cow": 0.8159134906457183,
+          "dining table": 0.3807444032975091,
+          "dog": 0.7460987487672033,
+          "horse": 0.6540135143737305,
+          "motorbike": 0.6275318139701992,
+          "person": 0.23774273358530068,
+          "potted plant": 0.660547683027553,
+          "sheep": 0.8677052584529141,
+          "sofa": 0.5984718293318083,
+          "train": 0.6181185621875782,
+          "tv": 0.7002062740475652
+        },
+        "per_class_delta": {
+          "aeroplane": -0.04385982056417892,
+          "bicycle": 0.004711686776819879,
+          "bird": -0.039897141671994985,
+          "boat": 0.0035068949878283018,
+          "bottle": -0.0053603478550010575,
+          "bus": 0.011858867777785886,
+          "car": 0.004562157883241547,
+          "cat": -0.0207919424302645,
+          "chair": -0.022942049124586805,
+          "cow": -0.026122145822513265,
+          "dining table": 0.01542694648549453,
+          "dog": -0.010075388607837077,
+          "horse": -0.0189911306625401,
+          "motorbike": -0.0015908558660054917,
+          "person": 0.006358008841450297,
+          "potted plant": -0.03595371719025875,
+          "sheep": -0.0070695812329422125,
+          "sofa": -0.006559465518072294,
+          "train": -0.007002478153763425,
+          "tv": 0.00044574056936941275
+        },
+        "versus_matching_reference": {
+          "candidate_miou": 0.6271735100277616,
+          "reference_miou": 0.6371407980966601,
+          "delta": -0.009967288068898572,
+          "paired_mean_image_iou": {
+            "mean": -0.025112317281510314,
+            "ci_low": -0.029918018839196578,
+            "ci_high": -0.02041447836666689,
+            "better": 229,
+            "worse": 477,
+            "ties": 1
+          }
+        }
+      }
+    },
+    "W/P1+R2": {
+      "voc_threshold": 0.45,
+      "reference": "W/P1+R2",
+      "voc": {
+        "metrics": {
+          "miou": 0.8132087583619251,
+          "recall": 0.9175913888629512,
+          "precision": 0.8845180169975553,
+          "fp_per_object_pixel": 0.15646327039396285,
+          "mean_image_iou": 0.8189078805804186,
+          "pixel_iou": 0.8043190653050765,
+          "pixel_recall": 0.900569037050191,
+          "pixel_precision": 0.8827070685199048
+        },
+        "per_class_iou": {
+          "aeroplane": 0.896221564907055,
+          "bicycle": 0.7624002532728724,
+          "bird": 0.8837346069397195,
+          "boat": 0.8396542746684696,
+          "bottle": 0.8767218691330015,
+          "bus": 0.9057811424098313,
+          "car": 0.8270996215992803,
+          "cat": 0.8331014293599925,
+          "chair": 0.7759948725925182,
+          "cow": 0.8553364383097637,
+          "dining-table": 0.4503992819814472,
+          "dog": 0.9149832495014427,
+          "horse": 0.8957027014754513,
+          "motorbike": 0.8486645083400947,
+          "person": 0.7378801305130792,
+          "potted-plant": 0.7515995674166501,
+          "sheep": 0.8102427342426607,
+          "sofa": 0.9579530109454276,
+          "train": 0.6644782717985591,
+          "tv": 0.776225637831183
+        },
+        "per_class_delta": {
+          "aeroplane": 0.0,
+          "bicycle": 0.0,
+          "bird": 0.0,
+          "boat": 0.0,
+          "bottle": 0.0,
+          "bus": 0.0,
+          "car": 0.0,
+          "cat": 0.0,
+          "chair": 0.0,
+          "cow": 0.0,
+          "dining-table": 0.0,
+          "dog": 0.0,
+          "horse": 0.0,
+          "motorbike": 0.0,
+          "person": 0.0,
+          "potted-plant": 0.0,
+          "sheep": 0.0,
+          "sofa": 0.0,
+          "train": 0.0,
+          "tv": 0.0
+        },
+        "versus_matching_reference": {
+          "candidate_miou": 0.8132087583619251,
+          "reference_miou": 0.8132087583619251,
+          "delta": 0.0,
+          "paired_mean_image_iou": {
+            "mean": 0.0,
+            "ci_low": 0.0,
+            "ci_high": 0.0,
+            "better": 0,
+            "worse": 0,
+            "ties": 490
+          }
+        }
+      },
+      "coco": {
+        "metrics": {
+          "miou": 0.6371407980966601,
+          "recall": 0.8915735765999662,
+          "precision": 0.7013931676773005,
+          "fp_per_object_pixel": 0.4765264443380808,
+          "mean_image_iou": 0.6765404752482005,
+          "pixel_iou": 0.6152054822484322,
+          "pixel_recall": 0.8684555772285293,
+          "pixel_precision": 0.6784243085495569
+        },
+        "per_class_iou": {
+          "aeroplane": 0.6338869758962933,
+          "bicycle": 0.5756120555512638,
+          "bird": 0.7558923622351892,
+          "boat": 0.5265864346345857,
+          "bottle": 0.47836333141167076,
+          "bus": 0.9059993461929059,
+          "car": 0.5583435351265461,
+          "cat": 0.8595094598967598,
+          "chair": 0.4503940821432896,
+          "cow": 0.8420356364682315,
+          "dining table": 0.36531745681201455,
+          "dog": 0.7561741373750404,
+          "horse": 0.6730046450362706,
+          "motorbike": 0.6291226698362047,
+          "person": 0.23138472474385038,
+          "potted plant": 0.6965014002178117,
+          "sheep": 0.8747748396858563,
+          "sofa": 0.6050312948498806,
+          "train": 0.6251210403413416,
+          "tv": 0.6997605334781958
+        },
+        "per_class_delta": {
+          "aeroplane": 0.0,
+          "bicycle": 0.0,
+          "bird": 0.0,
+          "boat": 0.0,
+          "bottle": 0.0,
+          "bus": 0.0,
+          "car": 0.0,
+          "cat": 0.0,
+          "chair": 0.0,
+          "cow": 0.0,
+          "dining table": 0.0,
+          "dog": 0.0,
+          "horse": 0.0,
+          "motorbike": 0.0,
+          "person": 0.0,
+          "potted plant": 0.0,
+          "sheep": 0.0,
+          "sofa": 0.0,
+          "train": 0.0,
+          "tv": 0.0
+        },
+        "versus_matching_reference": {
+          "candidate_miou": 0.6371407980966601,
+          "reference_miou": 0.6371407980966601,
+          "delta": 0.0,
+          "paired_mean_image_iou": {
+            "mean": 0.0,
+            "ci_low": 0.0,
+            "ci_high": 0.0,
+            "better": 0,
+            "worse": 0,
+            "ties": 707
+          }
+        }
+      }
+    },
+    "W/SG12/top50+R2": {
+      "voc_threshold": 0.425,
+      "reference": "W/P1+R2",
+      "voc": {
+        "metrics": {
+          "miou": 0.813125829808936,
+          "recall": 0.9317341933825526,
+          "precision": 0.8719906106481604,
+          "fp_per_object_pixel": 0.17756801357767946,
+          "mean_image_iou": 0.8179776637009689,
+          "pixel_iou": 0.8058822530525412,
+          "pixel_recall": 0.9155482819872532,
+          "pixel_precision": 0.8705990505337281
+        },
+        "per_class_iou": {
+          "aeroplane": 0.8875976083608393,
+          "bicycle": 0.7472476166777088,
+          "bird": 0.9008432218554098,
+          "boat": 0.8226080541840253,
+          "bottle": 0.8804106728554493,
+          "bus": 0.905788491982633,
+          "car": 0.8182266358534825,
+          "cat": 0.841684088811937,
+          "chair": 0.7188347515509326,
+          "cow": 0.8862382622079279,
+          "dining-table": 0.45029927227699784,
+          "dog": 0.9264004543807421,
+          "horse": 0.8989926155062556,
+          "motorbike": 0.8356590050283362,
+          "person": 0.7602300699471132,
+          "potted-plant": 0.755115482026844,
+          "sheep": 0.8282487082564177,
+          "sofa": 0.9532758514672621,
+          "train": 0.6465938902200664,
+          "tv": 0.7982218427283378
+        },
+        "per_class_delta": {
+          "aeroplane": -0.008623956546215616,
+          "bicycle": -0.015152636595163638,
+          "bird": 0.017108614915690268,
+          "boat": -0.017046220484444374,
+          "bottle": 0.003688803722447731,
+          "bus": 7.3495728016848005e-06,
+          "car": -0.008872985745797757,
+          "cat": 0.008582659451944474,
+          "chair": -0.05716012104158563,
+          "cow": 0.030901823898164205,
+          "dining-table": -0.0001000097044493442,
+          "dog": 0.011417204879299425,
+          "horse": 0.003289914030804364,
+          "motorbike": -0.013005503311758426,
+          "person": 0.02234993943403396,
+          "potted-plant": 0.0035159146101938488,
+          "sheep": 0.01800597401375703,
+          "sofa": -0.0046771594781654935,
+          "train": -0.017884381578492703,
+          "tv": 0.021996204897154814
+        },
+        "versus_matching_reference": {
+          "candidate_miou": 0.813125829808936,
+          "reference_miou": 0.8132087583619251,
+          "delta": -8.292855298908108e-05,
+          "paired_mean_image_iou": {
+            "mean": -0.0009302168794496526,
+            "ci_low": -0.004808765457096524,
+            "ci_high": 0.003423803930814086,
+            "better": 170,
+            "worse": 320,
+            "ties": 0
+          }
+        }
+      },
+      "coco": {
+        "metrics": {
+          "miou": 0.6315025777228536,
+          "recall": 0.9015088774794124,
+          "precision": 0.6902634928519077,
+          "fp_per_object_pixel": 0.5109889540936714,
+          "mean_image_iou": 0.6696896619450846,
+          "pixel_iou": 0.6103060661948538,
+          "pixel_recall": 0.8793088635478583,
+          "pixel_precision": 0.6661047764057308
+        },
+        "per_class_iou": {
+          "aeroplane": 0.6139810937108154,
+          "bicycle": 0.5696029433721667,
+          "bird": 0.7410917580385353,
+          "boat": 0.518889736325997,
+          "bottle": 0.46991946455757894,
+          "bus": 0.9052497768365266,
+          "car": 0.5493665940508077,
+          "cat": 0.8514022511688242,
+          "chair": 0.4371469805993863,
+          "cow": 0.8497248089091591,
+          "dining table": 0.3913854661423625,
+          "dog": 0.7585571013138498,
+          "horse": 0.6658591905393644,
+          "motorbike": 0.6208965420674353,
+          "person": 0.24434124127216175,
+          "potted plant": 0.6790814865482933,
+          "sheep": 0.8798905581686302,
+          "sofa": 0.5802818720029792,
+          "train": 0.6041976583617213,
+          "tv": 0.6991850304704748
+        },
+        "per_class_delta": {
+          "aeroplane": -0.01990588218547784,
+          "bicycle": -0.006009112179097165,
+          "bird": -0.014800604196653855,
+          "boat": -0.0076966983085886564,
+          "bottle": -0.00844386685409182,
+          "bus": -0.0007495693563792649,
+          "car": -0.008976941075738432,
+          "cat": -0.008107208727935578,
+          "chair": -0.013247101543903295,
+          "cow": 0.007689172440927594,
+          "dining table": 0.026068009330347974,
+          "dog": 0.002382963938809435,
+          "horse": -0.007145454496906178,
+          "motorbike": -0.008226127768769409,
+          "person": 0.012956516528311368,
+          "potted plant": -0.01741991366951845,
+          "sheep": 0.005115718482773812,
+          "sofa": -0.024749422846901403,
+          "train": -0.020923381979620292,
+          "tv": -0.0005755030077210233
+        },
+        "versus_matching_reference": {
+          "candidate_miou": 0.6315025777228536,
+          "reference_miou": 0.6371407980966601,
+          "delta": -0.005638220373806568,
+          "paired_mean_image_iou": {
+            "mean": -0.006850813303115945,
+            "ci_low": -0.009312484965862934,
+            "ci_high": -0.004453411935135761,
+            "better": 228,
+            "worse": 477,
+            "ties": 2
+          }
+        }
+      }
+    }
+  },
+  "mechanism": {
+    "voc": {
+      "same_input_threshold": 0.425,
+      "FN_to_TP": 232075,
+      "FP_to_TN": 1325589,
+      "TP_to_FN": 381867,
+      "TN_to_FP": 273015,
+      "new_fp_attached": 248469,
+      "new_fp_separate_component": 24546,
+      "new_fp_more_than_16px_from_GT": 147969,
+      "new_fp_more_than_64px_from_GT": 41057,
+      "boundary_error_pixels_before_after": [
+        2749953,
+        2154661
+      ],
+      "nonboundary_error_pixels_before_after": [
+        8646874,
+        8339384
+      ],
+      "raw_to_crf_same_threshold": {
+        "candidate_miou": 0.813125829808936,
+        "reference_miou": 0.7970952081888916,
+        "delta": 0.016030621620044427,
+        "paired_mean_image_iou": {
+          "mean": 0.020684050856587345,
+          "ci_low": 0.01720006655176491,
+          "ci_high": 0.024336899658527703,
+          "better": 370,
+          "worse": 120,
+          "ties": 0
+        }
+      },
+      "raw_to_crf_individually_VOC_selected_thresholds": {
+        "candidate_miou": 0.813125829808936,
+        "reference_miou": 0.7985584168680424,
+        "delta": 0.014567412940893587,
+        "paired_mean_image_iou": {
+          "mean": 0.017473596166512857,
+          "ci_low": 0.01355229049016926,
+          "ci_high": 0.021464842765939244,
+          "better": 328,
+          "worse": 162,
+          "ties": 0
+        }
+      },
+      "runtime": {
+        "images": 490,
+        "shared_generation_and_seed_mean_seconds": [
+          6.153692025524013,
+          0.028407669189024945
+        ],
+        "ordinary_two_pass_mean_seconds": 0.16564829203547263,
+        "SG12_observation_propagation_mean_seconds": 0.18193638054083805,
+        "SG12_ranking_mean_seconds": 0.001133741134283494,
+        "SG12_selected_average_mean_seconds": 2.815702131816319e-05,
+        "crf_reference_mean_seconds": 0.3012611012677757,
+        "crf_candidate_mean_seconds": 0.3013776877704932,
+        "reference_inclusive_per_image_latency_mean_seconds": 6.649009088016286,
+        "candidate_inclusive_per_image_latency_mean_seconds": 6.666575661179971,
+        "measurement_scope": "synchronized isolated operators plus shared live generation/CA seed and one selected-threshold CRF; excludes model loading/metric/report overhead; shared generation is charged in full to each. Not independent end-to-end job benchmarks: no speedup claim."
+      }
+    },
+    "coco": {
+      "same_input_threshold": 0.425,
+      "FN_to_TP": 185784,
+      "FP_to_TN": 2256274,
+      "TP_to_FN": 478735,
+      "TN_to_FP": 508152,
+      "new_fp_attached": 440087,
+      "new_fp_separate_component": 68065,
+      "new_fp_more_than_16px_from_GT": 388105,
+      "new_fp_more_than_64px_from_GT": 203404,
+      "boundary_error_pixels_before_after": [
+        3147160,
+        2446771
+      ],
+      "nonboundary_error_pixels_before_after": [
+        22389860,
+        21635078
+      ],
+      "raw_to_crf_same_threshold": {
+        "candidate_miou": 0.6315025777228536,
+        "reference_miou": 0.6157494521600931,
+        "delta": 0.01575312556276043,
+        "paired_mean_image_iou": {
+          "mean": 0.03077881127759898,
+          "ci_low": 0.02669598791514564,
+          "ci_high": 0.03513470956781305,
+          "better": 549,
+          "worse": 157,
+          "ties": 1
+        }
+      },
+      "raw_to_crf_individually_VOC_selected_thresholds": {
+        "candidate_miou": 0.6315025777228536,
+        "reference_miou": 0.6271735100277616,
+        "delta": 0.004329067695092004,
+        "paired_mean_image_iou": {
+          "mean": 0.01826150397839437,
+          "ci_low": 0.014190224786513913,
+          "ci_high": 0.022462361556093397,
+          "better": 407,
+          "worse": 299,
+          "ties": 1
+        }
+      },
+      "runtime": {
+        "images": 707,
+        "shared_generation_and_seed_mean_seconds": [
+          6.146080932088586,
+          0.028839784240958715
+        ],
+        "ordinary_two_pass_mean_seconds": 0.16645389038653152,
+        "SG12_observation_propagation_mean_seconds": 0.18227401774118443,
+        "SG12_ranking_mean_seconds": 0.000897672591148711,
+        "SG12_selected_average_mean_seconds": 2.8327592191466852e-05,
+        "crf_reference_mean_seconds": 0.31243443482751726,
+        "crf_candidate_mean_seconds": 0.3125595533232372,
+        "reference_inclusive_per_image_latency_mean_seconds": 6.653809041543593,
+        "candidate_inclusive_per_image_latency_mean_seconds": 6.670680287577307,
+        "measurement_scope": "synchronized isolated operators plus shared live generation/CA seed and one selected-threshold CRF; excludes model loading/metric/report overhead; shared generation is charged in full to each. Not independent end-to-end job benchmarks: no speedup claim."
+      }
+    }
+  },
+  "validation": "Same-generation audited controls; historical cross-hardware discrepancies are diagnostic only. Does not certify historical bit-identical reproduction.",
+  "selection_note": "VOC only selects. SG15 source thresholds selected on four training folds; refined outputs inherit them. Full-VOC choices frozen before COCO metrics are interpreted. Diagnostic variants never promoted on COCO.",
+  "screen_frozen_transfer": {
+    "primary": {
+      "reference": "W/P1+R2",
+      "frozen": "W/P1+R2",
+      "reference_threshold": 0.45,
+      "frozen_threshold": 0.45,
+      "reference_coco_miou": 0.6371407980966601,
+      "frozen_coco_miou": 0.6371407980966601
+    }
+  },
+  "heldout_fold_win_counts": {
+    "primary": {
+      "W/SG12/top50+R2": 2
+    }
+  },
+  "registered_success": {
+    "VOC_protocol_promotes_candidate": false,
+    "candidate_fold_votes": 0,
+    "COCO_descriptive_at_least_0p637": false,
+    "COCO_positive_vs_current_final": false
+  }
+}

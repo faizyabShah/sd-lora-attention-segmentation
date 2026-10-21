@@ -607,3 +607,13 @@ submission and review details are in protocol Section 91.
 Scheduling update at owner request: dependencies on jobs 235022/235023
 were removed. SG12+CRF, SG14 and SG15 are scientifically independent and
 may run concurrently. No method or selection rule changed; see Section 91.
+
+**Completed:** all three stages exit 0:0, with full VOC/COCO manifests.
+SG12+CRF OOF .811526 / COCO .631503 does not beat final .813209/.637141.
+SG14 has only +.000251 OOF versus SG11 and negative COCO transfer versus
+both parents; no complementarity promotion. SG15 A variants lose; SG11+B
+has only +.000534 OOF and negligible COCO macro gain, with zero promotion
+votes and mean-image CI spanning zero. All six SG15 screens retain the
+source prior in 5/5 folds. Existing final system remains unchanged.
+See protocol Section 92 and `docs/SG12_CRF_SG14_SG15_RESULTS.md`; Claude
+reviews before paper integration. No next method experiment submitted.

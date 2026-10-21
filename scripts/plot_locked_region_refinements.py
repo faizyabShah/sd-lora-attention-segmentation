@@ -62,7 +62,7 @@ def plot_package(directory,summary,keep_cache=False):
         fig.suptitle(f'{classname}: {image_id}; {path.stem}; diagnostic illustrations, not COCO selection',fontsize=11)
         fig.tight_layout();dest=out/(path.stem+'.jpg');fig.savefig(dest,dpi=130);plt.close(fig)
         index.append({'file':dest.name,'image_id':image_id,'class':classname,'selection':path.stem,
-                      'extreme_sampling':'largest/smallest VOC image-IoU change across all refinements at fixed .45; shown at frozen prior thresholds'})
+                      'extreme_sampling':('largest/smallest VOC image-IoU change across all refinements at fixed .45; shown at frozen prior thresholds' if path in candidates else 'first manifest VOC image from the preregistered representative class')})
     (out/'index.json').write_text(json.dumps(index,indent=2)+'\n')
     if not keep_cache:
         for p in cache.glob('*.npz'):p.unlink()
