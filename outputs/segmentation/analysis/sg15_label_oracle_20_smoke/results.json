@@ -1,0 +1,192 @@
+{
+  "plan": {
+    "spec": {
+      "name": "SG15 current versus oracle region decisions on fixed VOC examples",
+      "dataset": "VOC-Sim",
+      "sample_rule": "first annotated manifest row for each of 20 VOC classes, selected before looking at outputs",
+      "priors": [
+        "W/P1",
+        "W/SG11/trim20/rho0p80",
+        "W/SG12/top50"
+      ],
+      "prior_threshold_source": "full-VOC locked thresholds in outputs/segmentation/controlled_attention_cv/sg15/summary.json",
+      "partition": "same canonical SPEC32 as full SG15",
+      "current_labelling": [
+        "SG15-A050 majority region projection",
+        "SG15-B confidence snapping"
+      ],
+      "oracle_labelling": "GT foreground fraction >= 0.5 in each annotation-resolution SPEC32 region",
+      "interpretation": "GT-labelled majority oracle is a diagnostic upper bound for hard region decisions, not an inference method",
+      "no_selection": "No class, image, prior, threshold or region rule is selected by the 20 example results"
+    },
+    "locked": {
+      "name": "Locked SG12+DenseCRF, SG14 complementarity and SG15 prior-driven SPEC32 refinement",
+      "protocol": "Section 91",
+      "version": 1,
+      "track": "W class-word only; no learned or released optimized tokens",
+      "order": [
+        "sg12_crf",
+        "sg14",
+        "sg15"
+      ],
+      "sa": {
+        "module_index": 15,
+        "resolution": 64,
+        "calls": 31,
+        "heads": 8,
+        "observations": 248
+      },
+      "top_fraction": 0.5,
+      "selected_observations": 124,
+      "reliability": "leave-one-out cosine of raw propagation vectors; stable call-major/head-minor tie order",
+      "trim_fraction_per_tail": 0.2,
+      "consensus_rho": 0.8,
+      "thresholds": [
+        0.3,
+        0.325,
+        0.35,
+        0.375,
+        0.4,
+        0.425,
+        0.45,
+        0.475,
+        0.5,
+        0.525,
+        0.55,
+        0.575,
+        0.6,
+        0.625,
+        0.65,
+        0.675,
+        0.7
+      ],
+      "partition": "canonical SG13/SG4 SPEC32; no partition tuning",
+      "majority_q": [
+        0.25,
+        0.5,
+        0.75
+      ],
+      "snapping": {
+        "foreground_at_least": 0.75,
+        "background_at_most": 0.25
+      },
+      "prior_threshold_policy": "SG15 uses each unrefined prior's training-fold optimum; full VOC optimum frozen for COCO. Refinements never choose a new prior threshold.",
+      "region_fraction_resolution": "annotation resolution; native SPEC32 labels expanded nearest; prior map minmax at64 then bilinear; no boundary blur after refinement",
+      "bootstrap_resamples": 20000,
+      "visual_classes": [
+        "aeroplane",
+        "bird",
+        "person",
+        "chair",
+        "dining-table"
+      ],
+      "diagnostic_threshold": 0.45,
+      "diagnostic_change_tolerance": 1e-06,
+      "boundary_band_pixels": 4,
+      "selection": "unchanged training-only promotion guards; >=4/5 votes and positive selected OOF; paired forced-candidate OOF also reported",
+      "validation": "same-generation algebraic/control checks required; historical counts retained as drift diagnostics, never an unconditional cross-hardware gate",
+      "storage": "atomic per-image counts and reduced diagnostic sidecars; small representative visual caches only; no dataset-wide masks or attention"
+    },
+    "model": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+    "names": [
+      "W/P1",
+      "W/SG11/trim20/rho0p80",
+      "W/SG12/top50"
+    ],
+    "thresholds": [
+      0.45,
+      0.425,
+      0.45
+    ]
+  },
+  "records": {
+    "ovam-voc-sim-0": {
+      "image_id": "ovam-voc-sim-0",
+      "class": "aeroplane",
+      "prompt": "A photograph of a aeroplane",
+      "seed": "1401702261",
+      "figure": "00_aeroplane.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.9106963591375045,
+          "current_A050_iou": 0.8660165185114164,
+          "current_B_iou": 0.8813444524404183,
+          "oracle_iou": 0.8657831158970111,
+          "A050_oracle_disagreement_pixels": 1088,
+          "B_oracle_disagreement_pixels": 3225,
+          "oracle_positive_regions": 20,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.8913138614001157,
+          "current_A050_iou": 0.8578752570253598,
+          "current_B_iou": 0.9074451774436302,
+          "oracle_iou": 0.8657831158970111,
+          "A050_oracle_disagreement_pixels": 1792,
+          "B_oracle_disagreement_pixels": 5666,
+          "oracle_positive_regions": 20,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 1
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.9235294117647059,
+          "current_A050_iou": 0.8660165185114164,
+          "current_B_iou": 0.9038040426726558,
+          "oracle_iou": 0.8657831158970111,
+          "A050_oracle_disagreement_pixels": 1088,
+          "B_oracle_disagreement_pixels": 4205,
+          "oracle_positive_regions": 20,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 0
+        }
+      },
+      "source_same_generation_error_max": 1.7881393432617188e-07,
+      "rank_count": 124
+    },
+    "ovam-voc-sim-25": {
+      "image_id": "ovam-voc-sim-25",
+      "class": "bicycle",
+      "prompt": "A photograph of a bicycle",
+      "seed": "1052124838",
+      "figure": "01_bicycle.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.6206456123368155,
+          "current_A050_iou": 0.5853897120200334,
+          "current_B_iou": 0.6038979044802134,
+          "oracle_iou": 0.7466829085457272,
+          "A050_oracle_disagreement_pixels": 28352,
+          "B_oracle_disagreement_pixels": 28265,
+          "oracle_positive_regions": 10,
+          "A050_oracle_false_positive_regions": 8,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.6064304692030695,
+          "current_A050_iou": 0.5853897120200334,
+          "current_B_iou": 0.5924344431928327,
+          "oracle_iou": 0.7466829085457272,
+          "A050_oracle_disagreement_pixels": 28352,
+          "B_oracle_disagreement_pixels": 30737,
+          "oracle_positive_regions": 10,
+          "A050_oracle_false_positive_regions": 8,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.5884235354114872,
+          "current_A050_iou": 0.566250603065428,
+          "current_B_iou": 0.5814021483506007,
+          "oracle_iou": 0.7466829085457272,
+          "A050_oracle_disagreement_pixels": 33408,
+          "B_oracle_disagreement_pixels": 31198,
+          "oracle_positive_regions": 10,
+          "A050_oracle_false_positive_regions": 9,
+          "A050_oracle_missed_regions": 0
+        }
+      },
+      "source_same_generation_error_max": 1.7881393432617188e-07,
+      "rank_count": 124
+    }
+  }
+}

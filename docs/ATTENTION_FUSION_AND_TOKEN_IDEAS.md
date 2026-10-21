@@ -624,3 +624,8 @@ will compare current SG15 A050 and B masks from all three frozen priors with
 the GT-majority SPEC32 oracle on identical generated images, and report
 per-image IoUs and decision differences. Oracle uses GT for explanation
 only; no new tuned method or promotion follows from these 20 sheets.
+
+SG15 visual smoke **235133** passed; full fixed 20-image job **235134** is
+submitted on any available GPU, with no dependency. Protocol Section 93
+contains the source rule and comparison semantics. Claude reviews results
+after completion.

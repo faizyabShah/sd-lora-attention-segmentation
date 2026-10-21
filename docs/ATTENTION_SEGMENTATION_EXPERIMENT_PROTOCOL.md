@@ -5197,3 +5197,17 @@ Code and locked sample/threshold contract:
 `tests/test_sg15_label_oracle_20.py`. The job requests one available GPU,
 not a named node. A two-class live smoke test precedes the full 20-class
 submission. Results are visual examples, not a new full-dataset mIoU.
+
+**Smoke and production submitted:** source `cecb47d53`.
+Two-class live smoke job **235133** completed **0:0** in **55 seconds** on
+erdos/V100, covering aeroplane and bicycle. It passed the source P1 two-pass
+identity, 32-region/current-oracle calculations, CSV output and two rendered
+nine-column sheets; the first sheet was visually inspected. Frozen thresholds
+are P1 .450, SG11 .425, SG12 .450 from the completed full VOC SG15 package.
+No mask rule changed after the smoke. The full one-per-class job is **235134**,
+submitted without dependency, requesting one available GPU, eight CPUs,
+48 GB host RAM and 12 hours. Output:
+`outputs/segmentation/analysis/sg15_label_oracle_20/`.
+Claude: review the visual/IoU evidence after this job completes; GT-majority
+oracle scores must be presented only as diagnostic upper bounds for hard
+region decisions on these twenty selected images.
