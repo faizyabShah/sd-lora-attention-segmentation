@@ -75,7 +75,19 @@ def region_summary(rows,spec):
         values=[by_class[c]['features'][f]['raw']['roc_auc'] for c in by_class
                 if by_class[c]['features'][f]['raw'] is not None]
         balanced[f]=float(np.mean(values)) if values else None
+    balanced_subsets={}
+    for name,predicate in subsets.items():
+        if name=='all':
+            balanced_subsets[name]=balanced
+            continue
+        class_scores={c:score([r for r in rows if r['class']==c and predicate(r)]) for c in by_class}
+        balanced_subsets[name]={}
+        for f in features:
+            values=[s['features'][f]['raw']['roc_auc'] for s in class_scores.values()
+                    if s['features'][f]['raw'] is not None]
+            balanced_subsets[name][f]=float(np.mean(values)) if values else None
     return {'subsets':by_subset,'per_class':by_class,'class_balanced_roc_auc':balanced,
+            'class_balanced_roc_auc_by_subset':balanced_subsets,
             'region_area_bins':area,'object_area_bins':object_area}
 
 
@@ -128,15 +140,16 @@ def deciles(hist,feature,direction='raw',edges=None):
     return rows,edges
 
 
-def quantiles_from_hist(hist,feature,endpoint=0):
+def quantiles_from_hist(hist,feature,direction='raw',endpoint=0):
     fi=PIXEL_FEATURES.index(feature);out={}
     for label,values in zip(('useful','harmful'),hist[endpoint,:,fi]):
+        if direction=='inverse':values=values[::-1]
         out[label]={str(q):binned_quantile(values,np.zeros_like(values),q)
                     for q in (0,.1,.25,.5,.75,.9,1)}
     lo,hi=PIXEL_BOUNDS[feature]
     return {'quantile_score':{label:{q:(None if b is None else float(lo+(b+.5)*(hi-lo)/hist.shape[-1]))
                                for q,b in values.items()} for label,values in out.items()},
-            'score_range':[lo,hi]}
+            'score_range':[lo,hi],'direction':direction}
 
 
 def write_csv(path,rows):
@@ -207,8 +220,8 @@ def main():
     voc_deciles,edges=deciles(all_hist['voc'],best,direction)
     summary['datasets']['voc']['pixel']['best_reliability_deciles']=voc_deciles
     summary['datasets']['coco']['pixel']['best_reliability_deciles']=deciles(all_hist['coco'],best,direction,edges)[0]
-    summary['datasets']['voc']['pixel']['best_reliability_quantiles_bins']=quantiles_from_hist(all_hist['voc'],best)
-    summary['datasets']['coco']['pixel']['best_reliability_quantiles_bins']=quantiles_from_hist(all_hist['coco'],best)
+    summary['datasets']['voc']['pixel']['best_reliability_quantiles_bins']=quantiles_from_hist(all_hist['voc'],best,direction)
+    summary['datasets']['coco']['pixel']['best_reliability_quantiles_bins']=quantiles_from_hist(all_hist['coco'],best,direction)
     result=args.output_dir/'results.json'
     temporary=result.with_suffix('.json.tmp');temporary.write_text(json.dumps(summary,indent=2)+'\n')
     temporary.replace(result)
