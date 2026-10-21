@@ -5428,3 +5428,72 @@ Full GPU array **235239** covers 40 class/dataset shards with at most eight
 running together on any available GPU; CPU merger **235243** depends on
 `afterok:235239`. If a shard fails, rerun its resumable array task and then
 submit the merger again after all 40 shards are complete.
+
+## 97. SG18 locked temporal-windowed one-pass propagation (Codex owns run; Claude reviews)
+
+**Prerequisite outcomes, 21 October 2026:** SG17 full run **235237** and
+Pre-SG18/Pre-SG21 array **235239** plus merger **235243** completed 0:0.
+SG17 failed the VOC promotion rule: `W/P1` won 5/5 folds; forced SG17 OOF
+0.7991 versus P1 0.7998, full VOC 0.8001 versus 0.8007, and frozen COCO
+0.6196 versus 0.6249. Q70/Q80/Q90 collapsed to one cutoff, 248/248, because
+39.93% of positive VOC increments tied at that maximum. SG17+CRF was skipped.
+The completed diagnostic found early/middle/late CA-relative TP/FP ratios
+1.354/3.494/3.228 on VOC and 0.509/0.941/0.935 on COCO. This motivates
+testing *fixed window aggregation*, not a per-pixel reliability gate.
+
+**SG18 contract:** frozen class-word `W` CA seed, the same SA module 15,
+31 calls (0–30) and all eight heads. Each \(z_{t,h}=A_{t,h}c\) is computed
+without any GT input. `W/REF` is the equal one-pass mean across all 248
+observations; `W/P1` is the existing equal observation-wise two-pass mean and
+an external benchmark only. The **only** one-pass candidate windows are:
+
+- `W/T1`: calls 10–20, 88 observations (middle only);
+- `W/T2`: calls 10–30, 168 observations (middle + late);
+- `W/T3`: calls 6–30, 200 observations (drop only earliest six).
+
+No additional start call, head selection, structural weight, pixel gate,
+learned parameter, optimized token, or DenseCRF enters. The usual independent
+minmax at 64×64, bilinear resize and 17-value segmentation threshold grid
+apply. Existing five-fold `run_screen` selects method and threshold on four
+VOC folds, evaluates on the held-out fold, and requires at least four fold
+votes and positive OOF gain against **W/REF**. In near ties the more inclusive
+window wins (T3, then T2, then T1). COCO uses only VOC-frozen thresholds.
+P1 receives forced OOF benchmarking but cannot win SG18 selection. If no
+candidate passes, REF stays frozen; the best forced-OOF candidate is retained
+*only* for diagnostic visuals and change accounting.
+
+Outputs include all method/threshold fold records; full VOC and frozen COCO
+mIoU, pixel IoU, mean-image IoU, precision, recall, 20 per-class IoUs/deltas,
+20,000-resample paired intervals and image win/loss/tie counts. Each method's
+CA-relative additions/removals, distant and disjoint false positives, and
+normalized rates are reported under both VOC-frozen method thresholds and
+the controlled fixed 0.45 threshold. Direct REF-versus-window overlap counts
+retained/lost/new TP, removed/new FP, distant/separate FP removed, and how
+much of REF's new TP/FP each window supports. The CA reference mask uses
+0.45 in both diagnostic conditions. Binary-change comparisons include the
+effect of independently chosen mask thresholds; the fixed-0.45 condition
+helps separate that effect from the map window. Eight image sheets show RGB,
+CA, REF, T1/T2/T3, GT and a selected-window difference overlay.
+
+Runtime is benchmarked with three separate live generations per method
+(REF, VOC-selected or illustrative window, P1). All execute the same UNet
+and attention capture; only post-capture aggregation differs. The report
+provides end-to-end, common capture and aggregation medians and makes no
+inference speedup claim from dropping early calls.
+
+Code: `configs/sg18_temporal_windowed_propagation.json`,
+`src/segmentation/sg18_temporal.py`,
+`scripts/run_sg18_temporal_windowed.py`,
+`scripts/plot_sg18_temporal_windowed.py`,
+`tests/test_sg18_temporal_windowed.py`, and
+`jobs/run_sg18_temporal_windowed.slurm`. One resumable 12-hour GPU job on
+any available GPU checkpoints only reduced maps and scores, then discards
+raw Q/K and generated RGB. Final results and images live in
+`outputs/segmentation/controlled_attention_cv/sg18_temporal_windowed/`.
+Claude: verify the locked windows, five-fold boundary, CA-relative mechanism,
+COCO transfer and timing claim after completion. GPU smoke **235289**
+completed 0:0 on one VOC and one COCO image; it checked propagation algebra
+against the existing implementation, all five score maps, mechanism
+accounting, and the real eight-panel plot. The initial smoke **235288**
+identified and fixed a NumPy-to-Torch conversion at the mask boundary.
+Production job ID: pending.

@@ -1,0 +1,278 @@
+{
+  "spec": {
+    "name": "SG17 reliability-filtered second-pass additions",
+    "version": 1,
+    "track": "training-free W class-word; frozen CA and SA module 15",
+    "observations": 248,
+    "sa_calls": 31,
+    "sa_heads": 8,
+    "quantiles": [
+      0.7,
+      0.8,
+      0.9
+    ],
+    "quantile_population": "VOC-only native 64x64 pixels with raw y2-y1 > 0; one pixel has one vote",
+    "quantile_ties": "closest achievable nonempty upper-tail fraction on integer q_up counts; higher cutoff wins exact ties; actual fraction reported; no GT",
+    "variants": [
+      "W/P1",
+      "W/SG17-Q70",
+      "W/SG17-Q80",
+      "W/SG17-Q90"
+    ],
+    "threshold_source": "configs/sg12_crf_sg14_sg15.json 17-value 0.30..0.70 grid",
+    "five_fold_source": "configs/voc_sim_folds.csv; existing run_screen promotion and 4/5 vote guard",
+    "candidate_normalization": "each raw candidate map independently minmax-normalized at 64x64, bilinear to annotation size",
+    "coco_policy": "all cutoffs and mask thresholds frozen on VOC; transfer only",
+    "densecrf_policy": "run only if SG17 promoted; fixed existing OVAM SimpleCRF parameters; compare selected SG17+R2 with P1+R2",
+    "selection": "no extra cutoffs, per-class cutoffs, soft gates, COCO tuning or learned weights"
+  },
+  "cutoffs": {
+    "Q70": {
+      "count_cutoff": 248,
+      "q_cutoff": 1.0,
+      "requested_top_fraction": 0.30000000000000004,
+      "actual_retained_fraction": 0.39928043779607697
+    },
+    "Q80": {
+      "count_cutoff": 248,
+      "q_cutoff": 1.0,
+      "requested_top_fraction": 0.19999999999999996,
+      "actual_retained_fraction": 0.39928043779607697
+    },
+    "Q90": {
+      "count_cutoff": 248,
+      "q_cutoff": 1.0,
+      "requested_top_fraction": 0.09999999999999998,
+      "actual_retained_fraction": 0.39928043779607697
+    }
+  },
+  "screen": {
+    "reference": "W/P1",
+    "candidates": [
+      "W/SG17-Q70",
+      "W/SG17-Q80",
+      "W/SG17-Q90"
+    ],
+    "folds": [
+      {
+        "fold": 0,
+        "chosen": "W/P1",
+        "chosen_threshold": 0.45,
+        "reference_threshold": 0.45,
+        "reason": "no eligible candidate",
+        "train_miou_chosen": 0.8005158865604525,
+        "train_miou_reference": 0.8005158865604525,
+        "heldout_miou_chosen": 0.8045795656828908,
+        "heldout_miou_reference": 0.8045795656828908
+      },
+      {
+        "fold": 1,
+        "chosen": "W/P1",
+        "chosen_threshold": 0.45,
+        "reference_threshold": 0.45,
+        "reason": "no eligible candidate",
+        "train_miou_chosen": 0.7946784380838307,
+        "train_miou_reference": 0.7946784380838307,
+        "heldout_miou_chosen": 0.8233009334015075,
+        "heldout_miou_reference": 0.8233009334015075
+      },
+      {
+        "fold": 2,
+        "chosen": "W/P1",
+        "chosen_threshold": 0.45,
+        "reference_threshold": 0.45,
+        "reason": "no eligible candidate",
+        "train_miou_chosen": 0.8010741433843951,
+        "train_miou_reference": 0.8010741433843951,
+        "heldout_miou_chosen": 0.8023794709435027,
+        "heldout_miou_reference": 0.8023794709435027
+      },
+      {
+        "fold": 3,
+        "chosen": "W/P1",
+        "chosen_threshold": 0.45,
+        "reference_threshold": 0.45,
+        "reason": "no eligible candidate",
+        "train_miou_chosen": 0.8038801786371286,
+        "train_miou_reference": 0.8038801786371286,
+        "heldout_miou_chosen": 0.7906856394380709,
+        "heldout_miou_reference": 0.7906856394380709
+      },
+      {
+        "fold": 4,
+        "chosen": "W/P1",
+        "chosen_threshold": 0.475,
+        "reference_threshold": 0.475,
+        "reason": "no eligible candidate",
+        "train_miou_chosen": 0.8042936267498773,
+        "train_miou_reference": 0.8042936267498773,
+        "heldout_miou_chosen": 0.7823868143470845,
+        "heldout_miou_reference": 0.7823868143470845
+      }
+    ],
+    "selection_counts": {
+      "W/P1": 5
+    },
+    "vote_winner": "W/P1",
+    "vote_winner_votes": 5,
+    "frozen": "W/P1",
+    "freeze_reason": "reference won the fold vote",
+    "oof_miou_selection": 0.7998290843356893,
+    "oof_miou_reference": 0.7998290843356893,
+    "oof_gain": 0.0,
+    "full_threshold_frozen": 0.45,
+    "full_threshold_reference": 0.45,
+    "full_miou_frozen": 0.8007174033350053,
+    "full_miou_reference": 0.8007174033350053,
+    "paired_oof": {
+      "mean": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.0,
+      "better": 0,
+      "worse": 0,
+      "ties": 490
+    }
+  },
+  "forced_oof": {
+    "W/SG17-Q70": {
+      "candidate_miou": 0.7991371857657509,
+      "reference_miou": 0.7998290843356893,
+      "gain": -0.0006918985699384539,
+      "thresholds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.45
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.45
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.45
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.45
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.5,
+          "reference_threshold": 0.475
+        }
+      ],
+      "paired_mean_image_iou": {
+        "mean": -0.001267983501482399,
+        "ci_low": -0.003154608504013425,
+        "ci_high": 0.0007184847883587842,
+        "better": 176,
+        "worse": 314,
+        "ties": 0
+      }
+    },
+    "W/SG17-Q80": {
+      "candidate_miou": 0.7991371857657509,
+      "reference_miou": 0.7998290843356893,
+      "gain": -0.0006918985699384539,
+      "thresholds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.45
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.45
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.45
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.45
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.5,
+          "reference_threshold": 0.475
+        }
+      ],
+      "paired_mean_image_iou": {
+        "mean": -0.001267983501482399,
+        "ci_low": -0.003154608504013425,
+        "ci_high": 0.0007184847883587842,
+        "better": 176,
+        "worse": 314,
+        "ties": 0
+      }
+    },
+    "W/SG17-Q90": {
+      "candidate_miou": 0.7991371857657509,
+      "reference_miou": 0.7998290843356893,
+      "gain": -0.0006918985699384539,
+      "thresholds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.45
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.45
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.45
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.45
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.5,
+          "reference_threshold": 0.475
+        }
+      ],
+      "paired_mean_image_iou": {
+        "mean": -0.001267983501482399,
+        "ci_low": -0.003154608504013425,
+        "ci_high": 0.0007184847883587842,
+        "better": 176,
+        "worse": 314,
+        "ties": 0
+      }
+    }
+  },
+  "full_voc": {
+    "W/P1": {
+      "threshold": 0.45,
+      "voc_miou": 0.8007174033350053
+    },
+    "W/SG17-Q70": {
+      "threshold": 0.475,
+      "voc_miou": 0.800070241825485
+    },
+    "W/SG17-Q80": {
+      "threshold": 0.475,
+      "voc_miou": 0.800070241825485
+    },
+    "W/SG17-Q90": {
+      "threshold": 0.475,
+      "voc_miou": 0.800070241825485
+    }
+  },
+  "illustrative_variant": "W/SG17-Q70",
+  "promoted": false
+}

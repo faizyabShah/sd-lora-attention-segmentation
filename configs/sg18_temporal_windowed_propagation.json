@@ -1,0 +1,24 @@
+{
+  "name": "SG18 locked temporal-windowed one-pass SA propagation",
+  "version": 1,
+  "track": "training-free W class-word CA; module-15 SA, eight heads",
+  "calls": 31,
+  "heads": 8,
+  "windows": {
+    "W/T1": [10, 21],
+    "W/T2": [10, 31],
+    "W/T3": [6, 31]
+  },
+  "names": ["W/REF", "W/T1", "W/T2", "W/T3", "W/P1"],
+  "selection_reference": "W/REF",
+  "external_benchmark": "W/P1",
+  "threshold_source": "configs/sg12_crf_sg14_sg15.json: 17-value 0.30..0.70 grid",
+  "fold_source": "configs/voc_sim_folds.csv",
+  "selection": "existing five-fold run_screen; train-fold threshold, held-out OOF, >=4/5 vote and positive OOF guard; COCO transfer only",
+  "diagnostic_ca_threshold": 0.45,
+  "diagnostic_fixed_threshold": 0.45,
+  "normalization": "independent minmax at 64x64, then bilinear to annotation resolution",
+  "timing": "common live generation+attention capture and per-method post-capture aggregation; selected method benchmark uses three separate live generations after VOC selection",
+  "no_extra_methods": "no extra window, head selection, per-pixel gate, learned weights, structural weighting or DenseCRF",
+  "visual_classes": ["bird", "bicycle", "cow", "person", "chair", "dining-table"]
+}
