@@ -5361,7 +5361,11 @@ maps and score counts support requeue; raw Q/K, per-observation maps, generated
 RGB, and transient figure inputs are discarded. Only reviewed summaries and
 figures are Git candidates. The output root is
 `outputs/segmentation/controlled_attention_cv/sg17/`; `completed.json`
-signals the end of all required stages. Production job ID: pending.
+signals the end of all required stages. Production job **235236** was
+submitted on 21 October 2026 with no node constraint. It has a 12-hour
+allocation and requeues from the reduced per-image checkpoints if needed.
+Codex will not monitor it during execution; Claude's review can begin from
+commit `60f2fe1a4` and continue when final outputs are reported.
 
 **Smoke validation:** GPU job **235235** completed 0:0 on one VOC and one
 COCO sample, including generation, cutoff calibration, both screens, map
