@@ -5283,3 +5283,26 @@ The production GPU array is **235191** (`0-39%8`, no node constraint,
 12-hour per shard limit, resumable per image). The CPU report merger is
 **235196**, dependent on `afterok:235191`. Earlier failed smoke records are
 kept only in the local smoke output and do not enter the full results.
+
+**Completed:** all 40 tasks of **235191** completed 0:0. Merge **235196**
+failed before reading any shards because Bash `set -u` preceded `~/.bashrc`;
+the shell order was fixed and CPU-only merge **235232** completed 0:0. It
+validated 490 VOC images / 15,680 regions and 707 COCO images / 22,624
+regions, with reduced per-image records and no retained native attention
+stacks. Aggregate event totals were independently checked against per-image
+CSVs. Full interpretation and exact values are in
+`docs/PRE_SG16_SG17_RESULTS.md` and
+`outputs/segmentation/analysis/pre_sg16_sg17/results.json`. The local
+`PRE_SG16_SG17_CHATGPT.zip` packages the report, JSON, plot and reduced CSV
+records for external discussion.
+
+**Decision evidence for Claude:** on ambiguous P1 regions, strongest simple
+prior occupancy ROC-AUC is .686 VOC / .673 COCO, while the best observation
+statistic is .597 / .631; no SG16 recovery signal is promoted. The best
+second-pass directional agreement gives useful/harmful ROC-AUC .617 VOC /
+.634 COCO, below the preregistered .65 SG17 bar. COCO's top VOC-frozen
+reliability bin is 72.2% useful versus 39.0% overall, but addition leakage
+discrimination remains weak. These are diagnostics, not a new method.
+The GT-majority region result is a fixed-partition reference, **not an IoU
+upper bound**. Claude should review the complete tables and cautionary
+interpretation before any new SG16/SG17 design.
