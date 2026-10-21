@@ -5159,3 +5159,41 @@ Its visual index now explicitly distinguishes fixed first-manifest examples
 from diagnostic best/worst examples (metadata-only correction; no scores or
 images changed). ChatGPT upload archive:
 `outputs/segmentation/analysis/SG12_CRF_SG14_SG15_CHATGPT.zip`.
+
+## 93. Codex: SG15 current labels versus GT-majority oracle on 20 VOC images
+
+The owner requested a small visual experiment after reviewing completed
+SG15 results. Codex runs it; Claude can inspect the resulting masks and
+scores. This is diagnostic, with no model/component selection and no COCO
+transfer. Source rule, frozen before the new scores: take the **first
+annotated row in manifest order from each of the 20 VOC-Sim classes**.
+Exactly one image per class; no cherry-picking by old or new IoU.
+
+For each image, regenerate once with the frozen W class-word CA and module-15
+SA setup. Rebuild the canonical SPEC32 partition on this image. Evaluate the
+same three already-frozen semantic priors P1, SG11 trim20/rho=.80 and SG12
+top50, each using its full-VOC threshold from the completed SG15 study.
+Keep two current SG15 region decisions: **A050** (hard majority projection)
+and **B** (confidence snapping). Both are registered SG15 rules; neither is
+retuned here. The oracle marks each SPEC32 region positive iff at least half
+of its pixels are GT foreground at annotation resolution. It uses GT and is
+**only a diagnostic**, not an inference method or proposed final system.
+
+Each of 20 sheets has three prior rows and nine columns: generated RGB,
+original GT mask, SPEC32 regions, original prior mask, current A050 mask,
+current B mask, oracle mask, A050 versus oracle disagreement, and B versus
+oracle disagreement. IoUs are printed on predicted masks. Disagreement
+colors: red=current positive/oracle negative, blue=current negative/oracle
+positive. `per_image_iou.csv` includes all 20 x 3 prior comparisons, IoUs,
+false/missed region decisions and pixel disagreement counts. One generated
+image is consumed and released before the next; only the sheets and compact
+JSON/CSV remain. A transient one-image NPZ cache is removed after each sheet.
+
+Code and locked sample/threshold contract:
+`configs/sg15_label_oracle_20.json`,
+`scripts/run_sg15_label_oracle_20.py`,
+`scripts/plot_sg15_label_oracle_20.py`, and
+`jobs/run_sg15_label_oracle_20.slurm`. Formula and CPU-rendering checks:
+`tests/test_sg15_label_oracle_20.py`. The job requests one available GPU,
+not a named node. A two-class live smoke test precedes the full 20-class
+submission. Results are visual examples, not a new full-dataset mIoU.
