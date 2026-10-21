@@ -5496,4 +5496,7 @@ completed 0:0 on one VOC and one COCO image; it checked propagation algebra
 against the existing implementation, all five score maps, mechanism
 accounting, and the real eight-panel plot. The initial smoke **235288**
 identified and fixed a NumPy-to-Torch conversion at the mask boundary.
-Production job ID: pending.
+Production job **235290** was submitted on 21 October 2026 to one available
+GPU with no node constraint. It is resumable per image under the 12-hour
+allocation. Codex will leave this production run unmonitored as requested;
+the shared source and prerequisite evidence are in commit `6655ea4f5`.
