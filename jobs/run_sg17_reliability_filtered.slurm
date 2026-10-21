@@ -1,6 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=sg17-reliable-additions
 #SBATCH --partition=gpu
+#SBATCH --nodelist=renyi
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=48G
@@ -10,7 +11,7 @@
 #SBATCH --open-mode=append
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
-# One available GPU; VOC capture/calibration/selection precedes COCO transfer.
+# One GPU on renyi; VOC capture/calibration/selection precedes COCO transfer.
 set -eo pipefail
 cd "${SLURM_SUBMIT_DIR:?submit from repository root}"
 source ~/.bashrc

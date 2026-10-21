@@ -5356,13 +5356,14 @@ Code and contract: `configs/sg17_reliability_filtered_additions.json`,
 `scripts/plot_sg17_reliability_filtered.py`,
 `tests/test_sg17_reliability_filtered.py`, and
 `jobs/run_sg17_reliability_filtered.slurm`. One resumable 12-hour GPU job
-runs on any available GPU without a node constraint. Small reduced per-image
+runs on renyi. Small reduced per-image
 maps and score counts support requeue; raw Q/K, per-observation maps, generated
 RGB, and transient figure inputs are discarded. Only reviewed summaries and
 figures are Git candidates. The output root is
 `outputs/segmentation/controlled_attention_cv/sg17/`; `completed.json`
 signals the end of all required stages. Production job **235236** was
-submitted on 21 October 2026 with no node constraint. It has a 12-hour
+canceled at the owner's request and replaced by **235237** on renyi on
+21 October 2026. It has a 12-hour
 allocation and requeues from the reduced per-image checkpoints if needed.
 Codex will not monitor it during execution; Claude's review can begin from
 commit `60f2fe1a4` and continue when final outputs are reported.
