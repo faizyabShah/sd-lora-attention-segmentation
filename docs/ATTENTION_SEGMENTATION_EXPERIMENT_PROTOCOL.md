@@ -5376,3 +5376,55 @@ checkpoint. In the one-image smoke, 48.9% of positive increments tied at
 248/248 upward votes, so Q70/Q80/Q90 all attained the same cutoff. Full-VOC
 calibration will report the actual attainable fractions; a tied or collapsed
 candidate family is a valid outcome, not a reason to add new thresholds.
+
+## 96. Pre-SG18 / Pre-SG21 temporal and head-role diagnostics
+
+**Status, 21 October 2026:** Codex owns a diagnostic-only run requested before
+designing SG18 or SG21. No temporal window, SA head, weight, segmentation
+method, or DenseCRF variant is selected or promoted here. Claude may review
+the final evidence and interpretation after the merge.
+
+The frozen inputs are the class-word `W` CA seed, the same module-15 SA, and
+all 31 calls × 8 heads on the 490 VOC-Sim and 707 COCO-Cap images. Each
+observation is \(A_{t,h}c\), computed from live Q/K. The ordinary reference
+is the unweighted mean over all 248 observations. GT is used only after
+scores and binary masks exist, to classify CA-to-propagation additions and
+removals. Each individual observation, head-averaged call, and fixed-stage
+mean is normalized independently at 64×64, bilinearly resized, and compared
+with the same CA mask at the **fixed diagnostic threshold 0.45**. Therefore
+their additions are separate comparisons against CA; stage/call/head counts
+must not be summed to obtain the ordinary mean's counts.
+
+The fixed stages are early calls 0–9, middle 10–20, late 21–30. Temporal
+features include up/down persistence, runs, sign changes, stage-specific
+fractions, trend, and dispersion relative to CA. Five pixel-event endpoints
+are measured with 512 fixed histogram bins and both ROC-AUC and PR-AUC;
+per-class histograms permit class-balanced ROC. Head descriptors include
+entropy, diagonal/local mass within Euclidean radii 1/2/4 at the 64×64
+grid, attention distance, top-1/5/10 mass, row entropy variance, effective
+support, and exact reciprocity
+\(\sum_{p,q}\min(A_{pq},A_{qp})/\sum_{p,q}A_{pq}\).
+Median attention distance is omitted because exact weighted medians across
+all 248 matrices per image would materially increase computation; mean
+distance is exact. GT-distance and GT-disjoint component definitions match
+the prior diagnostic. Observation TP/FP, distant/separate FP, useful/harmful
+removals, and normalized rates are all reported. Per-call support of ordinary
+P1 additions and GT foreground/background upward support are also reported.
+
+Code: `configs/pre_sg18_sg21_diagnostics.json`,
+`src/segmentation/temporal_head_diagnostics.py`,
+`scripts/{run,finalize,plot}_pre_sg18_sg21_diagnostics.py`,
+`tests/test_pre_sg18_sg21_diagnostics.py`, and
+`jobs/{run,merge}_pre_sg18_sg21_diagnostics.slurm`.
+The 40 GPU array tasks are per-dataset/per-class, each resumable per image;
+a dependent CPU merger validates all image IDs, writes CSV/JSON and markdown
+handoffs, then creates shared-scale 31×8 heatmaps and 31-call curves. Only
+reduced arrays are checkpointed. Output root:
+`outputs/segmentation/analysis/pre_sg18_sg21/`.
+**Submitted 21 October 2026:** synthetic CPU checks and live GPU smoke job
+**235238** completed 0:0 (one VOC and one COCO image). The smoke outputs
+passed the CPU merger and produced ten heatmaps plus one temporal-curve plot.
+Full GPU array **235239** covers 40 class/dataset shards with at most eight
+running together on any available GPU; CPU merger **235243** depends on
+`afterok:235239`. If a shard fails, rerun its resumable array task and then
+submit the merger again after all 40 shards are complete.

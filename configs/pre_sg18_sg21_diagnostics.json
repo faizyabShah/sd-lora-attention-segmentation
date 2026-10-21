@@ -1,0 +1,18 @@
+{
+  "name": "Pre-SG18 / Pre-SG21 temporal and head-role diagnostics",
+  "version": 1,
+  "datasets": ["voc", "coco"],
+  "images": {"voc": 490, "coco": 707},
+  "sa_module_index": 15,
+  "calls": 31,
+  "heads": 8,
+  "threshold": 0.45,
+  "time_stages": {"early": [0, 10], "middle": [10, 21], "late": [21, 31]},
+  "pixel_histogram_bins": 512,
+  "diagnostic_only": true,
+  "gt_use": "event labels and analysis only; no mask, method, cutoff, or class tuning",
+  "observation_normalization": "independent minmax at 64x64, bilinear at annotation size, threshold 0.45",
+  "structure": "exact 64x64 attention affinity; Euclidean pixel distance; local radii inclusive; reciprocity=sum min(A_ij,A_ji)/sum A_ij",
+  "stage_definition": "mean z over all calls and heads in fixed stage, each stage scored against CA",
+  "call_definition": "mean z across eight heads within call, each call scored against CA"
+}
