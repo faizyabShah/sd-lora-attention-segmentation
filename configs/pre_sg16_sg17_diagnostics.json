@@ -1,0 +1,16 @@
+{
+  "name": "Pre-SG16 region separability and Pre-SG17 second-pass benefit diagnostics",
+  "version": 1,
+  "datasets": ["voc", "coco"],
+  "partition": "canonical SG15 SPEC32",
+  "region_oracle_threshold": 0.5,
+  "prior_threshold_source": "SG15 full-VOC frozen threshold for each unrefined prior",
+  "second_pass_threshold": 0.45,
+  "pixel_histogram_bins": 1024,
+  "region_area_fraction_bins": [0.0, 0.01, 0.03, 0.1, 1.0],
+  "object_area_fraction_bins": [0.0, 0.02, 0.1, 0.3, 1.0],
+  "observation_count": 248,
+  "top50_count": 124,
+  "diagnostic_only": true,
+  "selection": "none; no fitted classifier or new segmentation mask"
+}

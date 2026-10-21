@@ -5211,3 +5211,75 @@ submitted without dependency, requesting one available GPU, eight CPUs,
 Claude: review the visual/IoU evidence after this job completes; GT-majority
 oracle scores must be presented only as diagnostic upper bounds for hard
 region decisions on these twenty selected images.
+
+## 94. Codex: Pre-SG16 and Pre-SG17 prerequisite diagnostics; Claude reviews
+
+These are **diagnostics only**, requested before designing SG16 region recovery
+or SG17 adaptive depth. Codex owns execution on all annotated VOC-Sim and
+COCO-Cap images; Claude reviews the implementation and completed analysis.
+Neither run selects a new final pipeline, fits a classifier, retunes a
+threshold, uses COCO for selection, or produces SG16/SG17 predictions. The
+training-free W class-word CA seed, SA module 15, 31 calls, eight heads,
+248 call/head observations, SG12 leave-one-out cosine top 124, and frozen
+P1/SG11/SG12 VOC thresholds are the completed SG15 settings. The partition
+is exactly canonical SPEC32. GT labels are created only after maps, priors,
+partition and all candidate diagnostic features have been computed.
+
+**Pre-SG16.** Each nonempty SPEC32 region receives the GT-majority diagnostic
+label at annotation resolution. Features include the three frozen prior
+foreground occupancies and their mean/min/max/std/vote count; direct CA and
+ordinary one-pass CA mean/median/max/p90; and mean, median, std, MAD, IQR,
+10/20% trimmed means, min/max and directional up/down/max consensus of the
+248 individual region-mean propagated observations. The same statistics are
+also computed on the exact SG12 top-124 observations. Region ROC-AUC and
+average precision are computed exactly, for all regions, P1 occupancy
+0.2-0.8, wrong P1-majority regions, three-prior agreement and disagreement.
+The report also gives each class, class-balanced AUC, region-area and
+object-area bins. Per-image SG15 GT-majority oracle gain over P1 is correlated
+with target size, boundary/area, compactness, oracle-positive region count,
+crossed region count and prior IoU. Wrong-prior strata condition on the
+oracle label, so their occupancy AUC is descriptive and must not be compared
+naively with the all-region baseline.
+
+**Pre-SG17.** On the same generated image, raw one-pass and two-pass maps are
+independently min-max normalized, bilinearly resized, and thresholded at the
+predeclared 0.45. Every changed annotation pixel is GT-labelled useful
+(FN→TP or FP→TN) or harmful (TP→FN or TN→FP). Additions further distinguish
+new TP, new FP, FP farther than 16/64 annotation pixels from GT, and FP in a
+post-second-pass connected component with no GT pixel. Before GT inspection,
+features include first-pass directional consensus and dispersion; seed and
+mean; SG12 reliability among observations supporting the proposed binary
+direction; exact top-124 support; and per-observation second-minus-first
+directional support, median, trimmed mean, dispersion and magnitude for all
+248 and top-124 observations. All changed pixels contribute to 1024-bin
+fixed-range ROC-AUC/average precision for useful/harmful changes and four
+addition endpoints. Additions/removals are also reported separately. The
+best exploratory VOC reliability score is shown in deciles using VOC bin
+edges frozen on COCO; score quantiles and per-image benefit correlations
+are included. This is diagnostic ranking, never a gating rule.
+
+The worker is resumable per image. It writes only reduced JSON/CSV records
+and bounded histograms; generated images, native CA/SA matrices and 248-map
+stacks are discarded after each image. Configuration and code:
+`configs/pre_sg16_sg17_diagnostics.json`,
+`src/segmentation/pre_sg_diagnostics.py`,
+`scripts/run_pre_sg16_sg17_diagnostics.py`,
+`scripts/finalize_pre_sg16_sg17_diagnostics.py`,
+`tests/test_pre_sg16_sg17_diagnostics.py`, and
+`jobs/{run,merge}_pre_sg16_sg17_diagnostics.slurm`. The 40 GPU array tasks
+cover one class/dataset per task on any available GPU; a CPU merge has an
+`afterok` dependency. The result is
+`outputs/segmentation/analysis/pre_sg16_sg17/CHATGPT_HANDOFF.md` plus complete
+`results.json`, region records and image-level CSVs. Claude: review the
+contract, accounting invariants, AUC interpretation, and transfer evidence
+once complete; SG16/SG17 are intentionally not launched here.
+
+**Submitted 21 October 2026.** Synthetic CPU checks pass. The first live
+smoke job **235188** identified a CA seed shape mismatch; the next job
+**235189** generated one VOC and one COCO image successfully, then exposed a
+report lookup typo. Both defects were corrected. The final end-to-end smoke
+job **235190** completed **0:0** with the saved two-image records and report.
+The production GPU array is **235191** (`0-39%8`, no node constraint,
+12-hour per shard limit, resumable per image). The CPU report merger is
+**235196**, dependent on `afterok:235191`. Earlier failed smoke records are
+kept only in the local smoke output and do not enter the full results.
