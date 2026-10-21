@@ -5306,3 +5306,68 @@ discrimination remains weak. These are diagnostics, not a new method.
 The GT-majority region result is a fixed-partition reference, **not an IoU
 upper bound**. Claude should review the complete tables and cautionary
 interpretation before any new SG16/SG17 design.
+
+## 95. SG17 reliability-filtered second-pass additions (Codex owns run; Claude reviews)
+
+**Status, 21 October 2026:** Codex implements and submits this locked,
+training-free experiment. Claude should independently inspect the code,
+VOC-only cutoff calibration, fold selection, mechanism accounting, and final
+VOC/COCO interpretation after the run. No results are claimed at submission.
+
+Frozen inputs are the class-word `W` CA seed and the 248 observations from
+31 calls × 8 heads of SA module 15. For observation \(i\), compute
+\(z_i^{(1)}=A_i c\), \(z_i^{(2)}=A_i^2 c\), ordinary means \(y_1,y_2\),
+and \(q_\uparrow(p)=\#\{i:z_i^{(2)}(p)>z_i^{(1)}(p)\}/248\).
+The candidate score is
+\(y_1+\min(y_2-y_1,0)+1[q_\uparrow\ge\rho]\max(y_2-y_1,0)\).
+This leaves every raw second-pass decrease untouched. It gates only raw
+positive increments before the established independent minmax normalization,
+bilinear resize, and binary threshold. That normalization can change binary
+mask boundaries even when a raw pixel score is untouched; mechanism results
+must distinguish raw rejected increments from thresholded P1 additions.
+
+Three cutoffs, Q70/Q80/Q90, are calibrated **only on VOC native 64×64 pixels
+with positive raw \(y_2-y_1\)**. Integer ties use the count cutoff whose
+nonempty retained fraction is closest to the target top 30/20/10 percent
+(higher count cutoff on exact ties); actual fractions are reported because
+248-count discretization can make the targets impossible.
+All three cutoffs are frozen before any COCO score. The no-CRF screen compares
+`W/P1` to these three candidates on the existing 17 segmentation thresholds
+and five VOC folds. The existing `run_screen` eligibility and fold policy
+selects method and threshold on four folds, tests on the held-out fold, and
+requires a candidate to win at least 4/5 folds with positive OOF gain before
+promotion. Near ties favor the less restrictive gate, Q70 then Q80 then Q90.
+VOC selects a full-data threshold for each reported method. These thresholds
+and cutoffs are frozen for COCO transfer. No SG12 top-50 selection, extra
+cutoffs, learned weights, class-specific tuning, or COCO selection enters.
+
+The runner produces five fold winners, votes, forced OOF scores for every
+candidate, full VOC and frozen COCO mIoU, mean-image IoU, precision/recall,
+20 per-class IoUs and deltas, paired 20,000-resample intervals and
+improved/worsened/tied counts. It records retained/rejected true and false
+P1 additions, distant and GT-disjoint false additions, VOC-frozen reliability
+bins, per-image diagnostics, and eight visual sheets. If and only if a
+candidate passes the VOC rule, it runs the **one** fixed DenseCRF confirmation
+against ordinary `W/P1` plus the same CRF. No CRF parameters are tuned.
+
+Code and contract: `configs/sg17_reliability_filtered_additions.json`,
+`src/segmentation/sg17_reliability.py`,
+`scripts/run_sg17_reliability_filtered.py`,
+`scripts/plot_sg17_reliability_filtered.py`,
+`tests/test_sg17_reliability_filtered.py`, and
+`jobs/run_sg17_reliability_filtered.slurm`. One resumable 12-hour GPU job
+runs on any available GPU without a node constraint. Small reduced per-image
+maps and score counts support requeue; raw Q/K, per-observation maps, generated
+RGB, and transient figure inputs are discarded. Only reviewed summaries and
+figures are Git candidates. The output root is
+`outputs/segmentation/controlled_attention_cv/sg17/`; `completed.json`
+signals the end of all required stages. Production job ID: pending.
+
+**Smoke validation:** GPU job **235235** completed 0:0 on one VOC and one
+COCO sample, including generation, cutoff calibration, both screens, map
+rendering, and both fixed DenseCRF calls. The first two smoke attempts found
+and resolved an integer-cutoff edge case and an incompatible stale smoke
+checkpoint. In the one-image smoke, 48.9% of positive increments tied at
+248/248 upward votes, so Q70/Q80/Q90 all attained the same cutoff. Full-VOC
+calibration will report the actual attainable fractions; a tied or collapsed
+candidate family is a valid outcome, not a reason to add new thresholds.
