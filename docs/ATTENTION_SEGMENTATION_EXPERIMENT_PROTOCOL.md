@@ -5611,3 +5611,7 @@ stalled in neumann's scheduler prolog before Python started. Replacement
 smoke **235307** excludes neumann; production **235308** is queued with an
 `afterok:235307` dependency, so it starts only if the live smoke passes.
 There is no result claim while these jobs are pending.
+
+The finalizer writes `CHATGPT_HANDOFF.md`, exact AUC and reliability-bin CSVs,
+the TP/FP-ratio plot and a local handoff ZIP automatically. Synthetic
+one-image finalizer validation passed before the live smoke was scheduled.

@@ -6,6 +6,7 @@ import argparse
 import csv
 import json
 import sys
+import zipfile
 from pathlib import Path
 
 import numpy as np
@@ -241,6 +242,31 @@ def main():
         lines.append(f"| {cls} | {x['voc_chosen_feature']} | {fmt(x['voc_roc_auc'])} | {fmt(x['coco_roc_auc'])} |")
     lines+=['','Reliability plot: `late_support_tp_fp_ratio.png`. Temporary candidate-pixel feature caches are deleted after successful finalization; only reduced reports remain.','']
     (out/'report.md').write_text('\n'.join(lines))
+    handoff=lines+['## How to read the diagnostic','',
+                   'ROC-AUC is pixel pooled, not image macro averaged. PR-AUC depends on the TP prevalence of each contrast; use the TP/FP support counts in `auc_table.csv` when comparing it. Feature direction is defined once on VOC. Higher support bins should have higher TP/FP ratios on both datasets if a late veto is plausible. No SG19 mask or cutoff was tested.','',
+                   '## Direct sign splits at the frozen 0.425 threshold','']
+    for ds in ('voc','coco'):
+        handoff+=['',f'### {ds.upper()}','',
+                  '| Feature | Sign | Candidate fraction | TP rate | FP >16 rate | Separate FP rate |',
+                  '|---|---|---:|---:|---:|---:|']
+        for feature,parts in datasets[ds][str(primary)]['direct_splits'].items():
+            for direction,part in parts.items():
+                fmt=lambda x:'NA' if x is None else f'{x:.4f}'
+                handoff.append(f"| {feature} | {direction} | {part['fraction_of_additions']:.4f} | "
+                               f"{fmt(part['tp_rate'])} | {fmt(part['distant_fp_gt16_rate'])} | "
+                               f"{fmt(part['separate_fp_rate'])} |")
+    handoff+=['','## Files','',
+              '- `results.json`: full exact AUC/PR-AUC, direct sign splits, class transfer, bin edges and source-map drift.',
+              '- `auc_table.csv`: every feature, contrast, dataset and threshold.',
+              '- `reliability_bins.csv`: transferred VOC bins and TP/FP ratios.',
+              '- `late_support_tp_fp_ratio.png`: VOC/COCO ratio curves.',
+              '- `report.md`: compact top-line table.','',
+              'Question for ChatGPT: Is any late-support signal strong and transferable enough to justify a locked SG19 middle-proposal plus late-veto experiment? Consider ROC-AUC, PR-AUC prevalence, the VOC-to-COCO bin trend, and the person-class tradeoff.','']
+    (out/'CHATGPT_HANDOFF.md').write_text('\n'.join(handoff))
+    with zipfile.ZipFile(out/'PRE_SG19_CHATGPT.zip','w',compression=zipfile.ZIP_DEFLATED,compresslevel=6) as z:
+        for name in ('CHATGPT_HANDOFF.md','results.json','auc_table.csv',
+                     'reliability_bins.csv','late_support_tp_fp_ratio.png','report.md'):
+            z.write(out/name,name)
     (out/'completed.json').write_text(json.dumps({'images':{'voc':490,'coco':707},
                                                   'all_required_stages_complete':True},indent=2)+'\n')
     for p in (out/'cache').glob('*/*.npz'):p.unlink()
