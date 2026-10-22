@@ -5645,3 +5645,32 @@ Thus late absolute score has a transferable association, while evidence for
 a selective *late-stage veto* is insufficient. No SG19 mask or cutoff was
 tested. Full exact results are in the output folder's `results.json`,
 `auc_table.csv`, and `reliability_bins.csv`; Claude may review the diagnostics.
+
+## 100. Pre-SG19 raw-score control (CPU only; SG19 decision)
+
+**Completed 22 October 2026, job 235316 (0:0).** Use the saved SG18 image
+maps to reconstruct CA `c`, middle `M` (calls 10–20) and late `L` (calls
+21–30). No generation occurs. On each image, fix the same middle-added
+candidate set for all five raw scores: `c`, `M`, `L`, `min(M,L)` and
+`(M+L)/2`. Candidate definition and GT/distance/component labels follow
+Pre-SG19 exactly: raw `M>c`, normalized CA background at 0.45, normalized
+middle foreground at 0.425. Report exact pixel ROC-AUC and PR-AUC for TP
+versus all FP, FP >16, FP >64 and separate-component FP. This is a diagnostic;
+no cutoff or new segmentation mask is evaluated. Code:
+`scripts/pre_sg19_score_controls.py`; result:
+`outputs/segmentation/analysis/pre_sg19_score_controls/`.
+
+The table's ordinary TP/FP ROC-AUC is: CA **0.5590 VOC / 0.6198 COCO**;
+middle **0.6081 / 0.6861**; late **0.5835 / 0.6733**; min **0.6006 / 0.6784**;
+mean **0.5973 / 0.6814**. Middle also wins all three distant/separate FP
+contrasts on both datasets, and its ordinary TP/FP PR-AUC is **0.8417 /
+0.7099** versus late's **0.8262 / 0.6931**. The result does not support
+additional late-stage discrimination or the original SG19 late veto.
+
+The Pre-SG19 GPU replay's candidate-pixel checkpoint was removed after its
+finalizer. SG18 cache reconstruction gives 6,816,320 VOC and 12,665,100
+COCO candidates versus 6,837,692 and 12,671,265 in that replay. All five
+scores in this control still use exactly the same pixels *within the SG18
+cache run*. Late ROC-AUC here (0.5835 / 0.6733) is close to the replay's
+0.5857 / 0.6751. The `CHATGPT_HANDOFF.md` in the control output folder
+summarizes the full comparison; CSV and JSON contain every ROC/PR contrast.
