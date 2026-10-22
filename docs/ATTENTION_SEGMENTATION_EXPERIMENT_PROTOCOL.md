@@ -5626,3 +5626,22 @@ There is no result claim while these jobs are pending.
 The finalizer writes `CHATGPT_HANDOFF.md`, exact AUC and reliability-bin CSVs,
 the TP/FP-ratio plot and a local handoff ZIP automatically. Synthetic
 one-image finalizer validation passed before the live smoke was scheduled.
+
+**Outcome (22 October 2026):** Smoke **235307** passed. Production **235308**
+extracted all 490 VOC and 707 COCO images and computed the full exact tables;
+its final plotting step failed because the `trdp` environment lacks
+Matplotlib. CPU finalizer **235313** completed 0:0 and produced the figures,
+CSV tables and validated handoff ZIP from the finished candidate-pixel
+checkpoints, with no image regeneration. It deleted the 1.1 GB temporary
+feature cache; only reduced artifacts remain.
+At the primary threshold, raw late score separates middle-added TP from FP
+with ROC-AUC **0.586 VOC / 0.675 COCO**; late median and trimmed mean give
+essentially the same result. VOC-defined raw-score bins show TP/FP ratio
+**2.71 to 9.57** from lowest to highest bin; on COCO the same bins show
+**0.55 to 7.68**, with a monotonic COCO trend. However, `L-c`, retention,
+and late consensus are weaker (COCO TP/FP ROC-AUC 0.53–0.56), and VOC-person's
+best `L-M` signal (0.695 ROC-AUC) transfers poorly to COCO (0.481).
+Thus late absolute score has a transferable association, while evidence for
+a selective *late-stage veto* is insufficient. No SG19 mask or cutoff was
+tested. Full exact results are in the output folder's `results.json`,
+`auc_table.csv`, and `reliability_bins.csv`; Claude may review the diagnostics.

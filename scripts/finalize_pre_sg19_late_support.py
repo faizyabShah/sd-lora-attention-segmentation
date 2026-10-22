@@ -5,7 +5,10 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import os
+import subprocess
 import sys
+import tempfile
 import zipfile
 from pathlib import Path
 
@@ -123,20 +126,13 @@ def class_auc(features,labels,classes,sign):
 
 
 def plot_bins(out,bin_results,selected):
-    import matplotlib
-    matplotlib.use('Agg')
-    import matplotlib.pyplot as plt
-    fig,axes=plt.subplots(1,len(selected),figsize=(5*len(selected),4),sharey=False)
-    if len(selected)==1:axes=[axes]
-    for ax,name in zip(axes,selected):
-        for ds,color in [('voc','tab:blue'),('coco','tab:orange')]:
-            values=bin_results[ds][name]
-            ratio=[v['tp_fp_ratio'] if v['tp_fp_ratio'] is not None else np.nan for v in values]
-            ax.plot(range(1,len(ratio)+1),ratio,'o-',label=ds.upper(),color=color)
-        ax.set(title=name,xlabel='VOC-defined late-support bin',ylabel='TP / FP')
-        ax.grid(alpha=.25);ax.legend()
-    fig.tight_layout();fig.savefig(out/'late_support_tp_fp_ratio.png',dpi=170)
-    plt.close(fig)
+    plot_python=Path('/home/shafa/miniconda3/envs/ovam_sdxl/bin/python')
+    with tempfile.TemporaryDirectory(prefix='pre-sg19-mpl-') as mpl_cache:
+        env=dict(os.environ,MPLCONFIGDIR=mpl_cache)
+        subprocess.run([str(plot_python),str(ROOT/'scripts/plot_pre_sg19_late_support.py'),
+                        '--results',str(out/'results.json'),
+                        '--output',str(out/'late_support_tp_fp_ratio.png')],
+                       env=env,check=True)
 
 
 def main():
