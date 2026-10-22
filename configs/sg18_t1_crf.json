@@ -1,0 +1,16 @@
+{
+  "name": "Locked SG18 T1 plus unchanged DenseCRF confirmation",
+  "version": 1,
+  "source": "SG18 T1 selected on VOC 5/5 folds",
+  "track": "training-free W class-word CA, SA module 15, all eight heads",
+  "t1_calls_inclusive": [10, 20],
+  "p1_calls_inclusive": [0, 30],
+  "names": ["W/T1", "W/T1+R2", "W/P1", "W/P1+R2"],
+  "candidate": "W/T1+R2",
+  "reference": "W/P1+R2",
+  "thresholds": [0.30, 0.325, 0.35, 0.375, 0.40, 0.425, 0.45, 0.475, 0.50, 0.525, 0.55, 0.575, 0.60, 0.625, 0.65, 0.675, 0.70],
+  "selection": "VOC five-fold run_screen; independent training-fold thresholds; >=4/5 votes and positive OOF guard; frozen COCO transfer",
+  "crf": "apply_ovam_densecrf with unchanged OVAM_CRF_PARAMETERS on regenerated RGB and thresholded minmax map",
+  "locked_reference_threshold": 0.45,
+  "no_extra_methods": "no new temporal windows, CA changes, optimized tokens, CRF tuning or COCO selection"
+}

@@ -5521,3 +5521,47 @@ folder's `SG18_CHATGPT_HANDOFF.md` and JSON/CSV artifacts. Claude should
 verify the frozen threshold handling, selection boundary, and whether the
 mechanism counts support the stated false-positive interpretation before
 paper integration.
+
+## 98. SG18 follow-up: T1 + DenseCRF and late-call mechanism (Codex runs; Claude reviews)
+
+**Locked before running, 22 October 2026.** SG18 chose `W/T1`, calls 10–20,
+on all five VOC folds. Its frozen COCO mIoU 0.6285 exceeded ordinary
+two-pass `W/P1` at 0.6245. The production follow-up asks whether the same
+T1 window with the **unchanged** `apply_ovam_densecrf` and
+`OVAM_CRF_PARAMETERS` improves upon the established training-free
+`W/P1+R2` final reference. No new temporal window or CRF parameter is
+selected. The four paired cells are `W/T1`, `W/T1+R2`, `W/P1`, and
+`W/P1+R2`, all from the same regenerated trajectory and class-word CA
+seed. The 17-threshold grid is unchanged. `run_screen` compares T1+R2 to
+P1+R2 using the five fixed VOC folds and training-fold-selected thresholds,
+with its existing 4/5 vote and positive OOF guard; COCO uses the full-VOC
+thresholds without selection. Report forced OOF, all-cell full VOC and COCO
+mIoUs, per-class IoUs/deltas, precision/recall, paired image-level intervals,
+and the locked 0.45 final-reference scores. A live VOC+COCO smoke precedes
+the resumable GPU production run. Results: `outputs/segmentation/
+controlled_attention_cv/sg18_t1_crf/`.
+
+The separate **diagnostic-only** job reads the original SG18 reduced-map
+cache from job 235290. Algebraically, the late 21–30 map equals
+`(21*T2 - 11*T1)/10`, where T1 averages 11 calls and T2 averages 21.
+It compares independently minmax-normalized middle (10–20), late (21–30),
+and middle+late (10–30) maps at fixed thresholds 0.425 (primary, SG18 T1
+frozen threshold) and 0.45 (control). For both datasets it reports mIoU,
+precision/recall, CA-relative TP and FP additions, distant and separate
+FP, and direct middle-to-middle+late threshold crossings: TP gained/lost
+and FP gained/removed. Per-class diagnostics include person. Late is never
+a selection candidate and no COCO score feeds selection. This CPU job is
+resumable per image and stores only compact counts and diagnostics. Results:
+`outputs/segmentation/analysis/sg18_late_diagnostic/`.
+
+Shared source: `configs/sg18_t1_crf.json`, `configs/sg18_late_diagnostic.json`,
+`scripts/{run,finalize}_sg18_t1_crf.py`, `scripts/run_sg18_late_diagnostic.py`,
+and `jobs/run_sg18_{t1_crf,late_diagnostic}.slurm`. Claude should verify
+the CRF recipe, same-trajectory comparison, VOC-only threshold boundary,
+late-window algebra and threshold-crossing counts before paper integration.
+The one-VOC/one-COCO GPU smoke **235303** passed all four cells. The
+cached-map diagnostic smoke also passed. Independent production jobs were
+submitted on 22 October 2026: CPU late diagnostic **235304** and GPU
+T1+DenseCRF **235305**. Neither has a dependency on the other. Both jobs
+are resumable; no production-result claim is made until their completion
+markers and coverage are checked.

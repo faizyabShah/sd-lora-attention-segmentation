@@ -1,0 +1,10 @@
+{
+  "name": "SG18 late-call mechanism diagnostic only",
+  "version": 1,
+  "source": "exact reduced maps cached by SG18 job 235290",
+  "windows": {"middle": [10, 20], "late": [21, 30], "middle_plus_late": [10, 30]},
+  "threshold_conditions": [0.425, 0.45],
+  "primary_threshold": 0.425,
+  "normalization": "independent minmax at 64x64, bilinear to annotation resolution",
+  "no_selection": "late map is diagnostic only; no promotion, no COCO tuning"
+}
