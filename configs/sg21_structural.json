@@ -1,0 +1,26 @@
+{
+  "name": "SG21 locked structural reliability weighting",
+  "version": 1,
+  "track": "training-free W class-word; SD1.5; SA module 15; one-pass",
+  "reference": "SG18/T1",
+  "names": ["SG18/T1", "SG21-LM", "SG21-LM-RANK", "SG21-ENT", "SG21-DIST"],
+  "calls_inclusive": [10, 20],
+  "heads": 8,
+  "epsilon": 1e-8,
+  "descriptors": ["entropy", "mean_distance", "local_mass_r1"],
+  "rules": {
+    "SG21-LM": "raw local radius-1 mass, normalized within call",
+    "SG21-LM-RANK": "stable ascending local-mass ranks 1..8, normalized within call",
+    "SG21-ENT": "call maximum entropy minus head entropy plus epsilon, normalized within call",
+    "SG21-DIST": "inverse mean Euclidean distance plus epsilon, normalized within call"
+  },
+  "thresholds": [0.30, 0.325, 0.35, 0.375, 0.40, 0.425, 0.45, 0.475, 0.50, 0.525, 0.55, 0.575, 0.60, 0.625, 0.65, 0.675, 0.70],
+  "folds": "configs/voc_sim_folds.csv",
+  "selection": "unchanged five-fold train-threshold/held-out OOF screen; 4/5 votes, positive OOF, magnitude and class-stability guards; COCO transfer only",
+  "normalization": "independent minmax at 64x64, bilinear to annotation resolution",
+  "diagnostic_threshold": 0.45,
+  "diagnostic_ca_threshold": 0.45,
+  "external_context": "historical SG18 W/P1 only, not candidate or selection reference",
+  "storage": "per-image counts, event counts, head weights and descriptors; no images, attention matrices, Q/K/V, or propagated maps",
+  "excluded": "no head subsets, combinations, temperatures, exponents, learned weights, COCO tuning, CRF, second pass, or extra windows"
+}

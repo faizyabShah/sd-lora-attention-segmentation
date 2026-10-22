@@ -5674,3 +5674,55 @@ scores in this control still use exactly the same pixels *within the SG18
 cache run*. Late ROC-AUC here (0.5835 / 0.6733) is close to the replay's
 0.5857 / 0.6751. The `CHATGPT_HANDOFF.md` in the control output folder
 summarizes the full comparison; CSV and JSON contain every ROC/PR contrast.
+
+## 101. SG21 locked structural SA-head weighting (Codex runs; Claude reviews)
+
+**Locked before execution, 22 October 2026.** The W class-word CA seed,
+SD 1.5, SA module 15, eight heads, one-pass propagation, and calls 10–20
+inclusive are frozen from SG18/T1. SG21 changes only the eight-head average
+*within* each of those 11 calls; the 11 call outputs are averaged equally.
+The structural descriptors match the Pre-SG21 definitions exactly: mean
+row entropy, mean Euclidean query-key distance in the 64×64 grid, and mean
+radius-1 local attention mass. No GT or class-specific information enters
+descriptor computation or weights.
+
+Four and only four candidates are registered: **SG21-LM** weights raw local
+mass; **SG21-LM-RANK** weights stable ascending local-mass ranks 1–8 (ties
+by physical head ID); **SG21-ENT** weights call-maximum entropy minus each
+head's entropy plus 1e-8; **SG21-DIST** weights inverse distance plus 1e-8.
+Each candidate normalizes its eight weights to sum to one separately for
+each call. Reference is same-generation **SG18/T1**, never W/REF. W/P1 is
+historical external context only and is excluded from selection. There is
+no combination, exponent, temperature, hard head selection, additional
+window, CRF, second pass, training, COCO selection, or descriptor sweep.
+
+Use the fixed five VOC folds and unchanged 17-value 0.30–0.70 threshold
+grid. Select each threshold on four training folds and score the fifth;
+report forced OOF for every candidate, the normal promotion screen, fold
+votes, and full-VOC threshold. Promotion needs at least four of five fold
+votes, positive forced OOF versus T1, and the existing magnitude/class
+stability guards. Freeze VOC thresholds for COCO transfer. Report full VOC
+and COCO mIoU, precision/recall, pixel/mean-image IoU, all 20 class IoUs
+and deltas versus T1, 20,000-resample paired mean-image-IoU intervals, and
+better/worse/tied image counts. At fixed 0.45, report CA-relative TP/FP
+additions, distant and separate FP, useful/harmful removals. For each
+candidate report effective head count per call, top physical head
+frequencies, call-to-call top-head changes, and weight mean/spread. If a
+candidate is promoted, use VOC-defined weight quartiles to diagnose head
+observation TP/FP, distant FP and useful-change rates on VOC and COCO;
+this diagnostic cannot feed back into selection.
+
+Code: `src/segmentation/sg21_structural.py`,
+`scripts/{run,finalize}_sg21_structural.py`,
+`configs/sg21_structural.json`, and `jobs/{run,merge}_sg21_structural.slurm`.
+The GPU jobs are resumable class shards (20 VOC, 20 COCO) and retain only
+per-image counts, fixed-threshold event counts, weights, and descriptors;
+they do not save images, propagated maps, or attention matrices. The CPU
+merger refuses incomplete coverage. Numerical unit checks and live one-VOC/
+one-COCO GPU smoke **235321** completed 0:0. Production array **235322**
+(`0-39%8`, any available GPU, 12 hours per shard) and CPU merger **235326**
+were submitted. The merger uses `afterany` so it will report missing
+coverage explicitly if a shard fails rather than becoming permanently
+unsatisfied. No outcome is claimed while production runs. Codex owns the
+run and publishes the reduced results; Claude reviews the method,
+selection and interpretation afterward.
