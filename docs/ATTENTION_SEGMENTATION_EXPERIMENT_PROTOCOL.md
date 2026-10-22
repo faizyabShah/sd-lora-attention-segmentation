@@ -5566,6 +5566,17 @@ T1+DenseCRF **235305**. Neither has a dependency on the other. Both jobs
 are resumable; no production-result claim is made until their completion
 markers and coverage are checked.
 
+**Late diagnostic completed (job 235304, 0:0):** all 490 VOC and 707 COCO
+cached images. At the primary fixed 0.425 threshold, middle/T1 and
+middle+late/T2 mIoU were 0.7959/0.7936 on VOC and 0.6285/0.6240 on COCO.
+Adding late calls caused 261,001 TP gains versus 255,053 TP losses and
+399,322 FP gains versus 226,040 FP removals on VOC; on COCO it caused
+178,332 TP gains versus 581,249 TP losses and 674,271 FP gains versus
+929,652 FP removals. Thus the aggregate effect differs by dataset and
+cannot be reduced to a single leakage story. Exact per-class, fixed-0.45
+and component/distance diagnostics are in
+`outputs/segmentation/analysis/sg18_late_diagnostic/`.
+
 ## 99. Pre-SG19 late support of middle-stage additions (Codex diagnostic; Claude may review)
 
 **Locked before running, 22 October 2026.** This is a diagnostic of whether
