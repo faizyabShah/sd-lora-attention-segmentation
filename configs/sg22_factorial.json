@@ -1,0 +1,14 @@
+{
+  "experiment": "sg22",
+  "version": 1,
+  "track": "frozen W class-word CA; SA module 15, all 8 heads",
+  "calls": {"ALL": [0, 30], "MID": [10, 20]},
+  "depths": [1, 2, 3],
+  "names": ["ALL-P1", "ALL-P1+R2", "ALL-P2", "ALL-P2+R2", "ALL-P3", "ALL-P3+R2", "MID-P1", "MID-P1+R2", "MID-P2", "MID-P2+R2", "MID-P3", "MID-P3+R2"],
+  "raw_reference": "ALL-P2",
+  "crf_reference": "ALL-P2+R2",
+  "thresholds": [0.30, 0.325, 0.35, 0.375, 0.40, 0.425, 0.45, 0.475, 0.50, 0.525, 0.55, 0.575, 0.60, 0.625, 0.65, 0.675, 0.70],
+  "diagnostic_threshold": 0.45,
+  "selection": "VOC-only fixed five folds and existing promotion guards; full VOC threshold frozen for COCO",
+  "exclusions": "no P4/P5, blended depths, further windows, optimized tokens, or CRF tuning"
+}

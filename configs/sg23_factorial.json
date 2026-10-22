@@ -1,0 +1,15 @@
+{
+  "experiment": "sg23",
+  "version": 1,
+  "track": "frozen W class-word CA; SA module 15, all 8 heads; one pass for reliability cells",
+  "calls": {"ALL": [0, 30], "MID": [10, 20]},
+  "reliability": {"R0": "ordinary mean", "SG2": "exact G_cv_g20_n1, gamma 2, row-normalized mean affinity times squared coefficient-of-variation reliability", "SG11": "trim20 directional consensus rho 0.80", "SG12": "leave-one-out cosine top 50 percent, stable call/head order"},
+  "names": ["ALL-R0", "ALL-R0+R2", "ALL-SG2", "ALL-SG2+R2", "ALL-SG11", "ALL-SG11+R2", "ALL-SG12", "ALL-SG12+R2", "MID-R0", "MID-R0+R2", "MID-SG2", "MID-SG2+R2", "MID-SG11", "MID-SG11+R2", "MID-SG12", "MID-SG12+R2", "ALL-P2", "ALL-P2+R2"],
+  "auxiliary_same_generation_final_reference": "ALL-P2+R2",
+  "raw_reference": "MID-R0",
+  "crf_reference": "ALL-P2+R2",
+  "thresholds": [0.30, 0.325, 0.35, 0.375, 0.40, 0.425, 0.45, 0.475, 0.50, 0.525, 0.55, 0.575, 0.60, 0.625, 0.65, 0.675, 0.70],
+  "diagnostic_threshold": 0.45,
+  "selection": "VOC-only fixed five folds and existing promotion guards; full VOC threshold frozen for COCO",
+  "exclusions": "no stacked reliability rules, extra trim/rho/top-k settings, further windows, optimized tokens, or CRF tuning"
+}

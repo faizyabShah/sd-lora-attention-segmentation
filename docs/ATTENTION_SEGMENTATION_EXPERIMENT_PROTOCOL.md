@@ -5756,3 +5756,69 @@ results: `outputs/segmentation/controlled_attention_cv/sg21_structural/
 CHATGPT_HANDOFF.md`, `results.json`, `per_class_iou.csv`,
 `weight_diagnostics.json`. Claude should validate the selection and
 structural-mechanism interpretation before paper integration.
+
+## 102. SG22/SG23 locked factorials (Codex runs; Claude reviews)
+
+**Locked before execution, 22 October 2026.** These are training-free W
+class-word experiments using the same frozen CA seed, SD 1.5 generation,
+SA module 15 at 64×64, all eight heads, independent map min-max, bilinear
+resize, 17-value threshold grid, five VOC folds, and VOC-only selection.
+COCO-Cap is frozen transfer. All cells are regenerated together within each
+experiment so references and candidates are same-generation. The R2
+DenseCRF uses the existing SimpleCRF wrapper and unchanged parameters on
+the generated RGB and each thresholded mask. No optimized tokens or
+additional hyperparameter search enters either package.
+
+**SG22: temporal window × propagation depth.** ALL means calls 0–30;
+MID means calls 10–20 inclusive. For each call/head observation independently,
+form `A_i c`, `A_i² c`, and `A_i³ c`, then average observations inside the
+window. The six raw cells are ALL-P1 (historical REF), ALL-P2 (historical
+P1), ALL-P3, MID-P1 (SG18/T1), MID-P2, MID-P3. Apply unchanged R2 to all
+six for 12 cells total. Raw reference is ALL-P2; final reference is
+ALL-P2+R2. Raw candidates of primary interest are MID-P2, MID-P3, ALL-P3;
+the remaining cells are controls. At fixed 0.45 report CA-relative TP/FP
+additions, distant and separate FP, useful/harmful removals and depth
+1→2 / 2→3 threshold crossings for each window. In particular inspect
+person, chair, bird, bicycle, cat, dining table, TV, and potted plant.
+Do not test further depths, windows, blending, or per-class rules.
+
+**SG23: temporal window × reliability mechanism.** The eight raw factorial
+cells are ALL/MID crossed with R0 ordinary mean, exact locked SG2
+`G_cv_g20_n1` graph (gamma 2), SG11 20%-per-tail trim gated by directional
+consensus at rho 0.80, and SG12 leave-one-out cosine top 50% observation
+mean. For MID, every statistic uses only its 88 observations, retaining
+exactly 44 for SG12; ALL uses 248 and retains 124. Apply unchanged R2 to
+all eight. Regenerate ALL-P2 and ALL-P2+R2 in the same job solely as
+auxiliary final-pipeline references, outside the eight-cell factorial.
+Raw reference is MID-R0 (T1); final reference is ALL-P2+R2; MID-R0+R2 is
+reported explicitly. Report VOC OOF/full and COCO interaction
+`(MID-method−MID-R0)−(ALL-method−ALL-R0)` for SG2/11/12. At fixed 0.45
+compare each MID reliability mask to T1 for TP/FP retained/removed, distant
+and separate FP, and FP removed per TP lost. Do not stack mechanisms or
+sweep their parameters.
+
+Both packages report forced OOF for every cell, the normal fold-vote
+promotion screen, full VOC with its selected threshold, frozen COCO,
+precision/recall/pixel/mean-image IoU, all 20 class IoUs and deltas,
+20,000-resample paired per-image IoU intervals, and better/worse/tied
+image counts. Raw and final-pipeline questions are screened separately.
+Claude should independently check the operator identities, fold selection,
+CRF reference, class deltas and interpretation before paper integration.
+
+Code: `src/segmentation/sg22_sg23.py`,
+`scripts/{run,finalize}_sg22_sg23.py`, `configs/sg{22,23}_factorial.json`,
+`jobs/{run,merge}_sg22_sg23.slurm`. The GPU class-shard array is resumable,
+with 20 VOC and 20 COCO shards per experiment; its reduced per-image
+counts and diagnostics are local only. A CPU merger checks complete
+coverage and writes reviewed summary files under
+`outputs/segmentation/controlled_attention_cv/sg22/` and `/sg23/`.
+Numerical operator checks passed. Live one-VOC/one-COCO SG22 smoke
+**235366** scored both images; its initial finalizer encountered a shard
+filename filter error, corrected and rerun successfully on the saved smoke
+shards. SG23 live smoke **235367** completed end to end. Production GPU
+arrays **235368** (SG22) and **235372** (SG23) were submitted as
+`0-39%4`, any available GPU, 12 hours per resumable class shard. CPU
+mergers **235373** and **235374** depend on their respective arrays with
+`afterany`; they explicitly reject incomplete coverage. Claude can review
+the committed protocol and implementation while the jobs run. No outcome
+is claimed yet.
