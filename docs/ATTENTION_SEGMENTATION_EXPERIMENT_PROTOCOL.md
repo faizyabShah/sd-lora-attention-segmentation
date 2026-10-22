@@ -5565,3 +5565,45 @@ submitted on 22 October 2026: CPU late diagnostic **235304** and GPU
 T1+DenseCRF **235305**. Neither has a dependency on the other. Both jobs
 are resumable; no production-result claim is made until their completion
 markers and coverage are checked.
+
+## 99. Pre-SG19 late support of middle-stage additions (Codex diagnostic; Claude may review)
+
+**Locked before running, 22 October 2026.** This is a diagnostic of whether
+late calls 21–30 selectively support the useful additions made by middle
+calls 10–20. It does **not** construct SG19 or a new segmentation method.
+Use the frozen W class-word CA seed, SA module 15, all eight heads, and the
+same generated trajectory. Middle-added candidate pixels require raw
+`M-c > 0`, CA background at 0.45, and middle foreground at the frozen
+0.425 threshold; fixed 0.45 is a control. GT labels them as new TP, new FP,
+FP >16 px from GT, FP >64 px, or FP in a predicted component not touching
+GT, using the same distance/component definitions as SG18.
+
+For each candidate output pixel, measure raw late score, `L-c`, `L-M`,
+`(L-c)/(M-c+1e-8)`, fractions of the 80 late observations above `c` and
+above `M`, plus late median, 20% trimmed mean, population standard deviation
+and median absolute deviation. Each observation is bilinearly resized to
+the annotation size before its candidate-pixel statistic is computed.
+For VOC and COCO separately, compute **exact tie-aware pixel-level** ROC-AUC
+and average precision for TP versus all FP, distant FP >16, distant FP >64,
+and separate-component FP. Feature orientation is chosen by VOC TP/FP AUC
+only and transferred unchanged to COCO. The top three VOC features define
+VOC decile edges; the same edges are applied to COCO. Report per-bin TP/FP
+ratio, distant/separate FP fractions, direct `L>c` versus `L<c` and
+`L>M` versus `L<M` splits, and VOC-selected best feature for person, chair,
+bird, bicycle, cow, dining table and TV with frozen COCO class transfer.
+No veto threshold, class rule, CRF, weighted average, or COCO tuning enters.
+
+The SG18 cache contains only **averaged** T1/T2 maps, the CA seed and GT;
+the earlier Pre-SG18 cache stores descriptors and histograms, not the 80
+late observation vectors. Therefore the complete requested feature set
+requires one resumable GPU replay. It stores only candidate-pixel values and
+labels temporarily; images, QK and full attention matrices are discarded.
+After exact AUCs and plots are written, temporary feature checkpoints are
+removed. Source maps are compared to SG18's cached M/L and any cross-run
+drift is reported. Code and specification: `configs/pre_sg19_late_support.json`,
+`src/segmentation/pre_sg19_late_support.py`,
+`scripts/{run,finalize}_pre_sg19_late_support.py`,
+`jobs/run_pre_sg19_late_support.slurm`, and
+`tests/test_pre_sg19_late_support.py`. Results go to
+`outputs/segmentation/analysis/pre_sg19_late_support/`. Numerical checks
+passed; one-VOC/one-COCO GPU smoke was submitted as job **235306**.

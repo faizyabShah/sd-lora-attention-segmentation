@@ -1,0 +1,16 @@
+{
+  "name": "Pre-SG19 late support of middle-stage additions",
+  "version": 1,
+  "track": "frozen training-free W class-word CA; SA module 15, all eight heads",
+  "middle_calls_inclusive": [10, 20],
+  "late_calls_inclusive": [21, 30],
+  "ca_threshold": 0.45,
+  "middle_thresholds": [0.425, 0.45],
+  "primary_middle_threshold": 0.425,
+  "epsilon": 1e-8,
+  "features": ["late_score", "late_minus_ca", "late_minus_middle", "retention_ratio", "late_up_consensus", "late_vs_middle_consensus", "late_median", "late_trimmed_mean", "late_std", "late_mad"],
+  "comparisons": ["tp_vs_fp", "tp_vs_fp_gt16", "tp_vs_fp_gt64", "tp_vs_fp_separate"],
+  "bin_feature_count": 3,
+  "diagnostic_only": true,
+  "no_method_construction": "no veto threshold, SG19 mask, COCO tuning, CRF, weighted averaging, or class-specific rule"
+}
