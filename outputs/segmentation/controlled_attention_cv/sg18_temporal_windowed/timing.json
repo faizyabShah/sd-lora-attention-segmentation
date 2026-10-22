@@ -1,0 +1,76 @@
+{
+  "image_id": "ovam-voc-sim-0",
+  "repeats": 3,
+  "selected_window": "W/T1",
+  "selected_is_diagnostic": false,
+  "same_UNet_and_attention_capture_for_all_methods": true,
+  "no_inference_speedup_claim": true,
+  "methods": {
+    "W/REF": {
+      "trials": [
+        {
+          "capture_seconds": 13.785504460334778,
+          "aggregation_seconds": 0.2193457931280136,
+          "end_to_end_seconds": 14.004939541220665
+        },
+        {
+          "capture_seconds": 16.087834656238556,
+          "aggregation_seconds": 0.2873823493719101,
+          "end_to_end_seconds": 16.375299155712128
+        },
+        {
+          "capture_seconds": 15.768270045518875,
+          "aggregation_seconds": 0.29546189308166504,
+          "end_to_end_seconds": 16.063819602131844
+        }
+      ],
+      "median_end_to_end_seconds": 16.063819602131844,
+      "median_capture_seconds": 15.768270045518875,
+      "median_aggregation_seconds": 0.2873823493719101
+    },
+    "W/T1": {
+      "trials": [
+        {
+          "capture_seconds": 15.20172107219696,
+          "aggregation_seconds": 0.08953520655632019,
+          "end_to_end_seconds": 15.291338130831718
+        },
+        {
+          "capture_seconds": 16.737902000546455,
+          "aggregation_seconds": 0.16414672136306763,
+          "end_to_end_seconds": 16.902132481336594
+        },
+        {
+          "capture_seconds": 16.369462490081787,
+          "aggregation_seconds": 0.07577861845493317,
+          "end_to_end_seconds": 16.445323705673218
+        }
+      ],
+      "median_end_to_end_seconds": 16.445323705673218,
+      "median_capture_seconds": 16.369462490081787,
+      "median_aggregation_seconds": 0.08953520655632019
+    },
+    "W/P1": {
+      "trials": [
+        {
+          "capture_seconds": 16.220828592777252,
+          "aggregation_seconds": 0.3024529367685318,
+          "end_to_end_seconds": 16.523363053798676
+        },
+        {
+          "capture_seconds": 16.701069205999374,
+          "aggregation_seconds": 0.3754022717475891,
+          "end_to_end_seconds": 17.07655893266201
+        },
+        {
+          "capture_seconds": 16.794876947999,
+          "aggregation_seconds": 0.3427601605653763,
+          "end_to_end_seconds": 17.13772539794445
+        }
+      ],
+      "median_end_to_end_seconds": 17.07655893266201,
+      "median_capture_seconds": 16.701069205999374,
+      "median_aggregation_seconds": 0.3427601605653763
+    }
+  }
+}

@@ -5500,3 +5500,24 @@ Production job **235290** was submitted on 21 October 2026 to one available
 GPU with no node constraint. It is resumable per image under the 12-hour
 allocation. Codex will leave this production run unmonitored as requested;
 the shared source and prerequisite evidence are in commit `6655ea4f5`.
+
+**Completed result, 22 October 2026; Claude review requested.** Job
+**235290** completed all 490 VOC and 707 COCO images, eight visual sheets,
+and timing. `W/T1` (calls 10–20) won all five VOC selection folds and passed
+promotion: OOF 0.7939 versus `W/REF` 0.7873 (+0.0066). At full-VOC frozen
+threshold 0.425 it scored 0.7959 versus 0.7886 (+0.0073); on untouched
+COCO-Cap it scored 0.6285 versus 0.6172 (+0.0113). `W/T2` and `W/T3` had
+positive forced OOF gains (+0.0063, +0.0043) but no fold votes. External
+two-pass `W/P1` scored 0.8006 VOC / 0.6245 COCO at its VOC threshold 0.45.
+The T1 mechanism at VOC-frozen thresholds retained 95.2%/96.9% of REF's
+CA-relative added true positives on VOC/COCO, while removing 18.8%/12.9%
+of REF's added false positives; relative to REF's final masks, T1 removed
+453,720/1,404,320 false-positive pixels and introduced 95,469/341,586.
+These are pooled pixel counts, not independent image-level effects. Paired
+mean-image IoU gains were +0.0074 [0.0051, 0.0099] VOC and +0.0105
+[0.0086, 0.0123] COCO (20,000 bootstrap resamples). Full per-class,
+fixed-threshold mechanism, per-image scores and figures are in the output
+folder's `SG18_CHATGPT_HANDOFF.md` and JSON/CSV artifacts. Claude should
+verify the frozen threshold handling, selection boundary, and whether the
+mechanism counts support the stated false-positive interpretation before
+paper integration.

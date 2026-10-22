@@ -1,0 +1,322 @@
+{
+  "spec": {
+    "name": "SG18 locked temporal-windowed one-pass SA propagation",
+    "version": 1,
+    "track": "training-free W class-word CA; module-15 SA, eight heads",
+    "calls": 31,
+    "heads": 8,
+    "windows": {
+      "W/T1": [
+        10,
+        21
+      ],
+      "W/T2": [
+        10,
+        31
+      ],
+      "W/T3": [
+        6,
+        31
+      ]
+    },
+    "names": [
+      "W/REF",
+      "W/T1",
+      "W/T2",
+      "W/T3",
+      "W/P1"
+    ],
+    "selection_reference": "W/REF",
+    "external_benchmark": "W/P1",
+    "threshold_source": "configs/sg12_crf_sg14_sg15.json: 17-value 0.30..0.70 grid",
+    "fold_source": "configs/voc_sim_folds.csv",
+    "selection": "existing five-fold run_screen; train-fold threshold, held-out OOF, >=4/5 vote and positive OOF guard; COCO transfer only",
+    "diagnostic_ca_threshold": 0.45,
+    "diagnostic_fixed_threshold": 0.45,
+    "normalization": "independent minmax at 64x64, then bilinear to annotation resolution",
+    "timing": "common live generation+attention capture and per-method post-capture aggregation; selected method benchmark uses three separate live generations after VOC selection",
+    "no_extra_methods": "no extra window, head selection, per-pixel gate, learned weights, structural weighting or DenseCRF",
+    "visual_classes": [
+      "bird",
+      "bicycle",
+      "cow",
+      "person",
+      "chair",
+      "dining-table"
+    ]
+  },
+  "screen": {
+    "reference": "W/REF",
+    "candidates": [
+      "W/T1",
+      "W/T2",
+      "W/T3"
+    ],
+    "folds": [
+      {
+        "fold": 0,
+        "chosen": "W/T1",
+        "chosen_threshold": 0.425,
+        "reference_threshold": 0.425,
+        "reason": "conditional",
+        "train_miou_chosen": 0.7961637959835021,
+        "train_miou_reference": 0.7899826103234513,
+        "heldout_miou_chosen": 0.7975219175963826,
+        "heldout_miou_reference": 0.7854325094473272
+      },
+      {
+        "fold": 1,
+        "chosen": "W/T1",
+        "chosen_threshold": 0.425,
+        "reference_threshold": 0.425,
+        "reason": "conditional",
+        "train_miou_chosen": 0.790838241650919,
+        "train_miou_reference": 0.782439164574923,
+        "heldout_miou_chosen": 0.8143598729415202,
+        "heldout_miou_reference": 0.8114629845226913
+      },
+      {
+        "fold": 2,
+        "chosen": "W/T1",
+        "chosen_threshold": 0.425,
+        "reference_threshold": 0.425,
+        "reason": "conditional",
+        "train_miou_chosen": 0.7976989932855885,
+        "train_miou_reference": 0.7900352971413419,
+        "heldout_miou_chosen": 0.7921847256237132,
+        "heldout_miou_reference": 0.7859288835630348
+      },
+      {
+        "fold": 3,
+        "chosen": "W/T1",
+        "chosen_threshold": 0.425,
+        "reference_threshold": 0.425,
+        "reason": "conditional",
+        "train_miou_chosen": 0.7981905938511588,
+        "train_miou_reference": 0.7910933800578149,
+        "heldout_miou_chosen": 0.7882113911769156,
+        "heldout_miou_reference": 0.7802225143747952
+      },
+      {
+        "fold": 4,
+        "chosen": "W/T1",
+        "chosen_threshold": 0.45,
+        "reference_threshold": 0.45,
+        "reason": "conditional",
+        "train_miou_chosen": 0.7970268796937203,
+        "train_miou_reference": 0.7908405984980044,
+        "heldout_miou_chosen": 0.7797320399039109,
+        "heldout_miou_reference": 0.7751596960962914
+      }
+    ],
+    "selection_counts": {
+      "W/T1": 5
+    },
+    "vote_winner": "W/T1",
+    "vote_winner_votes": 5,
+    "frozen": "W/T1",
+    "freeze_reason": "fold vote and OOF guard passed",
+    "oof_miou_selection": 0.7939157576113474,
+    "oof_miou_reference": 0.7872796745627143,
+    "oof_gain": 0.006636083048633057,
+    "full_threshold_frozen": 0.425,
+    "full_threshold_reference": 0.425,
+    "full_miou_frozen": 0.7959385008015902,
+    "full_miou_reference": 0.788609844206335,
+    "paired_oof": {
+      "mean": 0.006776878854453956,
+      "ci_low": 0.004673329428924703,
+      "ci_high": 0.008938697078616616,
+      "better": 355,
+      "worse": 135,
+      "ties": 0
+    }
+  },
+  "forced_oof": {
+    "W/T1": {
+      "candidate_miou": 0.7939157576113474,
+      "reference_miou": 0.7872796745627143,
+      "gain": 0.006636083048633057,
+      "fold_thresholds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.425
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.425
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.425
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.425
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.45,
+          "reference_threshold": 0.45
+        }
+      ],
+      "paired_mean_image_iou": {
+        "mean": 0.006776878854453956,
+        "ci_low": 0.004673329428924703,
+        "ci_high": 0.008938697078616616,
+        "better": 355,
+        "worse": 135,
+        "ties": 0
+      }
+    },
+    "W/T2": {
+      "candidate_miou": 0.7935794507959004,
+      "reference_miou": 0.7872796745627143,
+      "gain": 0.006299776233186116,
+      "fold_thresholds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.425
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.425
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.425
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.425
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.45
+        }
+      ],
+      "paired_mean_image_iou": {
+        "mean": 0.005415439550466122,
+        "ci_low": 0.003066213303687791,
+        "ci_high": 0.008013076515589218,
+        "better": 317,
+        "worse": 173,
+        "ties": 0
+      }
+    },
+    "W/T3": {
+      "candidate_miou": 0.7916057261319637,
+      "reference_miou": 0.7872796745627143,
+      "gain": 0.004326051569249367,
+      "fold_thresholds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.425
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.425
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.425
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.425
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.45,
+          "reference_threshold": 0.45
+        }
+      ],
+      "paired_mean_image_iou": {
+        "mean": 0.004425809432997947,
+        "ci_low": 0.0030208243813635675,
+        "ci_high": 0.005896625193967922,
+        "better": 358,
+        "worse": 132,
+        "ties": 0
+      }
+    },
+    "W/P1": {
+      "candidate_miou": 0.7996523496064184,
+      "reference_miou": 0.7872796745627143,
+      "gain": 0.012372675043704096,
+      "fold_thresholds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.45,
+          "reference_threshold": 0.425
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.45,
+          "reference_threshold": 0.425
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.45,
+          "reference_threshold": 0.425
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.45,
+          "reference_threshold": 0.425
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.475,
+          "reference_threshold": 0.45
+        }
+      ],
+      "paired_mean_image_iou": {
+        "mean": 0.014350835490911353,
+        "ci_low": 0.010763472988855797,
+        "ci_high": 0.017873452384545064,
+        "better": 365,
+        "worse": 125,
+        "ties": 0
+      }
+    }
+  },
+  "full_voc": {
+    "W/REF": {
+      "threshold": 0.425,
+      "voc_miou": 0.788609844206335
+    },
+    "W/T1": {
+      "threshold": 0.425,
+      "voc_miou": 0.7959385008015902
+    },
+    "W/T2": {
+      "threshold": 0.425,
+      "voc_miou": 0.7935794507959004
+    },
+    "W/T3": {
+      "threshold": 0.425,
+      "voc_miou": 0.7934518432737026
+    },
+    "W/P1": {
+      "threshold": 0.45,
+      "voc_miou": 0.8005846665606157
+    }
+  },
+  "promoted": true,
+  "illustrative_window": "W/T1",
+  "illustrative_is_diagnostic": false
+}
