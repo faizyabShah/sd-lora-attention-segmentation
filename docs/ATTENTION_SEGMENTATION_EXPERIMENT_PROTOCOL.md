@@ -5606,4 +5606,8 @@ drift is reported. Code and specification: `configs/pre_sg19_late_support.json`,
 `jobs/run_pre_sg19_late_support.slurm`, and
 `tests/test_pre_sg19_late_support.py`. Results go to
 `outputs/segmentation/analysis/pre_sg19_late_support/`. Numerical checks
-passed; one-VOC/one-COCO GPU smoke was submitted as job **235306**.
+passed. Initial one-VOC/one-COCO GPU smoke **235306** was canceled while
+stalled in neumann's scheduler prolog before Python started. Replacement
+smoke **235307** excludes neumann; production **235308** is queued with an
+`afterok:235307` dependency, so it starts only if the live smoke passes.
+There is no result claim while these jobs are pending.
