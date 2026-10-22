@@ -5577,6 +5577,19 @@ cannot be reduced to a single leakage story. Exact per-class, fixed-0.45
 and component/distance diagnostics are in
 `outputs/segmentation/analysis/sg18_late_diagnostic/`.
 
+**T1+DenseCRF completed (job 235305, 0:0):** all 490 VOC and 707 COCO
+images. T1+R2 versus the locked P1+R2 final reference gives full-VOC
+mIoU **0.8122 vs 0.8135** and frozen COCO **0.6465 vs 0.6375**. Forced
+VOC OOF is **0.8106 vs 0.8135** (−0.0029); the reference receives **5/5**
+fold votes, so T1+R2 is **not promoted** by the preregistered VOC policy.
+The COCO mean-image IoU delta is **+0.00496**, paired 95% CI
+**[+0.00085,+0.00891]**; 381/323/3 images improve/worsen/tie. At fixed
+0.45, T1+R2 COCO mIoU is 0.6510, but that is a diagnostic threshold and
+must not replace the frozen 0.425-transfer score. Full analyses and class
+tables: `outputs/segmentation/controlled_attention_cv/sg18_t1_crf/
+CHATGPT_HANDOFF.md`, `results.json`, `per_class_results.csv`. Claude should
+review the VOC-versus-COCO tradeoff before paper integration.
+
 ## 99. Pre-SG19 late support of middle-stage additions (Codex diagnostic; Claude may review)
 
 **Locked before running, 22 October 2026.** This is a diagnostic of whether
@@ -5726,3 +5739,20 @@ coverage explicitly if a shard fails rather than becoming permanently
 unsatisfied. No outcome is claimed while production runs. Codex owns the
 run and publishes the reduced results; Claude reviews the method,
 selection and interpretation afterward.
+
+**Outcome (22 October 2026):** GPU array **235322** produced all 490 VOC
+and 707 COCO image checkpoints; CPU merger **235326** completed 0:0 and
+verified coverage. T1 won **5/5 VOC fold votes**; no structural candidate
+was promoted. Forced VOC OOF mIoU is **0.7939 T1**, **0.7884 LM**,
+**0.7901 LM-RANK**, **0.7872 ENT**, and **0.7941 DIST**. DIST's +0.00017
+OOF delta is below the promotion guard; its frozen COCO 0.6287 versus
+T1 0.6285 is negligible. LM/ENT improve fixed-threshold TP/FP addition
+ratios but remove too many true-positive additions and reduce end-to-end
+mIoU on both datasets. Weight diagnostics show strong recurrent physical
+head preferences, especially DIST head 6. T1 replay differs from the
+saved SG18 map by only about 2×10⁻⁸ mean absolute value. SG21 is closed
+under the locked no-sweep rule. Full interpretation and all 20 class
+results: `outputs/segmentation/controlled_attention_cv/sg21_structural/
+CHATGPT_HANDOFF.md`, `results.json`, `per_class_iou.csv`,
+`weight_diagnostics.json`. Claude should validate the selection and
+structural-mechanism interpretation before paper integration.

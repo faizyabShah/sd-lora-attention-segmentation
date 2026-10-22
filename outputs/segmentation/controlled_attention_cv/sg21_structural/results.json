@@ -1,0 +1,3289 @@
+{
+  "spec": {
+    "name": "SG21 locked structural reliability weighting",
+    "version": 1,
+    "track": "training-free W class-word; SD1.5; SA module 15; one-pass",
+    "reference": "SG18/T1",
+    "names": [
+      "SG18/T1",
+      "SG21-LM",
+      "SG21-LM-RANK",
+      "SG21-ENT",
+      "SG21-DIST"
+    ],
+    "calls_inclusive": [
+      10,
+      20
+    ],
+    "heads": 8,
+    "epsilon": 1e-08,
+    "descriptors": [
+      "entropy",
+      "mean_distance",
+      "local_mass_r1"
+    ],
+    "rules": {
+      "SG21-LM": "raw local radius-1 mass, normalized within call",
+      "SG21-LM-RANK": "stable ascending local-mass ranks 1..8, normalized within call",
+      "SG21-ENT": "call maximum entropy minus head entropy plus epsilon, normalized within call",
+      "SG21-DIST": "inverse mean Euclidean distance plus epsilon, normalized within call"
+    },
+    "thresholds": [
+      0.3,
+      0.325,
+      0.35,
+      0.375,
+      0.4,
+      0.425,
+      0.45,
+      0.475,
+      0.5,
+      0.525,
+      0.55,
+      0.575,
+      0.6,
+      0.625,
+      0.65,
+      0.675,
+      0.7
+    ],
+    "folds": "configs/voc_sim_folds.csv",
+    "selection": "unchanged five-fold train-threshold/held-out OOF screen; 4/5 votes, positive OOF, magnitude and class-stability guards; COCO transfer only",
+    "normalization": "independent minmax at 64x64, bilinear to annotation resolution",
+    "diagnostic_threshold": 0.45,
+    "diagnostic_ca_threshold": 0.45,
+    "external_context": "historical SG18 W/P1 only, not candidate or selection reference",
+    "storage": "per-image counts, event counts, head weights and descriptors; no images, attention matrices, Q/K/V, or propagated maps",
+    "excluded": "no head subsets, combinations, temperatures, exponents, learned weights, COCO tuning, CRF, second pass, or extra windows"
+  },
+  "images": {
+    "voc": 490,
+    "coco": 707
+  },
+  "selection": {
+    "screen": {
+      "reference": "SG18/T1",
+      "candidates": [
+        "SG21-LM",
+        "SG21-LM-RANK",
+        "SG21-ENT",
+        "SG21-DIST"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "SG18/T1",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7961638076105594,
+          "train_miou_reference": 0.7961638076105594,
+          "heldout_miou_chosen": 0.797521995913357,
+          "heldout_miou_reference": 0.797521995913357
+        },
+        {
+          "fold": 1,
+          "chosen": "SG18/T1",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.790838269645352,
+          "train_miou_reference": 0.790838269645352,
+          "heldout_miou_chosen": 0.8143598729415202,
+          "heldout_miou_reference": 0.8143598729415202
+        },
+        {
+          "fold": 2,
+          "chosen": "SG18/T1",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7976990236204864,
+          "train_miou_reference": 0.7976990236204864,
+          "heldout_miou_chosen": 0.7921847256237132,
+          "heldout_miou_reference": 0.7921847256237132
+        },
+        {
+          "fold": 3,
+          "chosen": "SG18/T1",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7981906115424373,
+          "train_miou_reference": 0.7981906115424373,
+          "heldout_miou_chosen": 0.7882114447476128,
+          "heldout_miou_reference": 0.7882114447476128
+        },
+        {
+          "fold": 4,
+          "chosen": "SG18/T1",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7970268663592492,
+          "train_miou_reference": 0.7970268663592492,
+          "heldout_miou_chosen": 0.7797320399039109,
+          "heldout_miou_reference": 0.7797320399039109
+        }
+      ],
+      "selection_counts": {
+        "SG18/T1": 5
+      },
+      "vote_winner": "SG18/T1",
+      "vote_winner_votes": 5,
+      "frozen": "SG18/T1",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.7939157806711625,
+      "oof_miou_reference": 0.7939157806711625,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.425,
+      "full_threshold_reference": 0.425,
+      "full_miou_frozen": 0.7959385238800849,
+      "full_miou_reference": 0.7959385238800849,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "forced_oof": {
+      "SG21-LM": {
+        "candidate_miou": 0.7884057273640954,
+        "reference_miou": 0.7939157806711625,
+        "gain": -0.005510053307067109,
+        "folds": [
+          {
+            "fold": 0,
+            "candidate_threshold": 0.4,
+            "reference_threshold": 0.425,
+            "heldout_miou_candidate": 0.7893637238386826,
+            "heldout_miou_reference": 0.797521995913357
+          },
+          {
+            "fold": 1,
+            "candidate_threshold": 0.4,
+            "reference_threshold": 0.425,
+            "heldout_miou_candidate": 0.806728451430627,
+            "heldout_miou_reference": 0.8143598729415202
+          },
+          {
+            "fold": 2,
+            "candidate_threshold": 0.4,
+            "reference_threshold": 0.425,
+            "heldout_miou_candidate": 0.7850929399453145,
+            "heldout_miou_reference": 0.7921847256237132
+          },
+          {
+            "fold": 3,
+            "candidate_threshold": 0.4,
+            "reference_threshold": 0.425,
+            "heldout_miou_candidate": 0.7843934126880842,
+            "heldout_miou_reference": 0.7882114447476128
+          },
+          {
+            "fold": 4,
+            "candidate_threshold": 0.425,
+            "reference_threshold": 0.45,
+            "heldout_miou_candidate": 0.7770465963516058,
+            "heldout_miou_reference": 0.7797320399039109
+          }
+        ],
+        "heldout_fold_wins": 0,
+        "paired_mean_image_iou": {
+          "mean": -0.007780372771196323,
+          "ci_low": -0.009796840583998068,
+          "ci_high": -0.005742354224031892,
+          "better": 120,
+          "worse": 370,
+          "ties": 0
+        }
+      },
+      "SG21-LM-RANK": {
+        "candidate_miou": 0.7900562979262878,
+        "reference_miou": 0.7939157806711625,
+        "gain": -0.003859482744874687,
+        "folds": [
+          {
+            "fold": 0,
+            "candidate_threshold": 0.4,
+            "reference_threshold": 0.425,
+            "heldout_miou_candidate": 0.7906838109516003,
+            "heldout_miou_reference": 0.797521995913357
+          },
+          {
+            "fold": 1,
+            "candidate_threshold": 0.4,
+            "reference_threshold": 0.425,
+            "heldout_miou_candidate": 0.8085417686621372,
+            "heldout_miou_reference": 0.8143598729415202
+          },
+          {
+            "fold": 2,
+            "candidate_threshold": 0.4,
+            "reference_threshold": 0.425,
+            "heldout_miou_candidate": 0.7861638846602885,
+            "heldout_miou_reference": 0.7921847256237132
+          },
+          {
+            "fold": 3,
+            "candidate_threshold": 0.4,
+            "reference_threshold": 0.425,
+            "heldout_miou_candidate": 0.7847389189331957,
+            "heldout_miou_reference": 0.7882114447476128
+          },
+          {
+            "fold": 4,
+            "candidate_threshold": 0.425,
+            "reference_threshold": 0.45,
+            "heldout_miou_candidate": 0.7801425777373073,
+            "heldout_miou_reference": 0.7797320399039109
+          }
+        ],
+        "heldout_fold_wins": 1,
+        "paired_mean_image_iou": {
+          "mean": -0.006152212509727573,
+          "ci_low": -0.008087312506893589,
+          "ci_high": -0.004182520526292693,
+          "better": 111,
+          "worse": 379,
+          "ties": 0
+        }
+      },
+      "SG21-ENT": {
+        "candidate_miou": 0.7872081131156703,
+        "reference_miou": 0.7939157806711625,
+        "gain": -0.006707667555492236,
+        "folds": [
+          {
+            "fold": 0,
+            "candidate_threshold": 0.4,
+            "reference_threshold": 0.425,
+            "heldout_miou_candidate": 0.7883366812870816,
+            "heldout_miou_reference": 0.797521995913357
+          },
+          {
+            "fold": 1,
+            "candidate_threshold": 0.4,
+            "reference_threshold": 0.425,
+            "heldout_miou_candidate": 0.805669612048985,
+            "heldout_miou_reference": 0.8143598729415202
+          },
+          {
+            "fold": 2,
+            "candidate_threshold": 0.4,
+            "reference_threshold": 0.425,
+            "heldout_miou_candidate": 0.7838472571126276,
+            "heldout_miou_reference": 0.7921847256237132
+          },
+          {
+            "fold": 3,
+            "candidate_threshold": 0.4,
+            "reference_threshold": 0.425,
+            "heldout_miou_candidate": 0.782730402625424,
+            "heldout_miou_reference": 0.7882114447476128
+          },
+          {
+            "fold": 4,
+            "candidate_threshold": 0.425,
+            "reference_threshold": 0.45,
+            "heldout_miou_candidate": 0.7759589995554397,
+            "heldout_miou_reference": 0.7797320399039109
+          }
+        ],
+        "heldout_fold_wins": 0,
+        "paired_mean_image_iou": {
+          "mean": -0.008988029263889662,
+          "ci_low": -0.011153105637691544,
+          "ci_high": -0.006824806924839154,
+          "better": 120,
+          "worse": 370,
+          "ties": 0
+        }
+      },
+      "SG21-DIST": {
+        "candidate_miou": 0.7940848124519995,
+        "reference_miou": 0.7939157806711625,
+        "gain": 0.00016903178083693682,
+        "folds": [
+          {
+            "fold": 0,
+            "candidate_threshold": 0.425,
+            "reference_threshold": 0.425,
+            "heldout_miou_candidate": 0.7961720802268054,
+            "heldout_miou_reference": 0.797521995913357
+          },
+          {
+            "fold": 1,
+            "candidate_threshold": 0.425,
+            "reference_threshold": 0.425,
+            "heldout_miou_candidate": 0.8124283361220026,
+            "heldout_miou_reference": 0.8143598729415202
+          },
+          {
+            "fold": 2,
+            "candidate_threshold": 0.425,
+            "reference_threshold": 0.425,
+            "heldout_miou_candidate": 0.7900206835973782,
+            "heldout_miou_reference": 0.7921847256237132
+          },
+          {
+            "fold": 3,
+            "candidate_threshold": 0.425,
+            "reference_threshold": 0.425,
+            "heldout_miou_candidate": 0.7881392817980275,
+            "heldout_miou_reference": 0.7882114447476128
+          },
+          {
+            "fold": 4,
+            "candidate_threshold": 0.425,
+            "reference_threshold": 0.45,
+            "heldout_miou_candidate": 0.7850991400301346,
+            "heldout_miou_reference": 0.7797320399039109
+          }
+        ],
+        "heldout_fold_wins": 1,
+        "paired_mean_image_iou": {
+          "mean": -0.0004330734818002668,
+          "ci_low": -0.001794310870024735,
+          "ci_high": 0.0010589125584520704,
+          "better": 200,
+          "worse": 290,
+          "ties": 0
+        }
+      }
+    },
+    "frozen": "SG18/T1",
+    "promoted": false,
+    "screen_frozen_before_forced_oof_guard": "SG18/T1",
+    "promotion_reason": "no candidate passed all frozen promotion guards",
+    "full_voc_thresholds": {
+      "SG18/T1": 0.425,
+      "SG21-LM": 0.4,
+      "SG21-LM-RANK": 0.4,
+      "SG21-ENT": 0.4,
+      "SG21-DIST": 0.425
+    },
+    "reference_oof_miou": 0.7939157806711625
+  },
+  "metrics": {
+    "voc": {
+      "SG18/T1": {
+        "images": 490,
+        "threshold": 0.425,
+        "miou": 0.7959385238800849,
+        "gain_vs_t1": 0.0,
+        "precision": 0.8646010297700067,
+        "recall": 0.9015983158478736,
+        "pixel_iou": 0.7900490402029118,
+        "mean_image_iou": 0.7962608356421096,
+        "per_class_iou": {
+          "aeroplane": 0.8377132077087263,
+          "bicycle": 0.751772546018718,
+          "bird": 0.8544689469732684,
+          "boat": 0.8297601508088824,
+          "bottle": 0.870098819129308,
+          "bus": 0.9163688068310423,
+          "car": 0.8363539128632257,
+          "cat": 0.804500932190492,
+          "chair": 0.6621126857429516,
+          "cow": 0.8550248374734655,
+          "dining-table": 0.46465483866578766,
+          "dog": 0.9072730426754176,
+          "horse": 0.8749933940068888,
+          "motorbike": 0.8513312276883563,
+          "person": 0.6775417025837326,
+          "potted-plant": 0.7317002324556934,
+          "sheep": 0.7967796082526576,
+          "sofa": 0.9389277690045906,
+          "train": 0.6655942099778694,
+          "tv": 0.791799606550622
+        },
+        "per_class_delta_vs_t1": {
+          "aeroplane": 0.0,
+          "bicycle": 0.0,
+          "bird": 0.0,
+          "boat": 0.0,
+          "bottle": 0.0,
+          "bus": 0.0,
+          "car": 0.0,
+          "cat": 0.0,
+          "chair": 0.0,
+          "cow": 0.0,
+          "dining-table": 0.0,
+          "dog": 0.0,
+          "horse": 0.0,
+          "motorbike": 0.0,
+          "person": 0.0,
+          "potted-plant": 0.0,
+          "sheep": 0.0,
+          "sofa": 0.0,
+          "train": 0.0,
+          "tv": 0.0
+        },
+        "paired_mean_image_iou_vs_t1": {
+          "mean": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "better": 0,
+          "worse": 0,
+          "ties": 490
+        }
+      },
+      "SG21-LM": {
+        "images": 490,
+        "threshold": 0.4,
+        "miou": 0.7903234301671487,
+        "gain_vs_t1": -0.0056150937129362255,
+        "precision": 0.8559770197447136,
+        "recall": 0.9049490304409341,
+        "pixel_iou": 0.7853668726809983,
+        "mean_image_iou": 0.7883711702383656,
+        "per_class_iou": {
+          "aeroplane": 0.8208899911435608,
+          "bicycle": 0.7472895719020695,
+          "bird": 0.8446219559549565,
+          "boat": 0.8194746070722158,
+          "bottle": 0.8589857109689385,
+          "bus": 0.9141625734754876,
+          "car": 0.8324931137949078,
+          "cat": 0.7959999369034322,
+          "chair": 0.6272128772882225,
+          "cow": 0.8635215442877765,
+          "dining-table": 0.4613978292623783,
+          "dog": 0.9061457328124944,
+          "horse": 0.8661168959924812,
+          "motorbike": 0.8461497219355815,
+          "person": 0.6728858197990512,
+          "potted-plant": 0.7261156812751559,
+          "sheep": 0.8219784148548701,
+          "sofa": 0.9284141524785308,
+          "train": 0.6545450245913369,
+          "tv": 0.7980674475495226
+        },
+        "per_class_delta_vs_t1": {
+          "aeroplane": -0.0168232165651655,
+          "bicycle": -0.004482974116648553,
+          "bird": -0.00984699101831188,
+          "boat": -0.01028554373666668,
+          "bottle": -0.011113108160369478,
+          "bus": -0.0022062333555546987,
+          "car": -0.0038607990683179327,
+          "cat": -0.008500995287059832,
+          "chair": -0.034899808454729064,
+          "cow": 0.008496706814311028,
+          "dining-table": -0.003257009403409339,
+          "dog": -0.0011273098629231981,
+          "horse": -0.008876498014407597,
+          "motorbike": -0.005181505752774873,
+          "person": -0.004655882784681431,
+          "potted-plant": -0.005584551180537467,
+          "sheep": 0.02519880660221252,
+          "sofa": -0.010513616526059866,
+          "train": -0.011049185386532545,
+          "tv": 0.006267840998900653
+        },
+        "paired_mean_image_iou_vs_t1": {
+          "mean": -0.007889665403743952,
+          "ci_low": -0.00987475953477391,
+          "ci_high": -0.005927896976825691,
+          "better": 116,
+          "worse": 374,
+          "ties": 0
+        }
+      },
+      "SG21-LM-RANK": {
+        "images": 490,
+        "threshold": 0.4,
+        "miou": 0.7917731567663903,
+        "gain_vs_t1": -0.00416536711369464,
+        "precision": 0.8552296960041844,
+        "recall": 0.9082410497895598,
+        "pixel_iou": 0.7872120186279057,
+        "mean_image_iou": 0.7898272474958841,
+        "per_class_iou": {
+          "aeroplane": 0.8218491900517052,
+          "bicycle": 0.7451899725527598,
+          "bird": 0.845967476819015,
+          "boat": 0.8179857166330553,
+          "bottle": 0.8599984023857706,
+          "bus": 0.9132259818597402,
+          "car": 0.8298815507080491,
+          "cat": 0.8058881591304269,
+          "chair": 0.6305024299345643,
+          "cow": 0.8663780777318946,
+          "dining-table": 0.4592931670845829,
+          "dog": 0.9089118590588627,
+          "horse": 0.8684587901200442,
+          "motorbike": 0.8453633898491174,
+          "person": 0.6808985882901767,
+          "potted-plant": 0.7324446071327188,
+          "sheep": 0.8231663386125905,
+          "sofa": 0.928856010555982,
+          "train": 0.6517697367646694,
+          "tv": 0.7994336900520802
+        },
+        "per_class_delta_vs_t1": {
+          "aeroplane": -0.015864017657021057,
+          "bicycle": -0.0065825734659582524,
+          "bird": -0.008501470154253399,
+          "boat": -0.011774434175827131,
+          "bottle": -0.010100416743537344,
+          "bus": -0.0031428249713020273,
+          "car": -0.0064723621551765476,
+          "cat": 0.0013872269399348713,
+          "chair": -0.03161025580838728,
+          "cow": 0.011353240258429098,
+          "dining-table": -0.005361671581204763,
+          "dog": 0.0016388163834450964,
+          "horse": -0.00653460388684457,
+          "motorbike": -0.005967837839238932,
+          "person": 0.0033568857064441016,
+          "potted-plant": 0.0007443746770253723,
+          "sheep": 0.026386730359932886,
+          "sofa": -0.010071758448608636,
+          "train": -0.013824473213200017,
+          "tv": 0.007634083501458222
+        },
+        "paired_mean_image_iou_vs_t1": {
+          "mean": -0.00643358814622558,
+          "ci_low": -0.008311934463447355,
+          "ci_high": -0.004544728002501298,
+          "better": 110,
+          "worse": 380,
+          "ties": 0
+        }
+      },
+      "SG21-ENT": {
+        "images": 490,
+        "threshold": 0.4,
+        "miou": 0.7891898133353559,
+        "gain_vs_t1": -0.006748710544729031,
+        "precision": 0.8552032672344185,
+        "recall": 0.9043610902857059,
+        "pixel_iou": 0.78427333445779,
+        "mean_image_iou": 0.7872367725883239,
+        "per_class_iou": {
+          "aeroplane": 0.815732099232932,
+          "bicycle": 0.7435872528729156,
+          "bird": 0.8441858947578434,
+          "boat": 0.8177688943159868,
+          "bottle": 0.8573010861010129,
+          "bus": 0.9153140347982791,
+          "car": 0.8318266390511911,
+          "cat": 0.7927933031436272,
+          "chair": 0.6246970411776199,
+          "cow": 0.8635289446911987,
+          "dining-table": 0.46236534974217186,
+          "dog": 0.907134435956791,
+          "horse": 0.8654689061737318,
+          "motorbike": 0.8456184020684828,
+          "person": 0.672494042748728,
+          "potted-plant": 0.7250713374219285,
+          "sheep": 0.8184674222390053,
+          "sofa": 0.9275470558745784,
+          "train": 0.6546645738853349,
+          "tv": 0.7982295504537608
+        },
+        "per_class_delta_vs_t1": {
+          "aeroplane": -0.021981108475794264,
+          "bicycle": -0.008185293145802408,
+          "bird": -0.010283052215424915,
+          "boat": -0.011991256492895674,
+          "bottle": -0.012797733028295122,
+          "bus": -0.0010547720327631627,
+          "car": -0.004527273812034549,
+          "cat": -0.011707629046864843,
+          "chair": -0.03741564456533164,
+          "cow": 0.008504107217733203,
+          "dining-table": -0.002289488923615801,
+          "dog": -0.00013860671862664375,
+          "horse": -0.009524487833156958,
+          "motorbike": -0.005712825619873518,
+          "person": -0.005047659835004548,
+          "potted-plant": -0.006628895033764848,
+          "sheep": 0.02168781398634767,
+          "sofa": -0.01138071313001221,
+          "train": -0.0109296360925345,
+          "tv": 0.0064299439031387795
+        },
+        "paired_mean_image_iou_vs_t1": {
+          "mean": -0.009024063053785647,
+          "ci_low": -0.011141887932146429,
+          "ci_high": -0.006926239498240506,
+          "better": 118,
+          "worse": 372,
+          "ties": 0
+        }
+      },
+      "SG21-DIST": {
+        "images": 490,
+        "threshold": 0.425,
+        "miou": 0.7940848124519995,
+        "gain_vs_t1": -0.001853711428085436,
+        "precision": 0.8659651948412176,
+        "recall": 0.8967463857925145,
+        "pixel_iou": 0.787449122294003,
+        "mean_image_iou": 0.7945552205414959,
+        "per_class_iou": {
+          "aeroplane": 0.8363225591552239,
+          "bicycle": 0.7524480464062913,
+          "bird": 0.8543261323681332,
+          "boat": 0.8306334009545642,
+          "bottle": 0.8708529916598444,
+          "bus": 0.9186086346203658,
+          "car": 0.8403814100824919,
+          "cat": 0.789530669109756,
+          "chair": 0.659064236172324,
+          "cow": 0.849324782348641,
+          "dining-table": 0.4680911568978517,
+          "dog": 0.9059183367620812,
+          "horse": 0.8729090739904886,
+          "motorbike": 0.8534287143774036,
+          "person": 0.6653157347402259,
+          "potted-plant": 0.7240659238107906,
+          "sheep": 0.7922759167060841,
+          "sofa": 0.9380731712234277,
+          "train": 0.670627928631252,
+          "tv": 0.7894974290227474
+        },
+        "per_class_delta_vs_t1": {
+          "aeroplane": -0.0013906485535023494,
+          "bicycle": 0.0006755003875732468,
+          "bird": -0.00014281460513521083,
+          "boat": 0.0008732501456817365,
+          "bottle": 0.0007541725305364455,
+          "bus": 0.002239827789323523,
+          "car": 0.004027497219266207,
+          "cat": -0.014970263080736013,
+          "chair": -0.003048449570627554,
+          "cow": -0.005700055124824521,
+          "dining-table": 0.0034363182320640284,
+          "dog": -0.001354705913336418,
+          "horse": -0.002084320016400243,
+          "motorbike": 0.002097486689047301,
+          "person": -0.012225967843506713,
+          "potted-plant": -0.007634308644902776,
+          "sheep": -0.004503691546573485,
+          "sofa": -0.0008545977811629246,
+          "train": 0.005033718653382535,
+          "tv": -0.0023021775278745382
+        },
+        "paired_mean_image_iou_vs_t1": {
+          "mean": -0.0017056151006138564,
+          "ci_low": -0.00240961066494808,
+          "ci_high": -0.0010179580897062093,
+          "better": 196,
+          "worse": 294,
+          "ties": 0
+        }
+      }
+    },
+    "coco": {
+      "SG18/T1": {
+        "images": 707,
+        "threshold": 0.425,
+        "miou": 0.6284749917666492,
+        "gain_vs_t1": 0.0,
+        "precision": 0.6755397345008517,
+        "recall": 0.8669557503509369,
+        "pixel_iou": 0.6120852937495131,
+        "mean_image_iou": 0.6476086586772017,
+        "per_class_iou": {
+          "aeroplane": 0.609615638980743,
+          "bicycle": 0.6079129474669823,
+          "bird": 0.716667554097802,
+          "boat": 0.5368311506476545,
+          "bottle": 0.46553349561693563,
+          "bus": 0.9261819039862381,
+          "car": 0.5711996953278724,
+          "cat": 0.8329906588678749,
+          "chair": 0.43137997595342686,
+          "cow": 0.8158030069354931,
+          "dining table": 0.36314296673008584,
+          "dog": 0.7489746626980648,
+          "horse": 0.654399266747225,
+          "motorbike": 0.6328459003136413,
+          "person": 0.22705941081004954,
+          "potted plant": 0.6531244279822984,
+          "sheep": 0.8668726688520019,
+          "sofa": 0.6007006725021896,
+          "train": 0.6171503242343372,
+          "tv": 0.6911135065820675
+        },
+        "per_class_delta_vs_t1": {
+          "aeroplane": 0.0,
+          "bicycle": 0.0,
+          "bird": 0.0,
+          "boat": 0.0,
+          "bottle": 0.0,
+          "bus": 0.0,
+          "car": 0.0,
+          "cat": 0.0,
+          "chair": 0.0,
+          "cow": 0.0,
+          "dining table": 0.0,
+          "dog": 0.0,
+          "horse": 0.0,
+          "motorbike": 0.0,
+          "person": 0.0,
+          "potted plant": 0.0,
+          "sheep": 0.0,
+          "sofa": 0.0,
+          "train": 0.0,
+          "tv": 0.0
+        },
+        "paired_mean_image_iou_vs_t1": {
+          "mean": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "better": 0,
+          "worse": 0,
+          "ties": 707
+        }
+      },
+      "SG21-LM": {
+        "images": 707,
+        "threshold": 0.4,
+        "miou": 0.6193471168590888,
+        "gain_vs_t1": -0.009127874907560396,
+        "precision": 0.6690571942591389,
+        "recall": 0.860891278591805,
+        "pixel_iou": 0.6037818257855929,
+        "mean_image_iou": 0.6366528043599617,
+        "per_class_iou": {
+          "aeroplane": 0.5938175065995945,
+          "bicycle": 0.6104863720263471,
+          "bird": 0.7120019141572468,
+          "boat": 0.5328607367971187,
+          "bottle": 0.4605706727744891,
+          "bus": 0.9261727831607628,
+          "car": 0.5621932557717257,
+          "cat": 0.8208736156977267,
+          "chair": 0.42457690012951294,
+          "cow": 0.8040085483373695,
+          "dining table": 0.3591295830170297,
+          "dog": 0.745856592531913,
+          "horse": 0.6446673476969499,
+          "motorbike": 0.6294663660519875,
+          "person": 0.20667981153696616,
+          "potted plant": 0.6294596310556329,
+          "sheep": 0.8530107749013297,
+          "sofa": 0.5887223687037912,
+          "train": 0.6023205454954653,
+          "tv": 0.6800670107388173
+        },
+        "per_class_delta_vs_t1": {
+          "aeroplane": -0.015798132381148466,
+          "bicycle": 0.002573424559364823,
+          "bird": -0.004665639940555244,
+          "boat": -0.00397041385053587,
+          "bottle": -0.004962822842446535,
+          "bus": -9.120825475328331e-06,
+          "car": -0.009006439556146661,
+          "cat": -0.012117043170148278,
+          "chair": -0.006803075823913929,
+          "cow": -0.01179445859812367,
+          "dining table": -0.004013383713056151,
+          "dog": -0.003118070166151732,
+          "horse": -0.00973191905027515,
+          "motorbike": -0.003379534261653827,
+          "person": -0.020379599273083387,
+          "potted plant": -0.023664796926665566,
+          "sheep": -0.013861893950672166,
+          "sofa": -0.011978303798398371,
+          "train": -0.014829778738871924,
+          "tv": -0.011046495843250237
+        },
+        "paired_mean_image_iou_vs_t1": {
+          "mean": -0.010955854317239968,
+          "ci_low": -0.013002378056319036,
+          "ci_high": -0.008983475148501677,
+          "better": 193,
+          "worse": 513,
+          "ties": 1
+        }
+      },
+      "SG21-LM-RANK": {
+        "images": 707,
+        "threshold": 0.4,
+        "miou": 0.6200138662493194,
+        "gain_vs_t1": -0.008461125517329804,
+        "precision": 0.666869092454209,
+        "recall": 0.8661811934019648,
+        "pixel_iou": 0.604581200816128,
+        "mean_image_iou": 0.6372354818908402,
+        "per_class_iou": {
+          "aeroplane": 0.5920651259878639,
+          "bicycle": 0.6047044918572131,
+          "bird": 0.7101668523394774,
+          "boat": 0.5296937542103887,
+          "bottle": 0.45849769737445645,
+          "bus": 0.9257050464897674,
+          "car": 0.5624148480814771,
+          "cat": 0.824521450753903,
+          "chair": 0.4243214319406947,
+          "cow": 0.8112154458605852,
+          "dining table": 0.366141000445427,
+          "dog": 0.7464271057199635,
+          "horse": 0.6434604403522577,
+          "motorbike": 0.6263995081011198,
+          "person": 0.2165522711326683,
+          "potted plant": 0.6338047770418966,
+          "sheep": 0.8548033828421945,
+          "sofa": 0.5874674355803559,
+          "train": 0.6015798037625778,
+          "tv": 0.6803354551121017
+        },
+        "per_class_delta_vs_t1": {
+          "aeroplane": -0.01755051299287913,
+          "bicycle": -0.003208455609769234,
+          "bird": -0.006500701758324623,
+          "boat": -0.007137396437265853,
+          "bottle": -0.007035798242479185,
+          "bus": -0.0004768574964707506,
+          "car": -0.008784847246395278,
+          "cat": -0.008469208113971893,
+          "chair": -0.007058544012732149,
+          "cow": -0.0045875610749078755,
+          "dining table": 0.0029980337153411862,
+          "dog": -0.002547556978101273,
+          "horse": -0.01093882639496735,
+          "motorbike": -0.006446392212521523,
+          "person": -0.010507139677381233,
+          "potted plant": -0.019319650940401778,
+          "sheep": -0.01206928600980739,
+          "sofa": -0.013233236921833758,
+          "train": -0.015570520471759441,
+          "tv": -0.0107780514699658
+        },
+        "paired_mean_image_iou_vs_t1": {
+          "mean": -0.010373176786361614,
+          "ci_low": -0.012000477957216689,
+          "ci_high": -0.008796179251680001,
+          "better": 173,
+          "worse": 533,
+          "ties": 1
+        }
+      },
+      "SG21-ENT": {
+        "images": 707,
+        "threshold": 0.4,
+        "miou": 0.6200992950889862,
+        "gain_vs_t1": -0.008375696677663025,
+        "precision": 0.6695839923627491,
+        "recall": 0.8614525071414305,
+        "pixel_iou": 0.6044872115989275,
+        "mean_image_iou": 0.6369795726425772,
+        "per_class_iou": {
+          "aeroplane": 0.5954590680616519,
+          "bicycle": 0.6086439214573306,
+          "bird": 0.7136362405581514,
+          "boat": 0.5350671643160936,
+          "bottle": 0.4606003521343528,
+          "bus": 0.9275538512566831,
+          "car": 0.5644572520100407,
+          "cat": 0.8209846046838939,
+          "chair": 0.4238110783181072,
+          "cow": 0.8016590898068744,
+          "dining table": 0.3581368800623335,
+          "dog": 0.7466148630050897,
+          "horse": 0.64587743330493,
+          "motorbike": 0.6291436168063028,
+          "person": 0.21249867140827125,
+          "potted plant": 0.6323424032437817,
+          "sheep": 0.8522716349342844,
+          "sofa": 0.5899257648281487,
+          "train": 0.6027490241110572,
+          "tv": 0.6805529874723463
+        },
+        "per_class_delta_vs_t1": {
+          "aeroplane": -0.01415657091909106,
+          "bicycle": 0.0007309739903482715,
+          "bird": -0.003031313539650582,
+          "boat": -0.0017639863315609405,
+          "bottle": -0.004933143482582836,
+          "bus": 0.0013719472704449842,
+          "car": -0.006742443317831692,
+          "cat": -0.01200605418398104,
+          "chair": -0.007568897635319649,
+          "cow": -0.014143917128618733,
+          "dining table": -0.005006086667752319,
+          "dog": -0.002359799692975062,
+          "horse": -0.008521833442295068,
+          "motorbike": -0.0037022835073384774,
+          "person": -0.014560739401778294,
+          "potted plant": -0.020782024738516758,
+          "sheep": -0.014601033917717499,
+          "sofa": -0.010774907674040879,
+          "train": -0.014401300123280003,
+          "tv": -0.010560519109721223
+        },
+        "paired_mean_image_iou_vs_t1": {
+          "mean": -0.01062908603462454,
+          "ci_low": -0.01276816632845998,
+          "ci_high": -0.008533481217975808,
+          "better": 204,
+          "worse": 502,
+          "ties": 1
+        }
+      },
+      "SG21-DIST": {
+        "images": 707,
+        "threshold": 0.425,
+        "miou": 0.6287117081389957,
+        "gain_vs_t1": 0.00023671637234645715,
+        "precision": 0.680191124155305,
+        "recall": 0.8598481376908685,
+        "pixel_iou": 0.6123057218178529,
+        "mean_image_iou": 0.6478761618755927,
+        "per_class_iou": {
+          "aeroplane": 0.615593577700011,
+          "bicycle": 0.6148474174572188,
+          "bird": 0.7197899174982254,
+          "boat": 0.542976135150148,
+          "bottle": 0.4691447683657206,
+          "bus": 0.9296964616198521,
+          "car": 0.5639231615949069,
+          "cat": 0.8281455551605694,
+          "chair": 0.42899113873018585,
+          "cow": 0.8087050934978561,
+          "dining table": 0.35391289550290694,
+          "dog": 0.7491581904286708,
+          "horse": 0.6568244419134308,
+          "motorbike": 0.6372766144472669,
+          "person": 0.2187794032834932,
+          "potted plant": 0.6534784017615387,
+          "sheep": 0.8653939846765316,
+          "sofa": 0.6061015093052338,
+          "train": 0.6205091717830437,
+          "tv": 0.6909863229031064
+        },
+        "per_class_delta_vs_t1": {
+          "aeroplane": 0.0059779387192679945,
+          "bicycle": 0.006934469990236503,
+          "bird": 0.003122363400423378,
+          "boat": 0.006144984502493456,
+          "bottle": 0.003611272748784977,
+          "bus": 0.0035145576336139683,
+          "car": -0.007276533732965551,
+          "cat": -0.004845103707305509,
+          "chair": -0.0023888372232410138,
+          "cow": -0.0070979134376369935,
+          "dining table": -0.009230071227178893,
+          "dog": 0.00018352773060603678,
+          "horse": 0.002425175166205773,
+          "motorbike": 0.004430714133625613,
+          "person": -0.008280007526556332,
+          "potted plant": 0.00035397377924029083,
+          "sheep": -0.0014786841754702573,
+          "sofa": 0.005400836803044151,
+          "train": 0.0033588475487064118,
+          "tv": -0.00012718367896114025
+        },
+        "paired_mean_image_iou_vs_t1": {
+          "mean": 0.000267503198391032,
+          "ci_low": -0.0008196976996754757,
+          "ci_high": 0.001229739765596801,
+          "better": 370,
+          "worse": 336,
+          "ties": 1
+        }
+      }
+    }
+  },
+  "mechanism_fixed_0p45": {
+    "voc": {
+      "SG18/T1": {
+        "tp_add": 5370527,
+        "fp_add": 1539078,
+        "fp_gt16": 699620,
+        "fp_gt64": 305945,
+        "fp_separate": 53984,
+        "useful_remove": 2639606,
+        "harmful_remove": 638419,
+        "tp_fp_ratio": 3.4894443296571063,
+        "tp_fraction_additions": 0.7772552844916605,
+        "fp_gt16_fraction": 0.454570853459019,
+        "fp_gt64_fraction": 0.1987845970119773,
+        "fp_separate_fraction": 0.03507554522902673,
+        "useful_change_fraction": 0.7862606906611254
+      },
+      "SG21-LM": {
+        "tp_add": 4391602,
+        "fp_add": 1182572,
+        "fp_gt16": 522402,
+        "fp_gt64": 231564,
+        "fp_separate": 36873,
+        "useful_remove": 2619378,
+        "harmful_remove": 712325,
+        "tp_fp_ratio": 3.713602216186414,
+        "tp_fraction_additions": 0.7878480291429726,
+        "fp_gt16_fraction": 0.4417506925582544,
+        "fp_gt64_fraction": 0.19581387010685183,
+        "fp_separate_fraction": 0.031180342507686636,
+        "useful_change_fraction": 0.7872307241611354
+      },
+      "SG21-LM-RANK": {
+        "tp_add": 4624007,
+        "fp_add": 1253214,
+        "fp_gt16": 558096,
+        "fp_gt64": 246922,
+        "fp_separate": 39833,
+        "useful_remove": 2626964,
+        "harmful_remove": 695702,
+        "tp_fp_ratio": 3.6897185955471294,
+        "tp_fraction_additions": 0.7867675896482368,
+        "fp_gt16_fraction": 0.4453317629710488,
+        "fp_gt64_fraction": 0.19703099390846257,
+        "fp_separate_fraction": 0.03178467524301516,
+        "useful_change_fraction": 0.7881587023840619
+      },
+      "SG21-ENT": {
+        "tp_add": 4355873,
+        "fp_add": 1180977,
+        "fp_gt16": 519566,
+        "fp_gt64": 227105,
+        "fp_separate": 33144,
+        "useful_remove": 2580654,
+        "harmful_remove": 709549,
+        "tp_fp_ratio": 3.6883639562836534,
+        "tp_fraction_additions": 0.7867059790313987,
+        "fp_gt16_fraction": 0.439945909192135,
+        "fp_gt64_fraction": 0.19230264433600316,
+        "fp_separate_fraction": 0.02806489880835952,
+        "useful_change_fraction": 0.7858259149457922
+      },
+      "SG21-DIST": {
+        "tp_add": 5092536,
+        "fp_add": 1424951,
+        "fp_gt16": 637850,
+        "fp_gt64": 278512,
+        "fp_separate": 49704,
+        "useful_remove": 2628280,
+        "harmful_remove": 654784,
+        "tp_fp_ratio": 3.573832363358459,
+        "tp_fraction_additions": 0.7813649647479158,
+        "fp_gt16_fraction": 0.44762942725749866,
+        "fp_gt64_fraction": 0.19545373840925057,
+        "fp_separate_fraction": 0.03488119942369948,
+        "useful_change_fraction": 0.7877940740270624
+      }
+    },
+    "coco": {
+      "SG18/T1": {
+        "tp_add": 7729557,
+        "fp_add": 8217193,
+        "fp_gt16": 6372720,
+        "fp_gt64": 4298183,
+        "fp_separate": 905373,
+        "useful_remove": 2265157,
+        "harmful_remove": 432071,
+        "tp_fp_ratio": 0.9406566208192992,
+        "tp_fraction_additions": 0.484710489598194,
+        "fp_gt16_fraction": 0.7755349058979143,
+        "fp_gt64_fraction": 0.5230719297940306,
+        "fp_separate_fraction": 0.11018032556859746,
+        "useful_change_fraction": 0.5360826965146601
+      },
+      "SG21-LM": {
+        "tp_add": 6666409,
+        "fp_add": 6637107,
+        "fp_gt16": 5113332,
+        "fp_gt64": 3476477,
+        "fp_separate": 790954,
+        "useful_remove": 2288106,
+        "harmful_remove": 497485,
+        "tp_fp_ratio": 1.0044148753364983,
+        "tp_fraction_additions": 0.5011012878099294,
+        "fp_gt16_fraction": 0.770415785070212,
+        "fp_gt64_fraction": 0.5237940265239057,
+        "fp_separate_fraction": 0.11917150047452904,
+        "useful_change_fraction": 0.5565576137942274
+      },
+      "SG21-LM-RANK": {
+        "tp_add": 6894024,
+        "fp_add": 6932155,
+        "fp_gt16": 5351131,
+        "fp_gt64": 3629069,
+        "fp_separate": 803132,
+        "useful_remove": 2295664,
+        "harmful_remove": 483466,
+        "tp_fp_ratio": 0.9944994017012025,
+        "tp_fraction_additions": 0.49862105792207667,
+        "fp_gt16_fraction": 0.77192893119095,
+        "fp_gt64_fraction": 0.5235123853981914,
+        "fp_separate_fraction": 0.11585603610998312,
+        "useful_change_fraction": 0.553418668692043
+      },
+      "SG21-ENT": {
+        "tp_add": 6685478,
+        "fp_add": 6636041,
+        "fp_gt16": 5101772,
+        "fp_gt64": 3454581,
+        "fp_separate": 761459,
+        "useful_remove": 2279335,
+        "harmful_remove": 488048,
+        "tp_fp_ratio": 1.0074497731403407,
+        "tp_fraction_additions": 0.5018555316401981,
+        "fp_gt16_fraction": 0.7687975405818017,
+        "fp_gt64_fraction": 0.520578610047768,
+        "fp_separate_fraction": 0.11474597580093311,
+        "useful_change_fraction": 0.557204773824839
+      },
+      "SG21-DIST": {
+        "tp_add": 7422016,
+        "fp_add": 7735188,
+        "fp_gt16": 5984883,
+        "fp_gt64": 4042793,
+        "fp_separate": 844357,
+        "useful_remove": 2269078,
+        "harmful_remove": 441801,
+        "tp_fp_ratio": 0.9595133305098725,
+        "tp_fraction_additions": 0.489669202842424,
+        "fp_gt16_fraction": 0.7737217246691354,
+        "fp_gt64_fraction": 0.5226496111018892,
+        "fp_separate_fraction": 0.10915791574813695,
+        "useful_change_fraction": 0.54236898272747
+      }
+    }
+  },
+  "weights": {
+    "voc": {
+      "SG21-LM": {
+        "effective_heads": {
+          "mean": 5.721935749053955,
+          "median": 5.728175163269043,
+          "min": 4.847899913787842,
+          "max": 7.170637607574463,
+          "per_call": [
+            {
+              "call": 10,
+              "mean": 5.859509468078613,
+              "median": 5.900489807128906,
+              "min": 4.916577339172363,
+              "max": 7.170637607574463
+            },
+            {
+              "call": 11,
+              "mean": 5.802156448364258,
+              "median": 5.830530643463135,
+              "min": 4.928989410400391,
+              "max": 7.010100841522217
+            },
+            {
+              "call": 12,
+              "mean": 5.762005805969238,
+              "median": 5.778387069702148,
+              "min": 4.887145042419434,
+              "max": 6.877224445343018
+            },
+            {
+              "call": 13,
+              "mean": 5.733684539794922,
+              "median": 5.756765365600586,
+              "min": 4.872386932373047,
+              "max": 6.794236660003662
+            },
+            {
+              "call": 14,
+              "mean": 5.711252689361572,
+              "median": 5.718451023101807,
+              "min": 4.893483638763428,
+              "max": 6.753604412078857
+            },
+            {
+              "call": 15,
+              "mean": 5.696823596954346,
+              "median": 5.700469017028809,
+              "min": 4.871237277984619,
+              "max": 6.706153392791748
+            },
+            {
+              "call": 16,
+              "mean": 5.685555934906006,
+              "median": 5.671219348907471,
+              "min": 4.875715732574463,
+              "max": 6.664060592651367
+            },
+            {
+              "call": 17,
+              "mean": 5.67778205871582,
+              "median": 5.670361042022705,
+              "min": 4.888230323791504,
+              "max": 6.5936808586120605
+            },
+            {
+              "call": 18,
+              "mean": 5.67288875579834,
+              "median": 5.650547981262207,
+              "min": 4.910084247589111,
+              "max": 6.546834468841553
+            },
+            {
+              "call": 19,
+              "mean": 5.6704182624816895,
+              "median": 5.646787643432617,
+              "min": 4.880069732666016,
+              "max": 6.538004398345947
+            },
+            {
+              "call": 20,
+              "mean": 5.669216632843018,
+              "median": 5.650280952453613,
+              "min": 4.847899913787842,
+              "max": 6.553889751434326
+            }
+          ]
+        },
+        "top_head_fraction": [
+          0.5866419294990723,
+          0.0,
+          0.06753246753246753,
+          0.0,
+          0.0,
+          0.3393320964749536,
+          0.006493506493506494,
+          0.0
+        ],
+        "top_head_fraction_per_call": [
+          {
+            "call": 10,
+            "fractions": [
+              0.8510204081632653,
+              0.0,
+              0.02857142857142857,
+              0.0,
+              0.0,
+              0.08979591836734693,
+              0.030612244897959183,
+              0.0
+            ]
+          },
+          {
+            "call": 11,
+            "fractions": [
+              0.8285714285714286,
+              0.0,
+              0.03469387755102041,
+              0.0,
+              0.0,
+              0.12244897959183673,
+              0.014285714285714285,
+              0.0
+            ]
+          },
+          {
+            "call": 12,
+            "fractions": [
+              0.763265306122449,
+              0.0,
+              0.04897959183673469,
+              0.0,
+              0.0,
+              0.17755102040816326,
+              0.01020408163265306,
+              0.0
+            ]
+          },
+          {
+            "call": 13,
+            "fractions": [
+              0.7122448979591837,
+              0.0,
+              0.061224489795918366,
+              0.0,
+              0.0,
+              0.22040816326530613,
+              0.006122448979591836,
+              0.0
+            ]
+          },
+          {
+            "call": 14,
+            "fractions": [
+              0.6387755102040816,
+              0.0,
+              0.0673469387755102,
+              0.0,
+              0.0,
+              0.29183673469387755,
+              0.0020408163265306124,
+              0.0
+            ]
+          },
+          {
+            "call": 15,
+            "fractions": [
+              0.5877551020408164,
+              0.0,
+              0.07346938775510205,
+              0.0,
+              0.0,
+              0.336734693877551,
+              0.0020408163265306124,
+              0.0
+            ]
+          },
+          {
+            "call": 16,
+            "fractions": [
+              0.5244897959183673,
+              0.0,
+              0.07959183673469387,
+              0.0,
+              0.0,
+              0.39387755102040817,
+              0.0020408163265306124,
+              0.0
+            ]
+          },
+          {
+            "call": 17,
+            "fractions": [
+              0.46122448979591835,
+              0.0,
+              0.07551020408163266,
+              0.0,
+              0.0,
+              0.46122448979591835,
+              0.0020408163265306124,
+              0.0
+            ]
+          },
+          {
+            "call": 18,
+            "fractions": [
+              0.4163265306122449,
+              0.0,
+              0.08163265306122448,
+              0.0,
+              0.0,
+              0.5,
+              0.0020408163265306124,
+              0.0
+            ]
+          },
+          {
+            "call": 19,
+            "fractions": [
+              0.3653061224489796,
+              0.0,
+              0.08775510204081632,
+              0.0,
+              0.0,
+              0.5469387755102041,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "call": 20,
+            "fractions": [
+              0.3040816326530612,
+              0.0,
+              0.10408163265306122,
+              0.0,
+              0.0,
+              0.5918367346938775,
+              0.0,
+              0.0
+            ]
+          }
+        ],
+        "fraction_images_head_changes_across_calls": 0.5979591836734693,
+        "fraction_adjacent_call_transitions_change_head": 0.06428571428571428,
+        "weight_mean_by_head": [
+          0.22994613647460938,
+          0.06784161180257797,
+          0.14712324738502502,
+          0.04919740557670593,
+          0.031686801463365555,
+          0.21902412176132202,
+          0.19317278265953064,
+          0.062007732689380646
+        ],
+        "weight_std_by_head": [
+          0.030436038970947266,
+          0.014470533467829227,
+          0.03784018009901047,
+          0.006162140518426895,
+          0.005880745593458414,
+          0.029820522293448448,
+          0.015199395827949047,
+          0.007181238848716021
+        ]
+      },
+      "SG21-LM-RANK": {
+        "effective_heads": {
+          "mean": 6.352941513061523,
+          "median": 6.352941513061523,
+          "min": 6.352940559387207,
+          "max": 6.352941513061523,
+          "per_call": [
+            {
+              "call": 10,
+              "mean": 6.352941989898682,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            },
+            {
+              "call": 11,
+              "mean": 6.352941989898682,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            },
+            {
+              "call": 12,
+              "mean": 6.352941989898682,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            },
+            {
+              "call": 13,
+              "mean": 6.352941989898682,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            },
+            {
+              "call": 14,
+              "mean": 6.352941513061523,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            },
+            {
+              "call": 15,
+              "mean": 6.352941513061523,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            },
+            {
+              "call": 16,
+              "mean": 6.352941513061523,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            },
+            {
+              "call": 17,
+              "mean": 6.352941513061523,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            },
+            {
+              "call": 18,
+              "mean": 6.352941513061523,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            },
+            {
+              "call": 19,
+              "mean": 6.352941513061523,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            },
+            {
+              "call": 20,
+              "mean": 6.352941513061523,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            }
+          ]
+        },
+        "top_head_fraction": [
+          0.5866419294990723,
+          0.0,
+          0.06753246753246753,
+          0.0,
+          0.0,
+          0.3393320964749536,
+          0.006493506493506494,
+          0.0
+        ],
+        "top_head_fraction_per_call": [
+          {
+            "call": 10,
+            "fractions": [
+              0.8510204081632653,
+              0.0,
+              0.02857142857142857,
+              0.0,
+              0.0,
+              0.08979591836734693,
+              0.030612244897959183,
+              0.0
+            ]
+          },
+          {
+            "call": 11,
+            "fractions": [
+              0.8285714285714286,
+              0.0,
+              0.03469387755102041,
+              0.0,
+              0.0,
+              0.12244897959183673,
+              0.014285714285714285,
+              0.0
+            ]
+          },
+          {
+            "call": 12,
+            "fractions": [
+              0.763265306122449,
+              0.0,
+              0.04897959183673469,
+              0.0,
+              0.0,
+              0.17755102040816326,
+              0.01020408163265306,
+              0.0
+            ]
+          },
+          {
+            "call": 13,
+            "fractions": [
+              0.7122448979591837,
+              0.0,
+              0.061224489795918366,
+              0.0,
+              0.0,
+              0.22040816326530613,
+              0.006122448979591836,
+              0.0
+            ]
+          },
+          {
+            "call": 14,
+            "fractions": [
+              0.6387755102040816,
+              0.0,
+              0.0673469387755102,
+              0.0,
+              0.0,
+              0.29183673469387755,
+              0.0020408163265306124,
+              0.0
+            ]
+          },
+          {
+            "call": 15,
+            "fractions": [
+              0.5877551020408164,
+              0.0,
+              0.07346938775510205,
+              0.0,
+              0.0,
+              0.336734693877551,
+              0.0020408163265306124,
+              0.0
+            ]
+          },
+          {
+            "call": 16,
+            "fractions": [
+              0.5244897959183673,
+              0.0,
+              0.07959183673469387,
+              0.0,
+              0.0,
+              0.39387755102040817,
+              0.0020408163265306124,
+              0.0
+            ]
+          },
+          {
+            "call": 17,
+            "fractions": [
+              0.46122448979591835,
+              0.0,
+              0.07551020408163266,
+              0.0,
+              0.0,
+              0.46122448979591835,
+              0.0020408163265306124,
+              0.0
+            ]
+          },
+          {
+            "call": 18,
+            "fractions": [
+              0.4163265306122449,
+              0.0,
+              0.08163265306122448,
+              0.0,
+              0.0,
+              0.5,
+              0.0020408163265306124,
+              0.0
+            ]
+          },
+          {
+            "call": 19,
+            "fractions": [
+              0.3653061224489796,
+              0.0,
+              0.08775510204081632,
+              0.0,
+              0.0,
+              0.5469387755102041,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "call": 20,
+            "fractions": [
+              0.3040816326530612,
+              0.0,
+              0.10408163265306122,
+              0.0,
+              0.0,
+              0.5918367346938775,
+              0.0,
+              0.0
+            ]
+          }
+        ],
+        "fraction_images_head_changes_across_calls": 0.5979591836734693,
+        "fraction_adjacent_call_transitions_change_head": 0.06428571428571428,
+        "weight_mean_by_head": [
+          0.20735782384872437,
+          0.10046545416116714,
+          0.14986328780651093,
+          0.05687382072210312,
+          0.0277774166315794,
+          0.195590540766716,
+          0.16932852566242218,
+          0.09277315437793732
+        ],
+        "weight_std_by_head": [
+          0.020073363557457924,
+          0.016177261248230934,
+          0.02447275072336197,
+          0.0059084296226501465,
+          3.613403123381431e-07,
+          0.02321329340338707,
+          0.017793739214539528,
+          0.013155833818018436
+        ]
+      },
+      "SG21-ENT": {
+        "effective_heads": {
+          "mean": 5.494126796722412,
+          "median": 5.5008544921875,
+          "min": 4.263629913330078,
+          "max": 6.072704792022705,
+          "per_call": [
+            {
+              "call": 10,
+              "mean": 5.469733715057373,
+              "median": 5.472137928009033,
+              "min": 4.358977794647217,
+              "max": 6.003347873687744
+            },
+            {
+              "call": 11,
+              "mean": 5.484721660614014,
+              "median": 5.487789154052734,
+              "min": 4.540289878845215,
+              "max": 6.030686378479004
+            },
+            {
+              "call": 12,
+              "mean": 5.497681617736816,
+              "median": 5.504563331604004,
+              "min": 4.263629913330078,
+              "max": 6.054084777832031
+            },
+            {
+              "call": 13,
+              "mean": 5.503121852874756,
+              "median": 5.511406898498535,
+              "min": 4.580285549163818,
+              "max": 6.065071105957031
+            },
+            {
+              "call": 14,
+              "mean": 5.5056586265563965,
+              "median": 5.510495185852051,
+              "min": 5.003048896789551,
+              "max": 6.072704792022705
+            },
+            {
+              "call": 15,
+              "mean": 5.505620002746582,
+              "median": 5.509785175323486,
+              "min": 5.010542869567871,
+              "max": 6.069611549377441
+            },
+            {
+              "call": 16,
+              "mean": 5.503646373748779,
+              "median": 5.506176948547363,
+              "min": 5.008695602416992,
+              "max": 6.059582710266113
+            },
+            {
+              "call": 17,
+              "mean": 5.500051021575928,
+              "median": 5.499329566955566,
+              "min": 5.003295421600342,
+              "max": 6.043291091918945
+            },
+            {
+              "call": 18,
+              "mean": 5.495115280151367,
+              "median": 5.4988250732421875,
+              "min": 5.003185272216797,
+              "max": 6.022485733032227
+            },
+            {
+              "call": 19,
+              "mean": 5.488649845123291,
+              "median": 5.497960090637207,
+              "min": 4.992150783538818,
+              "max": 6.00016450881958
+            },
+            {
+              "call": 20,
+              "mean": 5.481394290924072,
+              "median": 5.490150451660156,
+              "min": 4.9841718673706055,
+              "max": 5.981447696685791
+            }
+          ]
+        },
+        "top_head_fraction": [
+          0.46289424860853434,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.003339517625231911,
+          0.5330241187384045,
+          0.0007421150278293135
+        ],
+        "top_head_fraction_per_call": [
+          {
+            "call": 10,
+            "fractions": [
+              0.18979591836734694,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0020408163265306124,
+              0.8040816326530612,
+              0.004081632653061225
+            ]
+          },
+          {
+            "call": 11,
+            "fractions": [
+              0.23265306122448978,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.004081632653061225,
+              0.7591836734693878,
+              0.004081632653061225
+            ]
+          },
+          {
+            "call": 12,
+            "fractions": [
+              0.2979591836734694,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.004081632653061225,
+              0.6979591836734694,
+              0.0
+            ]
+          },
+          {
+            "call": 13,
+            "fractions": [
+              0.363265306122449,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.004081632653061225,
+              0.6326530612244898,
+              0.0
+            ]
+          },
+          {
+            "call": 14,
+            "fractions": [
+              0.4122448979591837,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.004081632653061225,
+              0.5836734693877551,
+              0.0
+            ]
+          },
+          {
+            "call": 15,
+            "fractions": [
+              0.4816326530612245,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0020408163265306124,
+              0.5163265306122449,
+              0.0
+            ]
+          },
+          {
+            "call": 16,
+            "fractions": [
+              0.5326530612244897,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0020408163265306124,
+              0.46530612244897956,
+              0.0
+            ]
+          },
+          {
+            "call": 17,
+            "fractions": [
+              0.5857142857142857,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0020408163265306124,
+              0.4122448979591837,
+              0.0
+            ]
+          },
+          {
+            "call": 18,
+            "fractions": [
+              0.6326530612244898,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0020408163265306124,
+              0.3653061224489796,
+              0.0
+            ]
+          },
+          {
+            "call": 19,
+            "fractions": [
+              0.6693877551020408,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.004081632653061225,
+              0.32653061224489793,
+              0.0
+            ]
+          },
+          {
+            "call": 20,
+            "fractions": [
+              0.6938775510204082,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.006122448979591836,
+              0.3,
+              0.0
+            ]
+          }
+        ],
+        "fraction_images_head_changes_across_calls": 0.5183673469387755,
+        "fraction_adjacent_call_transitions_change_head": 0.0536734693877551,
+        "weight_mean_by_head": [
+          0.2372354120016098,
+          0.08917949348688126,
+          0.12000612169504166,
+          0.038307081907987595,
+          1.2944682566740084e-05,
+          0.1798194795846939,
+          0.2392832636833191,
+          0.09615614265203476
+        ],
+        "weight_std_by_head": [
+          0.015492343343794346,
+          0.022106004878878593,
+          0.03241386264562607,
+          0.005152304191142321,
+          0.0005806480767205358,
+          0.026735052466392517,
+          0.013717309571802616,
+          0.02475063130259514
+        ]
+      },
+      "SG21-DIST": {
+        "effective_heads": {
+          "mean": 7.793272972106934,
+          "median": 7.834722518920898,
+          "min": 7.108165264129639,
+          "max": 7.985315799713135,
+          "per_call": [
+            {
+              "call": 10,
+              "mean": 7.854532241821289,
+              "median": 7.87899112701416,
+              "min": 7.496186256408691,
+              "max": 7.985315799713135
+            },
+            {
+              "call": 11,
+              "mean": 7.839894771575928,
+              "median": 7.866212368011475,
+              "min": 7.456055164337158,
+              "max": 7.984095573425293
+            },
+            {
+              "call": 12,
+              "mean": 7.825760364532471,
+              "median": 7.857115745544434,
+              "min": 7.40666389465332,
+              "max": 7.9822096824646
+            },
+            {
+              "call": 13,
+              "mean": 7.813355922698975,
+              "median": 7.846622467041016,
+              "min": 7.374073028564453,
+              "max": 7.981351375579834
+            },
+            {
+              "call": 14,
+              "mean": 7.801145076751709,
+              "median": 7.837303638458252,
+              "min": 7.339077472686768,
+              "max": 7.980484962463379
+            },
+            {
+              "call": 15,
+              "mean": 7.789939880371094,
+              "median": 7.829509735107422,
+              "min": 7.298686981201172,
+              "max": 7.979128837585449
+            },
+            {
+              "call": 16,
+              "mean": 7.779284954071045,
+              "median": 7.823345184326172,
+              "min": 7.262577056884766,
+              "max": 7.979058742523193
+            },
+            {
+              "call": 17,
+              "mean": 7.769138813018799,
+              "median": 7.817395210266113,
+              "min": 7.223418235778809,
+              "max": 7.979930877685547
+            },
+            {
+              "call": 18,
+              "mean": 7.759730815887451,
+              "median": 7.808143615722656,
+              "min": 7.185757160186768,
+              "max": 7.981330871582031
+            },
+            {
+              "call": 19,
+              "mean": 7.750877380371094,
+              "median": 7.801900386810303,
+              "min": 7.146517276763916,
+              "max": 7.982074737548828
+            },
+            {
+              "call": 20,
+              "mean": 7.742347717285156,
+              "median": 7.793672561645508,
+              "min": 7.108165264129639,
+              "max": 7.984160423278809
+            }
+          ]
+        },
+        "top_head_fraction": [
+          0.10742115027829313,
+          0.0,
+          0.006864564007421151,
+          0.0,
+          0.0,
+          0.01020408163265306,
+          0.8755102040816326,
+          0.0
+        ],
+        "top_head_fraction_per_call": [
+          {
+            "call": 10,
+            "fractions": [
+              0.061224489795918366,
+              0.0,
+              0.0020408163265306124,
+              0.0,
+              0.0,
+              0.004081632653061225,
+              0.9326530612244898,
+              0.0
+            ]
+          },
+          {
+            "call": 11,
+            "fractions": [
+              0.07346938775510205,
+              0.0,
+              0.0020408163265306124,
+              0.0,
+              0.0,
+              0.004081632653061225,
+              0.9204081632653062,
+              0.0
+            ]
+          },
+          {
+            "call": 12,
+            "fractions": [
+              0.08163265306122448,
+              0.0,
+              0.0020408163265306124,
+              0.0,
+              0.0,
+              0.006122448979591836,
+              0.9102040816326531,
+              0.0
+            ]
+          },
+          {
+            "call": 13,
+            "fractions": [
+              0.10204081632653061,
+              0.0,
+              0.004081632653061225,
+              0.0,
+              0.0,
+              0.006122448979591836,
+              0.8877551020408163,
+              0.0
+            ]
+          },
+          {
+            "call": 14,
+            "fractions": [
+              0.10612244897959183,
+              0.0,
+              0.004081632653061225,
+              0.0,
+              0.0,
+              0.006122448979591836,
+              0.8836734693877552,
+              0.0
+            ]
+          },
+          {
+            "call": 15,
+            "fractions": [
+              0.10816326530612246,
+              0.0,
+              0.00816326530612245,
+              0.0,
+              0.0,
+              0.012244897959183673,
+              0.8714285714285714,
+              0.0
+            ]
+          },
+          {
+            "call": 16,
+            "fractions": [
+              0.12244897959183673,
+              0.0,
+              0.01020408163265306,
+              0.0,
+              0.0,
+              0.012244897959183673,
+              0.8551020408163266,
+              0.0
+            ]
+          },
+          {
+            "call": 17,
+            "fractions": [
+              0.12244897959183673,
+              0.0,
+              0.01020408163265306,
+              0.0,
+              0.0,
+              0.014285714285714285,
+              0.8530612244897959,
+              0.0
+            ]
+          },
+          {
+            "call": 18,
+            "fractions": [
+              0.12653061224489795,
+              0.0,
+              0.01020408163265306,
+              0.0,
+              0.0,
+              0.014285714285714285,
+              0.8489795918367347,
+              0.0
+            ]
+          },
+          {
+            "call": 19,
+            "fractions": [
+              0.13673469387755102,
+              0.0,
+              0.01020408163265306,
+              0.0,
+              0.0,
+              0.014285714285714285,
+              0.8387755102040816,
+              0.0
+            ]
+          },
+          {
+            "call": 20,
+            "fractions": [
+              0.14081632653061224,
+              0.0,
+              0.012244897959183673,
+              0.0,
+              0.0,
+              0.018367346938775512,
+              0.8285714285714286,
+              0.0
+            ]
+          }
+        ],
+        "fraction_images_head_changes_across_calls": 0.13673469387755102,
+        "fraction_adjacent_call_transitions_change_head": 0.017551020408163264,
+        "weight_mean_by_head": [
+          0.1486554890871048,
+          0.11664532870054245,
+          0.12322848290205002,
+          0.10548418760299683,
+          0.09891809523105621,
+          0.13720621168613434,
+          0.15535619854927063,
+          0.11450640112161636
+        ],
+        "weight_std_by_head": [
+          0.010962320491671562,
+          0.006758647970855236,
+          0.005927788093686104,
+          0.006115651689469814,
+          0.007688743527978659,
+          0.006884860340505838,
+          0.010846253484487534,
+          0.00471308920532465
+        ]
+      }
+    },
+    "coco": {
+      "SG21-LM": {
+        "effective_heads": {
+          "mean": 5.8338446617126465,
+          "median": 5.818082809448242,
+          "min": 4.802304744720459,
+          "max": 6.975344181060791,
+          "per_call": [
+            {
+              "call": 10,
+              "mean": 5.9976606369018555,
+              "median": 5.9893999099731445,
+              "min": 5.0436224937438965,
+              "max": 6.975344181060791
+            },
+            {
+              "call": 11,
+              "mean": 5.934761047363281,
+              "median": 5.927253723144531,
+              "min": 5.037902355194092,
+              "max": 6.909863471984863
+            },
+            {
+              "call": 12,
+              "mean": 5.889531135559082,
+              "median": 5.8771820068359375,
+              "min": 4.989194393157959,
+              "max": 6.83063268661499
+            },
+            {
+              "call": 13,
+              "mean": 5.853179931640625,
+              "median": 5.841519832611084,
+              "min": 4.916642189025879,
+              "max": 6.848726749420166
+            },
+            {
+              "call": 14,
+              "mean": 5.826982498168945,
+              "median": 5.816120624542236,
+              "min": 4.88323450088501,
+              "max": 6.768119812011719
+            },
+            {
+              "call": 15,
+              "mean": 5.8068718910217285,
+              "median": 5.799665451049805,
+              "min": 4.898285388946533,
+              "max": 6.765989780426025
+            },
+            {
+              "call": 16,
+              "mean": 5.790890693664551,
+              "median": 5.779718399047852,
+              "min": 4.844560146331787,
+              "max": 6.696100234985352
+            },
+            {
+              "call": 17,
+              "mean": 5.7791900634765625,
+              "median": 5.769196033477783,
+              "min": 4.8311896324157715,
+              "max": 6.660905838012695
+            },
+            {
+              "call": 18,
+              "mean": 5.770645618438721,
+              "median": 5.762857437133789,
+              "min": 4.809706211090088,
+              "max": 6.634624004364014
+            },
+            {
+              "call": 19,
+              "mean": 5.763411998748779,
+              "median": 5.756826877593994,
+              "min": 4.8222856521606445,
+              "max": 6.615738868713379
+            },
+            {
+              "call": 20,
+              "mean": 5.7591633796691895,
+              "median": 5.75316858291626,
+              "min": 4.802304744720459,
+              "max": 6.596138000488281
+            }
+          ]
+        },
+        "top_head_fraction": [
+          0.6133470489906133,
+          0.0,
+          0.05966310916805966,
+          0.0,
+          0.0,
+          0.3185032788993185,
+          0.008486562942008486,
+          0.0
+        ],
+        "top_head_fraction_per_call": [
+          {
+            "call": 10,
+            "fractions": [
+              0.8585572842998586,
+              0.0,
+              0.02263083451202263,
+              0.0,
+              0.0,
+              0.07213578500707214,
+              0.04667609618104668,
+              0.0
+            ]
+          },
+          {
+            "call": 11,
+            "fractions": [
+              0.8486562942008486,
+              0.0,
+              0.0297029702970297,
+              0.0,
+              0.0,
+              0.10042432814710042,
+              0.021216407355021217,
+              0.0
+            ]
+          },
+          {
+            "call": 12,
+            "fractions": [
+              0.8217821782178217,
+              0.0,
+              0.039603960396039604,
+              0.0,
+              0.0,
+              0.12588401697312587,
+              0.01272984441301273,
+              0.0
+            ]
+          },
+          {
+            "call": 13,
+            "fractions": [
+              0.7807637906647807,
+              0.0,
+              0.04384724186704385,
+              0.0,
+              0.0,
+              0.16548797736916548,
+              0.009900990099009901,
+              0.0
+            ]
+          },
+          {
+            "call": 14,
+            "fractions": [
+              0.7015558698727016,
+              0.0,
+              0.05091937765205092,
+              0.0,
+              0.0,
+              0.2446958981612447,
+              0.002828854314002829,
+              0.0
+            ]
+          },
+          {
+            "call": 15,
+            "fractions": [
+              0.6308345120226309,
+              0.0,
+              0.05799151343705799,
+              0.0,
+              0.0,
+              0.31117397454031115,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "call": 16,
+            "fractions": [
+              0.5516265912305516,
+              0.0,
+              0.07072135785007072,
+              0.0,
+              0.0,
+              0.37765205091937765,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "call": 17,
+            "fractions": [
+              0.4908062234794908,
+              0.0,
+              0.07637906647807638,
+              0.0,
+              0.0,
+              0.4328147100424328,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "call": 18,
+            "fractions": [
+              0.4229137199434229,
+              0.0,
+              0.07779349363507779,
+              0.0,
+              0.0,
+              0.49929278642149927,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "call": 19,
+            "fractions": [
+              0.3521923620933522,
+              0.0,
+              0.0876944837340877,
+              0.0,
+              0.0,
+              0.5601131541725601,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "call": 20,
+            "fractions": [
+              0.2871287128712871,
+              0.0,
+              0.09900990099009901,
+              0.0,
+              0.0,
+              0.6138613861386139,
+              0.0,
+              0.0
+            ]
+          }
+        ],
+        "fraction_images_head_changes_across_calls": 0.6294200848656294,
+        "fraction_adjacent_call_transitions_change_head": 0.06746817538896747,
+        "weight_mean_by_head": [
+          0.2251114696264267,
+          0.07679310441017151,
+          0.14814187586307526,
+          0.0491345040500164,
+          0.032108649611473083,
+          0.21372121572494507,
+          0.19297489523887634,
+          0.06201508268713951
+        ],
+        "weight_std_by_head": [
+          0.025840573012828827,
+          0.013568701222538948,
+          0.034389596432447433,
+          0.005503111053258181,
+          0.005751124117523432,
+          0.028788041323423386,
+          0.015642862766981125,
+          0.007068738341331482
+        ]
+      },
+      "SG21-LM-RANK": {
+        "effective_heads": {
+          "mean": 6.35294246673584,
+          "median": 6.352941513061523,
+          "min": 6.352940559387207,
+          "max": 6.352941513061523,
+          "per_call": [
+            {
+              "call": 10,
+              "mean": 6.35294246673584,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            },
+            {
+              "call": 11,
+              "mean": 6.35294246673584,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            },
+            {
+              "call": 12,
+              "mean": 6.35294246673584,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            },
+            {
+              "call": 13,
+              "mean": 6.352941513061523,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            },
+            {
+              "call": 14,
+              "mean": 6.352941513061523,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            },
+            {
+              "call": 15,
+              "mean": 6.352941513061523,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            },
+            {
+              "call": 16,
+              "mean": 6.352941513061523,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            },
+            {
+              "call": 17,
+              "mean": 6.352941036224365,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            },
+            {
+              "call": 18,
+              "mean": 6.352941036224365,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            },
+            {
+              "call": 19,
+              "mean": 6.352941036224365,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            },
+            {
+              "call": 20,
+              "mean": 6.352941036224365,
+              "median": 6.352941513061523,
+              "min": 6.352940559387207,
+              "max": 6.352941513061523
+            }
+          ]
+        },
+        "top_head_fraction": [
+          0.6133470489906133,
+          0.0,
+          0.05966310916805966,
+          0.0,
+          0.0,
+          0.3185032788993185,
+          0.008486562942008486,
+          0.0
+        ],
+        "top_head_fraction_per_call": [
+          {
+            "call": 10,
+            "fractions": [
+              0.8585572842998586,
+              0.0,
+              0.02263083451202263,
+              0.0,
+              0.0,
+              0.07213578500707214,
+              0.04667609618104668,
+              0.0
+            ]
+          },
+          {
+            "call": 11,
+            "fractions": [
+              0.8486562942008486,
+              0.0,
+              0.0297029702970297,
+              0.0,
+              0.0,
+              0.10042432814710042,
+              0.021216407355021217,
+              0.0
+            ]
+          },
+          {
+            "call": 12,
+            "fractions": [
+              0.8217821782178217,
+              0.0,
+              0.039603960396039604,
+              0.0,
+              0.0,
+              0.12588401697312587,
+              0.01272984441301273,
+              0.0
+            ]
+          },
+          {
+            "call": 13,
+            "fractions": [
+              0.7807637906647807,
+              0.0,
+              0.04384724186704385,
+              0.0,
+              0.0,
+              0.16548797736916548,
+              0.009900990099009901,
+              0.0
+            ]
+          },
+          {
+            "call": 14,
+            "fractions": [
+              0.7015558698727016,
+              0.0,
+              0.05091937765205092,
+              0.0,
+              0.0,
+              0.2446958981612447,
+              0.002828854314002829,
+              0.0
+            ]
+          },
+          {
+            "call": 15,
+            "fractions": [
+              0.6308345120226309,
+              0.0,
+              0.05799151343705799,
+              0.0,
+              0.0,
+              0.31117397454031115,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "call": 16,
+            "fractions": [
+              0.5516265912305516,
+              0.0,
+              0.07072135785007072,
+              0.0,
+              0.0,
+              0.37765205091937765,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "call": 17,
+            "fractions": [
+              0.4908062234794908,
+              0.0,
+              0.07637906647807638,
+              0.0,
+              0.0,
+              0.4328147100424328,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "call": 18,
+            "fractions": [
+              0.4229137199434229,
+              0.0,
+              0.07779349363507779,
+              0.0,
+              0.0,
+              0.49929278642149927,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "call": 19,
+            "fractions": [
+              0.3521923620933522,
+              0.0,
+              0.0876944837340877,
+              0.0,
+              0.0,
+              0.5601131541725601,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "call": 20,
+            "fractions": [
+              0.2871287128712871,
+              0.0,
+              0.09900990099009901,
+              0.0,
+              0.0,
+              0.6138613861386139,
+              0.0,
+              0.0
+            ]
+          }
+        ],
+        "fraction_images_head_changes_across_calls": 0.6294200848656294,
+        "fraction_adjacent_call_transitions_change_head": 0.06746817538896747,
+        "weight_mean_by_head": [
+          0.20893824100494385,
+          0.10907736420631409,
+          0.14840887486934662,
+          0.055786579847335815,
+          0.027775445953011513,
+          0.19332842528820038,
+          0.17130883038043976,
+          0.08536400645971298
+        ],
+        "weight_std_by_head": [
+          0.018773477524518967,
+          0.008761116303503513,
+          0.023280439898371696,
+          0.0025478708557784557,
+          2.332143367311801e-06,
+          0.024017024785280228,
+          0.018023118376731873,
+          0.007369095925241709
+        ]
+      },
+      "SG21-ENT": {
+        "effective_heads": {
+          "mean": 5.562826633453369,
+          "median": 5.564034461975098,
+          "min": 4.438847064971924,
+          "max": 6.177478313446045,
+          "per_call": [
+            {
+              "call": 10,
+              "mean": 5.5534186363220215,
+              "median": 5.560733795166016,
+              "min": 4.438847064971924,
+              "max": 6.018362045288086
+            },
+            {
+              "call": 11,
+              "mean": 5.565697193145752,
+              "median": 5.57177209854126,
+              "min": 4.5530805587768555,
+              "max": 6.041787624359131
+            },
+            {
+              "call": 12,
+              "mean": 5.576019763946533,
+              "median": 5.580840587615967,
+              "min": 5.005221366882324,
+              "max": 6.040586471557617
+            },
+            {
+              "call": 13,
+              "mean": 5.577247619628906,
+              "median": 5.580935001373291,
+              "min": 5.122178077697754,
+              "max": 6.05195951461792
+            },
+            {
+              "call": 14,
+              "mean": 5.577661037445068,
+              "median": 5.580186367034912,
+              "min": 5.120660305023193,
+              "max": 6.059983730316162
+            },
+            {
+              "call": 15,
+              "mean": 5.5745134353637695,
+              "median": 5.575943946838379,
+              "min": 5.101837158203125,
+              "max": 6.052911758422852
+            },
+            {
+              "call": 16,
+              "mean": 5.569526195526123,
+              "median": 5.573994159698486,
+              "min": 5.053599834442139,
+              "max": 6.10080099105835
+            },
+            {
+              "call": 17,
+              "mean": 5.562363147735596,
+              "median": 5.565454483032227,
+              "min": 5.016242027282715,
+              "max": 6.1451921463012695
+            },
+            {
+              "call": 18,
+              "mean": 5.554728031158447,
+              "median": 5.555139541625977,
+              "min": 4.962251663208008,
+              "max": 6.168893814086914
+            },
+            {
+              "call": 19,
+              "mean": 5.544808387756348,
+              "median": 5.542405605316162,
+              "min": 4.91914701461792,
+              "max": 6.177478313446045
+            },
+            {
+              "call": 20,
+              "mean": 5.535101890563965,
+              "median": 5.529881954193115,
+              "min": 4.880218029022217,
+              "max": 6.173251152038574
+            }
+          ]
+        },
+        "top_head_fraction": [
+          0.4221422142214221,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0038575286100038576,
+          0.5715571557155715,
+          0.002443101453002443
+        ],
+        "top_head_fraction_per_call": [
+          {
+            "call": 10,
+            "fractions": [
+              0.1074964639321075,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.002828854314002829,
+              0.8854314002828855,
+              0.004243281471004243
+            ]
+          },
+          {
+            "call": 11,
+            "fractions": [
+              0.15134370579915135,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.002828854314002829,
+              0.842998585572843,
+              0.002828854314002829
+            ]
+          },
+          {
+            "call": 12,
+            "fractions": [
+              0.2164073550212164,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.002828854314002829,
+              0.7765205091937766,
+              0.004243281471004243
+            ]
+          },
+          {
+            "call": 13,
+            "fractions": [
+              0.297029702970297,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.002828854314002829,
+              0.695898161244696,
+              0.004243281471004243
+            ]
+          },
+          {
+            "call": 14,
+            "fractions": [
+              0.36916548797736914,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.004243281471004243,
+              0.6237623762376238,
+              0.002828854314002829
+            ]
+          },
+          {
+            "call": 15,
+            "fractions": [
+              0.4314002828854314,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.004243281471004243,
+              0.5615275813295615,
+              0.002828854314002829
+            ]
+          },
+          {
+            "call": 16,
+            "fractions": [
+              0.5077793493635078,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.004243281471004243,
+              0.48656294200848654,
+              0.0014144271570014145
+            ]
+          },
+          {
+            "call": 17,
+            "fractions": [
+              0.5586987270155587,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.004243281471004243,
+              0.43564356435643564,
+              0.0014144271570014145
+            ]
+          },
+          {
+            "call": 18,
+            "fractions": [
+              0.6195190947666195,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.004243281471004243,
+              0.37482319660537483,
+              0.0014144271570014145
+            ]
+          },
+          {
+            "call": 19,
+            "fractions": [
+              0.6746817538896747,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.004243281471004243,
+              0.31966053748231965,
+              0.0014144271570014145
+            ]
+          },
+          {
+            "call": 20,
+            "fractions": [
+              0.71004243281471,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.005657708628005658,
+              0.2842998585572843,
+              0.0
+            ]
+          }
+        ],
+        "fraction_images_head_changes_across_calls": 0.6181046676096181,
+        "fraction_adjacent_call_transitions_change_head": 0.06364922206506365,
+        "weight_mean_by_head": [
+          0.23381298780441284,
+          0.10362042486667633,
+          0.11997503787279129,
+          0.03751032426953316,
+          3.866141923936084e-05,
+          0.1740395724773407,
+          0.23930293321609497,
+          0.0917007327079773
+        ],
+        "weight_std_by_head": [
+          0.01351508591324091,
+          0.02151118963956833,
+          0.026027612388134003,
+          0.004816499538719654,
+          0.0012709726579487324,
+          0.025993062183260918,
+          0.014005826786160469,
+          0.023212123662233353
+        ]
+      },
+      "SG21-DIST": {
+        "effective_heads": {
+          "mean": 7.777726173400879,
+          "median": 7.8007893562316895,
+          "min": 7.170891761779785,
+          "max": 7.990009307861328,
+          "per_call": [
+            {
+              "call": 10,
+              "mean": 7.838312149047852,
+              "median": 7.854940414428711,
+              "min": 7.453709602355957,
+              "max": 7.989349365234375
+            },
+            {
+              "call": 11,
+              "mean": 7.8242974281311035,
+              "median": 7.841921329498291,
+              "min": 7.3726606369018555,
+              "max": 7.98798942565918
+            },
+            {
+              "call": 12,
+              "mean": 7.810057163238525,
+              "median": 7.828845500946045,
+              "min": 7.334247589111328,
+              "max": 7.987145900726318
+            },
+            {
+              "call": 13,
+              "mean": 7.797770023345947,
+              "median": 7.816359519958496,
+              "min": 7.303099155426025,
+              "max": 7.986398220062256
+            },
+            {
+              "call": 14,
+              "mean": 7.785522937774658,
+              "median": 7.80377197265625,
+              "min": 7.26558256149292,
+              "max": 7.98698616027832
+            },
+            {
+              "call": 15,
+              "mean": 7.774495601654053,
+              "median": 7.794486999511719,
+              "min": 7.230956077575684,
+              "max": 7.987658500671387
+            },
+            {
+              "call": 16,
+              "mean": 7.764057159423828,
+              "median": 7.784315586090088,
+              "min": 7.235436916351318,
+              "max": 7.988372325897217
+            },
+            {
+              "call": 17,
+              "mean": 7.753770351409912,
+              "median": 7.772333145141602,
+              "min": 7.221897125244141,
+              "max": 7.988759517669678
+            },
+            {
+              "call": 18,
+              "mean": 7.74451208114624,
+              "median": 7.76271915435791,
+              "min": 7.208993434906006,
+              "max": 7.989596366882324
+            },
+            {
+              "call": 19,
+              "mean": 7.735254287719727,
+              "median": 7.753938674926758,
+              "min": 7.1869683265686035,
+              "max": 7.9894537925720215
+            },
+            {
+              "call": 20,
+              "mean": 7.726938247680664,
+              "median": 7.744626998901367,
+              "min": 7.170891761779785,
+              "max": 7.990009307861328
+            }
+          ]
+        },
+        "top_head_fraction": [
+          0.037546611804037545,
+          0.0,
+          0.0066863829240066865,
+          0.0,
+          0.0,
+          0.009643821525009644,
+          0.9461231837469462,
+          0.0
+        ],
+        "top_head_fraction_per_call": [
+          {
+            "call": 10,
+            "fractions": [
+              0.015558698727015558,
+              0.0,
+              0.002828854314002829,
+              0.0,
+              0.0,
+              0.0,
+              0.9816124469589816,
+              0.0
+            ]
+          },
+          {
+            "call": 11,
+            "fractions": [
+              0.019801980198019802,
+              0.0,
+              0.004243281471004243,
+              0.0,
+              0.0,
+              0.0014144271570014145,
+              0.9745403111739745,
+              0.0
+            ]
+          },
+          {
+            "call": 12,
+            "fractions": [
+              0.024045261669024046,
+              0.0,
+              0.004243281471004243,
+              0.0,
+              0.0,
+              0.005657708628005658,
+              0.9660537482319661,
+              0.0
+            ]
+          },
+          {
+            "call": 13,
+            "fractions": [
+              0.0297029702970297,
+              0.0,
+              0.005657708628005658,
+              0.0,
+              0.0,
+              0.004243281471004243,
+              0.9603960396039604,
+              0.0
+            ]
+          },
+          {
+            "call": 14,
+            "fractions": [
+              0.036775106082036775,
+              0.0,
+              0.005657708628005658,
+              0.0,
+              0.0,
+              0.005657708628005658,
+              0.9519094766619519,
+              0.0
+            ]
+          },
+          {
+            "call": 15,
+            "fractions": [
+              0.039603960396039604,
+              0.0,
+              0.007072135785007072,
+              0.0,
+              0.0,
+              0.005657708628005658,
+              0.9476661951909476,
+              0.0
+            ]
+          },
+          {
+            "call": 16,
+            "fractions": [
+              0.042432814710042434,
+              0.0,
+              0.007072135785007072,
+              0.0,
+              0.0,
+              0.009900990099009901,
+              0.9405940594059405,
+              0.0
+            ]
+          },
+          {
+            "call": 17,
+            "fractions": [
+              0.04667609618104668,
+              0.0,
+              0.008486562942008486,
+              0.0,
+              0.0,
+              0.015558698727015558,
+              0.9292786421499293,
+              0.0
+            ]
+          },
+          {
+            "call": 18,
+            "fractions": [
+              0.05091937765205092,
+              0.0,
+              0.008486562942008486,
+              0.0,
+              0.0,
+              0.018387553041018388,
+              0.9222065063649222,
+              0.0
+            ]
+          },
+          {
+            "call": 19,
+            "fractions": [
+              0.05374823196605375,
+              0.0,
+              0.009900990099009901,
+              0.0,
+              0.0,
+              0.018387553041018388,
+              0.917963224893918,
+              0.0
+            ]
+          },
+          {
+            "call": 20,
+            "fractions": [
+              0.05374823196605375,
+              0.0,
+              0.009900990099009901,
+              0.0,
+              0.0,
+              0.021216407355021217,
+              0.9151343705799151,
+              0.0
+            ]
+          }
+        ],
+        "fraction_images_head_changes_across_calls": 0.07920792079207921,
+        "fraction_adjacent_call_transitions_change_head": 0.009476661951909477,
+        "weight_mean_by_head": [
+          0.1487112194299698,
+          0.11881133168935776,
+          0.12300349771976471,
+          0.1041426733136177,
+          0.09717317670583725,
+          0.13643108308315277,
+          0.15789486467838287,
+          0.1138322725892067
+        ],
+        "weight_std_by_head": [
+          0.009857005439698696,
+          0.00568139785900712,
+          0.005038000643253326,
+          0.006365329027175903,
+          0.008004437200725079,
+          0.006470606196671724,
+          0.011715793050825596,
+          0.004888765048235655
+        ]
+      }
+    }
+  },
+  "promoted_weight_quartiles": null,
+  "external_w_p1": {
+    "source": "historical SG18 run; external context, not same-generation SG21 control",
+    "voc_oof_miou": 0.7996523496064184,
+    "full_voc": 0.8005846665606157,
+    "voc_threshold": 0.45,
+    "frozen_coco": 0.6244708871408149
+  },
+  "t1_replay_mae": {
+    "voc": {
+      "mean": 2.0024697510145453e-08,
+      "max": 3.5797711461782455e-08
+    },
+    "coco": {
+      "mean": 1.624069766553456e-08,
+      "max": 2.994784153997898e-08
+    }
+  }
+}

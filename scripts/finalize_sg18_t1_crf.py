@@ -119,7 +119,7 @@ def main() -> None:
     args.output_dir.mkdir(parents=True, exist_ok=True)
     (args.output_dir / 'results.json').write_text(json.dumps(summary, indent=2)+'\n')
     with (args.output_dir / 'per_class_results.csv').open('w', newline='') as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]), lineterminator='\n')
         writer.writeheader(); writer.writerows(rows)
     lines = ['# SG18 T1 + unchanged DenseCRF', '',
              f"VOC fold votes: {screen['selection_counts']}; frozen: {screen['frozen']}",

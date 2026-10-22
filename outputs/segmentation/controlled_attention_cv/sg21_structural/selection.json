@@ -1,0 +1,308 @@
+{
+  "screen": {
+    "reference": "SG18/T1",
+    "candidates": [
+      "SG21-LM",
+      "SG21-LM-RANK",
+      "SG21-ENT",
+      "SG21-DIST"
+    ],
+    "folds": [
+      {
+        "fold": 0,
+        "chosen": "SG18/T1",
+        "chosen_threshold": 0.425,
+        "reference_threshold": 0.425,
+        "reason": "no eligible candidate",
+        "train_miou_chosen": 0.7961638076105594,
+        "train_miou_reference": 0.7961638076105594,
+        "heldout_miou_chosen": 0.797521995913357,
+        "heldout_miou_reference": 0.797521995913357
+      },
+      {
+        "fold": 1,
+        "chosen": "SG18/T1",
+        "chosen_threshold": 0.425,
+        "reference_threshold": 0.425,
+        "reason": "no eligible candidate",
+        "train_miou_chosen": 0.790838269645352,
+        "train_miou_reference": 0.790838269645352,
+        "heldout_miou_chosen": 0.8143598729415202,
+        "heldout_miou_reference": 0.8143598729415202
+      },
+      {
+        "fold": 2,
+        "chosen": "SG18/T1",
+        "chosen_threshold": 0.425,
+        "reference_threshold": 0.425,
+        "reason": "no eligible candidate",
+        "train_miou_chosen": 0.7976990236204864,
+        "train_miou_reference": 0.7976990236204864,
+        "heldout_miou_chosen": 0.7921847256237132,
+        "heldout_miou_reference": 0.7921847256237132
+      },
+      {
+        "fold": 3,
+        "chosen": "SG18/T1",
+        "chosen_threshold": 0.425,
+        "reference_threshold": 0.425,
+        "reason": "no eligible candidate",
+        "train_miou_chosen": 0.7981906115424373,
+        "train_miou_reference": 0.7981906115424373,
+        "heldout_miou_chosen": 0.7882114447476128,
+        "heldout_miou_reference": 0.7882114447476128
+      },
+      {
+        "fold": 4,
+        "chosen": "SG18/T1",
+        "chosen_threshold": 0.45,
+        "reference_threshold": 0.45,
+        "reason": "no eligible candidate",
+        "train_miou_chosen": 0.7970268663592492,
+        "train_miou_reference": 0.7970268663592492,
+        "heldout_miou_chosen": 0.7797320399039109,
+        "heldout_miou_reference": 0.7797320399039109
+      }
+    ],
+    "selection_counts": {
+      "SG18/T1": 5
+    },
+    "vote_winner": "SG18/T1",
+    "vote_winner_votes": 5,
+    "frozen": "SG18/T1",
+    "freeze_reason": "reference won the fold vote",
+    "oof_miou_selection": 0.7939157806711625,
+    "oof_miou_reference": 0.7939157806711625,
+    "oof_gain": 0.0,
+    "full_threshold_frozen": 0.425,
+    "full_threshold_reference": 0.425,
+    "full_miou_frozen": 0.7959385238800849,
+    "full_miou_reference": 0.7959385238800849,
+    "paired_oof": {
+      "mean": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.0,
+      "better": 0,
+      "worse": 0,
+      "ties": 490
+    }
+  },
+  "forced_oof": {
+    "SG21-LM": {
+      "candidate_miou": 0.7884057273640954,
+      "reference_miou": 0.7939157806711625,
+      "gain": -0.005510053307067109,
+      "folds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.425,
+          "heldout_miou_candidate": 0.7893637238386826,
+          "heldout_miou_reference": 0.797521995913357
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.425,
+          "heldout_miou_candidate": 0.806728451430627,
+          "heldout_miou_reference": 0.8143598729415202
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.425,
+          "heldout_miou_candidate": 0.7850929399453145,
+          "heldout_miou_reference": 0.7921847256237132
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.425,
+          "heldout_miou_candidate": 0.7843934126880842,
+          "heldout_miou_reference": 0.7882114447476128
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.45,
+          "heldout_miou_candidate": 0.7770465963516058,
+          "heldout_miou_reference": 0.7797320399039109
+        }
+      ],
+      "heldout_fold_wins": 0,
+      "paired_mean_image_iou": {
+        "mean": -0.007780372771196323,
+        "ci_low": -0.009796840583998068,
+        "ci_high": -0.005742354224031892,
+        "better": 120,
+        "worse": 370,
+        "ties": 0
+      }
+    },
+    "SG21-LM-RANK": {
+      "candidate_miou": 0.7900562979262878,
+      "reference_miou": 0.7939157806711625,
+      "gain": -0.003859482744874687,
+      "folds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.425,
+          "heldout_miou_candidate": 0.7906838109516003,
+          "heldout_miou_reference": 0.797521995913357
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.425,
+          "heldout_miou_candidate": 0.8085417686621372,
+          "heldout_miou_reference": 0.8143598729415202
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.425,
+          "heldout_miou_candidate": 0.7861638846602885,
+          "heldout_miou_reference": 0.7921847256237132
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.425,
+          "heldout_miou_candidate": 0.7847389189331957,
+          "heldout_miou_reference": 0.7882114447476128
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.45,
+          "heldout_miou_candidate": 0.7801425777373073,
+          "heldout_miou_reference": 0.7797320399039109
+        }
+      ],
+      "heldout_fold_wins": 1,
+      "paired_mean_image_iou": {
+        "mean": -0.006152212509727573,
+        "ci_low": -0.008087312506893589,
+        "ci_high": -0.004182520526292693,
+        "better": 111,
+        "worse": 379,
+        "ties": 0
+      }
+    },
+    "SG21-ENT": {
+      "candidate_miou": 0.7872081131156703,
+      "reference_miou": 0.7939157806711625,
+      "gain": -0.006707667555492236,
+      "folds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.425,
+          "heldout_miou_candidate": 0.7883366812870816,
+          "heldout_miou_reference": 0.797521995913357
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.425,
+          "heldout_miou_candidate": 0.805669612048985,
+          "heldout_miou_reference": 0.8143598729415202
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.425,
+          "heldout_miou_candidate": 0.7838472571126276,
+          "heldout_miou_reference": 0.7921847256237132
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.425,
+          "heldout_miou_candidate": 0.782730402625424,
+          "heldout_miou_reference": 0.7882114447476128
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.45,
+          "heldout_miou_candidate": 0.7759589995554397,
+          "heldout_miou_reference": 0.7797320399039109
+        }
+      ],
+      "heldout_fold_wins": 0,
+      "paired_mean_image_iou": {
+        "mean": -0.008988029263889662,
+        "ci_low": -0.011153105637691544,
+        "ci_high": -0.006824806924839154,
+        "better": 120,
+        "worse": 370,
+        "ties": 0
+      }
+    },
+    "SG21-DIST": {
+      "candidate_miou": 0.7940848124519995,
+      "reference_miou": 0.7939157806711625,
+      "gain": 0.00016903178083693682,
+      "folds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "heldout_miou_candidate": 0.7961720802268054,
+          "heldout_miou_reference": 0.797521995913357
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "heldout_miou_candidate": 0.8124283361220026,
+          "heldout_miou_reference": 0.8143598729415202
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "heldout_miou_candidate": 0.7900206835973782,
+          "heldout_miou_reference": 0.7921847256237132
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "heldout_miou_candidate": 0.7881392817980275,
+          "heldout_miou_reference": 0.7882114447476128
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.45,
+          "heldout_miou_candidate": 0.7850991400301346,
+          "heldout_miou_reference": 0.7797320399039109
+        }
+      ],
+      "heldout_fold_wins": 1,
+      "paired_mean_image_iou": {
+        "mean": -0.0004330734818002668,
+        "ci_low": -0.001794310870024735,
+        "ci_high": 0.0010589125584520704,
+        "better": 200,
+        "worse": 290,
+        "ties": 0
+      }
+    }
+  },
+  "frozen": "SG18/T1",
+  "promoted": false,
+  "screen_frozen_before_forced_oof_guard": "SG18/T1",
+  "promotion_reason": "no candidate passed all frozen promotion guards",
+  "full_voc_thresholds": {
+    "SG18/T1": 0.425,
+    "SG21-LM": 0.4,
+    "SG21-LM-RANK": 0.4,
+    "SG21-ENT": 0.4,
+    "SG21-DIST": 0.425
+  },
+  "reference_oof_miou": 0.7939157806711625
+}
