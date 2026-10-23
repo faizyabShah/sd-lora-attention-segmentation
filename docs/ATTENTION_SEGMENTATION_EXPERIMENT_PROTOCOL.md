@@ -5840,3 +5840,66 @@ window. The analyses are in
 cell/class/mechanism data are in
 `outputs/segmentation/controlled_attention_cv/sg22/` and `/sg23/`.
 Claude should validate these outcomes before paper integration.
+
+## 103. SG24-A and SG24-B: automatic CA construction (Codex runs; Claude reviews)
+
+**Locked 23 October 2026, before production.** Two separate experiments test
+CA-only segmentation and the current final pipeline. Both use SD1.5, ordinary
+class-word W attribution, conditional CFG query, padded 77-token text softmax,
+all class-word pieces averaged, calls 0–30, all CA heads, and the existing
+five VOC folds and 17 thresholds. The downstream operator is unchanged:
+SA module 15, calls 10–20 inclusive, all eight heads, mean of each
+observation's `A_i² c` (MID-P2), then existing R2 DenseCRF. COCO is frozen
+transfer; no optimized tokens, learned parameters, class-specific decisions,
+new time windows, SA rules, or CRF tuning.
+
+**SG24-A** fixes CA modules `[0,1,4,5,6,7,8,9,13,14,15]` and compares
+A0 existing equal aggregation; A1 per-pixel content-token mass rescaling;
+A2 projected-output CA head contribution weights; A3 pseudo-global/paired-SA
+similarity layer weights; and A4 all three changes combined. No optional
+combinations are included. A0 is a same-generation control. Content pieces
+exclude CLIP special/padding tokens, punctuation and English stopwords,
+while all target pieces are always retained. A2 computes
+`v_h=(A_h V_h) W_h^O`, `s_h=v_h·sum_j v_j`, uses GoCA SD1.5's
+dot-product normalization *without* clamping negative scores, and uses
+a uniform fallback only if the summed projected output vanishes. A3
+derives `F` from the conditional Q of SD1.5
+`up_blocks.2.attentions.1.transformer_blocks.0.attn2` at each call, concatenates
+heads, forms `softmax(FF^T/sqrt(d))`, and scores paired mean-head SA spatial
+affinities after GoCA's bilinear key-axis and nearest query-axis resize.
+Layer weights are nonnegative, normalized within each call, then calls are
+averaged equally. This is a GoCA-*style adaptation* to our full generation
+trajectory, not a claim to reproduce GoCA's original one-timestep SD1.5
+image-inversion settings.
+
+The COCO attribution prompt is the class name alone, as in our frozen
+pipeline. For A1/A4, content-token rescaling can therefore reduce a
+single target-content-token map to a spatial constant. Do not alter that
+prompt to rescue the method; report this as a structural transfer limitation.
+For both evaluation levels, report forced VOC OOF, fold thresholds/votes,
+full VOC, frozen COCO, all 20 classes, precision/recall/pixel and mean-image
+IoU, 20k paired intervals, and better/worse/tied images. CA-only maps are
+scored before SA or CRF. Fixed-0.45 CA TP/FP, coverage, distant/separate
+FP, and useful/harmful changes versus A0 are diagnostic only. Record
+content attention mass and automatic layer weights by module/call/class.
+
+**SG24-B** compares B0 the 11 current CA modules with B1 all 16 CA modules
+including all 32×32 modules, using the *same* automatic A3 or A4 method.
+The B method is frozen from SG24-A's VOC final-pipeline selection. If neither
+automatic method passes the existing VOC promotion gate, use preregistered
+A3 for B as a diagnostic, and label B as non-promotional. Recompute layer
+weights over each available set; do not manually prune any layer or search
+other resolution subsets. Both CA-only and MID-P2+R2 outcomes use the same
+VOC-only selection and frozen COCO transfer. Report per-layer/resolution
+weights including top-1/top-3 frequency and by-call/by-class means, plus
+CA-only versus final-pipeline gains.
+
+Implementation: `src/segmentation/sg24_ca.py`, `scripts/{run,finalize}_sg24.py`,
+`configs/sg24.json`, `jobs/{run,merge}_sg24.slurm`. The GPU runners write
+only resumable class-level counts and reduced diagnostics; no images, masks,
+or full attention matrices are saved. Each experiment has its own 40-task
+VOC/COCO array and CPU merge. SG24-B's production array depends on the
+SG24-A merge because its automatic method is frozen by that merge. Claude
+should independently review the GoCA adaptation, A0 reference reproduction,
+VOC selection, COCO content-rescaling limitation, full per-class results,
+and paper interpretation before any promotion or manuscript update.

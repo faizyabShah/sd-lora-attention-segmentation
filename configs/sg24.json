@@ -1,0 +1,20 @@
+{
+  "experiment": "SG24-A/B",
+  "version": 1,
+  "track": "ordinary class-word W, SD1.5, conditional 77-token padded attribution",
+  "selected_ca_modules": [0, 1, 4, 5, 6, 7, 8, 9, 13, 14, 15],
+  "expanded_ca_modules": "all 16 sorted attn2 modules",
+  "ca_calls": [0, 30],
+  "sa_module_index": 15,
+  "sa_calls": [10, 20],
+  "sa_heads": 8,
+  "propagation": "mean_i(A_i^2 c), 88 middle-window observations",
+  "ref_feature": "up_blocks.2.attentions.1.transformer_blocks.0.attn2 conditional Q, all heads concatenated, each call",
+  "head_weight": "GoCA SD1.5 projected-output dot product without clamp, uniform fallback only when summed projected output is zero",
+  "layer_weight": "GoCA pseudo-global softmax(F F^T / sqrt(d)) vs paired SA affinity, dot-product, normalized within each call",
+  "content_token_rule": "fast-tokenizer offsets, exclude zero-length special/padding, punctuation-only pieces and English stopwords; always include target pieces",
+  "thresholds": [0.3, 0.325, 0.35, 0.375, 0.4, 0.425, 0.45, 0.475, 0.5, 0.525, 0.55, 0.575, 0.6, 0.625, 0.65, 0.675, 0.7],
+  "diagnostic_threshold": 0.45,
+  "selection": "VOC-only five fixed folds; frozen COCO transfer; B method from A3/A4 VOC-only screen",
+  "storage": "per-image counts and reduced diagnostic sidecars; no saved images or attention maps"
+}
