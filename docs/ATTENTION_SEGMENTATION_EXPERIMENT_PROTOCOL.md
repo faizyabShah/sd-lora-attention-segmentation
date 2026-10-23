@@ -5822,3 +5822,21 @@ mergers **235373** and **235374** depend on their respective arrays with
 `afterany`; they explicitly reject incomplete coverage. Claude can review
 the committed protocol and implementation while the jobs run. No outcome
 is claimed yet.
+
+**Outcome (23 October 2026):** SG22 GPU array **235368** and merge
+**235373**, and SG23 GPU array **235372** and merge **235374**, completed
+with all 490 VOC and 707 COCO images per experiment. SG22's raw screen
+kept ALL-P2 (3/5 votes); its CRF screen selected **MID-P2+R2** (4/5
+votes), selected OOF 0.8158 versus P1+R2 0.8132. Forced MID-P2+R2 OOF
+is 0.8168; full VOC 0.8185 versus 0.8132 and frozen COCO 0.6438 versus
+0.6372. MID-P1+R2 still has slightly higher frozen COCO mIoU (0.6464)
+without satisfying the VOC selection gate. SG23's raw screen selected
+**MID-SG2** (5/5, OOF 0.7999 versus T1 0.7939), but its COCO advantage
+is only 0.6292 versus 0.6287. Its CRF screen kept **ALL-P2+R2** (4/5);
+no SG23 final cell was promoted. Raw SG2/SG11/SG12 temporal interactions
+are all negative on VOC OOF and COCO, indicating overlap with the middle
+window. The analyses are in
+`outputs/segmentation/analysis/SG22_SG23_CHATGPT_HANDOFF.md`; complete
+cell/class/mechanism data are in
+`outputs/segmentation/controlled_attention_cv/sg22/` and `/sg23/`.
+Claude should validate these outcomes before paper integration.

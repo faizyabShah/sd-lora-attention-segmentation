@@ -166,7 +166,8 @@ def main():
     out.mkdir(parents=True,exist_ok=True)
     (out/'results.json').write_text(json.dumps(summary,indent=2)+'\n')
     with (out/'per_class_iou.csv').open('w',newline='') as f:
-        writer=csv.DictWriter(f,fieldnames=list(per_class[0]));writer.writeheader();writer.writerows(per_class)
+        writer=csv.DictWriter(f,fieldnames=list(per_class[0]),lineterminator='\n')
+        writer.writeheader();writer.writerows(per_class)
     lines=[f'# {args.experiment.upper()} locked factorial', '',
            f"Raw VOC fold votes: {raw_screen['selection_counts']}; frozen: {raw_screen['frozen']}",
            f"CRF VOC fold votes: {crf_screen['selection_counts']}; frozen: {crf_screen['frozen']}", '',
