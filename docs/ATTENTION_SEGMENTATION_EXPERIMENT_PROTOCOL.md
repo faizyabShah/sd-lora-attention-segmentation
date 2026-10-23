@@ -5903,3 +5903,18 @@ SG24-A merge because its automatic method is frozen by that merge. Claude
 should independently review the GoCA adaptation, A0 reference reproduction,
 VOC selection, COCO content-rescaling limitation, full per-class results,
 and paper interpretation before any promotion or manuscript update.
+
+**Execution handoff (23 October 2026).** Final live smoke jobs **235898**
+(SG24-A) and **235899** (SG24-B) passed one VOC and one COCO image each.
+On those same-generation images, A0/MID-P2+R2 reproduced SG22's saved
+17-threshold counts *exactly* on both datasets. The class-only COCO
+attribution makes A1 and A4 CA maps spatial constants, as predicted by
+the rescaling formula; their smoke masks were empty at 0.45. This is a
+method limitation, not a prompt or threshold change. Production SG24-A
+GPU array **235900** and completeness-checking CPU merge **235904** are
+submitted. Separate SG24-B GPU array **235905** waits on the successful
+SG24-A merge and its VOC-only automatic-method manifest; its CPU merge is
+**235906**. Both arrays request any available GPU, at most four class shards
+concurrently, with 12 hours per resumable shard. These are submissions,
+not result claims. Claude should review the committed implementation and
+selection contract now, then independently validate the produced results.
