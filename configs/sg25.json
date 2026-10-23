@@ -1,0 +1,20 @@
+{
+  "experiment": "SG25 + Pre-SG26",
+  "version": 1,
+  "ca_method": "SG24-A3 selected 11 modules, calls 0-30, all heads, frozen",
+  "sa_calls": [10, 20],
+  "sa_modules": {
+    "16": "up_blocks.1.attentions.2.transformer_blocks.0.attn1",
+    "32": "up_blocks.2.attentions.2.transformer_blocks.0.attn1",
+    "64": "up_blocks.3.attentions.2.transformer_blocks.0.attn1"
+  },
+  "sa_heads": "all, equal weights",
+  "cells": ["FINE-P2", "COARSE16-P2", "COARSE32-P2", "16-to-64", "32-to-64", "64-to-16"],
+  "cross_resolution": "within the same diffusion call: first operator averaged over its heads, bilinear upsample or area downsample, second operator applied per head; then equal average over calls and second heads",
+  "normalization": "minmax each resulting 64x64 map; bilinear to annotation size; threshold grid unchanged",
+  "thresholds": [0.3, 0.325, 0.35, 0.375, 0.4, 0.425, 0.45, 0.475, 0.5, 0.525, 0.55, 0.575, 0.6, 0.625, 0.65, 0.675, 0.7],
+  "crf": "unchanged R2 DenseCRF applied to each cell for final-pipeline selection",
+  "selection": "five fixed VOC folds against FINE-P2+R2; COCO frozen transfer only",
+  "pre_sg26": "on FINE 64x64 per-observation mean maps at propagation depths 1-5, minmax each depth and use fixed threshold 0.425; first positive depth wins; diagnostic only",
+  "storage": "resumable per-image confusion counts and first-arrival counts; no image, mask or attention-map artifacts"
+}

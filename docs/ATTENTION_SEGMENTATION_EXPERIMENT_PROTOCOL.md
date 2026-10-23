@@ -5953,3 +5953,43 @@ multi-candidate promotion gate. That screen selected A3 in 3/5 folds and
 its selected-path OOF was below A0. Preserve A0 as the registered SG24-A
 winner and report the working-default decision separately in the paper.
 SG24-B's 16-module B1 remains excluded because it lost all five VOC folds.
+
+## 104. SG25 multi-resolution SA and Pre-SG26 arrival diagnostic (Codex runs; Claude reviews)
+
+**Locked 24 October 2026, before production.** Freeze the owner's A3 working
+pipeline: selected 11 CA modules, calls 0–30, all CA heads, SG24 pseudo-global
+layer weights. Freeze SA calls 10–20, all eight heads, equal observation
+averaging, and the existing R2 DenseCRF. Use one fixed SA module at each
+scale: final upsampling-path attention 2 at 16×16, 32×32, and the established
+module 15 at 64×64. Exact module names, 17-threshold grid and operator
+definitions are in `configs/sg25.json`. No CA, head, time-window, CRF,
+reliability, or token changes are searched.
+
+Compare six two-operator cells: FINE-P2, COARSE16-P2, COARSE32-P2, 16→64,
+32→64, and 64→16. The operators in a cross-resolution cell use the *same*
+diffusion call. Average all heads after the first operator, resize its map,
+apply each head of the second operator, then average second heads and calls.
+This avoids assuming that head index 0 at one scale matches head index 0 at
+another. Bilinear interpolation is used for upsampling; area interpolation
+for downsampling. Score raw maps and each map after unchanged R2. Five fixed
+VOC folds select against A3/FINE-P2+R2; evaluate COCO only with VOC-frozen
+thresholds. Report forced OOF, multi-candidate votes, per-class IoU,
+precision/recall, and paired image intervals. A3/FINE-P2+R2 is recomputed
+as a same-generation control and is checked against SG24's original fine
+propagation operator on smoke images. Prior independently regenerated SG24
+smoke counts differed by at most two pixels in one threshold cell, so an
+exact cross-job count match is not used as a gate.
+
+In the same generation pass, Pre-SG26 computes the mean 64×64 SA map at
+depths 1–5 using the existing fine module. Min-max normalize *each depth*
+and apply the fixed A3 working threshold 0.425 at annotation resolution.
+Each pixel is assigned to its first positive depth; report total pixels,
+TP, FP, FP beyond 16/64 pixels from GT, and FP in a predicted component
+with no GT overlap, overall and for every class on VOC and COCO. This is
+diagnostic only: no arrival-time mask or threshold is selected.
+
+Implementation: `src/segmentation/sg25_sa.py`, `scripts/{run,finalize}_sg25.py`,
+`jobs/{run,merge}_sg25.slurm`. Shards keep only confusion counts and small
+arrival-count sidecars. No images, attention matrices, or masks are saved.
+Claude should review scale pairing, exact FINE-P2 reproduction, selection,
+and cross-dataset interpretation before manuscript integration.
