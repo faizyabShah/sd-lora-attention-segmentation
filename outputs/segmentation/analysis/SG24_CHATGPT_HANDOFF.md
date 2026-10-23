@@ -55,7 +55,10 @@ preserve both statements rather than calling A3 the new final system.
 
 Thus the forced 4/5 held-out wins and the screen's 3/5 A3 votes measure
 different things. The latter, plus its negative selected-path OOF gain,
-controls promotion.
+determines the registered SG24-A outcome. After seeing these results, the
+project owner separately chose A3 as the **provisional working default**
+for subsequent training-free experiments. This post-results choice does not
+change the registered outcome.
 
 **Why A3 is interesting:** CA-only VOC worsens by .0086 even while the
 full pipeline improves by .0058; COCO improves at both levels (+.0209 CA,
@@ -135,22 +138,26 @@ the CA diagnostic threshold and final CRF threshold are different stages.
 
 ## Interpretation and decision for ChatGPT
 
-1. **Keep A0→MID-P2→R2 as the formally selected final pipeline** under
-   the existing multi-candidate VOC policy. The A3 forced comparison is a
-   strong follow-up candidate, not a formal promotion. Its benefit seems
-   tied to how a coarser CA seed interacts with SA/CRF; this is an inference
-   from the observed CA-only/final sign reversal, not a proven mechanism.
+1. **Registered result:** A0→MID-P2→R2 remains the SG24-A selector's
+   winner. **Owner's subsequent working default:** A3→MID-P2→R2, with the
+   selected 11 CA modules and VOC-selected threshold .425. This is a
+   post-results exploratory choice based on the forced 4/5 held-out wins,
+   +.00608 forced OOF VOC gain, and +.0183 frozen COCO gain. Do not present
+   it as satisfying the original 4/5 *selection-vote* gate. Its benefit
+   seems tied to how a coarser CA seed interacts with SA/CRF; this is an
+   inference from the observed CA-only/final sign reversal, not a proven
+   mechanism.
 2. **Do not promote B1 using COCO.** Its COCO transfer gain is observed in the
    frozen evaluation, but VOC worsens in every held-out fold. The 32×32
    weights are substantial rather than automatically pruned.
 3. **Retire A1/A4 for this attribution protocol.** COCO's class-only
    content set makes their seed constant by algebra. A2 projected-output
    head weights alone did not improve these segmentation metrics.
-4. The most interesting methodological question is whether a *locked,
-   separately preregistered A3-versus-A0 confirmation* would satisfy the
-   selection rule, or whether its gains are sensitive to the current
-   multi-candidate eligibility screen. Such a rerun would be a new
-   experiment, not a reinterpretation of this one.
+4. Before calling A3 a confirmed replacement in a manuscript, run a
+   *locked, separately preregistered A3-versus-A0 confirmation* or use an
+   independent evaluation. Such a run would be a new experiment, not a
+   reinterpretation of SG24-A. Claude should review this distinction when
+   integrating the result into the paper.
 
 ## Raw result files
 

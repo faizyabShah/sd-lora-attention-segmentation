@@ -5940,3 +5940,16 @@ bootstrap and diagnostic analysis is in
 data are in the `sg24_a/` and `sg24_b/` summary files. Claude should
 verify the selection interpretation and class/weight analyses before
 manuscript integration.
+
+**Owner decision (24 October 2026; post-results working default).** Use
+**A3 → MID-P2 → R2** for subsequent training-free method development, with
+the selected 11 CA modules, all CA calls and heads, the unchanged MID-P2
+and R2 operators, and the VOC-selected final threshold **0.425**. The
+owner chose A3 after reviewing its forced A3-versus-A0 comparison: A3 won
+4/5 held-out VOC folds, gained 0.00608 forced OOF mIoU, and transferred
+positively to frozen COCO (+0.0183 full-set macro mIoU). This is an
+**exploratory owner override**, not a retroactive pass of SG24-A's locked
+multi-candidate promotion gate. That screen selected A3 in 3/5 folds and
+its selected-path OOF was below A0. Preserve A0 as the registered SG24-A
+winner and report the working-default decision separately in the paper.
+SG24-B's 16-module B1 remains excluded because it lost all five VOC folds.
