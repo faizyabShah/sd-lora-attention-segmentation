@@ -5918,3 +5918,25 @@ SG24-A merge and its VOC-only automatic-method manifest; its CPU merge is
 concurrently, with 12 hours per resumable shard. These are submissions,
 not result claims. Claude should review the committed implementation and
 selection contract now, then independently validate the produced results.
+
+**Outcome (24 October 2026; pending Claude review).** Both arrays and
+mergers completed with 490 VOC and 707 COCO images each. SG24-A's CA-only
+screen retained A0 in 5/5 folds. Its final multi-candidate screen retained
+A0: A3 received 3/5 selection votes, below the 4/5 promotion gate, and
+selected-path OOF was 0.81616 versus 0.81689 for A0. In the *forced* A3
+comparison, A3 nevertheless won 4/5 held-out folds, with OOF 0.82297
+versus 0.81689, full VOC 0.8243 versus 0.8185, and frozen COCO 0.6620
+versus 0.6437. These are secondary findings, not a formal promotion.
+A1 and A4 collapse to zero COCO IoU because the unchanged class-only
+attribution prompt makes target-only content rescaling spatially constant.
+A2 worsens both datasets. SG24-B used diagnostic A3 per the preregistered
+fallback. Its expanded 16-module B1 lost all five VOC folds: final OOF
+0.8152 versus 0.8230 for 11-module B0, full VOC 0.8152 versus 0.8244.
+Frozen COCO final rose 0.6622→0.6703; this transfer-only gain cannot
+override VOC selection. The restored 32×32 group received about 31% of
+automatic layer weight, so it was not suppressed. Full fold, class,
+bootstrap and diagnostic analysis is in
+`outputs/segmentation/analysis/SG24_CHATGPT_HANDOFF.md`; machine-readable
+data are in the `sg24_a/` and `sg24_b/` summary files. Claude should
+verify the selection interpretation and class/weight analyses before
+manuscript integration.

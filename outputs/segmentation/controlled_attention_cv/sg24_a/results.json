@@ -1,0 +1,4359 @@
+{
+  "spec": {
+    "experiment": "SG24-A/B",
+    "version": 1,
+    "track": "ordinary class-word W, SD1.5, conditional 77-token padded attribution",
+    "selected_ca_modules": [
+      0,
+      1,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      13,
+      14,
+      15
+    ],
+    "expanded_ca_modules": "all 16 sorted attn2 modules",
+    "ca_calls": [
+      0,
+      30
+    ],
+    "sa_module_index": 15,
+    "sa_calls": [
+      10,
+      20
+    ],
+    "sa_heads": 8,
+    "propagation": "mean_i(A_i^2 c), 88 middle-window observations",
+    "ref_feature": "up_blocks.2.attentions.1.transformer_blocks.0.attn2 conditional Q, all heads concatenated, each call",
+    "head_weight": "GoCA SD1.5 projected-output dot product without clamp, uniform fallback only when summed projected output is zero",
+    "layer_weight": "GoCA pseudo-global softmax(F F^T / sqrt(d)) vs paired SA affinity, dot-product, normalized within each call",
+    "content_token_rule": "fast-tokenizer offsets, exclude zero-length special/padding, punctuation-only pieces and English stopwords; always include target pieces",
+    "thresholds": [
+      0.3,
+      0.325,
+      0.35,
+      0.375,
+      0.4,
+      0.425,
+      0.45,
+      0.475,
+      0.5,
+      0.525,
+      0.55,
+      0.575,
+      0.6,
+      0.625,
+      0.65,
+      0.675,
+      0.7
+    ],
+    "diagnostic_threshold": 0.45,
+    "selection": "VOC-only five fixed folds; frozen COCO transfer; B method from A3/A4 VOC-only screen",
+    "storage": "per-image counts and reduced diagnostic sidecars; no saved images or attention maps"
+  },
+  "experiment": "a",
+  "method": null,
+  "selection": {
+    "CA": {
+      "reference": "A0/CA",
+      "candidates": [
+        "A1/CA",
+        "A2/CA",
+        "A3/CA",
+        "A4/CA"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "A0/CA",
+          "chosen_threshold": 0.4,
+          "reference_threshold": 0.4,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7148016213805497,
+          "train_miou_reference": 0.7148016213805497,
+          "heldout_miou_chosen": 0.7079427659117188,
+          "heldout_miou_reference": 0.7079427659117188
+        },
+        {
+          "fold": 1,
+          "chosen": "A0/CA",
+          "chosen_threshold": 0.4,
+          "reference_threshold": 0.4,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7097983002214269,
+          "train_miou_reference": 0.7097983002214269,
+          "heldout_miou_chosen": 0.7253500546448384,
+          "heldout_miou_reference": 0.7253500546448384
+        },
+        {
+          "fold": 2,
+          "chosen": "A0/CA",
+          "chosen_threshold": 0.4,
+          "reference_threshold": 0.4,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7133678528150666,
+          "train_miou_reference": 0.7133678528150666,
+          "heldout_miou_chosen": 0.7150766135063351,
+          "heldout_miou_reference": 0.7150766135063351
+        },
+        {
+          "fold": 3,
+          "chosen": "A0/CA",
+          "chosen_threshold": 0.4,
+          "reference_threshold": 0.4,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7159618290807538,
+          "train_miou_reference": 0.7159618290807538,
+          "heldout_miou_chosen": 0.7006629731021267,
+          "heldout_miou_reference": 0.7006629731021267
+        },
+        {
+          "fold": 4,
+          "chosen": "A0/CA",
+          "chosen_threshold": 0.4,
+          "reference_threshold": 0.4,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.7132073197276212,
+          "train_miou_reference": 0.7132073197276212,
+          "heldout_miou_chosen": 0.7096683097623073,
+          "heldout_miou_reference": 0.7096683097623073
+        }
+      ],
+      "selection_counts": {
+        "A0/CA": 5
+      },
+      "vote_winner": "A0/CA",
+      "vote_winner_votes": 5,
+      "frozen": "A0/CA",
+      "freeze_reason": "reference won the fold vote",
+      "oof_miou_selection": 0.713531536561909,
+      "oof_miou_reference": 0.713531536561909,
+      "oof_gain": 0.0,
+      "full_threshold_frozen": 0.4,
+      "full_threshold_reference": 0.4,
+      "full_miou_frozen": 0.713531536561909,
+      "full_miou_reference": 0.713531536561909,
+      "paired_oof": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "FINAL": {
+      "reference": "A0/FINAL",
+      "candidates": [
+        "A1/FINAL",
+        "A2/FINAL",
+        "A3/FINAL",
+        "A4/FINAL"
+      ],
+      "folds": [
+        {
+          "fold": 0,
+          "chosen": "A3/FINAL",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "conditional",
+          "train_miou_chosen": 0.8258932283273573,
+          "train_miou_reference": 0.8170472505497131,
+          "heldout_miou_chosen": 0.8209827055336174,
+          "heldout_miou_reference": 0.8259378243058526
+        },
+        {
+          "fold": 1,
+          "chosen": "A0/FINAL",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8128584591440442,
+          "train_miou_reference": 0.8128584591440442,
+          "heldout_miou_chosen": 0.8415930438627386,
+          "heldout_miou_reference": 0.8415930438627386
+        },
+        {
+          "fold": 2,
+          "chosen": "A3/FINAL",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "conditional",
+          "train_miou_chosen": 0.8253013059663532,
+          "train_miou_reference": 0.8196201399653132,
+          "heldout_miou_chosen": 0.8219667194437734,
+          "heldout_miou_reference": 0.8175007391459761
+        },
+        {
+          "fold": 3,
+          "chosen": "A3/FINAL",
+          "chosen_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "reason": "conditional",
+          "train_miou_chosen": 0.8319015809223916,
+          "train_miou_reference": 0.8231888202137865,
+          "heldout_miou_chosen": 0.8003456061601033,
+          "heldout_miou_reference": 0.7996643510549981
+        },
+        {
+          "fold": 4,
+          "chosen": "A0/FINAL",
+          "chosen_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "reason": "no eligible candidate",
+          "train_miou_chosen": 0.8208756752166104,
+          "train_miou_reference": 0.8208756752166104,
+          "heldout_miou_chosen": 0.8061083751316798,
+          "heldout_miou_reference": 0.8061083751316798
+        }
+      ],
+      "selection_counts": {
+        "A3/FINAL": 3,
+        "A0/FINAL": 2
+      },
+      "vote_winner": "A3/FINAL",
+      "vote_winner_votes": 3,
+      "frozen": "A0/FINAL",
+      "freeze_reason": "fewer than 4 fold votes",
+      "oof_miou_selection": 0.8161585349760945,
+      "oof_miou_reference": 0.8168887370277413,
+      "oof_gain": -0.0007302020516468666,
+      "full_threshold_frozen": 0.45,
+      "full_threshold_reference": 0.45,
+      "full_miou_frozen": 0.8185068565614575,
+      "full_miou_reference": 0.8185068565614575,
+      "paired_oof": {
+        "mean": 0.00016050401705895026,
+        "ci_low": -0.0025286697504597897,
+        "ci_high": 0.002929092164269176,
+        "better": 140,
+        "worse": 154,
+        "ties": 196
+      }
+    }
+  },
+  "forced_oof": {
+    "A0/CA": {
+      "miou": 0.713531536561909,
+      "reference_miou": 0.713531536561909,
+      "delta": 0.0,
+      "fold_wins": 0,
+      "folds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.7079427659117188,
+          "reference_miou": 0.7079427659117188
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.7253500546448384,
+          "reference_miou": 0.7253500546448384
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.7150766135063351,
+          "reference_miou": 0.7150766135063351
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.7006629731021267,
+          "reference_miou": 0.7006629731021267
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.7096683097623073,
+          "reference_miou": 0.7096683097623073
+        }
+      ],
+      "paired_mean_image_iou": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "A0/FINAL": {
+      "miou": 0.8168887370277413,
+      "reference_miou": 0.8168887370277413,
+      "delta": 0.0,
+      "fold_wins": 0,
+      "folds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "candidate_miou": 0.8259378243058526,
+          "reference_miou": 0.8259378243058526
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "candidate_miou": 0.8415930438627386,
+          "reference_miou": 0.8415930438627386
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "candidate_miou": 0.8175007391459761,
+          "reference_miou": 0.8175007391459761
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "candidate_miou": 0.7996643510549981,
+          "reference_miou": 0.7996643510549981
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "candidate_miou": 0.8061083751316798,
+          "reference_miou": 0.8061083751316798
+        }
+      ],
+      "paired_mean_image_iou": {
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "better": 0,
+        "worse": 0,
+        "ties": 490
+      }
+    },
+    "A1/CA": {
+      "miou": 0.6405739878195947,
+      "reference_miou": 0.713531536561909,
+      "delta": -0.0729575487423143,
+      "fold_wins": 0,
+      "folds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.7,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.6313409662103397,
+          "reference_miou": 0.7079427659117188
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.7,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.6667984626296214,
+          "reference_miou": 0.7253500546448384
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.7,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.6295817912610678,
+          "reference_miou": 0.7150766135063351
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.7,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.6326956062568206,
+          "reference_miou": 0.7006629731021267
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.7,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.6366387382770475,
+          "reference_miou": 0.7096683097623073
+        }
+      ],
+      "paired_mean_image_iou": {
+        "mean": -0.07057275989697467,
+        "ci_low": -0.08456638394522642,
+        "ci_high": -0.05675305326399842,
+        "better": 141,
+        "worse": 349,
+        "ties": 0
+      }
+    },
+    "A1/FINAL": {
+      "miou": 0.800504799115159,
+      "reference_miou": 0.8168887370277413,
+      "delta": -0.016383937912582303,
+      "fold_wins": 0,
+      "folds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.625,
+          "reference_threshold": 0.425,
+          "candidate_miou": 0.8064938040090766,
+          "reference_miou": 0.8259378243058526
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.65,
+          "reference_threshold": 0.45,
+          "candidate_miou": 0.8196053720636115,
+          "reference_miou": 0.8415930438627386
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.625,
+          "reference_threshold": 0.45,
+          "candidate_miou": 0.7970830746011653,
+          "reference_miou": 0.8175007391459761
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.625,
+          "reference_threshold": 0.425,
+          "candidate_miou": 0.7863693980636717,
+          "reference_miou": 0.7996643510549981
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.625,
+          "reference_threshold": 0.45,
+          "candidate_miou": 0.7910613696983259,
+          "reference_miou": 0.8061083751316798
+        }
+      ],
+      "paired_mean_image_iou": {
+        "mean": -0.015641848116734334,
+        "ci_low": -0.02906673250601135,
+        "ci_high": -0.002583870028794441,
+        "better": 234,
+        "worse": 256,
+        "ties": 0
+      }
+    },
+    "A2/CA": {
+      "miou": 0.6896814321099722,
+      "reference_miou": 0.713531536561909,
+      "delta": -0.023850104451936804,
+      "fold_wins": 0,
+      "folds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.3,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.6777702169510412,
+          "reference_miou": 0.7079427659117188
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.3,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.6920789536857392,
+          "reference_miou": 0.7253500546448384
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.3,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.6956056904626906,
+          "reference_miou": 0.7150766135063351
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.3,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.6904226148048996,
+          "reference_miou": 0.7006629731021267
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.3,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.6839769951384538,
+          "reference_miou": 0.7096683097623073
+        }
+      ],
+      "paired_mean_image_iou": {
+        "mean": -0.026535021425433913,
+        "ci_low": -0.03363555300910517,
+        "ci_high": -0.019432686173940242,
+        "better": 173,
+        "worse": 317,
+        "ties": 0
+      }
+    },
+    "A2/FINAL": {
+      "miou": 0.8032795188911672,
+      "reference_miou": 0.8168887370277413,
+      "delta": -0.01360921813657412,
+      "fold_wins": 0,
+      "folds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.375,
+          "reference_threshold": 0.425,
+          "candidate_miou": 0.7987139399713609,
+          "reference_miou": 0.8259378243058526
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.375,
+          "reference_threshold": 0.45,
+          "candidate_miou": 0.8188664009335584,
+          "reference_miou": 0.8415930438627386
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.45,
+          "candidate_miou": 0.8065847010216839,
+          "reference_miou": 0.8175007391459761
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.375,
+          "reference_threshold": 0.425,
+          "candidate_miou": 0.7993334975747628,
+          "reference_miou": 0.7996643510549981
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.375,
+          "reference_threshold": 0.45,
+          "candidate_miou": 0.7979747164490824,
+          "reference_miou": 0.8061083751316798
+        }
+      ],
+      "paired_mean_image_iou": {
+        "mean": -0.01614401318557036,
+        "ci_low": -0.024489183781438648,
+        "ci_high": -0.007814608382058491,
+        "better": 173,
+        "worse": 317,
+        "ties": 0
+      }
+    },
+    "A3/CA": {
+      "miou": 0.7049473780541249,
+      "reference_miou": 0.713531536561909,
+      "delta": -0.008584158507784156,
+      "fold_wins": 1,
+      "folds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.6901783748243563,
+          "reference_miou": 0.7079427659117188
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.7150800006016708,
+          "reference_miou": 0.7253500546448384
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.7181606189661253,
+          "reference_miou": 0.7150766135063351
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.6888467239403283,
+          "reference_miou": 0.7006629731021267
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.4,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.6998798873263459,
+          "reference_miou": 0.7096683097623073
+        }
+      ],
+      "paired_mean_image_iou": {
+        "mean": -0.0130537227726617,
+        "ci_low": -0.01861159824428778,
+        "ci_high": -0.007420461389219375,
+        "better": 156,
+        "worse": 334,
+        "ties": 0
+      }
+    },
+    "A3/FINAL": {
+      "miou": 0.8229692025417157,
+      "reference_miou": 0.8168887370277413,
+      "delta": 0.006080465513974342,
+      "fold_wins": 4,
+      "folds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "candidate_miou": 0.8209827055336174,
+          "reference_miou": 0.8259378243058526
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.45,
+          "candidate_miou": 0.8575194724568167,
+          "reference_miou": 0.8415930438627386
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "candidate_miou": 0.8219667194437734,
+          "reference_miou": 0.8175007391459761
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.425,
+          "reference_threshold": 0.425,
+          "candidate_miou": 0.8003456061601033,
+          "reference_miou": 0.7996643510549981
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.45,
+          "reference_threshold": 0.45,
+          "candidate_miou": 0.8226579871214149,
+          "reference_miou": 0.8061083751316798
+        }
+      ],
+      "paired_mean_image_iou": {
+        "mean": 0.005880114131897738,
+        "ci_low": 0.0015671103962828547,
+        "ci_high": 0.010430144733415898,
+        "better": 252,
+        "worse": 238,
+        "ties": 0
+      }
+    },
+    "A4/CA": {
+      "miou": 0.6287518107309833,
+      "reference_miou": 0.713531536561909,
+      "delta": -0.08477972583092575,
+      "fold_wins": 0,
+      "folds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.7,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.6275725656888878,
+          "reference_miou": 0.7079427659117188
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.7,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.6385102102304764,
+          "reference_miou": 0.7253500546448384
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.7,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.615890780379696,
+          "reference_miou": 0.7150766135063351
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.7,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.6181126786837521,
+          "reference_miou": 0.7006629731021267
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.7,
+          "reference_threshold": 0.4,
+          "candidate_miou": 0.6347769636301568,
+          "reference_miou": 0.7096683097623073
+        }
+      ],
+      "paired_mean_image_iou": {
+        "mean": -0.08674127592765929,
+        "ci_low": -0.10087818021944692,
+        "ci_high": -0.0726063243824897,
+        "better": 131,
+        "worse": 359,
+        "ties": 0
+      }
+    },
+    "A4/FINAL": {
+      "miou": 0.8004275539677291,
+      "reference_miou": 0.8168887370277413,
+      "delta": -0.016461183060012208,
+      "fold_wins": 0,
+      "folds": [
+        {
+          "fold": 0,
+          "candidate_threshold": 0.6,
+          "reference_threshold": 0.425,
+          "candidate_miou": 0.8040323295031986,
+          "reference_miou": 0.8259378243058526
+        },
+        {
+          "fold": 1,
+          "candidate_threshold": 0.625,
+          "reference_threshold": 0.45,
+          "candidate_miou": 0.8302827176858617,
+          "reference_miou": 0.8415930438627386
+        },
+        {
+          "fold": 2,
+          "candidate_threshold": 0.6,
+          "reference_threshold": 0.45,
+          "candidate_miou": 0.7939243245522128,
+          "reference_miou": 0.8175007391459761
+        },
+        {
+          "fold": 3,
+          "candidate_threshold": 0.6,
+          "reference_threshold": 0.425,
+          "candidate_miou": 0.7858446970084156,
+          "reference_miou": 0.7996643510549981
+        },
+        {
+          "fold": 4,
+          "candidate_threshold": 0.625,
+          "reference_threshold": 0.45,
+          "candidate_miou": 0.796705702289789,
+          "reference_miou": 0.8061083751316798
+        }
+      ],
+      "paired_mean_image_iou": {
+        "mean": -0.015003174686291563,
+        "ci_low": -0.027777541309563156,
+        "ci_high": -0.0025899814819147367,
+        "better": 208,
+        "worse": 282,
+        "ties": 0
+      }
+    }
+  },
+  "cells": {
+    "voc": {
+      "A0/CA": {
+        "images": 490,
+        "voc_frozen_threshold": 0.4,
+        "miou": 0.713531536561909,
+        "delta_vs_reference": 0.0,
+        "precision": 0.8068170316996741,
+        "recall": 0.8538791451677559,
+        "pixel_iou": 0.7089361292585065,
+        "mean_image_iou": 0.7034896345578141,
+        "per_class_iou": {
+          "aeroplane": 0.694354929987151,
+          "bicycle": 0.6475521124020721,
+          "bird": 0.7412626957546867,
+          "boat": 0.7780597330888055,
+          "bottle": 0.7539533378687076,
+          "bus": 0.8954078800662223,
+          "car": 0.8000524201391207,
+          "cat": 0.7146634750586305,
+          "chair": 0.48150574494426185,
+          "cow": 0.8166489691923937,
+          "dining-table": 0.4422185468891625,
+          "dog": 0.8213958980183935,
+          "horse": 0.7845485930052908,
+          "motorbike": 0.7949612208675504,
+          "person": 0.43521906885021006,
+          "potted-plant": 0.638884288261255,
+          "sheep": 0.7798209486802143,
+          "sofa": 0.8612367441504956,
+          "train": 0.6417002495497606,
+          "tv": 0.7471838744637969
+        },
+        "per_class_delta_vs_reference": {
+          "aeroplane": 0.0,
+          "bicycle": 0.0,
+          "bird": 0.0,
+          "boat": 0.0,
+          "bottle": 0.0,
+          "bus": 0.0,
+          "car": 0.0,
+          "cat": 0.0,
+          "chair": 0.0,
+          "cow": 0.0,
+          "dining-table": 0.0,
+          "dog": 0.0,
+          "horse": 0.0,
+          "motorbike": 0.0,
+          "person": 0.0,
+          "potted-plant": 0.0,
+          "sheep": 0.0,
+          "sofa": 0.0,
+          "train": 0.0,
+          "tv": 0.0
+        },
+        "paired_mean_image_iou_vs_reference": {
+          "mean": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "better": 0,
+          "worse": 0,
+          "ties": 490
+        }
+      },
+      "A0/FINAL": {
+        "images": 490,
+        "voc_frozen_threshold": 0.45,
+        "miou": 0.8185068565614575,
+        "delta_vs_reference": 0.0,
+        "precision": 0.8914438968976413,
+        "recall": 0.8969598784485163,
+        "pixel_iou": 0.8086344989981121,
+        "mean_image_iou": 0.8234223060432915,
+        "per_class_iou": {
+          "aeroplane": 0.8969996076409992,
+          "bicycle": 0.760583709753778,
+          "bird": 0.8976802583284863,
+          "boat": 0.8542765702386932,
+          "bottle": 0.8935057044975049,
+          "bus": 0.9098378824379477,
+          "car": 0.8315824610945701,
+          "cat": 0.8274193687701902,
+          "chair": 0.8007920747294363,
+          "cow": 0.862072936296232,
+          "dining-table": 0.46398882926178747,
+          "dog": 0.918288628905169,
+          "horse": 0.8982717416880491,
+          "motorbike": 0.8569557571879745,
+          "person": 0.7216588796042546,
+          "potted-plant": 0.7534950802496133,
+          "sheep": 0.8066315814687816,
+          "sofa": 0.9601609149869372,
+          "train": 0.6773878210735349,
+          "tv": 0.7785473230152091
+        },
+        "per_class_delta_vs_reference": {
+          "aeroplane": 0.0,
+          "bicycle": 0.0,
+          "bird": 0.0,
+          "boat": 0.0,
+          "bottle": 0.0,
+          "bus": 0.0,
+          "car": 0.0,
+          "cat": 0.0,
+          "chair": 0.0,
+          "cow": 0.0,
+          "dining-table": 0.0,
+          "dog": 0.0,
+          "horse": 0.0,
+          "motorbike": 0.0,
+          "person": 0.0,
+          "potted-plant": 0.0,
+          "sheep": 0.0,
+          "sofa": 0.0,
+          "train": 0.0,
+          "tv": 0.0
+        },
+        "paired_mean_image_iou_vs_reference": {
+          "mean": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "better": 0,
+          "worse": 0,
+          "ties": 490
+        }
+      },
+      "A1/CA": {
+        "images": 490,
+        "voc_frozen_threshold": 0.7,
+        "miou": 0.6405739878195947,
+        "delta_vs_reference": -0.0729575487423143,
+        "precision": 0.7192519622925637,
+        "recall": 0.8748025392575671,
+        "pixel_iou": 0.6521249444568831,
+        "mean_image_iou": 0.6329168746608393,
+        "per_class_iou": {
+          "aeroplane": 0.5783482937830666,
+          "bicycle": 0.5286300322801157,
+          "bird": 0.6197716586079937,
+          "boat": 0.6062330747308223,
+          "bottle": 0.5564962817897112,
+          "bus": 0.693056295891429,
+          "car": 0.6203372664016995,
+          "cat": 0.7962364964166304,
+          "chair": 0.541349375702378,
+          "cow": 0.7733826332948125,
+          "dining-table": 0.3898745833834756,
+          "dog": 0.7920750549498592,
+          "horse": 0.7282083497250086,
+          "motorbike": 0.6600905122252313,
+          "person": 0.634028601329673,
+          "potted-plant": 0.707404961890073,
+          "sheep": 0.7043109807693698,
+          "sofa": 0.7884521105708169,
+          "train": 0.5663121252732553,
+          "tv": 0.5268810673764757
+        },
+        "per_class_delta_vs_reference": {
+          "aeroplane": -0.11600663620408436,
+          "bicycle": -0.11892208012195638,
+          "bird": -0.12149103714669307,
+          "boat": -0.17182665835798316,
+          "bottle": -0.19745705607899633,
+          "bus": -0.20235158417479326,
+          "car": -0.1797151537374212,
+          "cat": 0.08157302135799993,
+          "chair": 0.059843630758116106,
+          "cow": -0.04326633589758122,
+          "dining-table": -0.05234396350568693,
+          "dog": -0.02932084306853433,
+          "horse": -0.0563402432802822,
+          "motorbike": -0.1348707086423191,
+          "person": 0.19880953247946292,
+          "potted-plant": 0.06852067362881797,
+          "sheep": -0.07550996791084452,
+          "sofa": -0.07278463357967868,
+          "train": -0.07538812427650532,
+          "tv": -0.2203028070873212
+        },
+        "paired_mean_image_iou_vs_reference": {
+          "mean": -0.07057275989697467,
+          "ci_low": -0.08456638394522642,
+          "ci_high": -0.05675305326399842,
+          "better": 141,
+          "worse": 349,
+          "ties": 0
+        }
+      },
+      "A1/FINAL": {
+        "images": 490,
+        "voc_frozen_threshold": 0.625,
+        "miou": 0.8021657689272252,
+        "delta_vs_reference": -0.016341087634232254,
+        "precision": 0.8714098223653921,
+        "recall": 0.8996527355651046,
+        "pixel_iou": 0.7942145145262438,
+        "mean_image_iou": 0.8077151467485321,
+        "per_class_iou": {
+          "aeroplane": 0.8885201193384512,
+          "bicycle": 0.7669290149044751,
+          "bird": 0.8445548936754849,
+          "boat": 0.7642975348357308,
+          "bottle": 0.8086973869395762,
+          "bus": 0.8277531297351578,
+          "car": 0.7677735430797817,
+          "cat": 0.8195357210892782,
+          "chair": 0.8637306582390434,
+          "cow": 0.9380111144865764,
+          "dining-table": 0.3975945835621681,
+          "dog": 0.9229195318347695,
+          "horse": 0.9318484071727685,
+          "motorbike": 0.7769699022819504,
+          "person": 0.7977356504578975,
+          "potted-plant": 0.7504866048023912,
+          "sheep": 0.8536054439851672,
+          "sofa": 0.942566640792231,
+          "train": 0.7271786588597532,
+          "tv": 0.6526068384718532
+        },
+        "per_class_delta_vs_reference": {
+          "aeroplane": -0.008479488302547966,
+          "bicycle": 0.006345305150697089,
+          "bird": -0.05312536465300144,
+          "boat": -0.08997903540296237,
+          "bottle": -0.08480831755792873,
+          "bus": -0.08208475270278992,
+          "car": -0.06380891801478838,
+          "cat": -0.007883647680911987,
+          "chair": 0.06293858350960713,
+          "cow": 0.07593817819034432,
+          "dining-table": -0.06639424569961938,
+          "dog": 0.0046309029296004445,
+          "horse": 0.03357666548471938,
+          "motorbike": -0.07998585490602406,
+          "person": 0.07607677085364295,
+          "potted-plant": -0.0030084754472221586,
+          "sheep": 0.04697386251638569,
+          "sofa": -0.017594274194706272,
+          "train": 0.04979083778621829,
+          "tv": -0.12594048454335594
+        },
+        "paired_mean_image_iou_vs_reference": {
+          "mean": -0.01570715929475935,
+          "ci_low": -0.028961328703240745,
+          "ci_high": -0.002732725402104886,
+          "better": 230,
+          "worse": 260,
+          "ties": 0
+        }
+      },
+      "A2/CA": {
+        "images": 490,
+        "voc_frozen_threshold": 0.3,
+        "miou": 0.6896814321099722,
+        "delta_vs_reference": -0.023850104451936804,
+        "precision": 0.7706880746327601,
+        "recall": 0.86277892456148,
+        "pixel_iou": 0.6865362731042784,
+        "mean_image_iou": 0.6769546131323803,
+        "per_class_iou": {
+          "aeroplane": 0.6308098079557842,
+          "bicycle": 0.6618744740557483,
+          "bird": 0.7149474508092162,
+          "boat": 0.6747290577106841,
+          "bottle": 0.7187745983716541,
+          "bus": 0.8639170920261411,
+          "car": 0.7786611256281746,
+          "cat": 0.7163718587644536,
+          "chair": 0.4581628714201117,
+          "cow": 0.844639839789724,
+          "dining-table": 0.3510180014421764,
+          "dog": 0.810365941010849,
+          "horse": 0.7765040939569395,
+          "motorbike": 0.773989817811605,
+          "person": 0.3898912019670999,
+          "potted-plant": 0.6611826277229943,
+          "sheep": 0.8594989537886639,
+          "sofa": 0.8541351608055439,
+          "train": 0.46150318032121473,
+          "tv": 0.7926514868406663
+        },
+        "per_class_delta_vs_reference": {
+          "aeroplane": -0.06354512203136675,
+          "bicycle": 0.014322361653676174,
+          "bird": -0.02631524494547055,
+          "boat": -0.10333067537812135,
+          "bottle": -0.03517873949705341,
+          "bus": -0.03149078804008121,
+          "car": -0.021391294510946124,
+          "cat": 0.0017083837058231577,
+          "chair": -0.023342873524150154,
+          "cow": 0.027990870597330297,
+          "dining-table": -0.09120054544698614,
+          "dog": -0.0110299570075445,
+          "horse": -0.00804449904835125,
+          "motorbike": -0.02097140305594536,
+          "person": -0.045327866883110135,
+          "potted-plant": 0.022298339461739314,
+          "sheep": 0.07967800510844958,
+          "sofa": -0.007101583344951701,
+          "train": -0.18019706922854584,
+          "tv": 0.04546761237686947
+        },
+        "paired_mean_image_iou_vs_reference": {
+          "mean": -0.026535021425433913,
+          "ci_low": -0.03363555300910517,
+          "ci_high": -0.019432686173940242,
+          "better": 173,
+          "worse": 317,
+          "ties": 0
+        }
+      },
+      "A2/FINAL": {
+        "images": 490,
+        "voc_frozen_threshold": 0.375,
+        "miou": 0.8039259122749132,
+        "delta_vs_reference": -0.014580944286544328,
+        "precision": 0.8568406765472679,
+        "recall": 0.9161710652199154,
+        "pixel_iou": 0.7945479204000505,
+        "mean_image_iou": 0.8062571630371613,
+        "per_class_iou": {
+          "aeroplane": 0.890238759402467,
+          "bicycle": 0.7751345604117301,
+          "bird": 0.8753422935654593,
+          "boat": 0.7605508524586646,
+          "bottle": 0.8772439522619723,
+          "bus": 0.8679064377092711,
+          "car": 0.8326490096106123,
+          "cat": 0.8514181584667104,
+          "chair": 0.7473485895772631,
+          "cow": 0.9499282007822247,
+          "dining-table": 0.3547753087836255,
+          "dog": 0.9272706277103498,
+          "horse": 0.8970501339211595,
+          "motorbike": 0.832447937380556,
+          "person": 0.6465880868242181,
+          "potted-plant": 0.7792201549306946,
+          "sheep": 0.9105880289373214,
+          "sofa": 0.9598390867911702,
+          "train": 0.5287146588940888,
+          "tv": 0.8142634070787055
+        },
+        "per_class_delta_vs_reference": {
+          "aeroplane": -0.00676084823853218,
+          "bicycle": 0.014550850657952141,
+          "bird": -0.022337964763026963,
+          "boat": -0.09372571778002858,
+          "bottle": -0.01626175223553261,
+          "bus": -0.0419314447286766,
+          "car": 0.001066548516042154,
+          "cat": 0.02399878969652025,
+          "chair": -0.05344348515217312,
+          "cow": 0.08785526448599268,
+          "dining-table": -0.10921352047816196,
+          "dog": 0.008981998805180802,
+          "horse": -0.0012216077668896208,
+          "motorbike": -0.02450781980741845,
+          "person": -0.07507079278003648,
+          "potted-plant": 0.025725074681081317,
+          "sheep": 0.10395644746853983,
+          "sofa": -0.0003218281957669822,
+          "train": -0.14867316217944615,
+          "tv": 0.035716084063496356
+        },
+        "paired_mean_image_iou_vs_reference": {
+          "mean": -0.01716514300613001,
+          "ci_low": -0.02584489585972909,
+          "ci_high": -0.008492814485111286,
+          "better": 166,
+          "worse": 324,
+          "ties": 0
+        }
+      },
+      "A3/CA": {
+        "images": 490,
+        "voc_frozen_threshold": 0.4,
+        "miou": 0.7049473780541249,
+        "delta_vs_reference": -0.008584158507784156,
+        "precision": 0.7940515491543978,
+        "recall": 0.8592112918470246,
+        "pixel_iou": 0.7026309950512445,
+        "mean_image_iou": 0.6904359117851525,
+        "per_class_iou": {
+          "aeroplane": 0.618529622026792,
+          "bicycle": 0.6095311387217839,
+          "bird": 0.7190933800013939,
+          "boat": 0.7566255115503686,
+          "bottle": 0.7140209945693371,
+          "bus": 0.8876816190919732,
+          "car": 0.7840609923709573,
+          "cat": 0.7095212529901394,
+          "chair": 0.4428368056154485,
+          "cow": 0.8218291468379898,
+          "dining-table": 0.4348055968513141,
+          "dog": 0.7826307201907183,
+          "horse": 0.7585091235280617,
+          "motorbike": 0.7753626443190694,
+          "person": 0.5897461445831647,
+          "potted-plant": 0.5931603442550102,
+          "sheep": 0.7900008324582033,
+          "sofa": 0.8702129953830676,
+          "train": 0.6704427880433245,
+          "tv": 0.7703459076943807
+        },
+        "per_class_delta_vs_reference": {
+          "aeroplane": -0.07582530796035902,
+          "bicycle": -0.03802097368028823,
+          "bird": -0.02216931575329284,
+          "boat": -0.02143422153843688,
+          "bottle": -0.039932343299370454,
+          "bus": -0.007726260974249111,
+          "car": -0.015991427768163424,
+          "cat": -0.005142222068491131,
+          "chair": -0.03866893932881332,
+          "cow": 0.005180177645596085,
+          "dining-table": -0.00741295003784842,
+          "dog": -0.03876517782767519,
+          "horse": -0.026039469477229127,
+          "motorbike": -0.01959857654848096,
+          "person": 0.1545270757329546,
+          "potted-plant": -0.0457239440062448,
+          "sheep": 0.010179883777988952,
+          "sofa": 0.008976251232572063,
+          "train": 0.028742538493563896,
+          "tv": 0.023162033230583856
+        },
+        "paired_mean_image_iou_vs_reference": {
+          "mean": -0.0130537227726617,
+          "ci_low": -0.01861159824428778,
+          "ci_high": -0.007420461389219375,
+          "better": 156,
+          "worse": 334,
+          "ties": 0
+        }
+      },
+      "A3/FINAL": {
+        "images": 490,
+        "voc_frozen_threshold": 0.425,
+        "miou": 0.8243398458509145,
+        "delta_vs_reference": 0.005832989289456969,
+        "precision": 0.8828287381708599,
+        "recall": 0.916218727523667,
+        "pixel_iou": 0.8168833689767632,
+        "mean_image_iou": 0.8284953095045307,
+        "per_class_iou": {
+          "aeroplane": 0.883999139073394,
+          "bicycle": 0.7629949428219964,
+          "bird": 0.913040568327514,
+          "boat": 0.8390738954549627,
+          "bottle": 0.852795218661761,
+          "bus": 0.8970452489881149,
+          "car": 0.8460900684733373,
+          "cat": 0.8390481415148167,
+          "chair": 0.7794036273833338,
+          "cow": 0.9221383150268202,
+          "dining-table": 0.4555570186793128,
+          "dog": 0.931507947293235,
+          "horse": 0.8981350856696266,
+          "motorbike": 0.8565317218163273,
+          "person": 0.7748295122633608,
+          "potted-plant": 0.7393476102381755,
+          "sheep": 0.8403969324488322,
+          "sofa": 0.9640060819198326,
+          "train": 0.6888837006019616,
+          "tv": 0.8019721403615726
+        },
+        "per_class_delta_vs_reference": {
+          "aeroplane": -0.013000468567605172,
+          "bicycle": 0.0024112330682184435,
+          "bird": 0.01536030999902771,
+          "boat": -0.015202674783730497,
+          "bottle": -0.04071048583574388,
+          "bus": -0.012792633449832835,
+          "car": 0.014507607378767218,
+          "cat": 0.011628772744626481,
+          "chair": -0.021388447346102457,
+          "cow": 0.06006537873058815,
+          "dining-table": -0.008431810582474664,
+          "dog": 0.013219318388066004,
+          "horse": -0.00013665601842249853,
+          "motorbike": -0.0004240353716471468,
+          "person": 0.053170632659106265,
+          "potted-plant": -0.01414747001143779,
+          "sheep": 0.033765350980050624,
+          "sofa": 0.003845166932895383,
+          "train": 0.011495879528426678,
+          "tv": 0.02342481734636348
+        },
+        "paired_mean_image_iou_vs_reference": {
+          "mean": 0.005073003461239307,
+          "ci_low": 0.0003009179294605416,
+          "ci_high": 0.010029998592863337,
+          "better": 209,
+          "worse": 280,
+          "ties": 1
+        }
+      },
+      "A4/CA": {
+        "images": 490,
+        "voc_frozen_threshold": 0.7,
+        "miou": 0.6287518107309833,
+        "delta_vs_reference": -0.08477972583092575,
+        "precision": 0.6980537905051274,
+        "recall": 0.8792626633203583,
+        "pixel_iou": 0.6369950416122129,
+        "mean_image_iou": 0.6167483586301549,
+        "per_class_iou": {
+          "aeroplane": 0.41315269254922393,
+          "bicycle": 0.5265806807154109,
+          "bird": 0.6442487210949848,
+          "boat": 0.5212970151674098,
+          "bottle": 0.6536959025926689,
+          "bus": 0.7075244349610507,
+          "car": 0.6313880199412504,
+          "cat": 0.7698210013801403,
+          "chair": 0.5023045719711755,
+          "cow": 0.7470101225308614,
+          "dining-table": 0.36966255138338494,
+          "dog": 0.7879633921814394,
+          "horse": 0.6805949596851181,
+          "motorbike": 0.574281377387851,
+          "person": 0.6351833471444834,
+          "potted-plant": 0.690393727604996,
+          "sheep": 0.7029828577237359,
+          "sofa": 0.8479824936392365,
+          "train": 0.4394685812395429,
+          "tv": 0.7294997637257016
+        },
+        "per_class_delta_vs_reference": {
+          "aeroplane": -0.28120223743792705,
+          "bicycle": -0.12097143168666125,
+          "bird": -0.09701397465970196,
+          "boat": -0.2567627179213957,
+          "bottle": -0.1002574352760387,
+          "bus": -0.18788344510517163,
+          "car": -0.16866440019787032,
+          "cat": 0.05515752632150983,
+          "chair": 0.020798827026913658,
+          "cow": -0.0696388466615323,
+          "dining-table": -0.07255599550577757,
+          "dog": -0.03343250583695412,
+          "horse": -0.10395363332017271,
+          "motorbike": -0.22067984347969938,
+          "person": 0.19996427829427338,
+          "potted-plant": 0.05150943934374097,
+          "sheep": -0.07683809095647842,
+          "sofa": -0.013254250511259058,
+          "train": -0.20223166831021766,
+          "tv": -0.017684110738095282
+        },
+        "paired_mean_image_iou_vs_reference": {
+          "mean": -0.08674127592765929,
+          "ci_low": -0.10087818021944692,
+          "ci_high": -0.0726063243824897,
+          "better": 131,
+          "worse": 359,
+          "ties": 0
+        }
+      },
+      "A4/FINAL": {
+        "images": 490,
+        "voc_frozen_threshold": 0.6,
+        "miou": 0.8026931320613983,
+        "delta_vs_reference": -0.015813724500059245,
+        "precision": 0.8699445487560732,
+        "recall": 0.903014609189599,
+        "pixel_iou": 0.7956080215980058,
+        "mean_image_iou": 0.8089774198810917,
+        "per_class_iou": {
+          "aeroplane": 0.8782241998159052,
+          "bicycle": 0.7571178225759373,
+          "bird": 0.9145329558835417,
+          "boat": 0.7282479471087638,
+          "bottle": 0.8354050245599888,
+          "bus": 0.8692705008502185,
+          "car": 0.74773469453022,
+          "cat": 0.7993144540286686,
+          "chair": 0.8296727343905614,
+          "cow": 0.9392139549512628,
+          "dining-table": 0.3978002902688279,
+          "dog": 0.9213141604590497,
+          "horse": 0.9143482926643693,
+          "motorbike": 0.7613235132722516,
+          "person": 0.8423992118130436,
+          "potted-plant": 0.7533007984289686,
+          "sheep": 0.8671798213490924,
+          "sofa": 0.942963214236257,
+          "train": 0.620828572935159,
+          "tv": 0.733670477105882
+        },
+        "per_class_delta_vs_reference": {
+          "aeroplane": -0.018775407825094015,
+          "bicycle": -0.0034658871778406874,
+          "bird": 0.016852697555055363,
+          "boat": -0.12602862312992935,
+          "bottle": -0.05810067993751611,
+          "bus": -0.04056738158772921,
+          "car": -0.08384776656435011,
+          "cat": -0.028104914741521547,
+          "chair": 0.028880659661125185,
+          "cow": 0.07714101865503076,
+          "dining-table": -0.06618853899295957,
+          "dog": 0.0030255315538806338,
+          "horse": 0.016076550976320214,
+          "motorbike": -0.09563224391572289,
+          "person": 0.12074033220878899,
+          "potted-plant": -0.0001942818206447372,
+          "sheep": 0.06054823988031088,
+          "sofa": -0.017197700750680278,
+          "train": -0.05655924813837587,
+          "tv": -0.04487684590932717
+        },
+        "paired_mean_image_iou_vs_reference": {
+          "mean": -0.014444886162199725,
+          "ci_low": -0.027049885286862183,
+          "ci_high": -0.002044947782506799,
+          "better": 218,
+          "worse": 272,
+          "ties": 0
+        }
+      }
+    },
+    "coco": {
+      "A0/CA": {
+        "images": 707,
+        "voc_frozen_threshold": 0.4,
+        "miou": 0.5626864071303928,
+        "delta_vs_reference": 0.0,
+        "precision": 0.6870216627279908,
+        "recall": 0.759486405000772,
+        "pixel_iou": 0.5642584772060576,
+        "mean_image_iou": 0.5626729184148861,
+        "per_class_iou": {
+          "aeroplane": 0.5465146487707142,
+          "bicycle": 0.5824714292441525,
+          "bird": 0.6116595146159799,
+          "boat": 0.5343583712342399,
+          "bottle": 0.45998877186033343,
+          "bus": 0.8869025618024086,
+          "car": 0.5374372126054616,
+          "cat": 0.7040965298591004,
+          "chair": 0.39647468065470587,
+          "cow": 0.7078120541061408,
+          "dining table": 0.37683160663344806,
+          "dog": 0.6853827724804024,
+          "horse": 0.6190248789232179,
+          "motorbike": 0.6255402632140332,
+          "person": 0.11920718602489537,
+          "potted plant": 0.5228123107210281,
+          "sheep": 0.726462083618377,
+          "sofa": 0.5044680758851618,
+          "train": 0.5626808007897418,
+          "tv": 0.5436023895643088
+        },
+        "per_class_delta_vs_reference": {
+          "aeroplane": 0.0,
+          "bicycle": 0.0,
+          "bird": 0.0,
+          "boat": 0.0,
+          "bottle": 0.0,
+          "bus": 0.0,
+          "car": 0.0,
+          "cat": 0.0,
+          "chair": 0.0,
+          "cow": 0.0,
+          "dining table": 0.0,
+          "dog": 0.0,
+          "horse": 0.0,
+          "motorbike": 0.0,
+          "person": 0.0,
+          "potted plant": 0.0,
+          "sheep": 0.0,
+          "sofa": 0.0,
+          "train": 0.0,
+          "tv": 0.0
+        },
+        "paired_mean_image_iou_vs_reference": {
+          "mean": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "better": 0,
+          "worse": 0,
+          "ties": 707
+        }
+      },
+      "A0/FINAL": {
+        "images": 707,
+        "voc_frozen_threshold": 0.45,
+        "miou": 0.6436926133688543,
+        "delta_vs_reference": 0.0,
+        "precision": 0.6888995056488407,
+        "recall": 0.8654422611299546,
+        "pixel_iou": 0.6222507724279351,
+        "mean_image_iou": 0.6808773984008515,
+        "per_class_iou": {
+          "aeroplane": 0.649355626704212,
+          "bicycle": 0.590727223947803,
+          "bird": 0.7577757627082233,
+          "boat": 0.53361796083154,
+          "bottle": 0.4891895237235007,
+          "bus": 0.9100125459002637,
+          "car": 0.5625891312315835,
+          "cat": 0.8553371773786631,
+          "chair": 0.4711470336952218,
+          "cow": 0.8474176804686679,
+          "dining table": 0.3558636864494657,
+          "dog": 0.7557760838193599,
+          "horse": 0.6796699488120261,
+          "motorbike": 0.639056668599557,
+          "person": 0.23875026822118298,
+          "potted plant": 0.6975315212854466,
+          "sheep": 0.8842653621680274,
+          "sofa": 0.6178218167213149,
+          "train": 0.6365857191413873,
+          "tv": 0.7013615255696378
+        },
+        "per_class_delta_vs_reference": {
+          "aeroplane": 0.0,
+          "bicycle": 0.0,
+          "bird": 0.0,
+          "boat": 0.0,
+          "bottle": 0.0,
+          "bus": 0.0,
+          "car": 0.0,
+          "cat": 0.0,
+          "chair": 0.0,
+          "cow": 0.0,
+          "dining table": 0.0,
+          "dog": 0.0,
+          "horse": 0.0,
+          "motorbike": 0.0,
+          "person": 0.0,
+          "potted plant": 0.0,
+          "sheep": 0.0,
+          "sofa": 0.0,
+          "train": 0.0,
+          "tv": 0.0
+        },
+        "paired_mean_image_iou_vs_reference": {
+          "mean": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "better": 0,
+          "worse": 0,
+          "ties": 707
+        }
+      },
+      "A1/CA": {
+        "images": 707,
+        "voc_frozen_threshold": 0.7,
+        "miou": 0.0,
+        "delta_vs_reference": -0.5626864071303928,
+        "precision": 0.0,
+        "recall": 0.0,
+        "pixel_iou": 0.0,
+        "mean_image_iou": 0.0,
+        "per_class_iou": {
+          "aeroplane": 0.0,
+          "bicycle": 0.0,
+          "bird": 0.0,
+          "boat": 0.0,
+          "bottle": 0.0,
+          "bus": 0.0,
+          "car": 0.0,
+          "cat": 0.0,
+          "chair": 0.0,
+          "cow": 0.0,
+          "dining table": 0.0,
+          "dog": 0.0,
+          "horse": 0.0,
+          "motorbike": 0.0,
+          "person": 0.0,
+          "potted plant": 0.0,
+          "sheep": 0.0,
+          "sofa": 0.0,
+          "train": 0.0,
+          "tv": 0.0
+        },
+        "per_class_delta_vs_reference": {
+          "aeroplane": -0.5465146487707142,
+          "bicycle": -0.5824714292441525,
+          "bird": -0.6116595146159799,
+          "boat": -0.5343583712342399,
+          "bottle": -0.45998877186033343,
+          "bus": -0.8869025618024086,
+          "car": -0.5374372126054616,
+          "cat": -0.7040965298591004,
+          "chair": -0.39647468065470587,
+          "cow": -0.7078120541061408,
+          "dining table": -0.37683160663344806,
+          "dog": -0.6853827724804024,
+          "horse": -0.6190248789232179,
+          "motorbike": -0.6255402632140332,
+          "person": -0.11920718602489537,
+          "potted plant": -0.5228123107210281,
+          "sheep": -0.726462083618377,
+          "sofa": -0.5044680758851618,
+          "train": -0.5626808007897418,
+          "tv": -0.5436023895643088
+        },
+        "paired_mean_image_iou_vs_reference": {
+          "mean": -0.5626729184148861,
+          "ci_low": -0.5797204225804892,
+          "ci_high": -0.5453102455395595,
+          "better": 0,
+          "worse": 707,
+          "ties": 0
+        }
+      },
+      "A1/FINAL": {
+        "images": 707,
+        "voc_frozen_threshold": 0.625,
+        "miou": 0.0,
+        "delta_vs_reference": -0.6436926133688543,
+        "precision": 0.0,
+        "recall": 0.0,
+        "pixel_iou": 0.0,
+        "mean_image_iou": 0.0,
+        "per_class_iou": {
+          "aeroplane": 0.0,
+          "bicycle": 0.0,
+          "bird": 0.0,
+          "boat": 0.0,
+          "bottle": 0.0,
+          "bus": 0.0,
+          "car": 0.0,
+          "cat": 0.0,
+          "chair": 0.0,
+          "cow": 0.0,
+          "dining table": 0.0,
+          "dog": 0.0,
+          "horse": 0.0,
+          "motorbike": 0.0,
+          "person": 0.0,
+          "potted plant": 0.0,
+          "sheep": 0.0,
+          "sofa": 0.0,
+          "train": 0.0,
+          "tv": 0.0
+        },
+        "per_class_delta_vs_reference": {
+          "aeroplane": -0.649355626704212,
+          "bicycle": -0.590727223947803,
+          "bird": -0.7577757627082233,
+          "boat": -0.53361796083154,
+          "bottle": -0.4891895237235007,
+          "bus": -0.9100125459002637,
+          "car": -0.5625891312315835,
+          "cat": -0.8553371773786631,
+          "chair": -0.4711470336952218,
+          "cow": -0.8474176804686679,
+          "dining table": -0.3558636864494657,
+          "dog": -0.7557760838193599,
+          "horse": -0.6796699488120261,
+          "motorbike": -0.639056668599557,
+          "person": -0.23875026822118298,
+          "potted plant": -0.6975315212854466,
+          "sheep": -0.8842653621680274,
+          "sofa": -0.6178218167213149,
+          "train": -0.6365857191413873,
+          "tv": -0.7013615255696378
+        },
+        "paired_mean_image_iou_vs_reference": {
+          "mean": -0.6808773984008515,
+          "ci_low": -0.7015113510701507,
+          "ci_high": -0.6597323410113902,
+          "better": 0,
+          "worse": 706,
+          "ties": 1
+        }
+      },
+      "A2/CA": {
+        "images": 707,
+        "voc_frozen_threshold": 0.3,
+        "miou": 0.5558517548737275,
+        "delta_vs_reference": -0.006834652256665241,
+        "precision": 0.6824282790319153,
+        "recall": 0.7666882085606611,
+        "pixel_iou": 0.5650781807115186,
+        "mean_image_iou": 0.5484838102199415,
+        "per_class_iou": {
+          "aeroplane": 0.4918359680811102,
+          "bicycle": 0.5706928517475794,
+          "bird": 0.6342454948413371,
+          "boat": 0.5396827765384293,
+          "bottle": 0.46443405125795184,
+          "bus": 0.8901481871733673,
+          "car": 0.5449868230419623,
+          "cat": 0.7357020749039437,
+          "chair": 0.39227398466026214,
+          "cow": 0.7281035276257402,
+          "dining table": 0.3360494274958268,
+          "dog": 0.681084036066066,
+          "horse": 0.5874655927967068,
+          "motorbike": 0.5840192601750334,
+          "person": 0.06823659995304501,
+          "potted plant": 0.5856357635781506,
+          "sheep": 0.7101617710942313,
+          "sofa": 0.5845589894600328,
+          "train": 0.4227329446051222,
+          "tv": 0.5649849723786514
+        },
+        "per_class_delta_vs_reference": {
+          "aeroplane": -0.05467868068960402,
+          "bicycle": -0.011778577496573073,
+          "bird": 0.022585980225357183,
+          "boat": 0.005324405304189428,
+          "bottle": 0.004445279397618407,
+          "bus": 0.003245625370958738,
+          "car": 0.007549610436500709,
+          "cat": 0.03160554504484325,
+          "chair": -0.004200695994443726,
+          "cow": 0.020291473519599368,
+          "dining table": -0.04078217913762128,
+          "dog": -0.004298736414336313,
+          "horse": -0.031559286126511044,
+          "motorbike": -0.04152100303899986,
+          "person": -0.05097058607185036,
+          "potted plant": 0.06282345285712254,
+          "sheep": -0.016300312524145766,
+          "sofa": 0.08009091357487097,
+          "train": -0.13994785618461963,
+          "tv": 0.021382582814342577
+        },
+        "paired_mean_image_iou_vs_reference": {
+          "mean": -0.014189108194944521,
+          "ci_low": -0.020488804003095405,
+          "ci_high": -0.007870756364791018,
+          "better": 272,
+          "worse": 435,
+          "ties": 0
+        }
+      },
+      "A2/FINAL": {
+        "images": 707,
+        "voc_frozen_threshold": 0.375,
+        "miou": 0.6366497500392965,
+        "delta_vs_reference": -0.007042863329557836,
+        "precision": 0.7034030940114137,
+        "recall": 0.8607938935946388,
+        "pixel_iou": 0.6315610438836479,
+        "mean_image_iou": 0.6782774937371693,
+        "per_class_iou": {
+          "aeroplane": 0.5862284965780793,
+          "bicycle": 0.5369467996367107,
+          "bird": 0.7771828913199703,
+          "boat": 0.49738151418129384,
+          "bottle": 0.5020100348370983,
+          "bus": 0.8790366939645149,
+          "car": 0.6180371021245853,
+          "cat": 0.8617553119376604,
+          "chair": 0.47404496303507065,
+          "cow": 0.888538213870342,
+          "dining table": 0.3542427003476437,
+          "dog": 0.7591773649671948,
+          "horse": 0.6436032089573334,
+          "motorbike": 0.5902799567283397,
+          "person": 0.2831989061997334,
+          "potted plant": 0.7035168350969222,
+          "sheep": 0.8939049623790756,
+          "sofa": 0.7410382056046669,
+          "train": 0.43481873619514066,
+          "tv": 0.7080521028245567
+        },
+        "per_class_delta_vs_reference": {
+          "aeroplane": -0.06312713012613269,
+          "bicycle": -0.05378042431109231,
+          "bird": 0.019407128611746982,
+          "boat": -0.03623644665024617,
+          "bottle": 0.012820511113597555,
+          "bus": -0.03097585193574881,
+          "car": 0.0554479708930018,
+          "cat": 0.006418134558997313,
+          "chair": 0.002897929339848837,
+          "cow": 0.0411205334016741,
+          "dining table": -0.0016209861018219862,
+          "dog": 0.0034012811478348892,
+          "horse": -0.036066739854692775,
+          "motorbike": -0.04877671187121735,
+          "person": 0.04444863797855045,
+          "potted plant": 0.005985313811475601,
+          "sheep": 0.00963960021104815,
+          "sofa": 0.12321638888335207,
+          "train": -0.20176698294624662,
+          "tv": 0.006690577254918839
+        },
+        "paired_mean_image_iou_vs_reference": {
+          "mean": -0.002599904663682356,
+          "ci_low": -0.012726704285880044,
+          "ci_high": 0.007800257125882691,
+          "better": 284,
+          "worse": 421,
+          "ties": 2
+        }
+      },
+      "A3/CA": {
+        "images": 707,
+        "voc_frozen_threshold": 0.4,
+        "miou": 0.5835506172519223,
+        "delta_vs_reference": 0.020864210121529503,
+        "precision": 0.696462150067342,
+        "recall": 0.7899078041287182,
+        "pixel_iou": 0.5876135523430269,
+        "mean_image_iou": 0.5692057438237546,
+        "per_class_iou": {
+          "aeroplane": 0.5318501785760293,
+          "bicycle": 0.5332774603824525,
+          "bird": 0.613222130113681,
+          "boat": 0.5637535563429914,
+          "bottle": 0.4660296058912901,
+          "bus": 0.8898447756541729,
+          "car": 0.6133501259445844,
+          "cat": 0.6894850109629903,
+          "chair": 0.3791619030051642,
+          "cow": 0.7090971185169782,
+          "dining table": 0.5484698299658513,
+          "dog": 0.6780329260356843,
+          "horse": 0.5885439529750133,
+          "motorbike": 0.6414797514941186,
+          "person": 0.17287877095760026,
+          "potted plant": 0.5297813008926581,
+          "sheep": 0.7104902805577492,
+          "sofa": 0.5682206970026937,
+          "train": 0.6409416794084313,
+          "tv": 0.6031012903583098
+        },
+        "per_class_delta_vs_reference": {
+          "aeroplane": -0.014664470194684864,
+          "bicycle": -0.04919396886170002,
+          "bird": 0.001562615497701092,
+          "boat": 0.029395185108751498,
+          "bottle": 0.006040834030956677,
+          "bus": 0.002942213851764297,
+          "car": 0.07591291333912276,
+          "cat": -0.01461151889611012,
+          "chair": -0.017312777649541644,
+          "cow": 0.001285064410837422,
+          "dining table": 0.1716382233324032,
+          "dog": -0.007349846444718033,
+          "horse": -0.030480925948204618,
+          "motorbike": 0.0159394882800854,
+          "person": 0.053671584932704894,
+          "potted plant": 0.006968990171629996,
+          "sheep": -0.015971803060627843,
+          "sofa": 0.06375262111753188,
+          "train": 0.07826087861868947,
+          "tv": 0.059498900794001
+        },
+        "paired_mean_image_iou_vs_reference": {
+          "mean": 0.006532825408868476,
+          "ci_low": 0.0008949326257328543,
+          "ci_high": 0.012329216588788711,
+          "better": 304,
+          "worse": 403,
+          "ties": 0
+        }
+      },
+      "A3/FINAL": {
+        "images": 707,
+        "voc_frozen_threshold": 0.425,
+        "miou": 0.6620021992426063,
+        "delta_vs_reference": 0.018309585873751977,
+        "precision": 0.7031403604547383,
+        "recall": 0.8892180726131169,
+        "pixel_iou": 0.6465065728392527,
+        "mean_image_iou": 0.6925237354600757,
+        "per_class_iou": {
+          "aeroplane": 0.7171182769773299,
+          "bicycle": 0.5706655247115724,
+          "bird": 0.7785550003502464,
+          "boat": 0.5627192168048768,
+          "bottle": 0.4962831680366091,
+          "bus": 0.9026764219918791,
+          "car": 0.6325578054953899,
+          "cat": 0.8541259813282559,
+          "chair": 0.44587225955221615,
+          "cow": 0.8550045206814584,
+          "dining table": 0.47044772648865574,
+          "dog": 0.7556454768407826,
+          "horse": 0.6743378430106941,
+          "motorbike": 0.6235020380487367,
+          "person": 0.26583717757634584,
+          "potted plant": 0.6969192674583974,
+          "sheep": 0.8733343357243307,
+          "sofa": 0.6621164737939678,
+          "train": 0.6871438716062961,
+          "tv": 0.7151815983740847
+        },
+        "per_class_delta_vs_reference": {
+          "aeroplane": 0.0677626502731179,
+          "bicycle": -0.02006169923623058,
+          "bird": 0.020779237642023052,
+          "boat": 0.029101255973336793,
+          "bottle": 0.007093644313108383,
+          "bus": -0.007336123908384562,
+          "car": 0.06996867426380637,
+          "cat": -0.001211196050407204,
+          "chair": -0.025274774143005663,
+          "cow": 0.0075868402127904355,
+          "dining table": 0.11458404003919004,
+          "dog": -0.00013060697857725234,
+          "horse": -0.005332105801332032,
+          "motorbike": -0.015554630550820292,
+          "person": 0.027086909355162864,
+          "potted plant": -0.0006122538270492139,
+          "sheep": -0.0109310264436967,
+          "sofa": 0.0442946570726529,
+          "train": 0.0505581524649088,
+          "tv": 0.013820072804446859
+        },
+        "paired_mean_image_iou_vs_reference": {
+          "mean": 0.0116463370592242,
+          "ci_low": 0.003711987740825033,
+          "ci_high": 0.01978958665158403,
+          "better": 336,
+          "worse": 367,
+          "ties": 4
+        }
+      },
+      "A4/CA": {
+        "images": 707,
+        "voc_frozen_threshold": 0.7,
+        "miou": 0.0,
+        "delta_vs_reference": -0.5626864071303928,
+        "precision": 0.0,
+        "recall": 0.0,
+        "pixel_iou": 0.0,
+        "mean_image_iou": 0.0,
+        "per_class_iou": {
+          "aeroplane": 0.0,
+          "bicycle": 0.0,
+          "bird": 0.0,
+          "boat": 0.0,
+          "bottle": 0.0,
+          "bus": 0.0,
+          "car": 0.0,
+          "cat": 0.0,
+          "chair": 0.0,
+          "cow": 0.0,
+          "dining table": 0.0,
+          "dog": 0.0,
+          "horse": 0.0,
+          "motorbike": 0.0,
+          "person": 0.0,
+          "potted plant": 0.0,
+          "sheep": 0.0,
+          "sofa": 0.0,
+          "train": 0.0,
+          "tv": 0.0
+        },
+        "per_class_delta_vs_reference": {
+          "aeroplane": -0.5465146487707142,
+          "bicycle": -0.5824714292441525,
+          "bird": -0.6116595146159799,
+          "boat": -0.5343583712342399,
+          "bottle": -0.45998877186033343,
+          "bus": -0.8869025618024086,
+          "car": -0.5374372126054616,
+          "cat": -0.7040965298591004,
+          "chair": -0.39647468065470587,
+          "cow": -0.7078120541061408,
+          "dining table": -0.37683160663344806,
+          "dog": -0.6853827724804024,
+          "horse": -0.6190248789232179,
+          "motorbike": -0.6255402632140332,
+          "person": -0.11920718602489537,
+          "potted plant": -0.5228123107210281,
+          "sheep": -0.726462083618377,
+          "sofa": -0.5044680758851618,
+          "train": -0.5626808007897418,
+          "tv": -0.5436023895643088
+        },
+        "paired_mean_image_iou_vs_reference": {
+          "mean": -0.5626729184148861,
+          "ci_low": -0.5797204225804892,
+          "ci_high": -0.5453102455395595,
+          "better": 0,
+          "worse": 707,
+          "ties": 0
+        }
+      },
+      "A4/FINAL": {
+        "images": 707,
+        "voc_frozen_threshold": 0.6,
+        "miou": 0.0,
+        "delta_vs_reference": -0.6436926133688543,
+        "precision": 0.0,
+        "recall": 0.0,
+        "pixel_iou": 0.0,
+        "mean_image_iou": 0.0,
+        "per_class_iou": {
+          "aeroplane": 0.0,
+          "bicycle": 0.0,
+          "bird": 0.0,
+          "boat": 0.0,
+          "bottle": 0.0,
+          "bus": 0.0,
+          "car": 0.0,
+          "cat": 0.0,
+          "chair": 0.0,
+          "cow": 0.0,
+          "dining table": 0.0,
+          "dog": 0.0,
+          "horse": 0.0,
+          "motorbike": 0.0,
+          "person": 0.0,
+          "potted plant": 0.0,
+          "sheep": 0.0,
+          "sofa": 0.0,
+          "train": 0.0,
+          "tv": 0.0
+        },
+        "per_class_delta_vs_reference": {
+          "aeroplane": -0.649355626704212,
+          "bicycle": -0.590727223947803,
+          "bird": -0.7577757627082233,
+          "boat": -0.53361796083154,
+          "bottle": -0.4891895237235007,
+          "bus": -0.9100125459002637,
+          "car": -0.5625891312315835,
+          "cat": -0.8553371773786631,
+          "chair": -0.4711470336952218,
+          "cow": -0.8474176804686679,
+          "dining table": -0.3558636864494657,
+          "dog": -0.7557760838193599,
+          "horse": -0.6796699488120261,
+          "motorbike": -0.639056668599557,
+          "person": -0.23875026822118298,
+          "potted plant": -0.6975315212854466,
+          "sheep": -0.8842653621680274,
+          "sofa": -0.6178218167213149,
+          "train": -0.6365857191413873,
+          "tv": -0.7013615255696378
+        },
+        "paired_mean_image_iou_vs_reference": {
+          "mean": -0.6808773984008515,
+          "ci_low": -0.7015113510701507,
+          "ci_high": -0.6597323410113902,
+          "better": 0,
+          "worse": 706,
+          "ties": 1
+        }
+      }
+    }
+  },
+  "diagnostics_fixed_0p45": {
+    "voc": {
+      "A0": {
+        "tp": 37232473,
+        "fp": 6970959,
+        "foreground": 44203432,
+        "fp_gt16": 2454877,
+        "fp_gt64": 495134,
+        "fp_separate": 97321,
+        "changed": 0,
+        "useful_change": 0,
+        "harmful_change": 0
+      },
+      "A1": {
+        "tp": 47187921,
+        "fp": 58245786,
+        "foreground": 105433707,
+        "fp_gt16": 46950793,
+        "fp_gt64": 24420361,
+        "fp_separate": 212217,
+        "changed": 61300151,
+        "useful_change": 9990386,
+        "harmful_change": 51309765
+      },
+      "A2": {
+        "tp": 31143412,
+        "fp": 5131324,
+        "foreground": 36274736,
+        "fp_gt16": 2149507,
+        "fp_gt64": 698384,
+        "fp_separate": 166938,
+        "changed": 11397908,
+        "useful_change": 3574241,
+        "harmful_change": 7823667
+      },
+      "A3": {
+        "tp": 37825138,
+        "fp": 7908258,
+        "foreground": 45733396,
+        "fp_gt16": 3103718,
+        "fp_gt64": 426564,
+        "fp_separate": 34458,
+        "changed": 5965888,
+        "useful_change": 2810627,
+        "harmful_change": 3155261
+      },
+      "A4": {
+        "tp": 47155488,
+        "fp": 54461485,
+        "foreground": 101616973,
+        "fp_gt16": 43433026,
+        "fp_gt64": 22010370,
+        "fp_separate": 177820,
+        "changed": 57517059,
+        "useful_change": 9974774,
+        "harmful_change": 47542285
+      },
+      "mean_content_mass": 0.02821529470384121,
+      "fraction_non_content_mass": 0.9717847052961588,
+      "content_fg_bg": {
+        "content_mass_fg": 0.038051851093769073,
+        "content_mass_bg": 0.023425059393048286,
+        "target_top_content_fg": 0.8300725221633911,
+        "target_top_content_bg": 0.7614591717720032
+      },
+      "content_rank_change_fraction": 0.0
+    },
+    "coco": {
+      "A0": {
+        "tp": 29031675,
+        "fp": 9941280,
+        "foreground": 38972955,
+        "fp_gt16": 5188449,
+        "fp_gt64": 2839579,
+        "fp_separate": 1971552,
+        "changed": 0,
+        "useful_change": 0,
+        "harmful_change": 0
+      },
+      "A1": {
+        "tp": 0,
+        "fp": 0,
+        "foreground": 0,
+        "fp_gt16": 0,
+        "fp_gt64": 0,
+        "fp_separate": 0,
+        "changed": 38972955,
+        "useful_change": 9941280,
+        "harmful_change": 29031675
+      },
+      "A2": {
+        "tp": 24066009,
+        "fp": 5351277,
+        "foreground": 29417286,
+        "fp_gt16": 2328253,
+        "fp_gt64": 1110778,
+        "fp_separate": 878143,
+        "changed": 13153837,
+        "useful_change": 6389087,
+        "harmful_change": 6764750
+      },
+      "A3": {
+        "tp": 31041218,
+        "fp": 10768869,
+        "foreground": 41810087,
+        "fp_gt16": 5555559,
+        "fp_gt64": 2553195,
+        "fp_separate": 1163201,
+        "changed": 9852488,
+        "useful_change": 5517221,
+        "harmful_change": 4335267
+      },
+      "A4": {
+        "tp": 0,
+        "fp": 0,
+        "foreground": 0,
+        "fp_gt16": 0,
+        "fp_gt64": 0,
+        "fp_separate": 0,
+        "changed": 38972955,
+        "useful_change": 9941280,
+        "harmful_change": 29031675
+      },
+      "mean_content_mass": 0.01758919283747673,
+      "fraction_non_content_mass": 0.9824108071625233,
+      "content_fg_bg": {
+        "content_mass_fg": 0.029357079416513443,
+        "content_mass_bg": 0.014419558458030224,
+        "target_top_content_fg": 0.9999991655349731,
+        "target_top_content_bg": 0.9999991059303284
+      },
+      "content_rank_change_fraction": 0.0
+    }
+  },
+  "ca_to_final": {
+    "voc": {
+      "A1": {
+        "delta_ca": -0.0729575487423143,
+        "delta_final": -0.016341087634232254
+      },
+      "A2": {
+        "delta_ca": -0.023850104451936804,
+        "delta_final": -0.014580944286544328
+      },
+      "A3": {
+        "delta_ca": -0.008584158507784156,
+        "delta_final": 0.005832989289456969
+      },
+      "A4": {
+        "delta_ca": -0.08477972583092575,
+        "delta_final": -0.015813724500059245
+      }
+    },
+    "coco": {
+      "A1": {
+        "delta_ca": -0.5626864071303928,
+        "delta_final": -0.6436926133688543
+      },
+      "A2": {
+        "delta_ca": -0.006834652256665241,
+        "delta_final": -0.007042863329557836
+      },
+      "A3": {
+        "delta_ca": 0.020864210121529503,
+        "delta_final": 0.018309585873751977
+      },
+      "A4": {
+        "delta_ca": -0.5626864071303928,
+        "delta_final": -0.6436926133688543
+      }
+    }
+  },
+  "ca_to_final_per_class": {
+    "voc": {
+      "A1": {
+        "aeroplane": {
+          "delta_ca": -0.11600663620408436,
+          "delta_final": -0.008479488302547966
+        },
+        "bicycle": {
+          "delta_ca": -0.11892208012195638,
+          "delta_final": 0.006345305150697089
+        },
+        "bird": {
+          "delta_ca": -0.12149103714669307,
+          "delta_final": -0.05312536465300144
+        },
+        "boat": {
+          "delta_ca": -0.17182665835798316,
+          "delta_final": -0.08997903540296237
+        },
+        "bottle": {
+          "delta_ca": -0.19745705607899633,
+          "delta_final": -0.08480831755792873
+        },
+        "bus": {
+          "delta_ca": -0.20235158417479326,
+          "delta_final": -0.08208475270278992
+        },
+        "car": {
+          "delta_ca": -0.1797151537374212,
+          "delta_final": -0.06380891801478838
+        },
+        "cat": {
+          "delta_ca": 0.08157302135799993,
+          "delta_final": -0.007883647680911987
+        },
+        "chair": {
+          "delta_ca": 0.059843630758116106,
+          "delta_final": 0.06293858350960713
+        },
+        "cow": {
+          "delta_ca": -0.04326633589758122,
+          "delta_final": 0.07593817819034432
+        },
+        "dining-table": {
+          "delta_ca": -0.05234396350568693,
+          "delta_final": -0.06639424569961938
+        },
+        "dog": {
+          "delta_ca": -0.02932084306853433,
+          "delta_final": 0.0046309029296004445
+        },
+        "horse": {
+          "delta_ca": -0.0563402432802822,
+          "delta_final": 0.03357666548471938
+        },
+        "motorbike": {
+          "delta_ca": -0.1348707086423191,
+          "delta_final": -0.07998585490602406
+        },
+        "person": {
+          "delta_ca": 0.19880953247946292,
+          "delta_final": 0.07607677085364295
+        },
+        "potted-plant": {
+          "delta_ca": 0.06852067362881797,
+          "delta_final": -0.0030084754472221586
+        },
+        "sheep": {
+          "delta_ca": -0.07550996791084452,
+          "delta_final": 0.04697386251638569
+        },
+        "sofa": {
+          "delta_ca": -0.07278463357967868,
+          "delta_final": -0.017594274194706272
+        },
+        "train": {
+          "delta_ca": -0.07538812427650532,
+          "delta_final": 0.04979083778621829
+        },
+        "tv": {
+          "delta_ca": -0.2203028070873212,
+          "delta_final": -0.12594048454335594
+        }
+      },
+      "A2": {
+        "aeroplane": {
+          "delta_ca": -0.06354512203136675,
+          "delta_final": -0.00676084823853218
+        },
+        "bicycle": {
+          "delta_ca": 0.014322361653676174,
+          "delta_final": 0.014550850657952141
+        },
+        "bird": {
+          "delta_ca": -0.02631524494547055,
+          "delta_final": -0.022337964763026963
+        },
+        "boat": {
+          "delta_ca": -0.10333067537812135,
+          "delta_final": -0.09372571778002858
+        },
+        "bottle": {
+          "delta_ca": -0.03517873949705341,
+          "delta_final": -0.01626175223553261
+        },
+        "bus": {
+          "delta_ca": -0.03149078804008121,
+          "delta_final": -0.0419314447286766
+        },
+        "car": {
+          "delta_ca": -0.021391294510946124,
+          "delta_final": 0.001066548516042154
+        },
+        "cat": {
+          "delta_ca": 0.0017083837058231577,
+          "delta_final": 0.02399878969652025
+        },
+        "chair": {
+          "delta_ca": -0.023342873524150154,
+          "delta_final": -0.05344348515217312
+        },
+        "cow": {
+          "delta_ca": 0.027990870597330297,
+          "delta_final": 0.08785526448599268
+        },
+        "dining-table": {
+          "delta_ca": -0.09120054544698614,
+          "delta_final": -0.10921352047816196
+        },
+        "dog": {
+          "delta_ca": -0.0110299570075445,
+          "delta_final": 0.008981998805180802
+        },
+        "horse": {
+          "delta_ca": -0.00804449904835125,
+          "delta_final": -0.0012216077668896208
+        },
+        "motorbike": {
+          "delta_ca": -0.02097140305594536,
+          "delta_final": -0.02450781980741845
+        },
+        "person": {
+          "delta_ca": -0.045327866883110135,
+          "delta_final": -0.07507079278003648
+        },
+        "potted-plant": {
+          "delta_ca": 0.022298339461739314,
+          "delta_final": 0.025725074681081317
+        },
+        "sheep": {
+          "delta_ca": 0.07967800510844958,
+          "delta_final": 0.10395644746853983
+        },
+        "sofa": {
+          "delta_ca": -0.007101583344951701,
+          "delta_final": -0.0003218281957669822
+        },
+        "train": {
+          "delta_ca": -0.18019706922854584,
+          "delta_final": -0.14867316217944615
+        },
+        "tv": {
+          "delta_ca": 0.04546761237686947,
+          "delta_final": 0.035716084063496356
+        }
+      },
+      "A3": {
+        "aeroplane": {
+          "delta_ca": -0.07582530796035902,
+          "delta_final": -0.013000468567605172
+        },
+        "bicycle": {
+          "delta_ca": -0.03802097368028823,
+          "delta_final": 0.0024112330682184435
+        },
+        "bird": {
+          "delta_ca": -0.02216931575329284,
+          "delta_final": 0.01536030999902771
+        },
+        "boat": {
+          "delta_ca": -0.02143422153843688,
+          "delta_final": -0.015202674783730497
+        },
+        "bottle": {
+          "delta_ca": -0.039932343299370454,
+          "delta_final": -0.04071048583574388
+        },
+        "bus": {
+          "delta_ca": -0.007726260974249111,
+          "delta_final": -0.012792633449832835
+        },
+        "car": {
+          "delta_ca": -0.015991427768163424,
+          "delta_final": 0.014507607378767218
+        },
+        "cat": {
+          "delta_ca": -0.005142222068491131,
+          "delta_final": 0.011628772744626481
+        },
+        "chair": {
+          "delta_ca": -0.03866893932881332,
+          "delta_final": -0.021388447346102457
+        },
+        "cow": {
+          "delta_ca": 0.005180177645596085,
+          "delta_final": 0.06006537873058815
+        },
+        "dining-table": {
+          "delta_ca": -0.00741295003784842,
+          "delta_final": -0.008431810582474664
+        },
+        "dog": {
+          "delta_ca": -0.03876517782767519,
+          "delta_final": 0.013219318388066004
+        },
+        "horse": {
+          "delta_ca": -0.026039469477229127,
+          "delta_final": -0.00013665601842249853
+        },
+        "motorbike": {
+          "delta_ca": -0.01959857654848096,
+          "delta_final": -0.0004240353716471468
+        },
+        "person": {
+          "delta_ca": 0.1545270757329546,
+          "delta_final": 0.053170632659106265
+        },
+        "potted-plant": {
+          "delta_ca": -0.0457239440062448,
+          "delta_final": -0.01414747001143779
+        },
+        "sheep": {
+          "delta_ca": 0.010179883777988952,
+          "delta_final": 0.033765350980050624
+        },
+        "sofa": {
+          "delta_ca": 0.008976251232572063,
+          "delta_final": 0.003845166932895383
+        },
+        "train": {
+          "delta_ca": 0.028742538493563896,
+          "delta_final": 0.011495879528426678
+        },
+        "tv": {
+          "delta_ca": 0.023162033230583856,
+          "delta_final": 0.02342481734636348
+        }
+      },
+      "A4": {
+        "aeroplane": {
+          "delta_ca": -0.28120223743792705,
+          "delta_final": -0.018775407825094015
+        },
+        "bicycle": {
+          "delta_ca": -0.12097143168666125,
+          "delta_final": -0.0034658871778406874
+        },
+        "bird": {
+          "delta_ca": -0.09701397465970196,
+          "delta_final": 0.016852697555055363
+        },
+        "boat": {
+          "delta_ca": -0.2567627179213957,
+          "delta_final": -0.12602862312992935
+        },
+        "bottle": {
+          "delta_ca": -0.1002574352760387,
+          "delta_final": -0.05810067993751611
+        },
+        "bus": {
+          "delta_ca": -0.18788344510517163,
+          "delta_final": -0.04056738158772921
+        },
+        "car": {
+          "delta_ca": -0.16866440019787032,
+          "delta_final": -0.08384776656435011
+        },
+        "cat": {
+          "delta_ca": 0.05515752632150983,
+          "delta_final": -0.028104914741521547
+        },
+        "chair": {
+          "delta_ca": 0.020798827026913658,
+          "delta_final": 0.028880659661125185
+        },
+        "cow": {
+          "delta_ca": -0.0696388466615323,
+          "delta_final": 0.07714101865503076
+        },
+        "dining-table": {
+          "delta_ca": -0.07255599550577757,
+          "delta_final": -0.06618853899295957
+        },
+        "dog": {
+          "delta_ca": -0.03343250583695412,
+          "delta_final": 0.0030255315538806338
+        },
+        "horse": {
+          "delta_ca": -0.10395363332017271,
+          "delta_final": 0.016076550976320214
+        },
+        "motorbike": {
+          "delta_ca": -0.22067984347969938,
+          "delta_final": -0.09563224391572289
+        },
+        "person": {
+          "delta_ca": 0.19996427829427338,
+          "delta_final": 0.12074033220878899
+        },
+        "potted-plant": {
+          "delta_ca": 0.05150943934374097,
+          "delta_final": -0.0001942818206447372
+        },
+        "sheep": {
+          "delta_ca": -0.07683809095647842,
+          "delta_final": 0.06054823988031088
+        },
+        "sofa": {
+          "delta_ca": -0.013254250511259058,
+          "delta_final": -0.017197700750680278
+        },
+        "train": {
+          "delta_ca": -0.20223166831021766,
+          "delta_final": -0.05655924813837587
+        },
+        "tv": {
+          "delta_ca": -0.017684110738095282,
+          "delta_final": -0.04487684590932717
+        }
+      }
+    },
+    "coco": {
+      "A1": {
+        "aeroplane": {
+          "delta_ca": -0.5465146487707142,
+          "delta_final": -0.649355626704212
+        },
+        "bicycle": {
+          "delta_ca": -0.5824714292441525,
+          "delta_final": -0.590727223947803
+        },
+        "bird": {
+          "delta_ca": -0.6116595146159799,
+          "delta_final": -0.7577757627082233
+        },
+        "boat": {
+          "delta_ca": -0.5343583712342399,
+          "delta_final": -0.53361796083154
+        },
+        "bottle": {
+          "delta_ca": -0.45998877186033343,
+          "delta_final": -0.4891895237235007
+        },
+        "bus": {
+          "delta_ca": -0.8869025618024086,
+          "delta_final": -0.9100125459002637
+        },
+        "car": {
+          "delta_ca": -0.5374372126054616,
+          "delta_final": -0.5625891312315835
+        },
+        "cat": {
+          "delta_ca": -0.7040965298591004,
+          "delta_final": -0.8553371773786631
+        },
+        "chair": {
+          "delta_ca": -0.39647468065470587,
+          "delta_final": -0.4711470336952218
+        },
+        "cow": {
+          "delta_ca": -0.7078120541061408,
+          "delta_final": -0.8474176804686679
+        },
+        "dining table": {
+          "delta_ca": -0.37683160663344806,
+          "delta_final": -0.3558636864494657
+        },
+        "dog": {
+          "delta_ca": -0.6853827724804024,
+          "delta_final": -0.7557760838193599
+        },
+        "horse": {
+          "delta_ca": -0.6190248789232179,
+          "delta_final": -0.6796699488120261
+        },
+        "motorbike": {
+          "delta_ca": -0.6255402632140332,
+          "delta_final": -0.639056668599557
+        },
+        "person": {
+          "delta_ca": -0.11920718602489537,
+          "delta_final": -0.23875026822118298
+        },
+        "potted plant": {
+          "delta_ca": -0.5228123107210281,
+          "delta_final": -0.6975315212854466
+        },
+        "sheep": {
+          "delta_ca": -0.726462083618377,
+          "delta_final": -0.8842653621680274
+        },
+        "sofa": {
+          "delta_ca": -0.5044680758851618,
+          "delta_final": -0.6178218167213149
+        },
+        "train": {
+          "delta_ca": -0.5626808007897418,
+          "delta_final": -0.6365857191413873
+        },
+        "tv": {
+          "delta_ca": -0.5436023895643088,
+          "delta_final": -0.7013615255696378
+        }
+      },
+      "A2": {
+        "aeroplane": {
+          "delta_ca": -0.05467868068960402,
+          "delta_final": -0.06312713012613269
+        },
+        "bicycle": {
+          "delta_ca": -0.011778577496573073,
+          "delta_final": -0.05378042431109231
+        },
+        "bird": {
+          "delta_ca": 0.022585980225357183,
+          "delta_final": 0.019407128611746982
+        },
+        "boat": {
+          "delta_ca": 0.005324405304189428,
+          "delta_final": -0.03623644665024617
+        },
+        "bottle": {
+          "delta_ca": 0.004445279397618407,
+          "delta_final": 0.012820511113597555
+        },
+        "bus": {
+          "delta_ca": 0.003245625370958738,
+          "delta_final": -0.03097585193574881
+        },
+        "car": {
+          "delta_ca": 0.007549610436500709,
+          "delta_final": 0.0554479708930018
+        },
+        "cat": {
+          "delta_ca": 0.03160554504484325,
+          "delta_final": 0.006418134558997313
+        },
+        "chair": {
+          "delta_ca": -0.004200695994443726,
+          "delta_final": 0.002897929339848837
+        },
+        "cow": {
+          "delta_ca": 0.020291473519599368,
+          "delta_final": 0.0411205334016741
+        },
+        "dining table": {
+          "delta_ca": -0.04078217913762128,
+          "delta_final": -0.0016209861018219862
+        },
+        "dog": {
+          "delta_ca": -0.004298736414336313,
+          "delta_final": 0.0034012811478348892
+        },
+        "horse": {
+          "delta_ca": -0.031559286126511044,
+          "delta_final": -0.036066739854692775
+        },
+        "motorbike": {
+          "delta_ca": -0.04152100303899986,
+          "delta_final": -0.04877671187121735
+        },
+        "person": {
+          "delta_ca": -0.05097058607185036,
+          "delta_final": 0.04444863797855045
+        },
+        "potted plant": {
+          "delta_ca": 0.06282345285712254,
+          "delta_final": 0.005985313811475601
+        },
+        "sheep": {
+          "delta_ca": -0.016300312524145766,
+          "delta_final": 0.00963960021104815
+        },
+        "sofa": {
+          "delta_ca": 0.08009091357487097,
+          "delta_final": 0.12321638888335207
+        },
+        "train": {
+          "delta_ca": -0.13994785618461963,
+          "delta_final": -0.20176698294624662
+        },
+        "tv": {
+          "delta_ca": 0.021382582814342577,
+          "delta_final": 0.006690577254918839
+        }
+      },
+      "A3": {
+        "aeroplane": {
+          "delta_ca": -0.014664470194684864,
+          "delta_final": 0.0677626502731179
+        },
+        "bicycle": {
+          "delta_ca": -0.04919396886170002,
+          "delta_final": -0.02006169923623058
+        },
+        "bird": {
+          "delta_ca": 0.001562615497701092,
+          "delta_final": 0.020779237642023052
+        },
+        "boat": {
+          "delta_ca": 0.029395185108751498,
+          "delta_final": 0.029101255973336793
+        },
+        "bottle": {
+          "delta_ca": 0.006040834030956677,
+          "delta_final": 0.007093644313108383
+        },
+        "bus": {
+          "delta_ca": 0.002942213851764297,
+          "delta_final": -0.007336123908384562
+        },
+        "car": {
+          "delta_ca": 0.07591291333912276,
+          "delta_final": 0.06996867426380637
+        },
+        "cat": {
+          "delta_ca": -0.01461151889611012,
+          "delta_final": -0.001211196050407204
+        },
+        "chair": {
+          "delta_ca": -0.017312777649541644,
+          "delta_final": -0.025274774143005663
+        },
+        "cow": {
+          "delta_ca": 0.001285064410837422,
+          "delta_final": 0.0075868402127904355
+        },
+        "dining table": {
+          "delta_ca": 0.1716382233324032,
+          "delta_final": 0.11458404003919004
+        },
+        "dog": {
+          "delta_ca": -0.007349846444718033,
+          "delta_final": -0.00013060697857725234
+        },
+        "horse": {
+          "delta_ca": -0.030480925948204618,
+          "delta_final": -0.005332105801332032
+        },
+        "motorbike": {
+          "delta_ca": 0.0159394882800854,
+          "delta_final": -0.015554630550820292
+        },
+        "person": {
+          "delta_ca": 0.053671584932704894,
+          "delta_final": 0.027086909355162864
+        },
+        "potted plant": {
+          "delta_ca": 0.006968990171629996,
+          "delta_final": -0.0006122538270492139
+        },
+        "sheep": {
+          "delta_ca": -0.015971803060627843,
+          "delta_final": -0.0109310264436967
+        },
+        "sofa": {
+          "delta_ca": 0.06375262111753188,
+          "delta_final": 0.0442946570726529
+        },
+        "train": {
+          "delta_ca": 0.07826087861868947,
+          "delta_final": 0.0505581524649088
+        },
+        "tv": {
+          "delta_ca": 0.059498900794001,
+          "delta_final": 0.013820072804446859
+        }
+      },
+      "A4": {
+        "aeroplane": {
+          "delta_ca": -0.5465146487707142,
+          "delta_final": -0.649355626704212
+        },
+        "bicycle": {
+          "delta_ca": -0.5824714292441525,
+          "delta_final": -0.590727223947803
+        },
+        "bird": {
+          "delta_ca": -0.6116595146159799,
+          "delta_final": -0.7577757627082233
+        },
+        "boat": {
+          "delta_ca": -0.5343583712342399,
+          "delta_final": -0.53361796083154
+        },
+        "bottle": {
+          "delta_ca": -0.45998877186033343,
+          "delta_final": -0.4891895237235007
+        },
+        "bus": {
+          "delta_ca": -0.8869025618024086,
+          "delta_final": -0.9100125459002637
+        },
+        "car": {
+          "delta_ca": -0.5374372126054616,
+          "delta_final": -0.5625891312315835
+        },
+        "cat": {
+          "delta_ca": -0.7040965298591004,
+          "delta_final": -0.8553371773786631
+        },
+        "chair": {
+          "delta_ca": -0.39647468065470587,
+          "delta_final": -0.4711470336952218
+        },
+        "cow": {
+          "delta_ca": -0.7078120541061408,
+          "delta_final": -0.8474176804686679
+        },
+        "dining table": {
+          "delta_ca": -0.37683160663344806,
+          "delta_final": -0.3558636864494657
+        },
+        "dog": {
+          "delta_ca": -0.6853827724804024,
+          "delta_final": -0.7557760838193599
+        },
+        "horse": {
+          "delta_ca": -0.6190248789232179,
+          "delta_final": -0.6796699488120261
+        },
+        "motorbike": {
+          "delta_ca": -0.6255402632140332,
+          "delta_final": -0.639056668599557
+        },
+        "person": {
+          "delta_ca": -0.11920718602489537,
+          "delta_final": -0.23875026822118298
+        },
+        "potted plant": {
+          "delta_ca": -0.5228123107210281,
+          "delta_final": -0.6975315212854466
+        },
+        "sheep": {
+          "delta_ca": -0.726462083618377,
+          "delta_final": -0.8842653621680274
+        },
+        "sofa": {
+          "delta_ca": -0.5044680758851618,
+          "delta_final": -0.6178218167213149
+        },
+        "train": {
+          "delta_ca": -0.5626808007897418,
+          "delta_final": -0.6365857191413873
+        },
+        "tv": {
+          "delta_ca": -0.5436023895643088,
+          "delta_final": -0.7013615255696378
+        }
+      }
+    }
+  },
+  "restored_weight_relationship": null,
+  "layer_weights": {
+    "voc": {
+      "A": [
+        {
+          "module": "down_blocks.0.attentions.0.transformer_blocks.0.attn2",
+          "index": 0,
+          "resolution": 64,
+          "mean": 0.016080422326922417,
+          "median": 0.015610234811902046,
+          "std": 0.007354153785854578,
+          "min": 0.005532840732485056,
+          "max": 0.04000864550471306,
+          "top1_fraction": 0.0,
+          "top3_fraction": 0.0,
+          "mean_by_call": [
+            0.006912706419825554,
+            0.006935223005712032,
+            0.006930749863386154,
+            0.006999611388891935,
+            0.007192375138401985,
+            0.007661021780222654,
+            0.008245273493230343,
+            0.008984645828604698,
+            0.009846212342381477,
+            0.010725188069045544,
+            0.0117237139493227,
+            0.012664809823036194,
+            0.01367880217730999,
+            0.014638795517385006,
+            0.015640882775187492,
+            0.01658400520682335,
+            0.017525896430015564,
+            0.018441151827573776,
+            0.019316842779517174,
+            0.020173780620098114,
+            0.020997438579797745,
+            0.021773939952254295,
+            0.022515570744872093,
+            0.023214852437376976,
+            0.023857228457927704,
+            0.024418098852038383,
+            0.024875009432435036,
+            0.0251483041793108,
+            0.02515409328043461,
+            0.024614518508315086,
+            0.021102387458086014
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.014578750357031822,
+            "bicycle": 0.01653212308883667,
+            "bird": 0.015102488920092583,
+            "boat": 0.013697187416255474,
+            "bottle": 0.012790635228157043,
+            "bus": 0.016263078898191452,
+            "car": 0.01708749309182167,
+            "cat": 0.02041499875485897,
+            "chair": 0.014716850593686104,
+            "cow": 0.018802637234330177,
+            "dining-table": 0.01724553108215332,
+            "dog": 0.017773572355508804,
+            "horse": 0.016592133790254593,
+            "motorbike": 0.016774838790297508,
+            "person": 0.01488555409014225,
+            "potted-plant": 0.016391200944781303,
+            "sheep": 0.0160699263215065,
+            "sofa": 0.015020731836557388,
+            "train": 0.01421052124351263,
+            "tv": 0.016690518707036972
+          }
+        },
+        {
+          "module": "down_blocks.0.attentions.1.transformer_blocks.0.attn2",
+          "index": 1,
+          "resolution": 64,
+          "mean": 0.021768761798739433,
+          "median": 0.021756969392299652,
+          "std": 0.011605432257056236,
+          "min": 0.005554832052439451,
+          "max": 0.055860958993434906,
+          "top1_fraction": 0.0,
+          "top3_fraction": 0.0,
+          "mean_by_call": [
+            0.006660559680312872,
+            0.006705427076667547,
+            0.006708904169499874,
+            0.006924734916538,
+            0.007288766093552113,
+            0.00807761400938034,
+            0.00906089972704649,
+            0.010251452215015888,
+            0.011712764389812946,
+            0.013165381737053394,
+            0.01488074753433466,
+            0.01647987961769104,
+            0.018219266086816788,
+            0.019880913197994232,
+            0.021578211337327957,
+            0.02313919924199581,
+            0.024650532752275467,
+            0.02601458877325058,
+            0.027313044294714928,
+            0.02847776748239994,
+            0.029580185189843178,
+            0.030575906857848167,
+            0.03152989223599434,
+            0.03238966688513756,
+            0.03321506828069687,
+            0.03397835046052933,
+            0.03470093384385109,
+            0.035374294966459274,
+            0.035955220460891724,
+            0.03628161549568176,
+            0.034059714525938034
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.020727377384901047,
+            "bicycle": 0.02306329272687435,
+            "bird": 0.020170336589217186,
+            "boat": 0.018511712551116943,
+            "bottle": 0.016786079853773117,
+            "bus": 0.023433517664670944,
+            "car": 0.024560267105698586,
+            "cat": 0.027242416515946388,
+            "chair": 0.01956925168633461,
+            "cow": 0.02456916868686676,
+            "dining-table": 0.023620041087269783,
+            "dog": 0.022776100784540176,
+            "horse": 0.02156999707221985,
+            "motorbike": 0.023417368531227112,
+            "person": 0.01887555792927742,
+            "potted-plant": 0.022683124989271164,
+            "sheep": 0.020356696099042892,
+            "sofa": 0.0204764511436224,
+            "train": 0.01981532946228981,
+            "tv": 0.023296477273106575
+          }
+        },
+        {
+          "module": "down_blocks.2.attentions.0.transformer_blocks.0.attn2",
+          "index": 2,
+          "resolution": 16,
+          "mean": 0.11955138295888901,
+          "median": 0.11927570402622223,
+          "std": 0.011229629628360271,
+          "min": 0.08798053115606308,
+          "max": 0.18292580544948578,
+          "top1_fraction": 0.011454904542462147,
+          "top3_fraction": 0.5841342988808427,
+          "mean_by_call": [
+            0.10716443508863449,
+            0.10779044777154922,
+            0.1078302189707756,
+            0.10945811867713928,
+            0.11055555194616318,
+            0.11147582530975342,
+            0.11269210278987885,
+            0.11353114992380142,
+            0.11511268466711044,
+            0.11545200645923615,
+            0.11723697930574417,
+            0.11803765594959259,
+            0.11921433359384537,
+            0.12019596993923187,
+            0.1211785078048706,
+            0.12197302281856537,
+            0.12279108911752701,
+            0.12343091517686844,
+            0.12411903589963913,
+            0.1246584877371788,
+            0.12516523897647858,
+            0.125575453042984,
+            0.12588025629520416,
+            0.12612007558345795,
+            0.12627732753753662,
+            0.1263461858034134,
+            0.12631314992904663,
+            0.12616267800331116,
+            0.12583008408546448,
+            0.12521231174468994,
+            0.12331172823905945
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.11498751491308212,
+            "bicycle": 0.11723020672798157,
+            "bird": 0.11379031091928482,
+            "boat": 0.1191055178642273,
+            "bottle": 0.12202266603708267,
+            "bus": 0.11838583648204803,
+            "car": 0.11894682049751282,
+            "cat": 0.1326303333044052,
+            "chair": 0.11834637820720673,
+            "cow": 0.12717415392398834,
+            "dining-table": 0.11247450113296509,
+            "dog": 0.12032423168420792,
+            "horse": 0.1183425560593605,
+            "motorbike": 0.1128847599029541,
+            "person": 0.11498469859361649,
+            "potted-plant": 0.12042475491762161,
+            "sheep": 0.1240311786532402,
+            "sofa": 0.12596380710601807,
+            "train": 0.11442399770021439,
+            "tv": 0.12460077553987503
+          }
+        },
+        {
+          "module": "down_blocks.2.attentions.1.transformer_blocks.0.attn2",
+          "index": 3,
+          "resolution": 16,
+          "mean": 0.09991338104009628,
+          "median": 0.10069103538990021,
+          "std": 0.007493737619370222,
+          "min": 0.07473412156105042,
+          "max": 0.12504251301288605,
+          "top1_fraction": 0.0,
+          "top3_fraction": 0.0009216589861751152,
+          "mean_by_call": [
+            0.10203122347593307,
+            0.1014307290315628,
+            0.1011589989066124,
+            0.09994785487651825,
+            0.0981948971748352,
+            0.09648706018924713,
+            0.09492766112089157,
+            0.09392770379781723,
+            0.09343000501394272,
+            0.09319014102220535,
+            0.09346708655357361,
+            0.09377595037221909,
+            0.09436313062906265,
+            0.09503167867660522,
+            0.09575050324201584,
+            0.09655832499265671,
+            0.09739182889461517,
+            0.09823861718177795,
+            0.09910134971141815,
+            0.09993473440408707,
+            0.10077971965074539,
+            0.10160882025957108,
+            0.102396160364151,
+            0.10319788753986359,
+            0.10399364680051804,
+            0.10479141026735306,
+            0.10561639070510864,
+            0.10650710016489029,
+            0.10755947232246399,
+            0.10897763073444366,
+            0.11354684084653854
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.10078247636556625,
+            "bicycle": 0.09688439220190048,
+            "bird": 0.09859839826822281,
+            "boat": 0.10334333777427673,
+            "bottle": 0.10536491870880127,
+            "bus": 0.10175901651382446,
+            "car": 0.09825269877910614,
+            "cat": 0.09473288059234619,
+            "chair": 0.10126923769712448,
+            "cow": 0.0981813594698906,
+            "dining-table": 0.09685654938220978,
+            "dog": 0.09444812685251236,
+            "horse": 0.09929978847503662,
+            "motorbike": 0.0987219512462616,
+            "person": 0.09979865700006485,
+            "potted-plant": 0.1019127368927002,
+            "sheep": 0.09860337525606155,
+            "sofa": 0.10313546657562256,
+            "train": 0.10088931024074554,
+            "tv": 0.10607466101646423
+          }
+        },
+        {
+          "module": "mid_block.attentions.0.transformer_blocks.0.attn2",
+          "index": 4,
+          "resolution": 8,
+          "mean": 0.24293920397758484,
+          "median": 0.22346355020999908,
+          "std": 0.0741603821516037,
+          "min": 0.11299541592597961,
+          "max": 0.4072491228580475,
+          "top1_fraction": 0.9361421988150099,
+          "top3_fraction": 1.0,
+          "mean_by_call": [
+            0.38956695795059204,
+            0.3808501064777374,
+            0.3783133625984192,
+            0.36026132106781006,
+            0.33959466218948364,
+            0.3188238739967346,
+            0.2984115779399872,
+            0.28273895382881165,
+            0.26826679706573486,
+            0.25685688853263855,
+            0.2466498762369156,
+            0.2381833791732788,
+            0.23054544627666473,
+            0.22432221472263336,
+            0.21833357214927673,
+            0.2135000228881836,
+            0.20880384743213654,
+            0.20477178692817688,
+            0.2009459137916565,
+            0.19757674634456635,
+            0.19448670744895935,
+            0.19172734022140503,
+            0.1891951709985733,
+            0.1869969516992569,
+            0.18511183559894562,
+            0.18368560075759888,
+            0.18273618817329407,
+            0.18248501420021057,
+            0.1833677589893341,
+            0.18675768375396729,
+            0.20724692940711975
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.27351391315460205,
+            "bicycle": 0.23479901254177094,
+            "bird": 0.27034541964530945,
+            "boat": 0.269691526889801,
+            "bottle": 0.28894922137260437,
+            "bus": 0.217035174369812,
+            "car": 0.22191329300403595,
+            "cat": 0.2022494375705719,
+            "chair": 0.2632913589477539,
+            "cow": 0.22168150544166565,
+            "dining-table": 0.224428191781044,
+            "dog": 0.23700471222400665,
+            "horse": 0.23605979979038239,
+            "motorbike": 0.2208768129348755,
+            "person": 0.24600856006145477,
+            "potted-plant": 0.26251769065856934,
+            "sheep": 0.25178879499435425,
+            "sofa": 0.24400992691516876,
+            "train": 0.24081775546073914,
+            "tv": 0.23020079731941223
+          }
+        },
+        {
+          "module": "up_blocks.1.attentions.0.transformer_blocks.0.attn2",
+          "index": 5,
+          "resolution": 16,
+          "mean": 0.11240285634994507,
+          "median": 0.11243550479412079,
+          "std": 0.00787789560854435,
+          "min": 0.08872897177934647,
+          "max": 0.14200659096240997,
+          "top1_fraction": 0.0,
+          "top3_fraction": 0.22455562870309415,
+          "mean_by_call": [
+            0.11185762286186218,
+            0.11341167986392975,
+            0.11394882947206497,
+            0.1164555549621582,
+            0.11883071810007095,
+            0.12032565474510193,
+            0.12077228724956512,
+            0.12049674987792969,
+            0.11954979598522186,
+            0.11856723576784134,
+            0.11736217141151428,
+            0.11624851822853088,
+            0.11514761298894882,
+            0.11407139152288437,
+            0.11305025964975357,
+            0.11214737594127655,
+            0.11131501942873001,
+            0.1105557456612587,
+            0.10988418757915497,
+            0.10929235070943832,
+            0.10876113921403885,
+            0.10830305516719818,
+            0.10788754373788834,
+            0.10751136392354965,
+            0.107176274061203,
+            0.1068822368979454,
+            0.10662100464105606,
+            0.1064329445362091,
+            0.10634806752204895,
+            0.10650518536567688,
+            0.10876921564340591
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.11334218084812164,
+            "bicycle": 0.10477263480424881,
+            "bird": 0.11607120931148529,
+            "boat": 0.11388737708330154,
+            "bottle": 0.11347461491823196,
+            "bus": 0.11432532221078873,
+            "car": 0.11208023875951767,
+            "cat": 0.10818995535373688,
+            "chair": 0.10939187556505203,
+            "cow": 0.11246595531702042,
+            "dining-table": 0.11465932428836823,
+            "dog": 0.10829699784517288,
+            "horse": 0.11640731245279312,
+            "motorbike": 0.10713721811771393,
+            "person": 0.11498939245939255,
+            "potted-plant": 0.10875315219163895,
+            "sheep": 0.11315679550170898,
+            "sofa": 0.11739359050989151,
+            "train": 0.11754849553108215,
+            "tv": 0.11197762936353683
+          }
+        },
+        {
+          "module": "up_blocks.1.attentions.1.transformer_blocks.0.attn2",
+          "index": 6,
+          "resolution": 16,
+          "mean": 0.15295851230621338,
+          "median": 0.1527484953403473,
+          "std": 0.011949376203119755,
+          "min": 0.11932411044836044,
+          "max": 0.19534318149089813,
+          "top1_fraction": 0.05240289664252798,
+          "top3_fraction": 1.0,
+          "mean_by_call": [
+            0.13795159757137299,
+            0.14200419187545776,
+            0.14312495291233063,
+            0.14905068278312683,
+            0.1545523703098297,
+            0.15861517190933228,
+            0.160613015294075,
+            0.16148507595062256,
+            0.16096477210521698,
+            0.16041243076324463,
+            0.1590135544538498,
+            0.15808942914009094,
+            0.15700459480285645,
+            0.15600508451461792,
+            0.1549919694662094,
+            0.15427908301353455,
+            0.15356677770614624,
+            0.15302613377571106,
+            0.1525588184595108,
+            0.15217818319797516,
+            0.15186269581317902,
+            0.15161265432834625,
+            0.15144386887550354,
+            0.15132400393486023,
+            0.15121576189994812,
+            0.15114502608776093,
+            0.15109460055828094,
+            0.15107028186321259,
+            0.15100370347499847,
+            0.15087200701236725,
+            0.1495804488658905
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.1461121141910553,
+            "bicycle": 0.15072233974933624,
+            "bird": 0.1479218751192093,
+            "boat": 0.15547026693820953,
+            "bottle": 0.14791475236415863,
+            "bus": 0.16152426600456238,
+            "car": 0.15028461813926697,
+            "cat": 0.14216937124729156,
+            "chair": 0.15498094260692596,
+            "cow": 0.15361207723617554,
+            "dining-table": 0.16082599759101868,
+            "dog": 0.14819449186325073,
+            "horse": 0.1523428112268448,
+            "motorbike": 0.14728091657161713,
+            "person": 0.14823009073734283,
+            "potted-plant": 0.14817526936531067,
+            "sheep": 0.15509125590324402,
+            "sofa": 0.16200043261051178,
+            "train": 0.16314899921417236,
+            "tv": 0.16382595896720886
+          }
+        },
+        {
+          "module": "up_blocks.1.attentions.2.transformer_blocks.0.attn2",
+          "index": 7,
+          "resolution": 16,
+          "mean": 0.11211644858121872,
+          "median": 0.11285057663917542,
+          "std": 0.0074075195007026196,
+          "min": 0.07794871181249619,
+          "max": 0.14847463369369507,
+          "top1_fraction": 0.0,
+          "top3_fraction": 0.1892034233048058,
+          "mean_by_call": [
+            0.11366026848554611,
+            0.1137574166059494,
+            0.11380743235349655,
+            0.11405851691961288,
+            0.11456286907196045,
+            0.11519396305084229,
+            0.11536871641874313,
+            0.11537038534879684,
+            0.11485826969146729,
+            0.11445887386798859,
+            0.11370027810335159,
+            0.11312214285135269,
+            0.11244485527276993,
+            0.11183691769838333,
+            0.11132381856441498,
+            0.11080291867256165,
+            0.1104310154914856,
+            0.11007732152938843,
+            0.10985755920410156,
+            0.10967813432216644,
+            0.10960506647825241,
+            0.10959239304065704,
+            0.1096506416797638,
+            0.10978832840919495,
+            0.10997006297111511,
+            0.11023057252168655,
+            0.11056951433420181,
+            0.11099542677402496,
+            0.11148165166378021,
+            0.11215262115001678,
+            0.11320182681083679
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.11489979922771454,
+            "bicycle": 0.11433812230825424,
+            "bird": 0.1149340495467186,
+            "boat": 0.11590678244829178,
+            "bottle": 0.11291535198688507,
+            "bus": 0.11175950616598129,
+            "car": 0.1132393479347229,
+            "cat": 0.09858163446187973,
+            "chair": 0.11397790163755417,
+            "cow": 0.10538435727357864,
+            "dining-table": 0.11222152411937714,
+            "dog": 0.10581744462251663,
+            "horse": 0.11383666843175888,
+            "motorbike": 0.12136983871459961,
+            "person": 0.1156870499253273,
+            "potted-plant": 0.11065563559532166,
+            "sheep": 0.11100220680236816,
+            "sofa": 0.10932012647390366,
+            "train": 0.11653731763362885,
+            "tv": 0.11028008162975311
+          }
+        },
+        {
+          "module": "up_blocks.3.attentions.0.transformer_blocks.0.attn2",
+          "index": 8,
+          "resolution": 64,
+          "mean": 0.05420853942632675,
+          "median": 0.056279852986335754,
+          "std": 0.02595750242471695,
+          "min": 0.007342683617025614,
+          "max": 0.12543201446533203,
+          "top1_fraction": 0.0,
+          "top3_fraction": 0.001184990125082291,
+          "mean_by_call": [
+            0.009491990320384502,
+            0.011141489259898663,
+            0.011775515042245388,
+            0.016803091391921043,
+            0.023964008316397667,
+            0.03195122256875038,
+            0.040928445756435394,
+            0.047768484801054,
+            0.05387444794178009,
+            0.058789487928152084,
+            0.06216609477996826,
+            0.0649539902806282,
+            0.06676723062992096,
+            0.06796331703662872,
+            0.06891166418790817,
+            0.06928926706314087,
+            0.06955482065677643,
+            0.06957059353590012,
+            0.0694294273853302,
+            0.06918106228113174,
+            0.06874535977840424,
+            0.06823473423719406,
+            0.06763620674610138,
+            0.06693630665540695,
+            0.06614160537719727,
+            0.06517660617828369,
+            0.064028799533844,
+            0.06257836520671844,
+            0.0606800802052021,
+            0.05765807628631592,
+            0.0483727902173996
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.04354042187333107,
+            "bicycle": 0.06121991574764252,
+            "bird": 0.04421142488718033,
+            "boat": 0.03748369589447975,
+            "bottle": 0.03384380042552948,
+            "bus": 0.05961686745285988,
+            "car": 0.06299325078725815,
+            "cat": 0.08215399831533432,
+            "chair": 0.045644842088222504,
+            "cow": 0.06319846212863922,
+            "dining-table": 0.05891498178243637,
+            "dog": 0.06982962042093277,
+            "horse": 0.057720333337783813,
+            "motorbike": 0.06775187700986862,
+            "person": 0.062094759196043015,
+            "potted-plant": 0.04433555528521538,
+            "sheep": 0.049383968114852905,
+            "sofa": 0.0440065898001194,
+            "train": 0.04889814928174019,
+            "tv": 0.046992227435112
+          }
+        },
+        {
+          "module": "up_blocks.3.attentions.1.transformer_blocks.0.attn2",
+          "index": 9,
+          "resolution": 64,
+          "mean": 0.04216810688376427,
+          "median": 0.0446954146027565,
+          "std": 0.020123444497585297,
+          "min": 0.006916948594152927,
+          "max": 0.08492989093065262,
+          "top1_fraction": 0.0,
+          "top3_fraction": 0.0,
+          "mean_by_call": [
+            0.008126084692776203,
+            0.009125867858529091,
+            0.00946508627384901,
+            0.01222183182835579,
+            0.01611393690109253,
+            0.020541226491332054,
+            0.025864453986287117,
+            0.03017875738441944,
+            0.03469102084636688,
+            0.03841066733002663,
+            0.04165228083729744,
+            0.0443313904106617,
+            0.046668004244565964,
+            0.048515040427446365,
+            0.05022641643881798,
+            0.05148705467581749,
+            0.05260848626494408,
+            0.05353173986077309,
+            0.054275739938020706,
+            0.05490615963935852,
+            0.05540655180811882,
+            0.05580781027674675,
+            0.05614159628748894,
+            0.05635615065693855,
+            0.056486181914806366,
+            0.056467290967702866,
+            0.0563136525452137,
+            0.05591580644249916,
+            0.05518033728003502,
+            0.053593382239341736,
+            0.04660149663686752
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.03486698493361473,
+            "bicycle": 0.04881158471107483,
+            "bird": 0.036209940910339355,
+            "boat": 0.03256070986390114,
+            "bottle": 0.027294931933283806,
+            "bus": 0.0472804456949234,
+            "car": 0.05010642856359482,
+            "cat": 0.05866328999400139,
+            "chair": 0.03609301522374153,
+            "cow": 0.04686303809285164,
+            "dining-table": 0.04889664053916931,
+            "dog": 0.04776153713464737,
+            "horse": 0.042413052171468735,
+            "motorbike": 0.053300514817237854,
+            "person": 0.04102642089128494,
+            "potted-plant": 0.03886230289936066,
+            "sheep": 0.03785056993365288,
+            "sofa": 0.03579283505678177,
+            "train": 0.039241138845682144,
+            "tv": 0.03918246552348137
+          }
+        },
+        {
+          "module": "up_blocks.3.attentions.2.transformer_blocks.0.attn2",
+          "index": 10,
+          "resolution": 64,
+          "mean": 0.02589239738881588,
+          "median": 0.0268907081335783,
+          "std": 0.012612634338438511,
+          "min": 0.0062559498474001884,
+          "max": 0.055885959416627884,
+          "top1_fraction": 0.0,
+          "top3_fraction": 0.0,
+          "mean_by_call": [
+            0.0065765297040343285,
+            0.006847327575087547,
+            0.0069357845932245255,
+            0.007818690501153469,
+            0.009149856865406036,
+            0.010847251862287521,
+            0.013115477748215199,
+            0.015266692265868187,
+            0.017693152651190758,
+            0.01997172087430954,
+            0.022147327661514282,
+            0.02411275915801525,
+            0.02594662830233574,
+            0.02753879502415657,
+            0.02901417948305607,
+            0.030239813029766083,
+            0.03136084973812103,
+            0.032341260462999344,
+            0.03319811820983887,
+            0.03394249081611633,
+            0.0346098318696022,
+            0.03518783301115036,
+            0.03572304919362068,
+            0.036164283752441406,
+            0.03655480220913887,
+            0.03687840700149536,
+            0.03713063895702362,
+            0.03732982650399208,
+            0.03743954747915268,
+            0.03737475723028183,
+            0.034206535667181015
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.022648436948657036,
+            "bicycle": 0.03162636235356331,
+            "bird": 0.022644570097327232,
+            "boat": 0.02034187875688076,
+            "bottle": 0.01864299736917019,
+            "bus": 0.028616957366466522,
+            "car": 0.030535543337464333,
+            "cat": 0.03297166898846626,
+            "chair": 0.02271835319697857,
+            "cow": 0.028067292645573616,
+            "dining-table": 0.02985670603811741,
+            "dog": 0.027773147448897362,
+            "horse": 0.025415556505322456,
+            "motorbike": 0.030483897775411606,
+            "person": 0.023419270291924477,
+            "potted-plant": 0.025288593024015427,
+            "sheep": 0.022665243595838547,
+            "sofa": 0.02288001775741577,
+            "train": 0.02446901798248291,
+            "tv": 0.02687840163707733
+          }
+        }
+      ]
+    },
+    "coco": {
+      "A": [
+        {
+          "module": "down_blocks.0.attentions.0.transformer_blocks.0.attn2",
+          "index": 0,
+          "resolution": 64,
+          "mean": 0.016039416193962097,
+          "median": 0.015815969556570053,
+          "std": 0.007452339865267277,
+          "min": 0.005317256320267916,
+          "max": 0.04002409800887108,
+          "top1_fraction": 0.0,
+          "top3_fraction": 0.0,
+          "mean_by_call": [
+            0.006678584031760693,
+            0.006628646980971098,
+            0.006614233832806349,
+            0.006606983486562967,
+            0.006748650223016739,
+            0.007173528894782066,
+            0.007766639348119497,
+            0.008528502658009529,
+            0.009436036460101604,
+            0.010342231951653957,
+            0.011362284421920776,
+            0.012352846562862396,
+            0.013391203247010708,
+            0.014396649785339832,
+            0.015401887707412243,
+            0.016385750845074654,
+            0.0173301100730896,
+            0.018286097794771194,
+            0.019167492166161537,
+            0.0200546532869339,
+            0.020906109362840652,
+            0.021725250408053398,
+            0.022517206147313118,
+            0.02329016663134098,
+            0.02401379682123661,
+            0.024687524884939194,
+            0.025285057723522186,
+            0.025743570178747177,
+            0.02596898376941681,
+            0.025726115331053734,
+            0.022705096751451492
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.014724857173860073,
+            "bicycle": 0.016484590247273445,
+            "bird": 0.01472595427185297,
+            "boat": 0.01416158489882946,
+            "bottle": 0.016796670854091644,
+            "bus": 0.016845539212226868,
+            "car": 0.016726873815059662,
+            "cat": 0.017101125791668892,
+            "chair": 0.016885526478290558,
+            "cow": 0.016079524531960487,
+            "dining table": 0.017464153468608856,
+            "dog": 0.016612106934189796,
+            "horse": 0.015788177028298378,
+            "motorbike": 0.015974288806319237,
+            "person": 0.016375701874494553,
+            "potted plant": 0.016118351370096207,
+            "sheep": 0.01432187482714653,
+            "sofa": 0.017546646296977997,
+            "train": 0.015501031652092934,
+            "tv": 0.016650978475809097
+          }
+        },
+        {
+          "module": "down_blocks.0.attentions.1.transformer_blocks.0.attn2",
+          "index": 1,
+          "resolution": 64,
+          "mean": 0.021761195734143257,
+          "median": 0.022049928084015846,
+          "std": 0.01148846372961998,
+          "min": 0.005313874687999487,
+          "max": 0.05538017675280571,
+          "top1_fraction": 0.0,
+          "top3_fraction": 0.0,
+          "mean_by_call": [
+            0.006470257882028818,
+            0.006474370136857033,
+            0.0064698089845478535,
+            0.00668295519426465,
+            0.007056222762912512,
+            0.007936183363199234,
+            0.009017719887197018,
+            0.01031654141843319,
+            0.011889548972249031,
+            0.013388168066740036,
+            0.015075361356139183,
+            0.016703609377145767,
+            0.0183704923838377,
+            0.01996113546192646,
+            0.021520080044865608,
+            0.02299468405544758,
+            0.024363232776522636,
+            0.025656672194600105,
+            0.026865487918257713,
+            0.027983203530311584,
+            0.029073070734739304,
+            0.030075030401349068,
+            0.031072424724698067,
+            0.03200891986489296,
+            0.03291985020041466,
+            0.033806104212999344,
+            0.03468378260731697,
+            0.03557351604104042,
+            0.036447107791900635,
+            0.03727598488330841,
+            0.03646550700068474
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.02106240950524807,
+            "bicycle": 0.022689076140522957,
+            "bird": 0.019208185374736786,
+            "boat": 0.019113481044769287,
+            "bottle": 0.022930553182959557,
+            "bus": 0.02411404810845852,
+            "car": 0.02337554283440113,
+            "cat": 0.02320607379078865,
+            "chair": 0.023139214143157005,
+            "cow": 0.020806796848773956,
+            "dining table": 0.024868648499250412,
+            "dog": 0.021979667246341705,
+            "horse": 0.020270556211471558,
+            "motorbike": 0.02194090001285076,
+            "person": 0.022083576768636703,
+            "potted plant": 0.021373417228460312,
+            "sheep": 0.017977237701416016,
+            "sofa": 0.024147046729922295,
+            "train": 0.02191566862165928,
+            "tv": 0.023269522935152054
+          }
+        },
+        {
+          "module": "down_blocks.2.attentions.0.transformer_blocks.0.attn2",
+          "index": 2,
+          "resolution": 16,
+          "mean": 0.11588366329669952,
+          "median": 0.1157953217625618,
+          "std": 0.009057427756488323,
+          "min": 0.08441730588674545,
+          "max": 0.1596197932958603,
+          "top1_fraction": 0.00027376009490349956,
+          "top3_fraction": 0.4869735821508418,
+          "mean_by_call": [
+            0.10584183782339096,
+            0.1059512048959732,
+            0.10577753931283951,
+            0.10719480365514755,
+            0.10794033110141754,
+            0.10950394719839096,
+            0.11063358187675476,
+            0.1113610789179802,
+            0.11237189173698425,
+            0.11301282793283463,
+            0.11394979804754257,
+            0.11463651806116104,
+            0.11547046899795532,
+            0.11611679196357727,
+            0.11682303994894028,
+            0.11745350062847137,
+            0.11801936477422714,
+            0.11859455704689026,
+            0.11916851252317429,
+            0.11966900527477264,
+            0.1201825737953186,
+            0.12058337032794952,
+            0.12098053842782974,
+            0.12129582464694977,
+            0.12154927849769592,
+            0.12169885635375977,
+            0.12177970260381699,
+            0.12174838781356812,
+            0.1216040775179863,
+            0.1212778389453888,
+            0.12020274996757507
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.11891169100999832,
+            "bicycle": 0.11396753042936325,
+            "bird": 0.11446977406740189,
+            "boat": 0.1170690730214119,
+            "bottle": 0.11576344072818756,
+            "bus": 0.11791723221540451,
+            "car": 0.11391060799360275,
+            "cat": 0.1155749186873436,
+            "chair": 0.11575046926736832,
+            "cow": 0.12026245146989822,
+            "dining table": 0.11860766261816025,
+            "dog": 0.11590889096260071,
+            "horse": 0.11477329581975937,
+            "motorbike": 0.11153477430343628,
+            "person": 0.11365904659032822,
+            "potted plant": 0.11918332427740097,
+            "sheep": 0.11888939887285233,
+            "sofa": 0.11283840984106064,
+            "train": 0.1166590079665184,
+            "tv": 0.1147749274969101
+          }
+        },
+        {
+          "module": "down_blocks.2.attentions.1.transformer_blocks.0.attn2",
+          "index": 3,
+          "resolution": 16,
+          "mean": 0.10013091564178467,
+          "median": 0.10054918378591537,
+          "std": 0.006138898897916079,
+          "min": 0.0769963189959526,
+          "max": 0.12434994429349899,
+          "top1_fraction": 0.0,
+          "top3_fraction": 0.0005018935073230825,
+          "mean_by_call": [
+            0.10238318145275116,
+            0.10202798992395401,
+            0.10178415477275848,
+            0.10105275362730026,
+            0.09969796985387802,
+            0.09835775196552277,
+            0.09706823527812958,
+            0.09633903950452805,
+            0.09554023295640945,
+            0.09539925307035446,
+            0.09507188946008682,
+            0.09519243240356445,
+            0.09547732770442963,
+            0.0957394689321518,
+            0.09620553255081177,
+            0.09665167331695557,
+            0.09723583608865738,
+            0.09785991162061691,
+            0.09854477643966675,
+            0.09926855564117432,
+            0.09998569637537003,
+            0.10073208063840866,
+            0.10146696865558624,
+            0.10224267840385437,
+            0.10301291942596436,
+            0.10379216820001602,
+            0.10460025817155838,
+            0.10545303672552109,
+            0.10643571615219116,
+            0.10771165043115616,
+            0.11172735691070557
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.10218432545661926,
+            "bicycle": 0.09795625507831573,
+            "bird": 0.09920913726091385,
+            "boat": 0.10223157703876495,
+            "bottle": 0.10151952505111694,
+            "bus": 0.10305081307888031,
+            "car": 0.09891808778047562,
+            "cat": 0.09732092916965485,
+            "chair": 0.10008895397186279,
+            "cow": 0.1009845957159996,
+            "dining table": 0.10089899599552155,
+            "dog": 0.09888556599617004,
+            "horse": 0.09976951777935028,
+            "motorbike": 0.09820885956287384,
+            "person": 0.09984427690505981,
+            "potted plant": 0.10413458943367004,
+            "sheep": 0.10098038613796234,
+            "sofa": 0.09838904440402985,
+            "train": 0.10113587975502014,
+            "tv": 0.10227833688259125
+          }
+        },
+        {
+          "module": "mid_block.attentions.0.transformer_blocks.0.attn2",
+          "index": 4,
+          "resolution": 8,
+          "mean": 0.244535893201828,
+          "median": 0.2236645221710205,
+          "std": 0.07325650751590729,
+          "min": 0.12359841167926788,
+          "max": 0.413141667842865,
+          "top1_fraction": 0.9229365332846649,
+          "top3_fraction": 1.0,
+          "mean_by_call": [
+            0.38990432024002075,
+            0.38065823912620544,
+            0.37864789366722107,
+            0.3613806962966919,
+            0.3425706624984741,
+            0.32232046127319336,
+            0.3036113679409027,
+            0.28825974464416504,
+            0.2734034061431885,
+            0.2624567747116089,
+            0.25194814801216125,
+            0.2436065822839737,
+            0.23582088947296143,
+            0.22927501797676086,
+            0.22320860624313354,
+            0.21784670650959015,
+            0.2130352109670639,
+            0.20850317180156708,
+            0.20445296168327332,
+            0.20063984394073486,
+            0.19706033170223236,
+            0.19381804764270782,
+            0.19070199131965637,
+            0.1878633201122284,
+            0.1852516233921051,
+            0.18297170102596283,
+            0.18100392818450928,
+            0.1795397847890854,
+            0.17876239120960236,
+            0.17959044873714447,
+            0.19249612092971802
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.26935797929763794,
+            "bicycle": 0.23737028241157532,
+            "bird": 0.2751757800579071,
+            "boat": 0.2621825933456421,
+            "bottle": 0.2392592430114746,
+            "bus": 0.21566671133041382,
+            "car": 0.23078106343746185,
+            "cat": 0.23678167164325714,
+            "chair": 0.2375779151916504,
+            "cow": 0.24787558615207672,
+            "dining table": 0.23771440982818604,
+            "dog": 0.2455105185508728,
+            "horse": 0.24476680159568787,
+            "motorbike": 0.23715275526046753,
+            "person": 0.24235539138317108,
+            "potted plant": 0.2401522397994995,
+            "sheep": 0.2682417333126068,
+            "sofa": 0.2252591848373413,
+            "train": 0.23563313484191895,
+            "tv": 0.22567139565944672
+          }
+        },
+        {
+          "module": "up_blocks.1.attentions.0.transformer_blocks.0.attn2",
+          "index": 5,
+          "resolution": 16,
+          "mean": 0.11352631449699402,
+          "median": 0.11305089294910431,
+          "std": 0.007237349171191454,
+          "min": 0.0906384214758873,
+          "max": 0.1449294239282608,
+          "top1_fraction": 0.0,
+          "top3_fraction": 0.3291508874389743,
+          "mean_by_call": [
+            0.11200976371765137,
+            0.11394321918487549,
+            0.11448787897825241,
+            0.11715719848871231,
+            0.11986537277698517,
+            0.12127518653869629,
+            0.12179442495107651,
+            0.1215488389134407,
+            0.1208089292049408,
+            0.11990419775247574,
+            0.11873739957809448,
+            0.11768743395805359,
+            0.11657313257455826,
+            0.11558568477630615,
+            0.11457523703575134,
+            0.11369620263576508,
+            0.11290765553712845,
+            0.11214028298854828,
+            0.11145984381437302,
+            0.11083130538463593,
+            0.11023557931184769,
+            0.1097327396273613,
+            0.10925909131765366,
+            0.10881499201059341,
+            0.10839519649744034,
+            0.10800611972808838,
+            0.10764704644680023,
+            0.10733012855052948,
+            0.10708284378051758,
+            0.10700932890176773,
+            0.1088133305311203
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.11201690882444382,
+            "bicycle": 0.10983958840370178,
+            "bird": 0.11266665160655975,
+            "boat": 0.11412382125854492,
+            "bottle": 0.11264919489622116,
+            "bus": 0.11493150144815445,
+            "car": 0.11599389463663101,
+            "cat": 0.11383287608623505,
+            "chair": 0.11343255639076233,
+            "cow": 0.11455726623535156,
+            "dining table": 0.10610770434141159,
+            "dog": 0.1125509962439537,
+            "horse": 0.11552783101797104,
+            "motorbike": 0.11210309714078903,
+            "person": 0.11288245022296906,
+            "potted plant": 0.1129232719540596,
+            "sheep": 0.11446122825145721,
+            "sofa": 0.11509477347135544,
+            "train": 0.1158403605222702,
+            "tv": 0.11798856407403946
+          }
+        },
+        {
+          "module": "up_blocks.1.attentions.1.transformer_blocks.0.attn2",
+          "index": 6,
+          "resolution": 16,
+          "mean": 0.15868176519870758,
+          "median": 0.15920422971248627,
+          "std": 0.011589812114834785,
+          "min": 0.12311892211437225,
+          "max": 0.19935773313045502,
+          "top1_fraction": 0.07678970662043162,
+          "top3_fraction": 1.0,
+          "mean_by_call": [
+            0.14008457958698273,
+            0.14471060037612915,
+            0.1457088440656662,
+            0.151884987950325,
+            0.15762899816036224,
+            0.16194142401218414,
+            0.16423389315605164,
+            0.1655254065990448,
+            0.16543149948120117,
+            0.16517530381679535,
+            0.16433264315128326,
+            0.16366194188594818,
+            0.16292467713356018,
+            0.162125363945961,
+            0.16155403852462769,
+            0.16093584895133972,
+            0.16049103438854218,
+            0.1600181609392166,
+            0.15966971218585968,
+            0.1593332290649414,
+            0.15910020470619202,
+            0.15890811383724213,
+            0.15877684950828552,
+            0.15867403149604797,
+            0.1585884839296341,
+            0.1585167497396469,
+            0.15841670334339142,
+            0.15827278792858124,
+            0.15809530019760132,
+            0.15776260197162628,
+            0.15665113925933838
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.14926885068416595,
+            "bicycle": 0.15863466262817383,
+            "bird": 0.15356525778770447,
+            "boat": 0.15836724638938904,
+            "bottle": 0.1592589169740677,
+            "bus": 0.16408392786979675,
+            "car": 0.15567541122436523,
+            "cat": 0.15514922142028809,
+            "chair": 0.1600150167942047,
+            "cow": 0.15942901372909546,
+            "dining table": 0.16269321739673615,
+            "dog": 0.15843826532363892,
+            "horse": 0.16215096414089203,
+            "motorbike": 0.1557210236787796,
+            "person": 0.1597120761871338,
+            "potted plant": 0.16469763219356537,
+            "sheep": 0.15942791104316711,
+            "sofa": 0.1653165966272354,
+            "train": 0.16089697182178497,
+            "tv": 0.16578516364097595
+          }
+        },
+        {
+          "module": "up_blocks.1.attentions.2.transformer_blocks.0.attn2",
+          "index": 7,
+          "resolution": 16,
+          "mean": 0.11238712072372437,
+          "median": 0.1124095469713211,
+          "std": 0.005630867090076208,
+          "min": 0.09072627872228622,
+          "max": 0.13899344205856323,
+          "top1_fraction": 0.0,
+          "top3_fraction": 0.1833736369028608,
+          "mean_by_call": [
+            0.11250261962413788,
+            0.11260417848825455,
+            0.11271858215332031,
+            0.1130416989326477,
+            0.11373287439346313,
+            0.11433656513690948,
+            0.11475273966789246,
+            0.11482469737529755,
+            0.11480393260717392,
+            0.11426977068185806,
+            0.11392248421907425,
+            0.11334703117609024,
+            0.1128651425242424,
+            0.11243712902069092,
+            0.11202406138181686,
+            0.11171221733093262,
+            0.11139488220214844,
+            0.11115148663520813,
+            0.11095329374074936,
+            0.1108001321554184,
+            0.11070898920297623,
+            0.11067266762256622,
+            0.11068599671125412,
+            0.11074875295162201,
+            0.11087819933891296,
+            0.11105617880821228,
+            0.1112881749868393,
+            0.11158426851034164,
+            0.11197703331708908,
+            0.112523153424263,
+            0.11368173360824585
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.11243519932031631,
+            "bicycle": 0.11249949038028717,
+            "bird": 0.11434817314147949,
+            "boat": 0.1149408146739006,
+            "bottle": 0.11181743443012238,
+            "bus": 0.11012396961450577,
+            "car": 0.11273045837879181,
+            "cat": 0.10776574164628983,
+            "chair": 0.11151578277349472,
+            "cow": 0.1098562702536583,
+            "dining table": 0.1092725396156311,
+            "dog": 0.10956011712551117,
+            "horse": 0.11314333975315094,
+            "motorbike": 0.11800438910722733,
+            "person": 0.11606520414352417,
+            "potted plant": 0.11191441863775253,
+            "sheep": 0.11157708615064621,
+            "sofa": 0.10917365550994873,
+            "train": 0.11545375734567642,
+            "tv": 0.11310999095439911
+          }
+        },
+        {
+          "module": "up_blocks.3.attentions.0.transformer_blocks.0.attn2",
+          "index": 8,
+          "resolution": 64,
+          "mean": 0.0509556345641613,
+          "median": 0.05553602799773216,
+          "std": 0.02291150577366352,
+          "min": 0.007224511355161667,
+          "max": 0.11019749939441681,
+          "top1_fraction": 0.0,
+          "top3_fraction": 0.0,
+          "mean_by_call": [
+            0.00928453914821148,
+            0.010825423523783684,
+            0.011286727152764797,
+            0.01530349999666214,
+            0.020764769986271858,
+            0.027602776885032654,
+            0.0350746214389801,
+            0.04130721092224121,
+            0.04764976724982262,
+            0.05208466202020645,
+            0.05613285303115845,
+            0.05886745825409889,
+            0.06103074923157692,
+            0.06266292929649353,
+            0.0638071820139885,
+            0.06463690102100372,
+            0.06514207273721695,
+            0.06548783928155899,
+            0.06558433920145035,
+            0.06559581309556961,
+            0.06543637812137604,
+            0.06518065184354782,
+            0.06480912864208221,
+            0.06435461342334747,
+            0.06381727010011673,
+            0.06316813081502914,
+            0.06238982081413269,
+            0.0614059679210186,
+            0.06008059158921242,
+            0.05793757736682892,
+            0.05091249942779541
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.042206406593322754,
+            "bicycle": 0.05618993565440178,
+            "bird": 0.04081080108880997,
+            "boat": 0.04100015014410019,
+            "bottle": 0.05144655331969261,
+            "bus": 0.05802615359425545,
+            "car": 0.05735017731785774,
+            "cat": 0.05949235334992409,
+            "chair": 0.05290667712688446,
+            "cow": 0.04887772724032402,
+            "dining table": 0.05133489891886711,
+            "dog": 0.05412805825471878,
+            "horse": 0.05088193342089653,
+            "motorbike": 0.05730211362242699,
+            "person": 0.05161447823047638,
+            "potted plant": 0.045885976403951645,
+            "sheep": 0.041313283145427704,
+            "sofa": 0.05821705237030983,
+            "train": 0.049311161041259766,
+            "tv": 0.05173598974943161
+          }
+        },
+        {
+          "module": "up_blocks.3.attentions.1.transformer_blocks.0.attn2",
+          "index": 9,
+          "resolution": 64,
+          "mean": 0.041131772100925446,
+          "median": 0.04501304030418396,
+          "std": 0.019000738859176636,
+          "min": 0.00683986721560359,
+          "max": 0.08149577677249908,
+          "top1_fraction": 0.0,
+          "top3_fraction": 0.0,
+          "mean_by_call": [
+            0.008277587592601776,
+            0.009331479668617249,
+            0.009593167342245579,
+            0.012013150379061699,
+            0.015215728431940079,
+            0.01922779157757759,
+            0.023793566972017288,
+            0.027847589924931526,
+            0.03225095197558403,
+            0.03563044220209122,
+            0.03901591897010803,
+            0.04165246710181236,
+            0.04402817040681839,
+            0.0460502915084362,
+            0.04777801036834717,
+            0.04926459863781929,
+            0.05049969255924225,
+            0.0516323521733284,
+            0.052528101950883865,
+            0.053356170654296875,
+            0.05405723303556442,
+            0.0546448789536953,
+            0.055157680064439774,
+            0.05557745695114136,
+            0.05592827498912811,
+            0.05617956817150116,
+            0.05634358152747154,
+            0.05635179951786995,
+            0.0561240054666996,
+            0.05533083900809288,
+            0.050402186810970306
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.03485248237848282,
+            "bicycle": 0.045686934143304825,
+            "bird": 0.03449225798249245,
+            "boat": 0.03513114154338837,
+            "bottle": 0.04238516464829445,
+            "bus": 0.046890005469322205,
+            "car": 0.04662216827273369,
+            "cat": 0.04620245099067688,
+            "chair": 0.04261224344372749,
+            "cow": 0.038572024554014206,
+            "dining table": 0.04343264177441597,
+            "dog": 0.04185442253947258,
+            "horse": 0.03968631848692894,
+            "motorbike": 0.04571918025612831,
+            "person": 0.04095541313290596,
+            "potted plant": 0.03932950273156166,
+            "sheep": 0.032962895929813385,
+            "sofa": 0.04680929705500603,
+            "train": 0.041375838220119476,
+            "tv": 0.04206214100122452
+          }
+        },
+        {
+          "module": "up_blocks.3.attentions.2.transformer_blocks.0.attn2",
+          "index": 10,
+          "resolution": 64,
+          "mean": 0.024966305121779442,
+          "median": 0.026404358446598053,
+          "std": 0.012044004164636135,
+          "min": 0.006136921234428883,
+          "max": 0.05415911227464676,
+          "top1_fraction": 0.0,
+          "top3_fraction": 0.0,
+          "mean_by_call": [
+            0.006562781985849142,
+            0.006844525225460529,
+            0.006911144126206636,
+            0.007681257091462612,
+            0.00877834390848875,
+            0.01032424345612526,
+            0.012253141961991787,
+            0.014141296036541462,
+            0.01641385443508625,
+            0.018336473032832146,
+            0.02045135200023651,
+            0.0222919974476099,
+            0.02404751628637314,
+            0.025649460032582283,
+            0.027102051302790642,
+            0.028421815484762192,
+            0.02958083339035511,
+            0.03066927380859852,
+            0.031605396419763565,
+            0.032468222081661224,
+            0.03325387090444565,
+            0.033927034586668015,
+            0.034571900963783264,
+            0.03512931615114212,
+            0.03564491868019104,
+            0.03611693158745766,
+            0.0365619957447052,
+            0.03699668124318123,
+            0.03742150217294693,
+            0.037854284048080444,
+            0.03594212234020233
+          ],
+          "mean_by_class": {
+            "aeroplane": 0.022978894412517548,
+            "bicycle": 0.02868165448307991,
+            "bird": 0.021328043192625046,
+            "boat": 0.021678471937775612,
+            "bottle": 0.026173314079642296,
+            "bus": 0.028350085020065308,
+            "car": 0.02791573666036129,
+            "cat": 0.027572600170969963,
+            "chair": 0.02607565186917782,
+            "cow": 0.022698745131492615,
+            "dining table": 0.027605125680565834,
+            "dog": 0.024571387097239494,
+            "horse": 0.023241279646754265,
+            "motorbike": 0.026338623836636543,
+            "person": 0.02445237711071968,
+            "potted plant": 0.02428722009062767,
+            "sheep": 0.01984698325395584,
+            "sofa": 0.02720828168094158,
+            "train": 0.026277167722582817,
+            "tv": 0.026672957465052605
+          }
+        }
+      ]
+    }
+  },
+  "voc_thresholds_frozen_for_coco": true,
+  "layer_resolution_weights": {
+    "voc": {
+      "A": {
+        "8": {
+          "mean_total_weight": 0.24293920397758484,
+          "modules": 1
+        },
+        "16": {
+          "mean_total_weight": 0.5969425812363625,
+          "modules": 5
+        },
+        "32": {
+          "mean_total_weight": 0.0,
+          "modules": 0
+        },
+        "64": {
+          "mean_total_weight": 0.16011822782456875,
+          "modules": 5
+        }
+      }
+    },
+    "coco": {
+      "A": {
+        "8": {
+          "mean_total_weight": 0.244535893201828,
+          "modules": 1
+        },
+        "16": {
+          "mean_total_weight": 0.6006097793579102,
+          "modules": 5
+        },
+        "32": {
+          "mean_total_weight": 0.0,
+          "modules": 0
+        },
+        "64": {
+          "mean_total_weight": 0.15485432371497154,
+          "modules": 5
+        }
+      }
+    }
+  }
+}
