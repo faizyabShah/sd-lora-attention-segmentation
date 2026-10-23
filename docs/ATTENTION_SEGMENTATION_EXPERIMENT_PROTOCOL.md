@@ -5993,3 +5993,13 @@ Implementation: `src/segmentation/sg25_sa.py`, `scripts/{run,finalize}_sg25.py`,
 arrival-count sidecars. No images, attention matrices, or masks are saved.
 Claude should review scale pairing, exact FINE-P2 reproduction, selection,
 and cross-dataset interpretation before manuscript integration.
+
+**Execution handoff (24 October 2026).** Smoke job **236162** completed on
+one VOC and one COCO image; the live FINE-P2 map passed a direct numerical
+comparison with SG24's original MID-P2 operator on both. Production GPU
+array **236164** covers all 20 class shards on each dataset, with at most
+four shards at once, a 12-hour resumable limit per shard, and no node pin.
+CPU merge **236165** has an `afterok:236164` dependency and will reject
+incomplete coverage. These IDs are submissions, not result claims. Claude
+should review the code and locked conditions while the jobs run, then
+independently verify the results before paper integration.
