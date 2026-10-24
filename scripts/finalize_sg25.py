@@ -95,7 +95,7 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     (out / "results.json").write_text(json.dumps(summary, indent=2) + "\n")
     with (out / "per_class_iou.csv").open("w", newline="") as handle:
-        writer = csv.writer(handle)
+        writer = csv.writer(handle, lineterminator="\n")
         writer.writerow(("dataset", "cell", "class", "iou", "delta_vs_fine"))
         for dataset in ("voc", "coco"):
             for name in NAMES:
@@ -103,7 +103,7 @@ def main():
                 for classname, iou in item["per_class_iou"].items():
                     writer.writerow((dataset, name, classname, iou, item["per_class_delta_vs_reference"][classname]))
     with (out / "first_arrival.csv").open("w", newline="") as handle:
-        writer = csv.writer(handle)
+        writer = csv.writer(handle, lineterminator="\n")
         writer.writerow(("dataset", "class", "depth", *ARRIVAL_FIELDS, "tp_rate", "fp_rate", "tp_fp_ratio"))
         for dataset in ("voc", "coco"):
             for name, rows in (("ALL", arrival[dataset]["overall"]), *arrival[dataset]["per_class"].items()):

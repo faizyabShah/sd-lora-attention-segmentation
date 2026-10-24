@@ -6003,3 +6003,18 @@ CPU merge **236165** has an `afterok:236164` dependency and will reject
 incomplete coverage. These IDs are submissions, not result claims. Claude
 should review the code and locked conditions while the jobs run, then
 independently verify the results before paper integration.
+
+**Outcome (24 October 2026; pending Claude review).** Array **236164**
+and merge **236165** completed: all 490 VOC and 707 COCO images are present.
+The same-generation A3/FINE-P2+R2 control scored **0.82425 VOC / 0.66210
+COCO**. Raw and R2 VOC five-fold screens each kept their fine-resolution
+reference in all five folds; no SG25 cell is promoted. Frozen COCO transfer
+nevertheless favored **16→64+R2 at 0.69750** (+0.03540 versus fine) and
+**COARSE32-P2+R2 at 0.69481** (+0.03271), while both lost on VOC. The
+Pre-SG26 first-arrival diagnostic found declining TP rates with greater
+depth: VOC .865→.223 and COCO .708→.117 from first depth 1 to 5. Class
+exceptions and per-depth normalization prevent treating this diagnostic as
+an evaluated SG26 method. Full results and interpretation are in
+`outputs/segmentation/analysis/SG25_PRESG26_CHATGPT_HANDOFF.md`; exact
+summaries are under `outputs/segmentation/controlled_attention_cv/sg25/`.
+Claude should independently audit the outcomes before paper integration.
