@@ -1,0 +1,19 @@
+{
+  "experiment": "SG27 comprehensive multi-resolution SA map fusion",
+  "version": 1,
+  "ca": "frozen SG24-A3 class-word W, selected 11 modules, calls 0-30, all heads",
+  "sa": "exact SG25 FINE-P2, 16-to-64, 32-to-64 paths; calls 10-20, all eight heads",
+  "base_names": ["FINE", "C16", "C32"],
+  "proposed_cells": ["S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18", "S19", "S20", "S21", "S22", "S23", "S24", "S25", "S26", "S27", "S28", "S29", "S30", "S31", "S32", "S33", "S34", "S35", "S36", "S37", "S38", "S39", "S40", "S41", "S42", "S43", "S44", "S45"],
+  "normalization": "independently minmax-normalize the three complete 64x64 base maps, apply fixed fusion formula, then minmax-normalize every final map once",
+  "fusion_epsilon": 1e-8,
+  "duplicate_rule": "max absolute difference of final normalized maps <1e-8 on all four frozen smoke samples; retain first numeric cell name",
+  "duplicate_threshold": 1e-8,
+  "duplicate_smoke": [["voc", 0], ["voc", 14], ["coco", 0], ["coco", 14]],
+  "thresholds": [0.3, 0.325, 0.35, 0.375, 0.4, 0.425, 0.45, 0.475, 0.5, 0.525, 0.55, 0.575, 0.6, 0.625, 0.65, 0.675, 0.7],
+  "diagnostic_threshold": 0.45,
+  "disagreement_threshold": 0.5,
+  "crf": "unchanged R2 applied to every unique fusion cell",
+  "selection": "five fixed VOC folds, raw and R2 screens separately against S0; full VOC thresholds frozen for COCO",
+  "storage": "resumable per-image counts and reduced change/disagreement sidecars; no images, masks or attention matrices"
+}

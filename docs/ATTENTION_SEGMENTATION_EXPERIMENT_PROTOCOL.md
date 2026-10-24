@@ -6105,3 +6105,64 @@ and interpretation are in
 `outputs/segmentation/analysis/SG26_CHATGPT_HANDOFF.md`; exact reduced
 outputs are under `outputs/segmentation/controlled_attention_cv/sg26/`.
 Claude should audit these before integrating SG26 into the manuscript.
+
+## 106. SG27 comprehensive late fusion of three SA output maps (Codex runs; Claude reviews)
+
+**Locked 24 October 2026, before production.** The only inference change
+is a fixed, parameter-free fusion of three *completed* SG25 propagation
+maps: FINE-P2, 16→64 and 32→64. A3 CA, selected 11 CA modules, calls
+0–30, class-word W handling, SG25 SA modules/calls 10–20/heads/paths,
+five fixed VOC folds, 17-threshold grid, frozen COCO transfer and R2
+DenseCRF stay unchanged. No coarse affinity may alter a fine SA matrix.
+Independently spatially min-max normalize each base 64×64 map, apply one
+of the 46 proposed formulas in `src/segmentation/sg27_fusion.py`, then
+spatially min-max normalize the fused map again. Fixed epsilon is 1e-8
+for harmonic formulas. The proposed families include pairwise FINE+C16,
+FINE+C32, direct C16+C32, three-scale means/unions/intersections,
+two-of-three median/top-2/bottom-2 and fine-anchored agreement/residual
+operators. The full names and thresholds are in `configs/sg27.json`.
+
+Before production, compare every proposed pair on **four live samples**
+(VOC aeroplane/person and COCO aeroplane/person). The largest absolute
+difference across *all* samples must be below 1e-8 to call two formulas
+equivalent. Retain the first numeric cell name only and freeze the resulting
+manifest in `configs/sg27_unique.json`. Algebraic aliases expected from
+the specification are S11=S7, S12=S8, S15=S7 and S24=S20; the smoke
+scan must still verify them and detect any others. S0/S1/S2 must also
+numerically match SG25's original base maps on the same observations.
+
+Score each unique cell before R2 and after unchanged R2. Report forced
+per-cell OOF, held-out fold wins and the *separate* multi-candidate VOC
+selector, plus full VOC and frozen COCO metrics, all 20 classes and paired
+20k image intervals. Average VOC/COCO rank is descriptive only, never a
+selection rule. At a fixed raw-map threshold .45, reduce per-image TP/FP,
+distant FP >16/>64, separate-component FP and foreground-area changes for
+all cells so the finalizer can report cells within .005 VOC mIoU of FINE
+or with at least +.015 frozen COCO mIoU. Record 64×64 GT-positive/negative
+counts for the four FINE/C16 and FINE/C32 high/low patterns and all eight
+three-scale patterns at fixed normalized-map threshold .5. GT appears
+only in evaluation and post-hoc diagnostics. For a small set of result
+leaders, report COCO's released caption-word-present/absent split without
+using it to select a method. No image, mask or attention matrix is saved.
+
+Implementation: `src/segmentation/sg27_fusion.py`,
+`scripts/{sg27_runtime,smoke_sg27,run_sg27,finalize_sg27}.py`,
+`jobs/{smoke,run,merge}_sg27.slurm`. GPU smoke first freezes duplicates;
+a second live VOC/COCO smoke scores all unique cells and checks metrics;
+then a resumable 40-shard GPU array and complete-coverage CPU merge run.
+Claude should inspect formula uniqueness, normalization, base controls,
+VOC selection and broad-screen interpretation before paper integration.
+
+**Preproduction verification (24 October 2026).** Four-image duplicate
+scan job **236775** completed successfully. It found **42 unique cells**;
+the only aliases were S11=S7, S12=S8, S15=S7 and S24=S20. The closest
+remaining pair differed by 0.007784 in maximum absolute map value across
+the four samples, well above the locked 1e-8 duplicate rule. S0/S1/S2
+were checked against SG25 on the same captured observations. End-to-end
+smoke job **236776** then scored one VOC and one COCO image across all 42
+unique raw and R2 cells, validated reduced diagnostic shapes, and finished
+with exit code zero. `configs/sg27_unique.json` freezes the manifest;
+`outputs/segmentation/controlled_attention_cv/sg27/duplicate_scan.json`
+records the full pairwise differences. These are checks, not VOC/COCO
+performance results. Claude can review this implementation and the
+forthcoming full results before manuscript integration.
