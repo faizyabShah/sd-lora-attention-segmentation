@@ -6076,3 +6076,14 @@ memory until all cells and diagnostics are reduced to small per-image counts;
 then they are released. No images, masks, or attention matrices are saved.
 Claude should review the block-lift/row-normalization operator, S0–S2
 controls, VOC selection, and edge interpretation before manuscript claims.
+
+**Execution handoff (24 October 2026).** Live smoke job **236442** passed one
+VOC and one COCO image. S0, S1 and S2 were numerically checked against the
+same captured observations processed by SG25; row normalization and
+all-foreground GT diagnostic handling also passed small CPU checks.
+Production GPU array **236443** covers 20 class shards on each dataset,
+at most four at once, 12 hours per resumable shard, with no specified
+node. CPU merge **236444** waits on `afterok:236443` and checks full
+coverage before emitting results. These are submissions, not result
+claims. Claude should inspect the committed operator and diagnostic
+definitions while jobs run, then verify the results before paper use.
