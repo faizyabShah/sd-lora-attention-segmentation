@@ -6166,3 +6166,12 @@ with exit code zero. `configs/sg27_unique.json` freezes the manifest;
 records the full pairwise differences. These are checks, not VOC/COCO
 performance results. Claude can review this implementation and the
 forthcoming full results before manuscript integration.
+
+**Production handoff (24 October 2026).** Submitted GPU array **236777**
+for 20 VOC and 20 COCO class shards, at most four concurrent, with no
+specified GPU node. Each shard is resumable and has a 12-hour limit.
+CPU merge **236778** has `afterok:236777` dependency and will require
+all 490 VOC and 707 COCO samples before writing aggregate reports.
+Per-image count/diagnostic shards stay local; completed summaries will
+be reviewed and shared after the jobs finish. Claude owns independent
+review of the methods and results, not a duplicate SG27 run.
