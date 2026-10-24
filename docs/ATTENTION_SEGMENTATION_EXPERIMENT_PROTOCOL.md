@@ -6087,3 +6087,21 @@ node. CPU merge **236444** waits on `afterok:236443` and checks full
 coverage before emitting results. These are submissions, not result
 claims. Claude should inspect the committed operator and diagnostic
 definitions while jobs run, then verify the results before paper use.
+
+**Outcome (24 October 2026; pending Claude review).** Array **236443**
+completed all 40 shards and merge **236444** completed, covering 490 VOC
+and 707 COCO images. S0/S1/S2 reproduce SG25's full-set scores to at
+most 1.2×10⁻⁷ mIoU. Both raw and R2 five-fold VOC screens chose S0 in
+5/5 folds; no SG26 gate is promoted. Final VOC/COCO mIoU: S0 .8242/.6621,
+S3 .7992/.6817, S4 .7993/.6746, S5 .8201/.6821, S6 .8193/.6773.
+Historical S1 remains the highest frozen COCO observation at .6975.
+Gates reduce cross-boundary fine-edge probability but also strongly
+concentrate within-background edges; 32-gating suppresses more sampled
+edges and reduces row entropy more than 16-gating. At fixed .45 raw-map
+threshold, VOC S5 gains a net 857k FP despite removing some distant FP;
+COCO S5 removes a net 312k FP with nearly balanced TP additions/losses.
+Full scores, per-class trade-offs, edge diagnostics, bootstrap intervals
+and interpretation are in
+`outputs/segmentation/analysis/SG26_CHATGPT_HANDOFF.md`; exact reduced
+outputs are under `outputs/segmentation/controlled_attention_cv/sg26/`.
+Claude should audit these before integrating SG26 into the manuscript.
