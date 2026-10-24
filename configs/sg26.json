@@ -1,0 +1,30 @@
+{
+  "experiment": "SG26 coarse-guided fine SA",
+  "version": 1,
+  "ca": "frozen SG24-A3, selected 11 modules, calls 0-30, all heads, class-word W",
+  "sa_calls": [10, 20],
+  "sa_modules": {
+    "16": "up_blocks.1.attentions.2.transformer_blocks.0.attn1",
+    "32": "up_blocks.2.attentions.2.transformer_blocks.0.attn1",
+    "64": "up_blocks.3.attentions.2.transformer_blocks.0.attn1"
+  },
+  "sa_heads": "all eight; equal call/head averaging",
+  "cells": ["S0", "S1", "S2", "S3", "S4", "S5", "S6"],
+  "cell_meanings": {
+    "S0": "fine 64 then fine 64, same head and call",
+    "S1": "coarse 16 mean-head first pass, bilinear upsample, fine 64 second pass",
+    "S2": "coarse 32 mean-head first pass, bilinear upsample, fine 64 second pass",
+    "S3": "16-gated fine 64 for both passes, same head and call",
+    "S4": "32-gated fine 64 for both passes, same head and call",
+    "S5": "ordinary fine 64 first pass, 16-gated fine second pass",
+    "S6": "ordinary fine 64 first pass, 32-gated fine second pass"
+  },
+  "gate": "mean eight coarse SA heads at same call; block-lift by natural coarse-cell correspondence to 64x64; multiply each fine head elementwise; row normalize; no extra method hyperparameter",
+  "normalization": "minmax each final 64x64 map, bilinear to annotation size",
+  "thresholds": [0.3, 0.325, 0.35, 0.375, 0.4, 0.425, 0.45, 0.475, 0.5, 0.525, 0.55, 0.575, 0.6, 0.625, 0.65, 0.675, 0.7],
+  "diagnostic_threshold": 0.45,
+  "edge_diagnostic": "64 foreground and 64 background fine-grid query/key samples per image; seeded by image ID; strong suppression ratio<0.5, near unchanged 0.9<=ratio<=1.1; GT used only after inference",
+  "crf": "unchanged R2 for each cell",
+  "selection": "five fixed VOC folds separately screen raw and R2 against S0; COCO frozen transfer only",
+  "storage": "resumable per-image counts and small mechanism/edge sidecars; no images, masks, or full attention matrices"
+}

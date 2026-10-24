@@ -6031,3 +6031,48 @@ is also uncertain; the groups have unequal class coverage. This is
 descriptive, not a new selection rule. Full analysis and reduced per-image
 counts are in `outputs/segmentation/analysis/SG25_CAPTION_PRESENCE.md` and
 `outputs/segmentation/controlled_attention_cv/sg25/caption_presence_per_image.csv`.
+
+## 105. SG26 coarse-guided fine SA (Codex runs; Claude reviews)
+
+**Locked 24 October 2026, before production.** Test whether coarse SA can
+constrain fine SA without replacing fine propagation. Freeze A3 class-word
+CA from SG24, all 11 selected modules, CA calls 0–30, all heads and its
+normalization. Freeze SA calls 10–20, the three upsampling-path modules at
+16×16, 32×32 and 64×64 identified in SG25, all eight heads, equal averaging
+of 88 call/head observations, the existing 17-threshold VOC five-fold
+selection, frozen COCO transfer, and unchanged R2 DenseCRF. Exact modules,
+cells and diagnostics are in `configs/sg26.json`.
+
+S0 is current 64→64 FINE-P2. S1 and S2 exactly repeat SG25 16→64 and
+32→64. For each call, average the eight coarse attention matrices at 16
+or 32, lift the resulting row-stochastic matrix to the 64×64 grid by mapping
+each fine pixel to its containing coarse cell, multiply each fine head's
+attention matrix elementwise by the lifted gate, and row-normalize. S3/S4
+use this 16/32-gated fine operator for **both** propagation passes. S5/S6
+use ordinary fine SA on pass 1 and 16/32-gated fine SA on pass 2. Each
+pass pair remains within the same call and fine head. No exponent,
+temperature, gate cutoff, mixing coefficient, new head weighting or time
+window is permitted. S0–S2 must match SG25's live operators on VOC and
+COCO smoke samples.
+
+Score all seven raw maps and all seven maps after unchanged R2. Select raw
+and final candidates separately against S0 at five fixed VOC folds; COCO
+has no selection role. Report forced OOF and selector votes, full VOC,
+frozen COCO, precision/recall, pixel and mean-image IoU, all 20 per-class
+IoUs, and paired 20k image intervals. At a fixed raw-map threshold 0.45,
+record TP/FP gained/lost/removed, FP beyond 16/64 pixels, and separate
+component FP for S3–S6 versus S0. For edge diagnostics, use a deterministic
+GT-balanced post-hoc sample of 64 foreground and 64 background fine-grid
+query/key positions per image. Report gate values; fraction of gated/fine
+edge ratios below 0.5 and within [0.9,1.1]; sampled-row entropy and
+effective neighbors; and mean fine edge probabilities before/after gating
+for object→object, object→background, background→object and
+background→background edges. Diagnostic thresholds never alter inference.
+For all-foreground masks, unavailable edge categories are marked missing.
+
+Implementation: `src/segmentation/sg26_sa.py`, `scripts/{run,finalize}_sg26.py`,
+`jobs/{run,merge}_sg26.slurm`. One image and its attention matrices stay in
+memory until all cells and diagnostics are reduced to small per-image counts;
+then they are released. No images, masks, or attention matrices are saved.
+Claude should review the block-lift/row-normalization operator, S0–S2
+controls, VOC selection, and edge interpretation before manuscript claims.
