@@ -155,3 +155,11 @@ intervals, and per-class metrics are in
 [`results.json`](../controlled_attention_cv/sg25/results.json). The compact
 [`report.md`](../controlled_attention_cv/sg25/report.md) reproduces the
 headline tables. Resumable per-image shards were not committed.
+
+**Post-hoc caption-presence check:** both COCO caption-present and
+caption-absent groups gain from 16→64+R2; the absent group's macro mIoU
+gain is larger, but paired mean-image and class-balanced interaction
+intervals include zero. See the separate
+[caption-presence analysis](SG25_CAPTION_PRESENCE.md) and its reduced
+per-image CSV. COCO's class attribution prompt always contains the queried
+word even when the generation caption does not.

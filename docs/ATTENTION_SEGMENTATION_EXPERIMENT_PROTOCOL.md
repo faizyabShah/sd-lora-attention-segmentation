@@ -6018,3 +6018,16 @@ an evaluated SG26 method. Full results and interpretation are in
 `outputs/segmentation/analysis/SG25_PRESG26_CHATGPT_HANDOFF.md`; exact
 summaries are under `outputs/segmentation/controlled_attention_cv/sg25/`.
 Claude should independently audit the outcomes before paper integration.
+
+**Post-hoc caption-presence split (24 October 2026).** The released COCO
+`word_included` field divides SG25's 707 images into 465 whose generation
+caption names the queried class and 242 whose caption does not. The
+class-only CA attribution prompt names it in both groups; all 490 VOC
+generation prompts name their target class. Frozen 16→64+R2 versus fine
+gains +0.0239 macro mIoU in the COCO present group and +0.0480 in the
+absent group, but the paired mean-image gain difference is only +0.0033
+(image-bootstrap interval [−0.0122,+0.0196]). Class-balanced interaction
+is also uncertain; the groups have unequal class coverage. This is
+descriptive, not a new selection rule. Full analysis and reduced per-image
+counts are in `outputs/segmentation/analysis/SG25_CAPTION_PRESENCE.md` and
+`outputs/segmentation/controlled_attention_cv/sg25/caption_presence_per_image.csv`.
