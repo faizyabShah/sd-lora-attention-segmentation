@@ -453,6 +453,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | Locked SG3 / SG8 / SG9 review | Claude | Accepted: contracts, byte-for-byte regeneration, operators and tie-breaks match the registrations (Section 80) | this commit |
 | SG2 consensus-edge graph and SG4 SA regions, standalone (Narmeen's request) | Claude runs; Codex reviews | Complete (job `234856`): SG2 one-pass `W/G_cv_g20_n1` promoted 5/5, OOF +0.0111, COCO paired +0.016; SG4 not promoted (oracle regions 0.80–0.88); Codex review requested (Section 85) | this commit; `outputs/segmentation/controlled_attention_cv/sg2_consensus_edges/`, `sg4_region_labels/` |
 | Training-free backlog review (Section 83) | Claude | Accepted: contract, byte-for-byte regeneration, operators match the registration (Section 86) | this commit |
+| Review of Sections 84–105 | Claude | Accepted with notes; **A3 affinity is transposed relative to GoCA** (owner decision needed); shards from SG16 onward not committed, so not regenerable (Section 107) | this commit |
 
 ### Pre-sync exploratory run
 
@@ -6175,3 +6176,164 @@ all 490 VOC and 707 COCO samples before writing aggregate reports.
 Per-image count/diagnostic shards stay local; completed summaries will
 be reviewed and shared after the jobs finish. Claude owns independent
 review of the methods and results, not a duplicate SG27 run.
+
+## 107. Claude: review of Sections 84–105; one implementation problem (A3), one reproducibility gap
+
+Reviewed at `33a50f4` in Claude's environment (`gen`; the `trdp` checks noted
+below), from scratch copies only. SG27 (Section 106) is still running and is
+not covered.
+
+### Summary
+
+| Package (Sections) | Verdict | Basis |
+|---|---|---|
+| SG11 / SG12 / SG-Diag (84, 89) | Accept with notes | regenerated |
+| SG2 + DenseCRF (87, 89) | Accept | regenerated |
+| Recovery of the two failed jobs (89) | Accept | regenerated |
+| SG12+CRF, SG14, SG15 (91–92) | Accept | regenerated |
+| SG15 vs oracle visuals (93) | **Not verifiable** | outputs not in the repository |
+| SG13 (88, 90) | Accept with notes | regenerated |
+| Pre-SG16/17, Pre-SG18/21, Pre-SG19 (94, 96, 99, 100) | Accept | summaries and code only |
+| SG17 (95) | Accept | summaries and code only |
+| SG18 T1 (97) and T1 + DenseCRF (98) | Accept with notes | summaries and code only |
+| SG21 (101) | Accept with notes | summaries and code only |
+| SG22 / SG23 (102) | Accept with notes | summaries and code only |
+| **SG24-A / SG24-B (103)** | **Problem: A3 implementation** | summaries and code only |
+| SG25, SG26 (104, 105) | Accept with notes; inherit the A3 problem | summaries and code only |
+
+**Every number stated in Sections 84–105 matches its committed summary.**
+The one exception is cosmetic: Section 92 states SG11+B COCO +.000108; the
+summary gives +.000107.
+
+### Regenerated packages
+
+These finalizers were rerun on copies of the shards:
+
+- `summary.json`, `fold_results.json`, `report.md`, the ChatGPT reports and
+  the visuals are **byte-identical**.
+- CSVs differ only in line endings: the Python `csv` writer emits CRLF, the
+  committed files have LF.
+- SG11/SG12 `*_aggregates.npz` differ by one float32 ulp in histogram edges
+  (numpy version).
+- `src/segmentation/propagation_diagnostics.py:108` calls `np.trapz`, which
+  numpy 2.4 removed. The finalizer ran with `np.trapezoid`, the same rule.
+
+**Section 89 recovery is justified.**
+
+- The original gate fails only across hardware: SG2's VOC REF misses by .100
+  of an image, SG11's by .031. Claude measured independently that even
+  `trdp` vs `gen` on the same A100 exceeds .002 on 41/490 VOC and 99/707 COCO
+  images, so such a gate cannot pass across environments.
+- Same-hardware checks agree to within a few pixels. Stronger than Section 89
+  states: the later erdos runs `235021`–`235023` reproduce the recovered
+  SG11/SG12 cells with **0 pixel difference** on every image and threshold,
+  and `sg12_crf`'s P1 and P1+R2 exactly equal the SG2 package.
+- Not reported in Section 89: SG2+CRF's secondary screen against REF+R2 kept
+  REF+R2 (3/5). Its forced gain is positive, but COCO is −.0087.
+
+**SG13 notes.**
+
+- The region-score audit compares two implementations of the same mean on
+  the same labels, so it is close to tautological; partition equivalence
+  rests on the synthetic test.
+- Section 88 asked that large historical drift be discussed. Against the
+  `gen` packages it is: REF up to 10.1% / 10.6% of an image (VOC / COCO);
+  SPEC32 up to 15.4% / 51.8%, with 143/490 and 261/707 images over 1%.
+  Pooled REF mIoU moves only .0002 / .0006.
+
+### The A3 problem (Section 103; affects SG24-A/B, SG25, SG26 and the working default)
+
+`affinity_similarity` in `src/segmentation/sg24_ca.py:84–87` resizes the key
+axes (bilinear) and the query axes (nearest) as GoCA does. It **omits
+GoCA's second `permute(2, 3, 0, 1)`** (GoCA
+`src-additional/attention-observation.py:494–500`), so the resized SA matrix
+is indexed [key, query]: A3 scores ⟨Mᵀ, P⟩ instead of ⟨M, P⟩.
+
+- Claude reproduced this numerically on random attention. The function
+  returns exactly the transposed product (3.984319), against GoCA's
+  3.991347.
+- Every SG24-A module is 8, 16 or 64 wide and passes through this path, so
+  the error is consistent across A3's modules.
+- In SG24-B, the five restored 32×32 modules skip the resize and are scored
+  correctly, so B1 mixes two orientations. Its "31% weight to the 32×32
+  group" is affected.
+- The effect on the real layer weights cannot be measured from the committed
+  summaries (it needs the attention tensors).
+- **A3 is therefore not GoCA's score.** Its results stand as measured for
+  the operator as implemented.
+
+Before the paper cites A3, the owners should choose:
+
+1. relabel A3 as its own (transposed) affinity score, keeping all results; or
+2. fix the orientation and rerun SG24-A and the working-default control.
+
+**Owner position (Narmeen):** fix the transpose and rerun **if it changes
+the result**. To decide, Claude is measuring the effect on real attention
+(job `236814`). It runs Codex's unmodified SG24-A runner on four VOC-Sim
+images with the score computed both ways, and compares the resulting
+per-call layer weights. The recommendation follows in a short addendum.
+Codex: please do not rerun yet.
+
+**Owner override, checked.**
+
+- No leakage: A3's weights use only UNet Q/K, with no ground truth and no
+  COCO-Cap.
+- The stated rationale is computed correctly, and the forced comparison is
+  fold-safe: 4/5 folds, +.00608 OOF, COCO +.0183.
+- It remains post hoc. The registered procedure's fold-safe estimate is the
+  selected path, .81616 against .81689.
+- More VOC images get worse than better (209 / 280; COCO 336 / 367), although
+  the mean-image intervals are positive.
+- Threshold 0.425 is A3's full-VOC optimum, so the working default's full-VOC
+  0.8243 is in-sample. The COCO-Cap 0.6620 is a clean transfer.
+
+### Other notes
+
+- **SG22 tie order not registered.** `scripts/finalize_sg22_sg23.py:122`
+  prefers ALL-P3 > MID-P2 > MID-P3 within the tie band. Neither Section 102
+  nor `configs/sg22_factorial.json` states this. Whether it changed a fold
+  choice cannot be checked without the shards.
+- **SG22 interval.** MID-P2+R2's selected-path paired interval
+  [−.00003, +.00400] includes zero; the forced one [+.00067, +.00528] does
+  not.
+- **Replay drift.** ALL-P2+R2 differs by up to 4×10⁻⁴ mIoU across SG18,
+  SG22 and SG23, and A3's final cell by about 2×10⁻⁴ across SG24-A/B and
+  SG25.
+- **SG18 environment.** No run environment is recorded in its outputs. T2's
+  full-VOC gain (.00497) sits just under the .005 conditional bar.
+
+### Reproducibility gap
+
+- **Shards are not committed.** For SG16 onwards, the per-image shards and
+  caches are git-ignored (`.gitignore`) and exist only under Faiz's account,
+  which Claude cannot read. So these packages could not be regenerated, nor
+  their shard contracts or environments checked. The same holds for Section
+  93's 20 oracle sheets.
+- **The run environment no longer exists.** `trdp` now has torch 2.11 and
+  numpy 2.4; the packages were made with torch 2.6 and numpy 1.26.
+
+**Requests to Codex:**
+
+1. **Faiz: please commit the files needed for a full independent recheck of
+   SG16–SG26**, as was done for SG2–SG15 (compact count shards, a few MB per
+   package), or copy them where Claude's account can read them. They are
+   currently git-ignored (`.gitignore` lines 60–130):
+   - `controlled_attention_cv/sg17/{screen,crf}/`;
+     `sg18_temporal_windowed/screen/`;
+     `sg18_t1_crf/{voc,coco}/shards/`; `sg21_structural/` shards, if not in
+     `cache/`;
+     `sg22/{voc,coco}/shards/`; `sg23/{voc,coco}/shards/`;
+     `sg24_a/{voc,coco}/shards/`; `sg24_b/{voc,coco}/shards/`;
+     `sg25/{voc,coco}/shards/`; `sg26/{voc,coco}/shards/`; and, when done,
+     `sg27/{voc,coco}/shards/`;
+   - `analysis/pre_sg16_sg17/{voc,coco}/`; `analysis/pre_sg18_sg21/{voc,coco}/`;
+     `analysis/sg18_late_diagnostic/per_image/`;
+   - `analysis/sg15_label_oracle_20/` (the Section 93 sheets and
+     `per_image_iou.csv`).
+
+   Image, map and attention caches are not needed: only the per-image
+   confusion counts and diagnostics that the finalizers read;
+2. record the environment in SG18;
+3. pin or archive the torch 2.6 / numpy 1.26 environment;
+4. register the SG22 tie order retroactively, or show it did not change a
+   fold.
