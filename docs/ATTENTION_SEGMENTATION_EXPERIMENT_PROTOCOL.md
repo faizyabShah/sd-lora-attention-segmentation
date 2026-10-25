@@ -454,6 +454,7 @@ protocol or owned runner, and do not overwrite another agent's status entry.
 | SG2 consensus-edge graph and SG4 SA regions, standalone (Narmeen's request) | Claude runs; Codex reviews | Complete (job `234856`): SG2 one-pass `W/G_cv_g20_n1` promoted 5/5, OOF +0.0111, COCO paired +0.016; SG4 not promoted (oracle regions 0.80–0.88); Codex review requested (Section 85) | this commit; `outputs/segmentation/controlled_attention_cv/sg2_consensus_edges/`, `sg4_region_labels/` |
 | Training-free backlog review (Section 83) | Claude | Accepted: contract, byte-for-byte regeneration, operators match the registration (Section 86) | this commit |
 | Review of Sections 84–105 | Claude | Accepted with notes; **A3 affinity is transposed relative to GoCA** (owner decision needed); shards from SG16 onward not committed, so not regenerable (Section 107) | this commit |
+| Requests: SG11–SG27 comparison pages; Q7 external baselines | Codex (pages); owners (Q7) | Requested (Section 108) | this commit |
 
 ### Pre-sync exploratory run
 
@@ -6337,3 +6338,53 @@ Codex: please do not rerun yet.
 3. pin or archive the torch 2.6 / numpy 1.26 environment;
 4. register the SG22 tie order retroactively, or show it did not change a
    fold.
+
+## 108. Claude: requests to Codex: comparison pages for SG11–SG27, and the unrun external baselines (Q7)
+
+At Narmeen's request.
+
+### 1. Comparison pages for SG11–SG27, in the shared-audit layout
+
+The qualitative audit (`outputs/segmentation/sg_visual_audit/`, with
+`sg_visual_audit_claude/` for SG2 and SG4) covers SG1–SG10 only. The later
+packages have at most a few fixed sheets: SG11/SG12 (7 classes), SG13 (6),
+SG15 (7), SG17 and SG18 (8 each). SG12+CRF, SG14, T1+DenseCRF and SG21–SG27
+have none. None of their runners has a page-rendering mode.
+
+**Request.** Add the same opt-in `--visual-dir` mode to the runners of
+SG11/SG12, SG12+CRF/SG14/SG15, SG13, SG17, SG18, T1+DenseCRF, SG21,
+SG22/SG23, SG24-A/B, SG25, SG26 and SG27, as was done for SG1–SG10
+(`6241f55`):
+
+- Render with the shared `src/segmentation/sg_visual_audit.py`: released
+  image | CA seed | SA-derived score | predicted mask with GT outline,
+  threshold and per-image IoU.
+- Use the first VOC-Sim image of every class (20 per package) and every
+  registered cell, each at its full-VOC threshold from the committed summary.
+  For refinement cells, show the pre-CRF score in the third panel and the
+  post-CRF mask in the fourth, as in the SG1–SG10 audit.
+- Write to `outputs/segmentation/sg_visual_audit/<package>/`, extend
+  `scripts/finalize_sg_visual_audit.py`'s `EXPECTED` table, and commit the
+  pages and the index.
+- Generate in the package's own environment and hardware where possible,
+  and note it if not. The pages are for inspection only: nothing is
+  selected from them.
+- Also commit the 20 Section 93 oracle sheets
+  (`analysis/sg15_label_oracle_20/`) already produced by job `235134`.
+
+### 2. External baselines Q7: never run; proposal for the owners
+
+Registry row Q7 (DiffSeg, DiffSegmenter, SeeDiff, FA-Seg, and the related
+diffusion-attention methods) is the only Track-A comparison that has never
+run.
+
+- G1 (Section 83) transcribes DiffSeg's merging rule on our frozen graph.
+  It is a controlled operator comparison, not the published method.
+- The paper's comparison table currently rests on Q1–Q5 (OVAM's released
+  masks and procedures).
+- **Proposal:** reproduce at least DiffSeg, and one seeded-expansion method
+  (SeeDiff, or FA-Seg if code is available), from their official code on our
+  VOC-Sim and COCO-Cap images and annotations. Report them as external
+  baselines next to Q1–Q5, with no tuning on COCO-Cap.
+- For the owners to decide and assign; Claude can take one of them if
+  preferred.
