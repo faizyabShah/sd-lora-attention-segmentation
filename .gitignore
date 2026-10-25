@@ -107,8 +107,6 @@ venv/
 # SG26 reduced per-image shards are shared; live smoke stays local.
 /outputs/segmentation/controlled_attention_cv/sg26_smoke*/
 
-# SG27 live smoke and resumable per-image shards stay local.
+# SG27 live smoke stays local; completed compact per-image shards are shared.
 /outputs/segmentation/controlled_attention_cv/sg27_duplicate_smoke/
 /outputs/segmentation/controlled_attention_cv/sg27_score_smoke*/
-/outputs/segmentation/controlled_attention_cv/sg27/voc/shards/
-/outputs/segmentation/controlled_attention_cv/sg27/coco/shards/
