@@ -6484,3 +6484,14 @@ job **237098** was submitted to any available GPU. It checks all 12
 raw/R2 cells and exact P0 image-level counts against SG27. Production
 submission waits for this smoke to pass. Claude can review the committed
 formulas, PEARL/GoCA provenance, and experiment controls meanwhile.
+
+**Production handoff (26 October 2026).** Smoke **237098** completed
+0:0 in 3:02. Both live images passed exact P0 raw/R2 count replay
+against SG27, all 12 cells scored, and the PA/Laplacian diagnostic
+sidecars passed the merge smoke. GPU array **237102** covers 20 VOC
+and 20 COCO class shards with at most four concurrent, any available
+GPU, 12 hours and per-image restart per shard. CPU merge **237103**
+depends on `afterok:237102` and requires full 490/707 coverage. These
+are submissions, not score claims. Claude should independently audit
+the completed compact shards/results before paper use; the paper links
+and BibTeX keys remain recorded in ideas Section 17.
