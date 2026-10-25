@@ -629,3 +629,21 @@ SG15 visual smoke **235133** passed; full fixed 20-image job **235134** is
 submitted on any available GPU, with no dependency. Protocol Section 93
 contains the source rule and comparison semantics. Claude reviews results
 after completion.
+
+## 17. SG28 paper-inspired components: exact provenance and ownership (Codex)
+
+**Papers, verified against their CVPR 2026 publisher pages:**
+
+| Our idea | Paper to cite in the manuscript | What transfers into our code | Attribution limit |
+|---|---|---|---|
+| Existing SG24 A3 CA weighting | Meng et al., [*Making Training-Free Diffusion Segmentors Scale with the Generative Power* (GoCA)](https://openaccess.thecvf.com/content/CVPR2026/html/Meng_Making_Training-Free_Diffusion_Segmentors_Scale_with_the_Generative_Power_CVPR_2026_paper.html), CVPR 2026, pp. 35861–35871; BibTeX `meng2026making` | GoCA-inspired pseudo-global CA layer weighting. Content-token rescaling and projected-output head weighting were tested separately in SG24. | A3's current affinity-similarity orientation differs from GoCA's exact formula (protocol Section 107); report A3 as our implementation, not a GoCA reproduction. |
+| SG28 P1–P3 | Pei et al., [*PEARL: Geometry Aligns Semantics for Training-Free Open-Vocabulary Semantic Segmentation*](https://openaccess.thecvf.com/content/CVPR2026/html/Pei_PEARL_Geometry_Aligns_Semantics_for_Training-Free_Open-Vocabulary_Semantic_Segmentation_CVPR_2026_paper.html), CVPR 2026, pp. 17927–17937; BibTeX `pei2026pearl` | Weighted Q/K centering and per-head Procrustes rotation (P1), with centered-only (P2) and unweighted (P3) controls, applied to SD1.5 module-15 SA. | PEARL uses a CLIP vision encoder and changes its value-mixed features; we use its affinity idea for two-pass diffusion SA mask propagation. |
+| SG28 B1/B2 | Same PEARL paper and `pei2026pearl` | Local 4-neighbor Laplacian score refinement; B2 uses the paper's image-boundary weight with fixed κ=5 and τ=1. | Our graph has one binary queried foreground score and omits PEARL's multi-class text-prototype graph. |
+| SG28 C1–C3/D1–D3 | PEARL (`pei2026pearl`) **plus our SG27** (protocol Sections 106/109) | SG27 FINE/C16/C32 map agreement supplies PEARL-style data trust; D cells add fixed image-boundary weights. | The agreement confidence is our adaptation, not a formula or result reported by PEARL. |
+
+The locked SG28 source formulas, 12 cells, VOC-only five-fold selection,
+frozen COCO transfer, diagnostics, and job handoff are in protocol Section
+110 and `configs/sg28.json`. Codex implements and submits; Claude reviews
+both the adapted operators and completed results before paper integration.
+PA and Laplacian are tested independently; no PA+Laplacian method is included
+in SG28. Both publisher-checked BibTeX entries are in `paper/references.bib`.

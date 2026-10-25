@@ -6430,3 +6430,57 @@ merger from the newly shared shards, review the broad VOC selector,
 and audit the threshold/monotone-equivalence interpretation before
 paper integration. The previously identified A3 transposition issue
 applies to this frozen A3 run as well.
+
+## 110. SG28 independent PEARL-inspired components (Codex runs; Claude reviews)
+
+**Locked before live scoring, 26 October 2026.** Source papers and exact
+publisher links are next to each idea in
+`docs/ATTENTION_FUSION_AND_TOKEN_IDEAS.md` Section 17. The publisher-verified
+references are `meng2026making` (GoCA) and `pei2026pearl` (PEARL) in
+`paper/references.bib`. This is an *adaptation* of PEARL's CLIP methods
+to SD1.5 attention and a binary queried-class score, not a PEARL
+reproduction. Existing SG24 A3 remains the frozen CA source, including
+the orientation caveat in Section 107.
+
+P0 is the exact historical A3→FINE-P2 score from SG27, raw and after
+unchanged R2. SA module15 at 64×64, all eight heads, calls 10–20 and
+two observation-wise propagation passes are frozen. The PA-only branch
+recomputes those affinities after per-head Q/K operations: P1 weighted
+query-norm centering then SVD Procrustes K→Q; P2 weighted centering only;
+P3 uniform centering then SVD Procrustes. P1/P3 rotate **uncentered** K
+for attention as PEARL specifies. No V modification or PA strength sweep.
+
+The independent local-refinement branch starts with normalized P0 score
+`f` at 64×64. A four-neighbor graph solves `(Dρ+L)F=Dρf` in float64 by
+diagonally preconditioned conjugate gradients to relative residual ≤5e-8.
+The fixed 2,000 iteration cap detects numerical failure; it is not tuned.
+B1 uses unit edges and ρ=1. B2 uses ρ=1 and image-boundary weights
+`exp(-5|I_i-I_j|)` from the generated RGB image converted to [0,1]
+grayscale and area-downsampled to 64×64. C1/C2/C3 use plain edges and
+`ρ=1-|f-c16|`, `1-|f-c32|`, or one minus average three-scale pairwise
+absolute disagreement. D1/D2/D3 use the corresponding ρ with B2's
+boundary edges. Clamp only ρ to [1e-6,1]; τ=1 throughout. No multi-class
+text graph, edge-range sweep, PA+Laplacian combination, or COCO tuning.
+
+All 12 cells are scored before and after unchanged R2 at the same 17
+thresholds. Report forced per-cell VOC OOF and pairwise fold wins **apart
+from** independent branch and all-candidate five-fold VOC selectors.
+Thresholds selected on full VOC are frozen for COCO. Per-class IoU,
+precision/recall, paired 20k mean-image bootstrap, fixed .45 raw-map
+TP/FP/distant/separate changes, PA alignment/entropy/neighborhood changes
+and alignment-gain versus IoU correlations, solver accuracy, and post-hoc
+ρ-bin GT fractions are required. No GT enters inference. Save compact
+atomic per-image counts/diagnostics only; no generated images or maps.
+
+Implementation: `src/segmentation/sg28_pearl.py`, `scripts/run_sg28.py`,
+`scripts/finalize_sg28.py`, `jobs/{run,merge}_sg28.slurm`. A live VOC and
+COCO smoke must verify P0 against the committed SG27 image-level raw/R2
+counts and check the PA/Laplacian diagnostics before the 40-shard array.
+Claude should review the locked choices and independent results before
+any manuscript or pipeline promotion.
+
+**Execution handoff (26 October 2026).** Live two-image VOC/COCO smoke
+job **237098** was submitted to any available GPU. It checks all 12
+raw/R2 cells and exact P0 image-level counts against SG27. Production
+submission waits for this smoke to pass. Claude can review the committed
+formulas, PEARL/GoCA provenance, and experiment controls meanwhile.

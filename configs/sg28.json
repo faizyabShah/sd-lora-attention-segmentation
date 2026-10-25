@@ -1,0 +1,35 @@
+{
+  "experiment": "SG28 independent paper-inspired PA and Laplacian components",
+  "version": 1,
+  "cells": ["P0", "P1", "P2", "P3", "B1", "B2", "C1", "C2", "C3", "D1", "D2", "D3"],
+  "source_papers": {
+    "GoCA": "https://arxiv.org/abs/2603.06178",
+    "PEARL": "https://arxiv.org/abs/2603.21528"
+  },
+  "baseline": "frozen A3 CA, FINE-P2 SA, R2 DenseCRF; historical A3 orientation caveat retained",
+  "ca": "selected 11 modules, calls 0-30, all heads, class-word W, A3 pseudo-global weights",
+  "sa": "module 15 at 64x64, calls 10-20 inclusive, all eight heads, two observation-wise passes",
+  "thresholds": [0.3, 0.325, 0.35, 0.375, 0.4, 0.425, 0.45, 0.475, 0.5, 0.525, 0.55, 0.575, 0.6, 0.625, 0.65, 0.675, 0.7],
+  "pa": {
+    "P1": "weighted Q-norm centering, SVD Procrustes K to Q, uncentered K rotated for attention",
+    "P2": "weighted Q-norm centering only, Qc Kc attention",
+    "P3": "uniform centering, SVD Procrustes K to Q, uncentered K rotated for attention",
+    "solver": "torch.linalg.svd float32; no sweep",
+    "diagnostic_rows_per_image": 64
+  },
+  "laplacian": {
+    "grid": 64,
+    "neighbors": 4,
+    "tau": 1.0,
+    "kappa": 5.0,
+    "epsilon": 1e-6,
+    "grayscale": "0.299 R + 0.587 G + 0.114 B, image divided by 255, area downsampled to 64x64",
+    "rho_bins": [0.5, 0.75],
+    "cg_rtol": 1e-8,
+    "cg_maxiter_accuracy_cap": 2000,
+    "solver_note": "maximum iterations is an accuracy guard, not a tuned model parameter"
+  },
+  "diagnostic_threshold": 0.45,
+  "selection": "five fixed VOC folds, raw and R2 screens, forced OOF per cell, 17-threshold grid; frozen COCO only",
+  "storage": "atomic per-image metric/diagnostic checkpoints; no generated images, masks or attention maps retained"
+}
