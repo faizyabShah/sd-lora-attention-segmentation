@@ -1,0 +1,984 @@
+{
+  "plan": {
+    "spec": {
+      "name": "SG15 current versus oracle region decisions on fixed VOC examples",
+      "dataset": "VOC-Sim",
+      "sample_rule": "first annotated manifest row for each of 20 VOC classes, selected before looking at outputs",
+      "priors": [
+        "W/P1",
+        "W/SG11/trim20/rho0p80",
+        "W/SG12/top50"
+      ],
+      "prior_threshold_source": "full-VOC locked thresholds in outputs/segmentation/controlled_attention_cv/sg15/summary.json",
+      "partition": "same canonical SPEC32 as full SG15",
+      "current_labelling": [
+        "SG15-A050 majority region projection",
+        "SG15-B confidence snapping"
+      ],
+      "oracle_labelling": "GT foreground fraction >= 0.5 in each annotation-resolution SPEC32 region",
+      "interpretation": "GT-labelled majority oracle is a diagnostic upper bound for hard region decisions, not an inference method",
+      "no_selection": "No class, image, prior, threshold or region rule is selected by the 20 example results"
+    },
+    "locked": {
+      "name": "Locked SG12+DenseCRF, SG14 complementarity and SG15 prior-driven SPEC32 refinement",
+      "protocol": "Section 91",
+      "version": 1,
+      "track": "W class-word only; no learned or released optimized tokens",
+      "order": [
+        "sg12_crf",
+        "sg14",
+        "sg15"
+      ],
+      "sa": {
+        "module_index": 15,
+        "resolution": 64,
+        "calls": 31,
+        "heads": 8,
+        "observations": 248
+      },
+      "top_fraction": 0.5,
+      "selected_observations": 124,
+      "reliability": "leave-one-out cosine of raw propagation vectors; stable call-major/head-minor tie order",
+      "trim_fraction_per_tail": 0.2,
+      "consensus_rho": 0.8,
+      "thresholds": [
+        0.3,
+        0.325,
+        0.35,
+        0.375,
+        0.4,
+        0.425,
+        0.45,
+        0.475,
+        0.5,
+        0.525,
+        0.55,
+        0.575,
+        0.6,
+        0.625,
+        0.65,
+        0.675,
+        0.7
+      ],
+      "partition": "canonical SG13/SG4 SPEC32; no partition tuning",
+      "majority_q": [
+        0.25,
+        0.5,
+        0.75
+      ],
+      "snapping": {
+        "foreground_at_least": 0.75,
+        "background_at_most": 0.25
+      },
+      "prior_threshold_policy": "SG15 uses each unrefined prior's training-fold optimum; full VOC optimum frozen for COCO. Refinements never choose a new prior threshold.",
+      "region_fraction_resolution": "annotation resolution; native SPEC32 labels expanded nearest; prior map minmax at64 then bilinear; no boundary blur after refinement",
+      "bootstrap_resamples": 20000,
+      "visual_classes": [
+        "aeroplane",
+        "bird",
+        "person",
+        "chair",
+        "dining-table"
+      ],
+      "diagnostic_threshold": 0.45,
+      "diagnostic_change_tolerance": 1e-06,
+      "boundary_band_pixels": 4,
+      "selection": "unchanged training-only promotion guards; >=4/5 votes and positive selected OOF; paired forced-candidate OOF also reported",
+      "validation": "same-generation algebraic/control checks required; historical counts retained as drift diagnostics, never an unconditional cross-hardware gate",
+      "storage": "atomic per-image counts and reduced diagnostic sidecars; small representative visual caches only; no dataset-wide masks or attention"
+    },
+    "model": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+    "names": [
+      "W/P1",
+      "W/SG11/trim20/rho0p80",
+      "W/SG12/top50"
+    ],
+    "thresholds": [
+      0.45,
+      0.425,
+      0.45
+    ]
+  },
+  "records": {
+    "ovam-voc-sim-0": {
+      "image_id": "ovam-voc-sim-0",
+      "class": "aeroplane",
+      "prompt": "A photograph of a aeroplane",
+      "seed": "1401702261",
+      "figure": "00_aeroplane.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.9106963591375045,
+          "current_A050_iou": 0.8660165185114164,
+          "current_B_iou": 0.8813444524404183,
+          "oracle_iou": 0.8657831158970111,
+          "A050_oracle_disagreement_pixels": 1088,
+          "B_oracle_disagreement_pixels": 3225,
+          "oracle_positive_regions": 20,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.8913138614001157,
+          "current_A050_iou": 0.8578752570253598,
+          "current_B_iou": 0.9074451774436302,
+          "oracle_iou": 0.8657831158970111,
+          "A050_oracle_disagreement_pixels": 1792,
+          "B_oracle_disagreement_pixels": 5666,
+          "oracle_positive_regions": 20,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 1
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.9235294117647059,
+          "current_A050_iou": 0.8660165185114164,
+          "current_B_iou": 0.9038040426726558,
+          "oracle_iou": 0.8657831158970111,
+          "A050_oracle_disagreement_pixels": 1088,
+          "B_oracle_disagreement_pixels": 4205,
+          "oracle_positive_regions": 20,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 0
+        }
+      },
+      "source_same_generation_error_max": 1.7881393432617188e-07,
+      "rank_count": 124
+    },
+    "ovam-voc-sim-25": {
+      "image_id": "ovam-voc-sim-25",
+      "class": "bicycle",
+      "prompt": "A photograph of a bicycle",
+      "seed": "1052124838",
+      "figure": "01_bicycle.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.6206456123368155,
+          "current_A050_iou": 0.5853897120200334,
+          "current_B_iou": 0.6038979044802134,
+          "oracle_iou": 0.7466829085457272,
+          "A050_oracle_disagreement_pixels": 28352,
+          "B_oracle_disagreement_pixels": 28265,
+          "oracle_positive_regions": 10,
+          "A050_oracle_false_positive_regions": 8,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.6064304692030695,
+          "current_A050_iou": 0.5853897120200334,
+          "current_B_iou": 0.5924344431928327,
+          "oracle_iou": 0.7466829085457272,
+          "A050_oracle_disagreement_pixels": 28352,
+          "B_oracle_disagreement_pixels": 30737,
+          "oracle_positive_regions": 10,
+          "A050_oracle_false_positive_regions": 8,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.5884235354114872,
+          "current_A050_iou": 0.566250603065428,
+          "current_B_iou": 0.5814021483506007,
+          "oracle_iou": 0.7466829085457272,
+          "A050_oracle_disagreement_pixels": 33408,
+          "B_oracle_disagreement_pixels": 31198,
+          "oracle_positive_regions": 10,
+          "A050_oracle_false_positive_regions": 9,
+          "A050_oracle_missed_regions": 0
+        }
+      },
+      "source_same_generation_error_max": 1.7881393432617188e-07,
+      "rank_count": 124
+    },
+    "ovam-voc-sim-50": {
+      "image_id": "ovam-voc-sim-50",
+      "class": "bird",
+      "prompt": "A photograph of a bird",
+      "seed": "1101767043",
+      "figure": "02_bird.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.6877650897226754,
+          "current_A050_iou": 0.5963491725264578,
+          "current_B_iou": 0.6329376854599407,
+          "oracle_iou": 0.46997869455742786,
+          "A050_oracle_disagreement_pixels": 7296,
+          "B_oracle_disagreement_pixels": 9299,
+          "oracle_positive_regions": 2,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.7032575500508992,
+          "current_A050_iou": 0.5963491725264578,
+          "current_B_iou": 0.6328052906797909,
+          "oracle_iou": 0.46997869455742786,
+          "A050_oracle_disagreement_pixels": 7296,
+          "B_oracle_disagreement_pixels": 8538,
+          "oracle_positive_regions": 2,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.696913530502055,
+          "current_A050_iou": 0.5963491725264578,
+          "current_B_iou": 0.636557714958775,
+          "oracle_iou": 0.46997869455742786,
+          "A050_oracle_disagreement_pixels": 7296,
+          "B_oracle_disagreement_pixels": 9114,
+          "oracle_positive_regions": 2,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 0
+        }
+      },
+      "source_same_generation_error_max": 1.7881393432617188e-07,
+      "rank_count": 124
+    },
+    "ovam-voc-sim-75": {
+      "image_id": "ovam-voc-sim-75",
+      "class": "boat",
+      "prompt": "A photograph of a boat",
+      "seed": "1032945820",
+      "figure": "03_boat.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.9292575982810958,
+          "current_A050_iou": 0.9418286814244465,
+          "current_B_iou": 0.9378949359904143,
+          "oracle_iou": 0.9418286814244465,
+          "A050_oracle_disagreement_pixels": 0,
+          "B_oracle_disagreement_pixels": 2329,
+          "oracle_positive_regions": 17,
+          "A050_oracle_false_positive_regions": 0,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.9244278805404597,
+          "current_A050_iou": 0.9418286814244465,
+          "current_B_iou": 0.9380504137974603,
+          "oracle_iou": 0.9418286814244465,
+          "A050_oracle_disagreement_pixels": 0,
+          "B_oracle_disagreement_pixels": 2070,
+          "oracle_positive_regions": 17,
+          "A050_oracle_false_positive_regions": 0,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.9147343054565127,
+          "current_A050_iou": 0.9418286814244465,
+          "current_B_iou": 0.9346885921902894,
+          "oracle_iou": 0.9418286814244465,
+          "A050_oracle_disagreement_pixels": 0,
+          "B_oracle_disagreement_pixels": 2572,
+          "oracle_positive_regions": 17,
+          "A050_oracle_false_positive_regions": 0,
+          "A050_oracle_missed_regions": 0
+        }
+      },
+      "source_same_generation_error_max": 2.384185791015625e-07,
+      "rank_count": 124
+    },
+    "ovam-voc-sim-100": {
+      "image_id": "ovam-voc-sim-100",
+      "class": "bottle",
+      "prompt": "A photograph of a bottle",
+      "seed": "1071257360",
+      "figure": "04_bottle.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.8871950458211602,
+          "current_A050_iou": 0.8866039515488483,
+          "current_B_iou": 0.8702945691104451,
+          "oracle_iou": 0.917106743431937,
+          "A050_oracle_disagreement_pixels": 7168,
+          "B_oracle_disagreement_pixels": 8678,
+          "oracle_positive_regions": 16,
+          "A050_oracle_false_positive_regions": 2,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.8267785571142284,
+          "current_A050_iou": 0.8058268352386,
+          "current_B_iou": 0.8195223312637693,
+          "oracle_iou": 0.917106743431937,
+          "A050_oracle_disagreement_pixels": 16064,
+          "B_oracle_disagreement_pixels": 17099,
+          "oracle_positive_regions": 16,
+          "A050_oracle_false_positive_regions": 2,
+          "A050_oracle_missed_regions": 2
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.8578557993730408,
+          "current_A050_iou": 0.8655840714664244,
+          "current_B_iou": 0.8559192757827349,
+          "oracle_iou": 0.917106743431937,
+          "A050_oracle_disagreement_pixels": 11328,
+          "B_oracle_disagreement_pixels": 13868,
+          "oracle_positive_regions": 16,
+          "A050_oracle_false_positive_regions": 2,
+          "A050_oracle_missed_regions": 1
+        }
+      },
+      "source_same_generation_error_max": 1.7881393432617188e-07,
+      "rank_count": 124
+    },
+    "ovam-voc-sim-125": {
+      "image_id": "ovam-voc-sim-125",
+      "class": "bus",
+      "prompt": "A photograph of a bus",
+      "seed": "1017941704",
+      "figure": "05_bus.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.9621616558958509,
+          "current_A050_iou": 0.9532864107347201,
+          "current_B_iou": 0.9679569059385208,
+          "oracle_iou": 0.9651121586650488,
+          "A050_oracle_disagreement_pixels": 7808,
+          "B_oracle_disagreement_pixels": 9917,
+          "oracle_positive_regions": 23,
+          "A050_oracle_false_positive_regions": 2,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.9693979423479092,
+          "current_A050_iou": 0.9532864107347201,
+          "current_B_iou": 0.9693111260278571,
+          "oracle_iou": 0.9651121586650488,
+          "A050_oracle_disagreement_pixels": 7808,
+          "B_oracle_disagreement_pixels": 9514,
+          "oracle_positive_regions": 23,
+          "A050_oracle_false_positive_regions": 2,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.9681268431170219,
+          "current_A050_iou": 0.9532864107347201,
+          "current_B_iou": 0.9691296209885023,
+          "oracle_iou": 0.9651121586650488,
+          "A050_oracle_disagreement_pixels": 7808,
+          "B_oracle_disagreement_pixels": 9568,
+          "oracle_positive_regions": 23,
+          "A050_oracle_false_positive_regions": 2,
+          "A050_oracle_missed_regions": 0
+        }
+      },
+      "source_same_generation_error_max": 2.980232238769531e-07,
+      "rank_count": 124
+    },
+    "ovam-voc-sim-150": {
+      "image_id": "ovam-voc-sim-150",
+      "class": "car",
+      "prompt": "A photograph of a car",
+      "seed": "1077118065",
+      "figure": "06_car.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.9251959466106975,
+          "current_A050_iou": 0.9140001308729224,
+          "current_B_iou": 0.9140001308729224,
+          "oracle_iou": 0.9140001308729224,
+          "A050_oracle_disagreement_pixels": 0,
+          "B_oracle_disagreement_pixels": 0,
+          "oracle_positive_regions": 12,
+          "A050_oracle_false_positive_regions": 0,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.9137552632862415,
+          "current_A050_iou": 0.9140001308729224,
+          "current_B_iou": 0.9140001308729224,
+          "oracle_iou": 0.9140001308729224,
+          "A050_oracle_disagreement_pixels": 0,
+          "B_oracle_disagreement_pixels": 0,
+          "oracle_positive_regions": 12,
+          "A050_oracle_false_positive_regions": 0,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.924327868852459,
+          "current_A050_iou": 0.9140001308729224,
+          "current_B_iou": 0.9140001308729224,
+          "oracle_iou": 0.9140001308729224,
+          "A050_oracle_disagreement_pixels": 0,
+          "B_oracle_disagreement_pixels": 0,
+          "oracle_positive_regions": 12,
+          "A050_oracle_false_positive_regions": 0,
+          "A050_oracle_missed_regions": 0
+        }
+      },
+      "source_same_generation_error_max": 1.7881393432617188e-07,
+      "rank_count": 124
+    },
+    "ovam-voc-sim-175": {
+      "image_id": "ovam-voc-sim-175",
+      "class": "cat",
+      "prompt": "A photograph of a cat",
+      "seed": "101934821",
+      "figure": "07_cat.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.9265015606942659,
+          "current_A050_iou": 0.9391057252986869,
+          "current_B_iou": 0.931044683002388,
+          "oracle_iou": 0.9391057252986869,
+          "A050_oracle_disagreement_pixels": 0,
+          "B_oracle_disagreement_pixels": 9255,
+          "oracle_positive_regions": 25,
+          "A050_oracle_false_positive_regions": 0,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.8848932220643553,
+          "current_A050_iou": 0.8896628859654362,
+          "current_B_iou": 0.8971112763912942,
+          "oracle_iou": 0.9391057252986869,
+          "A050_oracle_disagreement_pixels": 15680,
+          "B_oracle_disagreement_pixels": 14274,
+          "oracle_positive_regions": 25,
+          "A050_oracle_false_positive_regions": 0,
+          "A050_oracle_missed_regions": 2
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.8857874659400545,
+          "current_A050_iou": 0.8896628859654362,
+          "current_B_iou": 0.8968688749776038,
+          "oracle_iou": 0.9391057252986869,
+          "A050_oracle_disagreement_pixels": 15680,
+          "B_oracle_disagreement_pixels": 14349,
+          "oracle_positive_regions": 25,
+          "A050_oracle_false_positive_regions": 0,
+          "A050_oracle_missed_regions": 2
+        }
+      },
+      "source_same_generation_error_max": 2.384185791015625e-07,
+      "rank_count": 124
+    },
+    "ovam-voc-sim-200": {
+      "image_id": "ovam-voc-sim-200",
+      "class": "chair",
+      "prompt": "A photograph of a chair",
+      "seed": "1018370505",
+      "figure": "08_chair.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.655226792826023,
+          "current_A050_iou": 0.6014780279734153,
+          "current_B_iou": 0.6454789615040286,
+          "oracle_iou": 0.78035538005923,
+          "A050_oracle_disagreement_pixels": 14080,
+          "B_oracle_disagreement_pixels": 11994,
+          "oracle_positive_regions": 12,
+          "A050_oracle_false_positive_regions": 5,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.6480823959886164,
+          "current_A050_iou": 0.6014780279734153,
+          "current_B_iou": 0.6362737187329186,
+          "oracle_iou": 0.78035538005923,
+          "A050_oracle_disagreement_pixels": 14080,
+          "B_oracle_disagreement_pixels": 12366,
+          "oracle_positive_regions": 12,
+          "A050_oracle_false_positive_regions": 5,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.6290061840856022,
+          "current_A050_iou": 0.6014780279734153,
+          "current_B_iou": 0.6192653597413096,
+          "oracle_iou": 0.78035538005923,
+          "A050_oracle_disagreement_pixels": 14080,
+          "B_oracle_disagreement_pixels": 13599,
+          "oracle_positive_regions": 12,
+          "A050_oracle_false_positive_regions": 5,
+          "A050_oracle_missed_regions": 0
+        }
+      },
+      "source_same_generation_error_max": 2.384185791015625e-07,
+      "rank_count": 124
+    },
+    "ovam-voc-sim-225": {
+      "image_id": "ovam-voc-sim-225",
+      "class": "cow",
+      "prompt": "A photograph of a cow",
+      "seed": "1133430295",
+      "figure": "09_cow.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.4987395166492978,
+          "current_A050_iou": 0.48363278610327143,
+          "current_B_iou": 0.4928940536408357,
+          "oracle_iou": 0.9586108374384237,
+          "A050_oracle_disagreement_pixels": 99008,
+          "B_oracle_disagreement_pixels": 102069,
+          "oracle_positive_regions": 27,
+          "A050_oracle_false_positive_regions": 0,
+          "A050_oracle_missed_regions": 7
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.5936442206486235,
+          "current_A050_iou": 0.5302812217711115,
+          "current_B_iou": 0.5471346059619201,
+          "oracle_iou": 0.9586108374384237,
+          "A050_oracle_disagreement_pixels": 89280,
+          "B_oracle_disagreement_pixels": 90911,
+          "oracle_positive_regions": 27,
+          "A050_oracle_false_positive_regions": 0,
+          "A050_oracle_missed_regions": 5
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.49746582706189524,
+          "current_A050_iou": 0.48363278610327143,
+          "current_B_iou": 0.4909339719466302,
+          "oracle_iou": 0.9586108374384237,
+          "A050_oracle_disagreement_pixels": 99008,
+          "B_oracle_disagreement_pixels": 102588,
+          "oracle_positive_regions": 27,
+          "A050_oracle_false_positive_regions": 0,
+          "A050_oracle_missed_regions": 7
+        }
+      },
+      "source_same_generation_error_max": 2.384185791015625e-07,
+      "rank_count": 124
+    },
+    "ovam-voc-sim-250": {
+      "image_id": "ovam-voc-sim-250",
+      "class": "dining-table",
+      "prompt": "A photograph of a dining-table",
+      "seed": "1184946014",
+      "figure": "10_dining-table.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.32936398378354814,
+          "current_A050_iou": 0.330655341754048,
+          "current_B_iou": 0.32955636363636365,
+          "oracle_iou": 0.802455311698359,
+          "A050_oracle_disagreement_pixels": 93824,
+          "B_oracle_disagreement_pixels": 94281,
+          "oracle_positive_regions": 5,
+          "A050_oracle_false_positive_regions": 13,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.3298144779919971,
+          "current_A050_iou": 0.330655341754048,
+          "current_B_iou": 0.330655341754048,
+          "oracle_iou": 0.802455311698359,
+          "A050_oracle_disagreement_pixels": 93824,
+          "B_oracle_disagreement_pixels": 93824,
+          "oracle_positive_regions": 5,
+          "A050_oracle_false_positive_regions": 13,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.3366528538965379,
+          "current_A050_iou": 0.34150017710319464,
+          "current_B_iou": 0.33687199845369253,
+          "oracle_iou": 0.802455311698359,
+          "A050_oracle_disagreement_pixels": 89472,
+          "B_oracle_disagreement_pixels": 91295,
+          "oracle_positive_regions": 5,
+          "A050_oracle_false_positive_regions": 12,
+          "A050_oracle_missed_regions": 0
+        }
+      },
+      "source_same_generation_error_max": 1.7881393432617188e-07,
+      "rank_count": 124
+    },
+    "ovam-voc-sim-275": {
+      "image_id": "ovam-voc-sim-275",
+      "class": "dog",
+      "prompt": "A photograph of a dog",
+      "seed": "1299929544",
+      "figure": "11_dog.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.8372001409881611,
+          "current_A050_iou": 0.8233819601397164,
+          "current_B_iou": 0.8221426808195508,
+          "oracle_iou": 0.8448892218773413,
+          "A050_oracle_disagreement_pixels": 2560,
+          "B_oracle_disagreement_pixels": 4710,
+          "oracle_positive_regions": 11,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.8048378229796591,
+          "current_A050_iou": 0.8233819601397164,
+          "current_B_iou": 0.8036139992387363,
+          "oracle_iou": 0.8448892218773413,
+          "A050_oracle_disagreement_pixels": 2560,
+          "B_oracle_disagreement_pixels": 3847,
+          "oracle_positive_regions": 11,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.8415701012631799,
+          "current_A050_iou": 0.8233819601397164,
+          "current_B_iou": 0.8214344464550091,
+          "oracle_iou": 0.8448892218773413,
+          "A050_oracle_disagreement_pixels": 2560,
+          "B_oracle_disagreement_pixels": 4738,
+          "oracle_positive_regions": 11,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 0
+        }
+      },
+      "source_same_generation_error_max": 1.1920928955078125e-07,
+      "rank_count": 124
+    },
+    "ovam-voc-sim-300": {
+      "image_id": "ovam-voc-sim-300",
+      "class": "horse",
+      "prompt": "A photograph of a horse",
+      "seed": "1146925722",
+      "figure": "12_horse.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.8565719130088756,
+          "current_A050_iou": 0.8150618060267082,
+          "current_B_iou": 0.8150618060267082,
+          "oracle_iou": 0.8841876066615665,
+          "A050_oracle_disagreement_pixels": 13632,
+          "B_oracle_disagreement_pixels": 13632,
+          "oracle_positive_regions": 6,
+          "A050_oracle_false_positive_regions": 2,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.8435120544428227,
+          "current_A050_iou": 0.8150618060267082,
+          "current_B_iou": 0.8612766404935502,
+          "oracle_iou": 0.8841876066615665,
+          "A050_oracle_disagreement_pixels": 13632,
+          "B_oracle_disagreement_pixels": 10143,
+          "oracle_positive_regions": 6,
+          "A050_oracle_false_positive_regions": 2,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.8593193095254735,
+          "current_A050_iou": 0.8150618060267082,
+          "current_B_iou": 0.8602781855035997,
+          "oracle_iou": 0.8841876066615665,
+          "A050_oracle_disagreement_pixels": 13632,
+          "B_oracle_disagreement_pixels": 10406,
+          "oracle_positive_regions": 6,
+          "A050_oracle_false_positive_regions": 2,
+          "A050_oracle_missed_regions": 0
+        }
+      },
+      "source_same_generation_error_max": 1.7881393432617188e-07,
+      "rank_count": 124
+    },
+    "ovam-voc-sim-325": {
+      "image_id": "ovam-voc-sim-325",
+      "class": "motorbike",
+      "prompt": "A photograph of a motorbike",
+      "seed": "1008102817",
+      "figure": "13_motorbike.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.8553794361060457,
+          "current_A050_iou": 0.7865678491900253,
+          "current_B_iou": 0.855349106001436,
+          "oracle_iou": 0.8464622871046229,
+          "A050_oracle_disagreement_pixels": 10240,
+          "B_oracle_disagreement_pixels": 11084,
+          "oracle_positive_regions": 6,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.8407864102785203,
+          "current_A050_iou": 0.7865678491900253,
+          "current_B_iou": 0.8452286179086913,
+          "oracle_iou": 0.8464622871046229,
+          "A050_oracle_disagreement_pixels": 10240,
+          "B_oracle_disagreement_pixels": 11759,
+          "oracle_positive_regions": 6,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.8534238124614435,
+          "current_A050_iou": 0.7865678491900253,
+          "current_B_iou": 0.8572431588000913,
+          "oracle_iou": 0.8464622871046229,
+          "A050_oracle_disagreement_pixels": 10240,
+          "B_oracle_disagreement_pixels": 10947,
+          "oracle_positive_regions": 6,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 0
+        }
+      },
+      "source_same_generation_error_max": 1.7881393432617188e-07,
+      "rank_count": 124
+    },
+    "ovam-voc-sim-350": {
+      "image_id": "ovam-voc-sim-350",
+      "class": "person",
+      "prompt": "A photograph of a person",
+      "seed": "1005722776",
+      "figure": "14_person.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.8494937706600839,
+          "current_A050_iou": 0.8696581454602538,
+          "current_B_iou": 0.8681637575839205,
+          "oracle_iou": 0.950068461338947,
+          "A050_oracle_disagreement_pixels": 13632,
+          "B_oracle_disagreement_pixels": 18152,
+          "oracle_positive_regions": 22,
+          "A050_oracle_false_positive_regions": 0,
+          "A050_oracle_missed_regions": 2
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.6833232661578167,
+          "current_A050_iou": 0.5771912982049378,
+          "current_B_iou": 0.70997659915953,
+          "oracle_iou": 0.950068461338947,
+          "A050_oracle_disagreement_pixels": 62080,
+          "B_oracle_disagreement_pixels": 44156,
+          "oracle_positive_regions": 22,
+          "A050_oracle_false_positive_regions": 0,
+          "A050_oracle_missed_regions": 6
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.7228177079509581,
+          "current_A050_iou": 0.7618489850627317,
+          "current_B_iou": 0.7476849156396129,
+          "oracle_iou": 0.950068461338947,
+          "A050_oracle_disagreement_pixels": 31488,
+          "B_oracle_disagreement_pixels": 38128,
+          "oracle_positive_regions": 22,
+          "A050_oracle_false_positive_regions": 0,
+          "A050_oracle_missed_regions": 4
+        }
+      },
+      "source_same_generation_error_max": 1.1920928955078125e-07,
+      "rank_count": 124
+    },
+    "ovam-voc-sim-375": {
+      "image_id": "ovam-voc-sim-375",
+      "class": "potted-plant",
+      "prompt": "A photograph of a potted-plant",
+      "seed": "1404157894",
+      "figure": "15_potted-plant.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.7764933212950696,
+          "current_A050_iou": 0.7750130071766581,
+          "current_B_iou": 0.7752437753623802,
+          "oracle_iou": 0.7888126343641475,
+          "A050_oracle_disagreement_pixels": 6912,
+          "B_oracle_disagreement_pixels": 12295,
+          "oracle_positive_regions": 23,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 2
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.7351047999659879,
+          "current_A050_iou": 0.7277644485515418,
+          "current_B_iou": 0.7361960056526995,
+          "oracle_iou": 0.7888126343641475,
+          "A050_oracle_disagreement_pixels": 18048,
+          "B_oracle_disagreement_pixels": 17899,
+          "oracle_positive_regions": 23,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 4
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.7753327283726558,
+          "current_A050_iou": 0.7750130071766581,
+          "current_B_iou": 0.7799311810545492,
+          "oracle_iou": 0.7888126343641475,
+          "A050_oracle_disagreement_pixels": 6912,
+          "B_oracle_disagreement_pixels": 10793,
+          "oracle_positive_regions": 23,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 2
+        }
+      },
+      "source_same_generation_error_max": 1.7881393432617188e-07,
+      "rank_count": 124
+    },
+    "ovam-voc-sim-400": {
+      "image_id": "ovam-voc-sim-400",
+      "class": "sheep",
+      "prompt": "A photograph of a sheep",
+      "seed": "1273564889",
+      "figure": "16_sheep.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.9360294344989643,
+          "current_A050_iou": 0.9137034155568776,
+          "current_B_iou": 0.9216821691288224,
+          "oracle_iou": 0.9282059770668433,
+          "A050_oracle_disagreement_pixels": 2688,
+          "B_oracle_disagreement_pixels": 3678,
+          "oracle_positive_regions": 16,
+          "A050_oracle_false_positive_regions": 0,
+          "A050_oracle_missed_regions": 1
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.8937003058103975,
+          "current_A050_iou": 0.9060455808118522,
+          "current_B_iou": 0.8923123856009763,
+          "oracle_iou": 0.9282059770668433,
+          "A050_oracle_disagreement_pixels": 4864,
+          "B_oracle_disagreement_pixels": 6651,
+          "oracle_positive_regions": 16,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 1
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.9236079082495465,
+          "current_A050_iou": 0.9060455808118522,
+          "current_B_iou": 0.9203666049588783,
+          "oracle_iou": 0.9282059770668433,
+          "A050_oracle_disagreement_pixels": 4864,
+          "B_oracle_disagreement_pixels": 3795,
+          "oracle_positive_regions": 16,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 1
+        }
+      },
+      "source_same_generation_error_max": 1.7881393432617188e-07,
+      "rank_count": 124
+    },
+    "ovam-voc-sim-425": {
+      "image_id": "ovam-voc-sim-425",
+      "class": "sofa",
+      "prompt": "A photograph of a sofa",
+      "seed": "1145604983",
+      "figure": "17_sofa.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.967186407871391,
+          "current_A050_iou": 0.9645622426218257,
+          "current_B_iou": 0.9645622426218257,
+          "oracle_iou": 0.9743698738385242,
+          "A050_oracle_disagreement_pixels": 4096,
+          "B_oracle_disagreement_pixels": 4096,
+          "oracle_positive_regions": 22,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.9705888700644228,
+          "current_A050_iou": 0.9645622426218257,
+          "current_B_iou": 0.9645622426218257,
+          "oracle_iou": 0.9743698738385242,
+          "A050_oracle_disagreement_pixels": 4096,
+          "B_oracle_disagreement_pixels": 4096,
+          "oracle_positive_regions": 22,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.9666770560165083,
+          "current_A050_iou": 0.9645622426218257,
+          "current_B_iou": 0.9645622426218257,
+          "oracle_iou": 0.9743698738385242,
+          "A050_oracle_disagreement_pixels": 4096,
+          "B_oracle_disagreement_pixels": 4096,
+          "oracle_positive_regions": 22,
+          "A050_oracle_false_positive_regions": 1,
+          "A050_oracle_missed_regions": 0
+        }
+      },
+      "source_same_generation_error_max": 2.384185791015625e-07,
+      "rank_count": 124
+    },
+    "ovam-voc-sim-450": {
+      "image_id": "ovam-voc-sim-450",
+      "class": "train",
+      "prompt": "A photograph of a train",
+      "seed": "1196543666",
+      "figure": "18_train.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.8054091745636195,
+          "current_A050_iou": 0.8419803404459363,
+          "current_B_iou": 0.8096879430988968,
+          "oracle_iou": 0.900660976705384,
+          "A050_oracle_disagreement_pixels": 5568,
+          "B_oracle_disagreement_pixels": 8895,
+          "oracle_positive_regions": 14,
+          "A050_oracle_false_positive_regions": 2,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.8107106575544883,
+          "current_A050_iou": 0.8419803404459363,
+          "current_B_iou": 0.811212233207059,
+          "oracle_iou": 0.900660976705384,
+          "A050_oracle_disagreement_pixels": 5568,
+          "B_oracle_disagreement_pixels": 8732,
+          "oracle_positive_regions": 14,
+          "A050_oracle_false_positive_regions": 2,
+          "A050_oracle_missed_regions": 0
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.7983728414086932,
+          "current_A050_iou": 0.8014011227237461,
+          "current_B_iou": 0.80474335472044,
+          "oracle_iou": 0.900660976705384,
+          "A050_oracle_disagreement_pixels": 9792,
+          "B_oracle_disagreement_pixels": 9428,
+          "oracle_positive_regions": 14,
+          "A050_oracle_false_positive_regions": 3,
+          "A050_oracle_missed_regions": 0
+        }
+      },
+      "source_same_generation_error_max": 1.7881393432617188e-07,
+      "rank_count": 124
+    },
+    "ovam-voc-sim-475": {
+      "image_id": "ovam-voc-sim-475",
+      "class": "tv",
+      "prompt": "A photograph of a tv",
+      "seed": "1041715573",
+      "figure": "19_tv.png",
+      "comparisons": {
+        "W/P1": {
+          "prior_iou": 0.8446679203634142,
+          "current_A050_iou": 0.8691842250465261,
+          "current_B_iou": 0.8534329638022907,
+          "oracle_iou": 0.9618023292202071,
+          "A050_oracle_disagreement_pixels": 28096,
+          "B_oracle_disagreement_pixels": 32009,
+          "oracle_positive_regions": 22,
+          "A050_oracle_false_positive_regions": 2,
+          "A050_oracle_missed_regions": 2
+        },
+        "W/SG11/trim20/rho0p80": {
+          "prior_iou": 0.8531939486022688,
+          "current_A050_iou": 0.8691842250465261,
+          "current_B_iou": 0.8677886849982338,
+          "oracle_iou": 0.9618023292202071,
+          "A050_oracle_disagreement_pixels": 28096,
+          "B_oracle_disagreement_pixels": 25985,
+          "oracle_positive_regions": 22,
+          "A050_oracle_false_positive_regions": 2,
+          "A050_oracle_missed_regions": 2
+        },
+        "W/SG12/top50": {
+          "prior_iou": 0.8452315689981097,
+          "current_A050_iou": 0.8691842250465261,
+          "current_B_iou": 0.8553002328480372,
+          "oracle_iou": 0.9618023292202071,
+          "A050_oracle_disagreement_pixels": 28096,
+          "B_oracle_disagreement_pixels": 31649,
+          "oracle_positive_regions": 22,
+          "A050_oracle_false_positive_regions": 2,
+          "A050_oracle_missed_regions": 2
+        }
+      },
+      "source_same_generation_error_max": 2.980232238769531e-07,
+      "rank_count": 124
+    }
+  }
+}

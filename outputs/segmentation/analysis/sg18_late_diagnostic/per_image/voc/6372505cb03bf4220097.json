@@ -1,0 +1,137 @@
+{
+  "image_id": "ovam-voc-sim-104",
+  "dataset": "voc",
+  "truth_pixels": 53934,
+  "conditions": {
+    "0.425": {
+      "methods": {
+        "middle": {
+          "counts": [
+            53545,
+            5921,
+            389,
+            202289
+          ],
+          "ca_relative_events": [
+            3667,
+            2021,
+            0,
+            0,
+            0,
+            1674,
+            0
+          ]
+        },
+        "late": {
+          "counts": [
+            53122,
+            6551,
+            812,
+            201659
+          ],
+          "ca_relative_events": [
+            3244,
+            2324,
+            0,
+            0,
+            0,
+            1347,
+            0
+          ]
+        },
+        "middle_plus_late": {
+          "counts": [
+            53410,
+            6396,
+            524,
+            201814
+          ],
+          "ca_relative_events": [
+            3532,
+            2269,
+            0,
+            0,
+            0,
+            1447,
+            0
+          ]
+        }
+      },
+      "middle_to_middle_plus_late": {
+        "tp_gained": 2,
+        "tp_lost": 137,
+        "fp_gained": 500,
+        "fp_removed": 25,
+        "distant_fp_gained_gt16": 0,
+        "distant_fp_removed_gt16": 0,
+        "foreground_gained": 502,
+        "foreground_lost": 162
+      }
+    },
+    "0.45": {
+      "methods": {
+        "middle": {
+          "counts": [
+            53413,
+            5177,
+            521,
+            203033
+          ],
+          "ca_relative_events": [
+            3535,
+            1558,
+            0,
+            0,
+            0,
+            1955,
+            0
+          ]
+        },
+        "late": {
+          "counts": [
+            52854,
+            5706,
+            1080,
+            202504
+          ],
+          "ca_relative_events": [
+            2976,
+            1754,
+            0,
+            0,
+            0,
+            1622,
+            0
+          ]
+        },
+        "middle_plus_late": {
+          "counts": [
+            53173,
+            5624,
+            761,
+            202586
+          ],
+          "ca_relative_events": [
+            3295,
+            1769,
+            0,
+            0,
+            0,
+            1719,
+            0
+          ]
+        }
+      },
+      "middle_to_middle_plus_late": {
+        "tp_gained": 4,
+        "tp_lost": 244,
+        "fp_gained": 468,
+        "fp_removed": 21,
+        "distant_fp_gained_gt16": 0,
+        "distant_fp_removed_gt16": 0,
+        "foreground_gained": 472,
+        "foreground_lost": 265
+      }
+    }
+  }
+}

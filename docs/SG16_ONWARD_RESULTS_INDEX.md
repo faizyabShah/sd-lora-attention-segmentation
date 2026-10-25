@@ -7,11 +7,14 @@ diagnostics, not generated images or attention maps.
 
 | Study | Aggregate report | Per-image evidence |
 |---|---|---|
-| Pre-SG16/17 diagnostics | `outputs/segmentation/analysis/pre_sg16_sg17/results.json` | Reduced diagnostic tables in that directory; native image/map data stay local. |
+| Pre-SG16/17 diagnostics | `outputs/segmentation/analysis/pre_sg16_sg17/results.json` | 1,197 compact `voc/shards/` and `coco/shards/` region/histogram records. |
+| SG15 oracle visual audit (Section 93) | `outputs/segmentation/analysis/sg15_label_oracle_20/results.json` | `per_image_iou.csv` and 20 presentation sheets in `figures/`. |
 | SG17 | `outputs/segmentation/controlled_attention_cv/sg17/results.json` | `sg17/per_image_selected.csv` and 1,197 compact `sg17/screen/{voc,coco}/*.npz` scoring records. |
 | SG18 temporal windows | `outputs/segmentation/controlled_attention_cv/sg18_temporal_windowed/results.json` | `sg18_temporal_windowed/per_image_selected.csv` and 1,197 compact `screen/{voc,coco}/*.npz` records. |
 | SG18 T1 + CRF | `outputs/segmentation/controlled_attention_cv/sg18_t1_crf/results.json` | 40 compact `voc/shards/` and `coco/shards/` metric files. |
-| Pre-SG18/21 and Pre-SG19 diagnostics | `outputs/segmentation/analysis/pre_sg18_sg21/` and `outputs/segmentation/analysis/pre_sg19_*/` | Published reduced tables; heavy map caches remain local. |
+| Pre-SG18/21 diagnostics | `outputs/segmentation/analysis/pre_sg18_sg21/` | 1,197 compact `voc/shards/` and `coco/shards/` descriptor/histogram records. |
+| SG18 late-call diagnostic | `outputs/segmentation/analysis/sg18_late_diagnostic/` | 1,197 small `per_image/{voc,coco}/*.json` event records. |
+| Pre-SG19 diagnostics | `outputs/segmentation/analysis/pre_sg19_*/` | Published reduced tables; heavy map caches remain local. |
 | SG21 | `outputs/segmentation/controlled_attention_cv/sg21_structural/results.json` | 1,197 compact `sg21_structural/cache/{voc,coco}/class_*/*.npz` count/descriptor records. |
 | SG22/23 | `outputs/segmentation/controlled_attention_cv/sg22/` and `sg23/` | 40 class shards per study, each with a metric and diagnostic file in `voc/shards/` or `coco/shards/`. |
 | SG24-A/B | `outputs/segmentation/controlled_attention_cv/sg24_a/` and `sg24_b/` | 40 class shards per study, each with metrics and reduced CA layer-weight descriptors. |

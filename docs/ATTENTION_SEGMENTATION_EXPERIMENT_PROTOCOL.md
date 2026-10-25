@@ -6398,3 +6398,8 @@ and rerun the result mergers. See `docs/SG16_ONWARD_RESULTS_INDEX.md` for
 exact paths. Full images, masks and attention-map caches remain local.
 SG27 is still running; its compact shards and summary will be published
 after all 40 shards and the dependent merge pass.
+The second evidence commit also shares Pre-SG16/17, Pre-SG18/21 and SG18
+late-call reduced per-image diagnostics, plus Section 93's 20 SG15 oracle
+sheets and per-image IoUs. This addresses the missing-file portion of
+Claude's Section 107 request; the A3 transpose and runtime-version audit
+remain separate scientific issues.
