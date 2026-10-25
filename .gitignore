@@ -69,7 +69,6 @@ venv/
 /outputs/segmentation/controlled_attention_cv/sg17_smoke/
 /outputs/segmentation/controlled_attention_cv/sg17_smoke_v2/
 /outputs/segmentation/controlled_attention_cv/sg17/cache/
-/outputs/segmentation/controlled_attention_cv/sg17/screen/
 /outputs/segmentation/controlled_attention_cv/sg17/crf/
 /outputs/segmentation/controlled_attention_cv/sg17/visuals/temporary/
 
@@ -86,12 +85,9 @@ venv/
 # SG18 resumable reduced-map cache and smoke products.
 /outputs/segmentation/controlled_attention_cv/sg18_temporal_windowed_smoke/
 /outputs/segmentation/controlled_attention_cv/sg18_temporal_windowed/cache/
-/outputs/segmentation/controlled_attention_cv/sg18_temporal_windowed/screen/
 /outputs/segmentation/controlled_attention_cv/sg18_temporal_windowed/visuals/temporary/
 /outputs/segmentation/controlled_attention_cv/sg18_temporal_windowed/SG18_CHATGPT_HANDOFF.zip
 /outputs/segmentation/controlled_attention_cv/sg18_t1_crf_smoke/
-/outputs/segmentation/controlled_attention_cv/sg18_t1_crf/voc/shards/
-/outputs/segmentation/controlled_attention_cv/sg18_t1_crf/coco/shards/
 /outputs/segmentation/analysis/sg18_late_diagnostic_smoke/
 /outputs/segmentation/analysis/sg18_late_diagnostic/per_image/
 /outputs/segmentation/analysis/pre_sg19_late_support_smoke/
@@ -100,34 +96,21 @@ venv/
 
 # SG21 resumable per-image GPU checkpoints and live smoke products.
 /outputs/segmentation/controlled_attention_cv/sg21_structural_smoke/
-/outputs/segmentation/controlled_attention_cv/sg21_structural/cache/
 /outputs/segmentation/analysis/SG18_CRF_SG21_CHATGPT.zip
 
-# SG22/SG23 resumable counts and diagnostics; reviewed summaries stay trackable.
+# SG22/SG23 compact per-image counts and diagnostics are shared for review.
 /outputs/segmentation/controlled_attention_cv/sg22_smoke/
 /outputs/segmentation/controlled_attention_cv/sg23_smoke/
-/outputs/segmentation/controlled_attention_cv/sg22/voc/shards/
-/outputs/segmentation/controlled_attention_cv/sg22/coco/shards/
-/outputs/segmentation/controlled_attention_cv/sg23/voc/shards/
-/outputs/segmentation/controlled_attention_cv/sg23/coco/shards/
 /outputs/segmentation/analysis/SG22_SG23_CHATGPT.zip
 
-# SG24 live smoke and resumable per-image class shards; summaries stay trackable.
+# SG24 live smoke stays local; compact per-image class shards are shared.
 /outputs/segmentation/controlled_attention_cv/sg24_*_smoke*/
-/outputs/segmentation/controlled_attention_cv/sg24_a/voc/shards/
-/outputs/segmentation/controlled_attention_cv/sg24_a/coco/shards/
-/outputs/segmentation/controlled_attention_cv/sg24_b/voc/shards/
-/outputs/segmentation/controlled_attention_cv/sg24_b/coco/shards/
 
-# SG25 keeps shareable summaries but not resumable per-image shards.
+# SG25 compact per-image metrics and arrival counts are shared.
 /outputs/segmentation/controlled_attention_cv/sg25_smoke*/
-/outputs/segmentation/controlled_attention_cv/sg25/voc/shards/
-/outputs/segmentation/controlled_attention_cv/sg25/coco/shards/
 
-# SG26 reduced per-image shards and live smoke are local; summaries are shared.
+# SG26 reduced per-image shards are shared; live smoke stays local.
 /outputs/segmentation/controlled_attention_cv/sg26_smoke*/
-/outputs/segmentation/controlled_attention_cv/sg26/voc/shards/
-/outputs/segmentation/controlled_attention_cv/sg26/coco/shards/
 
 # SG27 live smoke and resumable per-image shards stay local.
 /outputs/segmentation/controlled_attention_cv/sg27_duplicate_smoke/

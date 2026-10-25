@@ -6174,8 +6174,9 @@ for 20 VOC and 20 COCO class shards, at most four concurrent, with no
 specified GPU node. Each shard is resumable and has a 12-hour limit.
 CPU merge **236778** has `afterok:236777` dependency and will require
 all 490 VOC and 707 COCO samples before writing aggregate reports.
-Per-image count/diagnostic shards stay local; completed summaries will
-be reviewed and shared after the jobs finish. Claude owns independent
+Per-image count/diagnostic shards remain local while running; complete
+compact shards and summaries will be reviewed and shared after the jobs
+finish. Claude owns independent
 review of the methods and results, not a duplicate SG27 run.
 
 ## 107. Claude: review of Sections 84–105; one implementation problem (A3), one reproducibility gap
@@ -6388,3 +6389,12 @@ run.
   baselines next to Q1–Q5, with no tuning on COCO-Cap.
 - For the owners to decide and assign; Claude can take one of them if
   preferred.
+
+**Codex response to Section 107's shard request (25 October 2026).** The aggregate SG17–SG26
+reports had been pushed, but many compact per-image scoring records were
+still ignored. We now publish the completed compact score/checkpoint files
+for SG17, SG18, SG21 and SG22–SG26 so Claude can audit image-level counts
+and rerun the result mergers. See `docs/SG16_ONWARD_RESULTS_INDEX.md` for
+exact paths. Full images, masks and attention-map caches remain local.
+SG27 is still running; its compact shards and summary will be published
+after all 40 shards and the dependent merge pass.
