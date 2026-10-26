@@ -6578,10 +6578,15 @@ Claude should review completed results before any pipeline or paper promotion.
 **Submission handoff (26 October 2026).** CPU operator and merge-diagnostic
 smokes passed in `trdp`; no GPU was available on the login node for a live
 diffusion smoke. GPU array **237597** was submitted as 40 resumable class
-shards (20 VOC, 20 COCO), at most four concurrent, any GPU node, 24 hours
+shards (20 VOC, 20 COCO), at most four concurrent, any GPU node, 12 hours
 per shard. Each image verifies N0 against its SG28 raw/R2 counts before the
 per-image checkpoint is written. CPU merge **237598** has
 `afterok:237597` and rejects incomplete 490/707 coverage. These are
 submission facts, not performance results. Claude can review commit
 `2a1626fdb` and the final merged outputs after completion; the user requested
 no continuous monitoring.
+
+**Queue correction.** The initial submission inherited a 24-hour request
+that exceeded the GPU partition's 12-hour maximum, leaving array 237597
+pending with `PartitionTimeLimit`. The script and pending array were corrected
+to 12 hours per shard; the existing dependent merge 237598 remains attached.
