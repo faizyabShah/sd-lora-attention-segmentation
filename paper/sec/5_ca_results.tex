@@ -1,44 +1,15 @@
-\section{Controlled cross-attention results}
+\section{Semantic localization: selecting the CA seed}
 \label{sec:ca}
+A CA map should identify a reliable semantic core before any SA expansion. We first hold propagation aside and screen denoising calls, resolutions, modules, heads and attribution conventions. This separates a weak seed from an overly aggressive graph operation.
 
-\paragraph{Calls and resolutions.}
-\owner{Codex (package A)}
-\TODO{CA-T keeps all calls; CA-R removes the 32$\times$32 modules.}
-\source{protocol Section 20; evidence A2}
+\paragraph{Spatial scale matters more than a preferred head.}
+Removing the five $32\times32$ CA modules raises OOF mIoU from 0.665 to 0.691 in the combined CA confirmation; four folds choose it. The paired mean-image IoU change is $+0.022$ (95\% bootstrap interval $[+0.014,+0.029]$). The effect persists at 0.35, 0.45 and 0.55, although average precision falls from 0.922 to 0.913: the chosen seed is more selective at the operating threshold, not a universal improvement in pixel ranking. Figure~\ref{fig:ca_example} shows why scale is a substantive choice: the example's 32-pixel map highlights only a narrow part of the airplane, while the retained scales offer complementary extent and detail. This is an illustration, not evidence that every 32-pixel layer is poor.
 
-\paragraph{Layers, heads and attribution.}
-\owner{Claude (package B)}
-Removing the two 32$\times$32 decoder modules
-(\texttt{up\_blocks.2.attentions.0} and \texttt{.1}) is chosen in all five
-folds and raises OOF mIoU from 0.666 to 0.692. Removing head~1 in every module
-is chosen in four folds (0.666 to 0.674). Both changes are
-calibration-dependent: they help at 0.45 and 0.55 but not at 0.35, and both
-slightly lower AP, so they make the map more selective rather than rank
-pixels better. Head~1 alone scores 0.098 mIoU, against 0.26--0.43 for every
-other head. For the attribution convention, the reference (conditional query,
-softmax over all 77 padded positions, mean over all class-word pieces) is kept
-in all folds; OVAM's convention (unconditional query, unpadded softmax, first
-piece) is 0.016 lower.
-\source{protocol Section 21; evidence A1}
+On separate screens, removing CA head 1 and some module subsets appeared useful. Once crossed with the resolution choice, the extra head restriction changes mIoU by only $+0.0004$ and lies inside the 0.002 tie band. We therefore keep all eight heads. The conditional-query attribution convention, with the softmax over 77 text positions and the mean of all pieces of the class word, also survives; the tested OVAM-style unconditional/first-piece alternative is 0.016 lower in its own screen. Denoising-call restriction is not retained in this initial CA stage.
 
-\paragraph{Combined confirmation.}
-\owner{Claude (CA-C)}
-Re-scoring the three promoted changes together (\cref{tab:controlled_path})
-freezes the resolution change alone: without the five 32$\times$32 modules,
-OOF mIoU rises from 0.665 to 0.691 (four of five folds; paired
-$\Delta$ image IoU $+0.022$, 95\% interval $[+0.014, +0.029]$). It is not
-calibration-dependent ($+0.001$, $+0.030$ and $+0.045$ at 0.35, 0.45 and
-0.55), although mean AP falls from 0.922 to 0.913. The layer change is
-contained in it and adds nothing. Removing head~1 on top of it changes mIoU by
-only $+0.0004$, inside the tie band, so all eight heads are kept: a head
-restriction that passes its own screen does not survive the combination.
-\source{protocol Section 27; evidence A3}
-
-\begin{table}[t]
-  \centering
-  \input{tables/generated/controlled_path}
-  \caption{Controlled selection path on VOC-Sim. Out-of-fold (OOF) mIoU of the
-  reference and of the setting chosen on the other four folds; fold votes;
-  paired bootstrap 95\% interval of the change in image IoU.}
-  \label{tab:controlled_path}
-\end{table}
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/ca_airplane.pdf}
+\caption{\textbf{Why CA resolution is a real design choice.} One VOC-Sim airplane generated image and annotation (left), followed by representative head-averaged CA modules from the same image and all calls. All heatmaps use one color scale. The selected seed retains 8, 16 and 64-pixel modules and omits the 32-pixel group. This visual example motivates the controlled resolution test; the fold-level evidence is in Tab.~\ref{tab:stage_decisions}.}
+\label{fig:ca_example}
+\end{figure*}

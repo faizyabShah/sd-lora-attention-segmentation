@@ -1,55 +1,15 @@
 \section{Discussion and limitations}
 \label{sec:discussion}
-\owner{Claude (draft from frozen results; Codex review requested, protocol Section 63)}
+\paragraph{A coherent mechanism, not a monotone list of tricks.}
+The CA resolution choice improves the operating-point semantic seed. A single 64-pixel SA module then spreads that seed more usefully than averaging every module. A second pass repairs under-covered objects, and image-aware refinement removes boundary errors. Crucially, these effects interact: head and call subsets that pass independent screens disappear after the relevant combination is tested. The later middle-call improvement appears only after R2. A3's improvement is likewise measured only for its implemented weighted seed and final pipeline, not as a generic CA-only gain; its CA-only mIoU actually falls in the SG24 screen.
 
-\paragraph{What the controlled path shows.}
-Restrictions chosen on their own screen rarely survive: removing a
-cross-attention head, keeping only the last denoising call, a subset of
-self-attention resolutions or heads, and per-image Otsu thresholding each
-passed or nearly passed alone and failed in combination. The changes that did
-survive are simple: drop one cross-attention resolution, propagate through
-one self-attention module, and refine with DenseCRF. The largest single lever
-is the seed. OVAM's token raises the one-pass pipeline by 0.063 out-of-fold,
-more than all propagation and refinement choices together on the class word
-(0.026). DenseCRF is the most robust component: it is selected on VOC-Sim and
-transfers to COCO-Cap with both the class word and the token.
+\paragraph{What the figures do and do not show.}
+The airplane CA panels in Fig.~\ref{fig:ca_example} illustrate the spatial signals entering the tested operator. The quantitative figure and Tab.~\ref{tab:stage_decisions} state the corresponding cohort-level evidence. The gain and loss in Fig.~\ref{fig:temporal_tradeoff} illustrate why a temporal restriction needs a cohort-level test. The second-pass diagnostic explains why deeper diffusion eventually leaks: among newly accepted pixels, true-positive rates decline sharply with arrival depth, particularly on COCO-Cap. These observations suggest targeted propagation as future work, but they do not prove a universal per-pixel confidence rule.
 
-\paragraph{Why a second propagation pass helps.}
-\owner{Claude (AN1)}
-Decomposing the error by pass shows that the second pass is pure filling: on
-VOC-Sim it raises recall from 0.912 to 0.924 at unchanged precision, while
-further passes lower precision. Its gain is concentrated in images whose seed
-covers least of the object (the lowest third gains $+0.029$ image IoU, the
-others under $+0.006$) and grows with object size; \emph{person} gains most.
-The optimized token's seed already covers 94\% of the object, against 84\% for
-the class word, which is why the token pipeline does not select a second pass.
-Tracking the pixels each pass adds confirms that the second pass genuinely
-fills: a quarter of its new object pixels lie more than 16 pixels from the
-previous mask, and the false positives it adds are offset by those it removes.
-On COCO-Cap, by contrast, it adds 2.3 false-positive pixels per new object
-pixel (0.6 on VOC-Sim), farther from the object and twice as often in separate
-regions, so the second pass does not transfer.
-\source{protocol Sections 57--58; registry AN1}
+\paragraph{Selection and implementation boundaries.}
+The main all-call pipeline and the later middle-call refinement were selected by their registered VOC rules. A3 received a favorable forced pairwise comparison after the multi-candidate selector kept A0; consequently it is exploratory and its full-VOC score is in-sample. An independent code audit found that its resized SA affinity was transposed relative to the GoCA-inspired equation. Until a corrected replay is evaluated, the A3 number belongs only to the implemented operator. SG25 and SG27 further reuse that seed and inherit this limitation.
 
-\paragraph{Limitations.}
-\owner{Claude (draft)}
-Both benchmarks are generated images: VOC-Sim and COCO-Cap are rendered by
-Stable Diffusion~1.5 from released prompts and seeds. Our scores are on
-regenerated images and released annotations, while the released baseline masks
-were produced on their authors' renders and, for Attn2Mask, Grounded Diffusion
-and DatasetDM, on their own image sets. All choices are made on one dataset
-(VOC-Sim, 490 images, about 25 per class), so per-class conclusions are noisy.
-COCO-Cap is scored with OVAM's VOC tokens because no COCO-Cap tokens were
-released. Finally, all experiments use one model; whether the selected modules
-transfer to other diffusion models or to domain-adapted ones is open.
-\source{protocol Sections 41, 48, 54--56; registry R1, R10}
+The benchmarks contain images generated from prompts and seeds, not natural-image segmentation benchmarks. Our regenerated images may differ from the renders annotated by OVAM, and some published baselines used their own generation settings. For that reason, the final literature table is contextual, not a claim of a paired statistical victory. All choices are made on VOC-Sim and one diffusion backbone; the 20-class macro mean also hides class and image-level variation. A separate optimized-token track uses annotations and is not part of the training-free claim.
 
 \section{Conclusion}
-\label{sec:conclusion}
-\owner{Claude (draft)}
-Read out under a controlled, cross-validated selection, the attention of a
-text-to-image diffusion model segments objects well with few, simple choices.
-One self-attention module propagates a cross-attention seed, DenseCRF refines
-it, and a better seed matters more than a deeper propagation. The resulting
-training-free pipeline transfers to COCO-Cap without tuning, and an optimized
-token closes much of the remaining gap.
+The most reliable training-free recipe in this study is a selective CA seed, observation-wise propagation through one fine SA module, two passes for object completion, and fixed image-aware refinement. Controlled VOC folds and frozen COCO transfer reveal both its gains and its failure mode: later propagation or additional scale can help object extent while leaking into unrelated regions. Reporting the registered selection path beside exploratory extensions gives a clearer account of what is established and what remains to be tested.

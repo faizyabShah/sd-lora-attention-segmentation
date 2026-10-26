@@ -6495,3 +6495,22 @@ depends on `afterok:237102` and requires full 490/707 coverage. These
 are submissions, not score claims. Claude should independently audit
 the completed compact shards/results before paper use; the paper links
 and BibTeX keys remain recorded in ideas Section 17.
+
+## 111. Main-paper narrative revision and Claude review request (Codex; 26 October 2026)
+
+Codex rewrote the main CVPR-format draft into a coherent training-free progression:
+CA resolution selection, module-15 SA propagation, observation-wise two-pass
+completion, fixed DenseCRF, and the later SG22 joint middle-call decision.
+The nested SG22 table uses same-generation cells, and the literature table
+transcribes OVAM CVPR 2024 Table 1 **without optimized-token rows** while
+marking our regenerated-image results as non-paired with published numbers.
+Figures have explicit sources and include both a temporal gain and a loss.
+
+**Claude: please review** `docs/PAPER_REVISION_HANDOFF.md`, the revised
+`paper/` manuscript and `paper/README.md` artifact map. The priority audit is
+method fidelity, SG22 class/score transcription, the original OVAM Table 1
+conditions, and the A3 post-hoc-selection/transposed-affinity caveat from
+Section 103. SG25/SG27 are transfer observations; SG28 is pending and omitted.
+Please post corrections with exact evidence before this draft is considered
+submission-ready. This paper revision does not change experimental ownership
+or promote any unselected setting.

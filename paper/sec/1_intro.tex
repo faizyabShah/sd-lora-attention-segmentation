@@ -1,50 +1,18 @@
 \section{Introduction}
 \label{sec:intro}
-\owner{Claude (draft from frozen results; Codex review requested, protocol Section 63)}
+Diffusion models generate an image while repeatedly connecting text tokens to image positions and image positions to one another. Cross-attention (CA) offers a semantic seed for a queried class; self-attention (SA) can carry that evidence across the object's extent. DAAM aggregates CA for attribution~\cite{tang2023daam}, while OVAM extends attribution to words absent from the generation prompt and studies SA fusion and CRF refinement~\cite{marcosmanchon2024ovam}. This makes generated-image segmentation possible without fitting a segmentation network.
 
-Text-to-image diffusion models localize the concepts they draw. The
-cross-attention between image positions and prompt tokens marks where a word
-is rendered, and the self-attention between image positions groups pixels that
-belong together \todo{[cite: Prompt-to-Prompt; DAAM --- verify]}. Several
-training-free segmenters read these maps out directly, and OVAM extends them
-to words that are absent from the prompt and to tokens optimized on a few
-annotated images \todo{[cite: OVAM; DiffSegmenter; DiffSeg --- verify]}.
+The difficulty is selecting \emph{which} attention to use. Stable Diffusion 1.5 exposes many denoising calls, spatial scales, modules and heads. A highly tuned combination may look better on the images used to choose it, while a restriction that helps alone may fail after another change. The problem is especially visible when transferring from the simpler VOC-Sim scenes to caption-driven COCO-Cap scenes.
 
-Such methods expose many settings: which denoising calls, resolutions, layers
-and heads to aggregate, how to combine cross- and self-attention, how to
-normalize and threshold the map, and how to refine it. When these choices are
-made on the images used for evaluation, the reported numbers are optimistic.
-In our own exploratory phase, a pipeline tuned in this way reached 0.800 mIoU
-on VOC-Sim, in-sample. Under held-out selection, several of its tuned choices
-(fixed head subsets, a late window of denoising calls, a subset of
-cross-attention layers) are not selected; the frozen pipeline is simpler and
-reaches 0.813 out-of-fold.
+We organize the method around three testable roles (Fig.~\ref{fig:overview}). First, CA determines whether the queried class has a useful semantic core. Second, SA determines whether that core grows into a coherent object or leaks into nearby background. Third, fixed image-aware refinement sharpens the resulting boundary. We measure these roles with five VOC-Sim folds, test combinations after individual screens, and use COCO-Cap only for frozen transfer. A head or temporal restriction is retained only if its benefit survives the combined system.
 
-We therefore study diffusion-attention segmentation under a controlled
-protocol. Each setting is varied one axis at a time from an inclusive
-reference, chosen on four of five class-stratified folds and scored on the
-fifth, and frozen only after a combined confirmation in which separately
-promoted changes are re-tested together. COCO-Cap is never used to choose
-anything and serves only to measure transfer.
+Our principal result is a simple training-free class-word pipeline: retain the non-32-pixel CA modules, propagate through the last 64-pixel SA module twice per observation, then use OVAM's DenseCRF parameters. It scores 0.813 out-of-fold (OOF) mean IoU on VOC-Sim and 0.637 on COCO-Cap. A later factorial study finds that restricting SA to calls 10--20 \emph{after CRF} improves the same-generation OOF score from 0.813 to 0.817 and transfers to 0.644. We also report later CA-weighting and coarse-to-fine SA studies, but keep their selection status explicit. In particular, the CA weighting variant was chosen after a multi-candidate screen and its implemented affinity orientation differs from a published inspiration; it is a measured extension, not part of our confirmed method.
 
-Our contributions are:
-\begin{itemize}
-\item \textbf{A controlled selection protocol} for diffusion-attention
-  segmentation, and the finding that most single-axis restrictions that pass
-  their own screen, including head, call and resolution subsets, fail when
-  combined (\cref{sec:selection,sec:ca,sec:sa}).
-\item \textbf{A training-free pipeline}, frozen under that protocol: the
-  cross-attention seed without the $32\times32$ modules, two passes through a
-  single $64\times64$ self-attention module, and DenseCRF. It scores 0.813
-  out-of-fold on VOC-Sim and 0.637 on COCO-Cap without any COCO-Cap tuning,
-  above every released class-word baseline (\cref{sec:fusion,sec:transfer}).
-\item \textbf{A few-shot variant} that replaces the class word by OVAM's
-  optimized token: 0.864 on VOC-Sim and 0.685 on COCO-Cap. We also find that
-  OVAM's released tokens average two or three per-image tokens, each learned
-  from one annotated image (\cref{sec:fusion}).
-\item \textbf{A mechanism analysis} of propagation: a second pass fills
-  objects that the seed under-covers, a better seed makes it unnecessary, and
-  in cluttered scenes its leakage outweighs the fill
-  (\cref{sec:discussion}).
-\end{itemize}
-\source{protocol Sections 11, 27, 33, 51, 52, 54, 56, 57; registry B1--B17}
+The paper contributes a traceable selection protocol for CA, SA and post-processing; a staged analysis of semantic seeding, object completion and leakage; and a published-baseline comparison that distinguishes regenerated-image results from the original paper's results.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/method_overview.pdf}
+\caption{\textbf{From semantic evidence to an object mask.} A class-word attribution prompt yields a CA seed; the selected 64-pixel SA module propagates that seed twice within each call--head observation; the observations are averaged and the fixed DenseCRF refines the thresholded map using RGB boundaries. We select settings on VOC-Sim folds and only then score COCO-Cap. The diagram describes the confirmed training-free path; the later middle-call variant changes only the SA observation set.}
+\label{fig:overview}
+\end{figure*}

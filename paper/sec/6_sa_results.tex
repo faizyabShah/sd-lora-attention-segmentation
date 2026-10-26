@@ -1,41 +1,10 @@
-\section{Controlled self-attention results}
+\section{Object completion: selecting SA propagation}
 \label{sec:sa}
+A semantic core can be accurate yet incomplete. We therefore treat SA as a propagation operator, not as another class detector. One pass through all sixteen SA modules improves the frozen seed in the SA module screen, but the last 64-pixel module (\texttt{up\_blocks.3.attentions.2}, index 15) is better: OOF mIoU rises from 0.756 to 0.789 in the combined SA confirmation, and all five folds select this module. Its paired mean-image IoU gain is $+0.042$ with interval $[+0.037,+0.047]$. Eighteen classes improve; person loses 0.055, an early warning that diffusion can also erase or misassign object extent.
 
-\paragraph{Calls and resolutions.}
-\owner{Codex (package A)}
-\TODO{SA-T (call 30) and SA-R (8+64), both calibration-dependent.}
-\source{protocol Section 31; evidence A5}
+Separate screens favored call 30, resolutions 8+64 and heads $\{1,4,6\}$, but none survives the SA combination. With module 15 fixed, the head subset lowers mIoU by 0.002 and call 30 lowers it further. A Cartesian audit of six CA seeds and twelve SA settings plus no-SA controls retains the sequential CA/SA pair in all five folds. Module 15 is the best SA partner for every audited CA seed. This rules out the simple explanation that the sequential choice worked only because the CA seed happened to be frozen first.
 
-\paragraph{Modules, heads and operator.}
-\owner{Claude (package B)}
-Seeded by the frozen CA map, one propagation pass through all sixteen
-self-attention modules raises in-sample mIoU from 0.696 (seed alone) to
-0.755. Propagating through a single module,
-\texttt{up\_blocks.3.attentions.2} (64$\times$64), is better still and is
-chosen in all five folds (OOF 0.755 to 0.788); the exhaustive search over all
-65{,}535 module subsets, which is not eligible for selection, picks the same
-module. Restricting every module to heads $\{1, 4, 6\}$ is chosen in all
-folds with a small gain (0.755 to 0.761, the conditional band). Propagating
-with the transpose, $\sa^\top\ca$, gives 0.474, far below $\sa\ca$, which
-confirms the row-stochastic orientation.
-\source{protocol Section 30; evidence A4}
+\paragraph{How far should evidence propagate?}
+With that same module, adding a second observation-wise pass raises OOF mIoU from 0.788 to 0.800 ($+0.012$); three passes are not promoted. The second pass particularly helps chair ($+0.078$) and person ($+0.030$). With the fixed DenseCRF added, the combined confirmation selects two passes plus R2 in all five folds and reaches 0.813 OOF, compared with 0.788 for one unrefined pass. Figure~\ref{fig:progression} depicts these same-study stages, without implying that the independent CA and SA screens are additive.
 
-\paragraph{Combined confirmation and joint audit.}
-\owner{Claude (SA-C text, protocol Section 29); Codex ran SA-C and the joint audit}
-SA-C re-scores the four promoted SA changes (call 30 only, resolutions
-8 and 64 only, module 15 only, heads $\{1, 4, 6\}$) in every unique
-combination. Module 15 alone, with all calls and heads, is chosen in all five
-folds: OOF mIoU rises from 0.756 to 0.789 (paired $\Delta$ $+0.042$,
-$[+0.037, +0.047]$; 403 images better, 87 worse). It helps at all three
-thresholds and raises AP from 0.954 to 0.956. None of the other restrictions
-survives: adding the head subset to module 15 changes mIoU by $-0.002$, and
-adding call 30 to that by $-0.005$. Eighteen of twenty classes improve;
-\emph{person} falls by 0.055.
-
-Because CA and SA were chosen in sequence, a further audit crosses all six
-CA-C cells with all twelve SA-C cells and a no-SA control (78 configurations)
-under the same rule. The sequential pair is kept in all five folds, and module
-15 alone is the best SA partner for every CA seed. The closest alternative
-(also removing CA head~1) is $+0.0017$ in-sample, with a paired interval that
-includes zero.
-\source{protocol Sections 33, 35, 36, 38; evidence A6}
+The mechanism is a completion--leakage tradeoff. In the diagnostic decomposition, pass two raises VOC recall from 0.912 to 0.924 at nearly unchanged precision; its largest mean image-IoU gain is in the lowest third of seed coverage ($+0.029$). The first-arrival diagnostic finds that pixels first accepted at depth one are 86.5\% true positive on VOC and 70.8\% on COCO, while pixels first accepted at depth three are only 39.3\% and 14.0\%. Further propagation therefore has diminishing reliability, especially under COCO clutter. These are diagnostic pixel statistics, not an alternative segmentation score.

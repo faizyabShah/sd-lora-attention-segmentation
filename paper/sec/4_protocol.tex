@@ -1,51 +1,12 @@
 \section{Experimental protocol}
 \label{sec:protocol}
+\paragraph{Data and metric.}
+We evaluate binary masks for a queried VOC class on the 490 annotated VOC-Sim images and 707 annotated COCO-Cap images released with OVAM~\cite{marcosmanchon2024ovam}. We regenerate the images from released prompts and seeds to record the attention needed by our method; generation details can produce visual differences from the released renders. VOC-Sim is the selection set. COCO-Cap is evaluated only after the operator and threshold are frozen. We report class IoU from pooled TP, FP and FN within each class and the unweighted mean of 20 class IoUs. This is different from averaging per-image IoUs.
 
-\subsection{Data and metric}
-\owner{Codex (protocol Section 29)}
-\TODO{VOC-Sim (490 images, 20 classes) for selection; COCO-Cap (707) only for
-transfer; regenerated images scored on the released annotations; pooled class
-IoU and its macro mean.}
-\source{protocol Section 2; registry R1}
+\paragraph{Fold selection.}
+The 490 VOC-Sim images are assigned once to five class-stratified folds of 98 images. For each held-out fold, a candidate is chosen on the other four folds and scored on the held-out fold. The resulting OOF score estimates the selection procedure. We also identify \emph{forced OOF} scores for a named candidate when it is evaluated on all held-out folds even when the registered selection rule would not choose it. We never conflate forced OOF with a promoted method.
 
-\subsection{Cross-validated selection}
-\label{sec:selection}
-\owner{Claude (protocol Section 29: statistical-selection wording)}
+Early one-axis screens use a fixed 0.45 mask threshold, with 0.35 and 0.55 as calibration checks. A candidate must improve the training-fold mIoU by at least 0.010, or by at least 0.005 with 12 of 20 classes improving and no class losing more than 0.05. Differences within 0.002 favor the more inclusive setting. Promotion requires at least four of five fold votes and a positive OOF change. Promoted settings are tested jointly before a stage is frozen. Later factorial studies select their mask threshold from a registered 17-point VOC grid within each training fold; full-VOC threshold selection is used only to freeze COCO transfer. This distinction matters when comparing scores from different study phases.
 
-Every attention setting is chosen by the same cross-validated rule, so that
-no reported gain comes from tuning on the images it is reported on.
-\source{protocol Sections 5, 5a; registry R3--R5}
-
-\paragraph{One axis at a time.}
-Each screen varies one axis (calls, resolutions, modules, heads, or the
-attribution convention) away from an \emph{inclusive reference} that keeps
-every option of that axis, with all other settings held at their reference
-values.
-
-\paragraph{Folds.}
-The 490 VOC-Sim images are split once into five folds of 98 images,
-stratified by class (four or five images per class per fold) with a fixed
-seed. For each held-out fold, a candidate is chosen using only the other four
-folds and then scored on the held-out fold. Pooling the five held-out folds
-gives an out-of-fold (OOF) mIoU for the selection procedure and for the
-reference.
-
-\paragraph{Promotion rule.}
-On the training folds, a candidate replaces the reference if it improves
-mIoU at the 0.45 threshold by at least $0.010$, or by $0.005$--$0.0099$ when at
-least 12 of the 20 classes improve and no class loses more than $0.05$.
-Candidates within $0.002$ of each other are resolved towards the more
-inclusive setting. A setting is promoted only if at least four of the five
-folds choose it \emph{and} its pooled OOF mIoU exceeds the reference's.
-
-\paragraph{Combined confirmation.}
-Settings promoted by separate one-axis screens are not assumed to combine.
-They are re-scored together in a single run, alone and in every combination,
-and the same rule chooses among them. Only this confirmation freezes a stage.
-
-\paragraph{Uncertainty and calibration.}
-We report a paired bootstrap (20{,}000 resamples) 95\% interval of the mean
-per-image IoU change, the number of images that improve and worsen, the
-change in mIoU at thresholds 0.35 and 0.55, and the mean average precision
-(AP) of the continuous map. A change is \emph{calibration-dependent} if its
-sign differs across the three thresholds.
+\paragraph{Comparisons and uncertainty.}
+We report each stage against its same-run reference. Paired image-IoU intervals use 20,000 bootstrap resamples; these intervals complement, rather than replace, the class-macro mIoU and fold decision. Published OVAM benchmark numbers are shown separately from our regenerated-image scores. The released baseline masks in our repository are also scored separately, because some methods used different generated images or modified evaluation code.
