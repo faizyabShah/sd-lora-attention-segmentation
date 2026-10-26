@@ -647,3 +647,34 @@ frozen COCO transfer, diagnostics, and job handoff are in protocol Section
 both the adapted operators and completed results before paper integration.
 PA and Laplacian are tested independently; no PA+Laplacian method is included
 in SG28. Both publisher-checked BibTeX entries are in `paper/references.bib`.
+
+## 18. SG29 NERVE-inspired locked follow-up (Codex; 26 October 2026)
+
+**Ownership:** Codex implements and submits; Claude independently audits the
+completed compact shards, selection, and any interpretation before paper use.
+SG29 adapts [NERVE: Neighbourhood & Entropy-guided Random-walk for Training
+Free Open-Vocabulary Segmentation](https://arxiv.org/abs/2511.08248) by
+Kunal Mahatha B, Jose Dolz, and Christian Desrosiers; see the
+[released code](https://github.com/kunal-mahatha/nerve/) and BibTeX
+`mahatha2025nerve`. Provenance: GoCA→historical SG24 A3 CA,
+PEARL→SG28 geometry/Laplacian tests (none promoted), NERVE→SG29
+head weighting/local affinity/stopped walk.
+
+SG29 fixes historical A3, module-15 64×64 SA calls 10–20 with eight heads,
+class-word W, and unchanged R2. Registered cells are N0 historical FINE-P2;
+N1 spatial-semantic-entropy weighted P2; N2 stopped walk over original SD
+softmax SA; N3 local eight-neighbor Q/K cosine stopped walk; N4 global/local
+fusion stopped walk; N5 N2 with semantic head weights; N6 N4 with weights.
+N2 lengths 1/2/5 are **diagnostics**, not selectable candidates. All cells
+receive raw and R2 scores, five-fold VOC selection, frozen COCO transfer,
+paired 20k intervals, per-class metrics, and reduced diagnostics. No
+generated image, attention map, mask, or Q/K is retained.
+
+NERVE uses multiclass semantic entropy; SG29 necessarily uses *spatial
+entropy of a single class-word propagated map*. It retains SD scaled-dot-
+product softmax global SA; NERVE's global affinity is cosine based. Released
+NERVE scripts differ: the efficient final script uses α=.9, β=.8 and L=10;
+a separate clean script uses c=3 and a 0.01 self weight but L=30. SG29 locks
+the explicit hybrid α=.9, β=.8, L=10, c=3, self=.01 and shifted cosine
+`(sim+1)/2+1e-6`. This is **not** an exact NERVE reproduction or a parameter
+sweep. See `configs/sg29.json`. Claude should review these distinctions.

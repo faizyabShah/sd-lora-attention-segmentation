@@ -6546,3 +6546,31 @@ future paper mention should distinguish its negative selection outcome from
 its small, exploratory boundary-aware transfer signal. The compact score and
 reduced diagnostic shards are shared; generated images and attention maps
 were not retained.
+
+## 113. SG29 NERVE-inspired experiment and Claude handoff (Codex; 26 October 2026)
+
+Codex owns implementation/submission; Claude owns independent review of the
+locked cells, source provenance, compact results, and proposed paper claims.
+The user requested this experiment now and will request results after it runs;
+do not monitor the job continuously. Paper and source provenance are in ideas
+Section 18 and `paper/references.bib` (`mahatha2025nerve`). The manuscript
+related-work paragraph names SG29 as ongoing, without claiming an outcome.
+
+Historical A3 CA and R2 stay frozen. SG29 uses module-15 64×64 SA, calls
+10–20, all eight heads; global transitions remain original SD softmax SA.
+N0 is exact historical observation-wise P2. N1 changes only class-conditioned
+head weights; N2 changes only to a geometrically stopped walk; N3 is local
+Q/K eight-neighbor walk; N4 fuses original global plus local; N5 combines N1
+and N2; N6 combines all three. Main cells N0–N6 are assessed raw and +R2.
+N2 L=1/2/5 are explicitly diagnostic. Parameter constants are frozen in
+`configs/sg29.json`, with mixed released-script provenance called out there.
+NERVE's multiclass output entropy becomes spatial entropy of a one-class
+map; it must never be called a direct NERVE reproduction. No COCO tuning.
+
+The runner writes per-image atomic metric and reduced diagnostic shards;
+the merger rejects partial 490/707 coverage, selects on fixed VOC folds,
+freezes VOC thresholds on COCO, and exports per-class and paired-bootstrap
+results. GT enters only scoring and post-hoc diagnostics. CPU operator tests
+cover stochastic local rows, weights, stopped-walk mass, and map invariants.
+The live smoke, if GPUs are available, checks N0 against SG28 raw/R2 counts.
+Claude should review completed results before any pipeline or paper promotion.
