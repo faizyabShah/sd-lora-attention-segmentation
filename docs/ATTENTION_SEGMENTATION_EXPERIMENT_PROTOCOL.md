@@ -6574,3 +6574,14 @@ results. GT enters only scoring and post-hoc diagnostics. CPU operator tests
 cover stochastic local rows, weights, stopped-walk mass, and map invariants.
 The live smoke, if GPUs are available, checks N0 against SG28 raw/R2 counts.
 Claude should review completed results before any pipeline or paper promotion.
+
+**Submission handoff (26 October 2026).** CPU operator and merge-diagnostic
+smokes passed in `trdp`; no GPU was available on the login node for a live
+diffusion smoke. GPU array **237597** was submitted as 40 resumable class
+shards (20 VOC, 20 COCO), at most four concurrent, any GPU node, 24 hours
+per shard. Each image verifies N0 against its SG28 raw/R2 counts before the
+per-image checkpoint is written. CPU merge **237598** has
+`afterok:237597` and rejects incomplete 490/707 coverage. These are
+submission facts, not performance results. Claude can review commit
+`2a1626fdb` and the final merged outputs after completion; the user requested
+no continuous monitoring.
