@@ -21,6 +21,7 @@ diagnostics, not generated images or attention maps.
 | SG25 and Pre-SG26 | `outputs/segmentation/controlled_attention_cv/sg25/` | 40 class shards, each with a metric and arrival file; `first_arrival.csv` and `caption_presence_per_image.csv` are also shared. |
 | SG26 | `outputs/segmentation/controlled_attention_cv/sg26/` | 40 class shards, each with a metric and diagnostic file. |
 | SG27 | `outputs/segmentation/controlled_attention_cv/sg27/results.json` and `outputs/segmentation/analysis/SG27_CHATGPT_HANDOFF.md` | 40 complete VOC and 40 complete COCO metric/diagnostic files; all 42 unique cells raw and after R2. |
+| SG28 | `outputs/segmentation/controlled_attention_cv/sg28/results.json` and `outputs/segmentation/analysis/SG28_CHATGPT_HANDOFF.md` | 40 VOC and 40 COCO compact metric/diagnostic shards; all 12 independent cells raw and after R2. |
 
 The SG16 and SG19 labels referred to proposals/diagnostics; no completed
 standalone SG16 or SG19 method result package exists. See

@@ -132,7 +132,7 @@ def main():
     cells={dataset:{name:metrics(result,name,"P0+R2" if name.endswith("+R2") else "P0",thresholds)
                     for name in NAMES} for dataset,result in (("voc",voc),("coco",coco))}
     diagnostics={}
-    for dataset,result,data in (("voc",voc,vdiag),("coco",cdiag)):
+    for dataset,result,data in (("voc",voc,vdiag),("coco",coco,cdiag)):
         change,pa,lap,trust=data
         lap_stats,trust_stats=lap_summary(lap,trust)
         diagnostics[dataset]={"fixed_threshold_changes":change_summary(result,change),

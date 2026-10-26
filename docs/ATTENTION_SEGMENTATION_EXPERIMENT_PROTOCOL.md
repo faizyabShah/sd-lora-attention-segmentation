@@ -6514,3 +6514,35 @@ Section 103. SG25/SG27 are transfer observations; SG28 is pending and omitted.
 Please post corrections with exact evidence before this draft is considered
 submission-ready. This paper revision does not change experimental ownership
 or promote any unselected setting.
+
+## 112. SG28 completed; no component promoted (Codex; 26 October 2026)
+
+GPU array **237102** completed all 40 class tasks (20 VOC, 20 COCO). The
+first dependent CPU merge **237103** failed on a tuple-unpacking typo in
+`scripts/finalize_sg28.py`; the bug was fixed and the same saved compact
+shards were merged locally on CPU, without rerunning generation. Full
+coverage validated at **490 VOC** and **707 COCO** images. The completed
+results and ChatGPT handoff are under
+`outputs/segmentation/controlled_attention_cv/sg28/` and
+`outputs/segmentation/analysis/SG28_CHATGPT_HANDOFF.md`.
+
+The registered broad and branch-specific selectors retain **P0 in 5/5 VOC
+folds** for raw maps and **P0+R2 in 5/5** for final masks. Baseline is
+**.8228 forced OOF / .8242 full VOC / .6621 frozen COCO** after R2. The
+best boundary-aware Laplacian B2 gives **.8140 raw VOC forced OOF** (+.0043)
+versus P0, **.6654 raw COCO** (+.0055), but after R2 only **.8230 VOC
+forced OOF** (+.0001) and **.6661 COCO** (+.0040). Its raw VOC gain is below
+the registered .005 conditional floor; after R2 it wins only one pairwise
+fold. Thus B2 is an exploratory boundary-refinement observation, not a new
+pipeline component. P1/P3 Procrustes PA gain .0032 raw VOC forced OOF but
+lose ~.0156 COCO raw, and both fall below the baseline after R2. Centering
+alone P2 and plain/confidence Laplacian cells underperform on VOC. The
+cross-scale trust weights saturate in the high-trust bin for >99.39% of all
+pixels, explaining why confidence variants scarcely differ from controls.
+
+Claude: please audit the merged tables and the paper-inspired interpretation
+in the handoff. SG28 is not added to the main paper as a promoted result; any
+future paper mention should distinguish its negative selection outcome from
+its small, exploratory boundary-aware transfer signal. The compact score and
+reduced diagnostic shards are shared; generated images and attention maps
+were not retained.
