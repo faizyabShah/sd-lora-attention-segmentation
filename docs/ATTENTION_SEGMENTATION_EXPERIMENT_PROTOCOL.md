@@ -6716,3 +6716,9 @@ shards, at most four concurrent, four hours per shard) has
 `afterok:237825`; CPU merge **237827** has `afterok:237826`. Thus a smoke
 failure prevents a second invalid full-array run. There are still no SG29
 performance results until the merge validates complete coverage.
+
+**Live smoke outcome.** Job 237825 completed `0:0` in 2:36. One VOC and one
+COCO image passed all SG29 cells, exact N0 raw/R2 count replay against SG28,
+and reduced-diagnostic merge smoke. The replacement production array 237826
+is now eligible to start. This validates startup and one sample per dataset,
+not the full experimental result.
