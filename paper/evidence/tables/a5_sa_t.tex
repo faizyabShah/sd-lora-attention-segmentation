@@ -1,0 +1,26 @@
+\begin{table}[H]\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{3.22cm}rrrrrr}
+\toprule
+Configuration & mIoU@0.45 & $\Delta$ vs reference & mIoU@0.35 & mIoU@0.55 & Mean AP & SD across folds \\
+\midrule
+all 00 30 & 0.7556 & 0.0000 & 0.7213 & 0.7466 & 0.9536 & 0.0121 \\
+window 00 04 & 0.6105 & -0.1452 & 0.5513 & 0.6432 & 0.8907 & 0.0175 \\
+window 05 09 & 0.7290 & -0.0266 & 0.6893 & 0.7286 & 0.9424 & 0.0130 \\
+window 10 14 & 0.7569 & 0.0012 & 0.7241 & 0.7470 & 0.9535 & 0.0118 \\
+window 15 20 & 0.7636 & 0.0079 & 0.7354 & 0.7477 & 0.9548 & 0.0110 \\
+window 21 25 & 0.7661 & 0.0105 & 0.7412 & 0.7453 & 0.9544 & 0.0100 \\
+window 26 30 & 0.7687 & 0.0131 & 0.7447 & 0.7447 & 0.9545 & 0.0098 \\
+trailing 05 30 & 0.7617 & 0.0060 & 0.7318 & 0.7473 & 0.9549 & 0.0114 \\
+trailing 10 30 & 0.7650 & 0.0093 & 0.7376 & 0.7474 & 0.9552 & 0.0108 \\
+trailing 15 30 & 0.7663 & 0.0107 & 0.7407 & 0.7465 & 0.9549 & 0.0103 \\
+trailing 21 30 & 0.7675 & 0.0119 & 0.7432 & 0.7452 & 0.9545 & 0.0098 \\
+trailing 26 30 & 0.7687 & 0.0131 & 0.7447 & 0.7447 & 0.9545 & 0.0098 \\
+cumulative 00 04 & 0.6105 & -0.1452 & 0.5513 & 0.6432 & 0.8907 & 0.0175 \\
+cumulative 00 09 & 0.6956 & -0.0600 & 0.6390 & 0.7114 & 0.9318 & 0.0151 \\
+cumulative 00 14 & 0.7276 & -0.0280 & 0.6813 & 0.7337 & 0.9454 & 0.0136 \\
+cumulative 00 20 & 0.7441 & -0.0116 & 0.7042 & 0.7429 & 0.9508 & 0.0132 \\
+cumulative 00 25 & 0.7510 & -0.0046 & 0.7143 & 0.7454 & 0.9526 & 0.0126 \\
+\bottomrule
+\end{tabular}
+\caption{SA-T: call windows (in-sample; all 79 configurations, including every single call and leave-one-call-out, in controlled\_\allowbreak{}sa\_\allowbreak{}package\_\allowbreak{}a.csv)}\label{tab:a5_sa_t}
+\end{table}

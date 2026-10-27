@@ -1,0 +1,13 @@
+\begin{table}[H]\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{3.06cm}>{\raggedright\arraybackslash}p{2.11cm}>{\raggedright\arraybackslash}p{1.73cm}r}
+\toprule
+Component & With & Without & $\Delta$ mIoU@0.45 \\
+\midrule
+T within T+L+H & T + L + H & L + H & -0.0046 \\
+L within T+L+H & T + L + H & T + H & 0.0093 \\
+H within T+L+H & T + L + H & T + L & 0.0005 \\
+R within T+R+H & T + R + H & T + H & -0.0040 \\
+\bottomrule
+\end{tabular}
+\caption{SA-C: removing one component from the full combination (in-sample)}\label{tab:a6_sa_c_components}
+\end{table}

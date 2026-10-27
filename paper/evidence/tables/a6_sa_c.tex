@@ -1,0 +1,21 @@
+\begin{table}[H]\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{4.26cm}rrrrr>{\raggedright\arraybackslash}p{1.51cm}}
+\toprule
+Configuration & mIoU@0.45 & $\Delta$ vs reference & mIoU@0.35 & mIoU@0.55 & Mean AP & Fold votes \\
+\midrule
+reference (16 SA modules, 31 calls, 8 heads) & 0.7556 & 0.0000 & 0.7213 & 0.7466 & 0.9536 & 0/\allowbreak{}5 \\
+T: call 30 only & 0.7710 & 0.0153 & 0.7465 & 0.7457 & 0.9551 & 0/\allowbreak{}5 \\
+R: resolutions 8+64 & 0.7676 & 0.0119 & 0.7414 & 0.7399 & 0.9542 & 0/\allowbreak{}5 \\
+L: module 15 only (U3.2) & 0.7887 & 0.0330 & 0.7691 & 0.7532 & 0.9560 & 5/\allowbreak{}5 \\
+H: heads 1, 4, 6 & 0.7613 & 0.0057 & 0.7295 & 0.7470 & 0.9552 & 0/\allowbreak{}5 \\
+T + R & 0.7749 & 0.0193 & 0.7659 & 0.7244 & 0.9517 & 0/\allowbreak{}5 \\
+T + L & 0.7820 & 0.0264 & 0.7704 & 0.7260 & 0.9474 & 0/\allowbreak{}5 \\
+T + H & 0.7732 & 0.0175 & 0.7534 & 0.7412 & 0.9563 & 0/\allowbreak{}5 \\
+R + H & 0.7656 & 0.0099 & 0.7389 & 0.7343 & 0.9534 & 0/\allowbreak{}5 \\
+L + H & 0.7871 & 0.0314 & 0.7637 & 0.7554 & 0.9587 & 0/\allowbreak{}5 \\
+T + R + H & 0.7692 & 0.0136 & 0.7669 & 0.7098 & 0.9512 & 0/\allowbreak{}5 \\
+T + L + H & 0.7825 & 0.0268 & 0.7658 & 0.7330 & 0.9514 & 0/\allowbreak{}5 \\
+\bottomrule
+\end{tabular}
+\caption{SA-C: the combined confirmation (one run, in-sample values; fold votes from the 5-fold selection)}\label{tab:a6_sa_c}
+\end{table}

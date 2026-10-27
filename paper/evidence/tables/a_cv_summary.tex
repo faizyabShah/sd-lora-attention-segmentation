@@ -1,0 +1,15 @@
+\begin{table}[H]\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.40cm}>{\raggedright\arraybackslash}p{1.40cm}>{\raggedright\arraybackslash}p{1.40cm}>{\raggedright\arraybackslash}p{1.40cm}rrr>{\raggedright\arraybackslash}p{1.40cm}>{\raggedright\arraybackslash}p{1.40cm}>{\raggedright\arraybackslash}p{1.40cm}}
+\toprule
+Screen & Package & Reference & Vote winner (votes) & OOF mIoU reference & OOF mIoU choice & OOF gain & Paired $\Delta$ image IoU [95\% CI] & $\Delta$ mIoU @0.35 /\allowbreak{} 0.45 /\allowbreak{} 0.55 & Outcome \\
+\midrule
+CA-T & A (Codex) & time/\allowbreak{}all\_\allowbreak{}00\_\allowbreak{}30 & time/\allowbreak{}all\_\allowbreak{}00\_\allowbreak{}30 (5/\allowbreak{}5) & 0.6661 & 0.6661 & 0.0000 & +0.0000 [+0.0000, +0.0000] & +0.0000 /\allowbreak{} +0.0000 /\allowbreak{} +0.0000 & reference won the fold vote \\
+CA-R & A (Codex) & resolution/\allowbreak{}r8\_\allowbreak{}r16\_\allowbreak{}r32\_\allowbreak{}r64 & resolution/\allowbreak{}r8\_\allowbreak{}r16\_\allowbreak{}r64 (5/\allowbreak{}5) & 0.6661 & 0.6957 & 0.0296 & +0.0211 [+0.0139, +0.0286] & +0.0009 /\allowbreak{} +0.0296 /\allowbreak{} +0.0442 & fold vote and OOF guard passed \\
+CA-L & B (Claude) & L/\allowbreak{}all\_\allowbreak{}16 & L/\allowbreak{}leave2\_\allowbreak{}10\_\allowbreak{}11 (5/\allowbreak{}5) & 0.6661 & 0.6923 & 0.0262 & +0.0209 [+0.0155, +0.0265] & -0.0021 /\allowbreak{} +0.0262 /\allowbreak{} +0.0501 & fold vote and OOF guard passed \\
+CA-H & B (Claude) & H/\allowbreak{}0\_\allowbreak{}1\_\allowbreak{}2\_\allowbreak{}3\_\allowbreak{}4\_\allowbreak{}5\_\allowbreak{}6\_\allowbreak{}7 & H/\allowbreak{}0\_\allowbreak{}2\_\allowbreak{}3\_\allowbreak{}4\_\allowbreak{}5\_\allowbreak{}6\_\allowbreak{}7 (4/\allowbreak{}5) & 0.6661 & 0.6741 & 0.0080 & +0.0089 [+0.0047, +0.0131] & -0.0002 /\allowbreak{} +0.0104 /\allowbreak{} +0.0193 & fold vote and OOF guard passed \\
+CA-A & B (Claude) & A/\allowbreak{}cond\_\allowbreak{}padded\_\allowbreak{}all & A/\allowbreak{}cond\_\allowbreak{}padded\_\allowbreak{}all (5/\allowbreak{}5) & 0.6661 & 0.6661 & 0.0000 & +0.0000 [+0.0000, +0.0000] & +0.0000 /\allowbreak{} +0.0000 /\allowbreak{} +0.0000 & reference won the fold vote \\
+CA-C & C (Claude) & C/\allowbreak{}reference & C/\allowbreak{}R (4/\allowbreak{}5) & 0.6653 & 0.6914 & 0.0260 & +0.0217 [+0.0145, +0.0293] & +0.0010 /\allowbreak{} +0.0303 /\allowbreak{} +0.0447 & fold vote and OOF guard passed \\
+\bottomrule
+\end{tabular}
+\caption{Controlled CA screens (VOC-Sim, 5 folds, selection at threshold 0.45). The single-axis screens promote candidates; only the combined confirmation (CA-C) freezes the CA.}\label{tab:a_cv_summary}
+\end{table}

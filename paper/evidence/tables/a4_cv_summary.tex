@@ -1,0 +1,11 @@
+\begin{table}[H]\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.40cm}>{\raggedright\arraybackslash}p{1.40cm}>{\raggedright\arraybackslash}p{1.40cm}rrr>{\raggedright\arraybackslash}p{1.40cm}>{\raggedright\arraybackslash}p{1.40cm}>{\raggedright\arraybackslash}p{1.42cm}}
+\toprule
+Screen & Reference & Vote winner (votes) & OOF mIoU reference & OOF mIoU choice & OOF gain & Paired $\Delta$ image IoU [95\% CI] & $\Delta$ mIoU @0.35 /\allowbreak{} 0.45 /\allowbreak{} 0.55 & Outcome \\
+\midrule
+SA-L & SL/\allowbreak{}all\_\allowbreak{}16 & SL/\allowbreak{}single\_\allowbreak{}15 (5/\allowbreak{}5) & 0.7553 & 0.7884 & 0.0331 & +0.0417 [+0.0365, +0.0469] & +0.0477 /\allowbreak{} +0.0331 /\allowbreak{} +0.0068 & fold vote and OOF guard passed \\
+SA-H & SH/\allowbreak{}0\_\allowbreak{}1\_\allowbreak{}2\_\allowbreak{}3\_\allowbreak{}4\_\allowbreak{}5\_\allowbreak{}6\_\allowbreak{}7 & SH/\allowbreak{}1\_\allowbreak{}4\_\allowbreak{}6 (5/\allowbreak{}5) & 0.7553 & 0.7610 & 0.0057 & +0.0065 [+0.0056, +0.0074] & +0.0083 /\allowbreak{} +0.0057 /\allowbreak{} +0.0004 & fold vote and OOF guard passed \\
+\bottomrule
+\end{tabular}
+\caption{Controlled SA package B (frozen CA seed; VOC-Sim, 5 folds, selection at 0.45). SA-C combines these with SA-T/\allowbreak{}SA-R.}\label{tab:a4_cv_summary}
+\end{table}

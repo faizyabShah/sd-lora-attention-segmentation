@@ -1,0 +1,17 @@
+\begin{table}[H]\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{r>{\raggedright\arraybackslash}p{1.73cm}>{\raggedright\arraybackslash}p{3.25cm}r}
+\toprule
+Round & Removed & Heads left & mIoU@0.45 \\
+\midrule
+0 & --- & 0 1 2 3 4 5 6 7 & 0.6661 \\
+1 & 1 & 0 2 3 4 5 6 7 & 0.6765 \\
+2 & 5 & 0 2 3 4 6 7 & 0.6718 \\
+3 & 7 & 0 2 3 4 6 & 0.6609 \\
+4 & 0 & 2 3 4 6 & 0.6388 \\
+5 & 2 & 3 4 6 & 0.6005 \\
+6 & 6 & 3 4 & 0.5444 \\
+7 & 3 & 4 & 0.4344 \\
+\bottomrule
+\end{tabular}
+\caption{CA-H: greedy backward elimination (in-sample)}\label{tab:a1_ca_h_greedy}
+\end{table}

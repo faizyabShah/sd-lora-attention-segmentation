@@ -1,0 +1,556 @@
+{
+ "sg5_contrastive_seed": {
+  "title": "SG5 contrastive cross-attention seed",
+  "sections": "66, 70",
+  "what": "Tests whether contrasting the class-word cross-attention (CA) probability against other prompt positions closes the coverage gap between the class-word seed (seed recall 0.82) and OVAM's released token (0.93) without losing precision. Only the per-head map entering the frozen CA average changes; every seed is then run through the same five fixed pipelines. Training-free for the W-variants; the token variants use OVAM's released token, frozen.",
+  "names": "Each name is <seed>/<pipeline>. Seeds: W = class word, p_T (mean softmax probability of the class word pieces over the 77 padded prompt keys; frozen convention); WS = log p_T - log p_SoT (contrast with the start token); WK = p_T/(p_T + p_SoT) (class word in OVAM's two-key form); WN = log p_T - log mean of p over all non-target positions; WE = log p_T - log mean of p over <EoT> and padding positions; WY = mean of p_T over the class word and its fixed synonyms (same template; 8 classes have no synonym, so WY = W for them); TC = OVAM released token with keys [<SoT>, token], p_tok (few-shot reference, T-C); TS = log p_tok - log p_SoT. Pipelines: seed = CA map alone, no propagation; REF = one observation-wise SA pass through module 15, mean_i(A_i c); P1 = two passes, mean_i(A_i^2 c); R2 = REF followed by OVAM's fixed DenseCRF (note: here 'R2' alone means REF+DenseCRF); P1+R2 = two passes + DenseCRF (FTF for W). 8 seeds x 5 pipelines = 40 cells.",
+  "reference": "Four separate screens: W/REF (seed effect under one pass; candidates WS/WK/WN/WE/WY at REF), W/P1+R2 = FTF (candidates the same five at P1+R2), TC/REF (candidate TS/REF) and TC/R2 = T-C few-shot pipeline (candidate TS/R2). The seed and P1 cells of non-screened pipelines are reported only.",
+  "outcome": "The reference won 5/5 folds in all four screens and nothing was frozen (OOF W/REF 0.7873, W/P1+R2 0.8134, TC/REF 0.8496, TC/R2 0.8647). The log-ratio seeds raise seed recall to 0.96-0.98 but cut precision to 0.47-0.67 (Section 70).",
+  "unsure": ""
+ },
+ "sg1_sg3_graph_refinement": {
+  "title": "SG1/SG3 anchored graph refinement",
+  "sections": "68, 71",
+  "what": "Asks whether confident foreground/background anchors can keep the object completion of SA propagation while limiting leakage. SG1 solves a foreground-before-background absorbing walk (hitting probability) on the mean SA graph; SG3 is a finite-step confidence-locked baseline. The anchor quantiles, an optional image-border background band and (for SG3) the number of steps are varied, on both the class-word (W) and released-token (T) tracks.",
+  "names": "<track>/<family>/f<FF>_b<BB>_r<R>[_n<N>]. Track W = class-word CA seed, T = OVAM released token. The graph is the mean row-stochastic SA affinity (all 31 calls x 8 heads of module 15). fFF = foreground anchors are pixels at or above quantile 0.FF of the min-max-normalized 64x64 seed (f80/f90/f95 = top 20/10/5%). bBB = background anchors at or below quantile 0.BB (b05/b10 = bottom 5/10%). rR = border width: r0 none, r1 also adds a one-pixel image border to the background anchors (foreground wins at overlap). SG1 = clamp anchors to 1/0 and iterate the mean graph, re-clamping each step, until max change < 1e-4 or 200 iterations. SG3 = start from the CA seed, apply nN mean-graph steps (n1 or n2), restoring the original CA values at both anchor sets after each step. REF = observation-wise one pass mean_i(A_i c); P1 = observation-wise two passes mean_i(A_i^2 c). 12 SG1 + 24 SG3 + 2 references = 38 cells per track, 76 total.",
+  "reference": "W/REF for screens W-SG1 and W-SG3, T/REF for T-SG1 and T-SG3 (each family screened independently against its track's one-pass map). P1 is recomputed and reported only.",
+  "outcome": "No family met the 4/5 rule; W-SG1, W-SG3 and T-SG1 kept REF 5/5 (OOF 0.7873 word, 0.8507 token); T-SG3 kept T/REF with 3/5 votes (candidate chosen in 2 folds, selected-path OOF 0.8507 -> 0.8534, +0.0027). Best token cell T/SG3/f95_b05_r0_n1 led to the locked confirmation (Section 72).",
+  "unsure": ""
+ },
+ "sg8_observation_consensus": {
+  "title": "SG8 observation-consensus propagation",
+  "sections": "73, 78, 80",
+  "what": "Asks whether agreement among the 248 individual SA observations (31 denoising calls x 8 heads of module 15) identifies pixels where propagation is reliable. Each z_i = A_i c is computed separately (affinities are never averaged before propagation) and combined by four independent families: robust aggregation, variance-guided retention of the seed, symmetric sign agreement, and expansion-only agreement. Screened separately on the class-word (W) and released-token (T) tracks.",
+  "names": "<track>/<family>/<parameter>; track W = class word, T = OVAM released token. REF = ordinary mean mu = mean_i z_i (one pass). A = per-pixel robust aggregate instead of the mean: trim10 / trim20 = trimmed mean removing floor(0.1*248)=24 / floor(0.2*248)=49 observations from each tail; median = median (mean of the two central values). B/tauXpYY = variance-guided CA retention, u*c + (1-u)*mu with u = sigma/(sigma+tau), sigma = per-pixel population std of the z_i; tau in {0.02, 0.05, 0.10, 0.20} ('p' = decimal point). C/rhoXpYY = symmetric sign agreement: mu where r_up >= rho or r_down >= rho, else keep the seed c, where r_up / r_down = fraction of observations with z_i > c / z_i < c; rho in {0.60, 0.70, 0.80, 0.90}. D/rhoXpYY = expansion-only agreement: max(c, mu) where r_up >= rho, else c; same rho values. 16 cells per track, 32 total.",
+  "reference": "W/REF and T/REF (the ordinary observation-wise one-pass mean); each family A-D is its own screen against its track's REF.",
+  "outcome": "Two screens froze. W-C froze W/C/rho0p80 (4/5, OOF 0.7875 -> 0.7970, +0.0095; COCO 0.6213 vs 0.6178) and T-A froze T/A/median (4/5, OOF 0.8508 -> 0.8544, +0.0036; COCO 0.6742 vs 0.6683). W-A had a positive path (+0.0067) but only 3/5 votes; B and D lost; T-C kept REF.",
+  "unsure": ""
+ },
+ "sg9_reciprocal_propagation": {
+  "title": "SG9 reciprocal SA propagation",
+  "sections": "74, 78, 80",
+  "what": "Tests whether propagation edges supported in both spatial directions are more reliable than asymmetric long-range shortcuts. Each of the 248 per-observation affinities A_i is made reciprocal before a single observation-wise pass; three reciprocity operators are compared with the original A on the class-word and released-token tracks.",
+  "names": "<track>/<operator>; W = class word, T = OVAM released token. REF = original row-stochastic A_i (one pass, mean_i A_i c). R1_geometric = sqrt(A_i * A_i^T) elementwise, then row-normalized. R2_minimum = min(A_i, A_i^T) elementwise, then row-normalized. R3_soft_gate = A_i * sqrt(A_i^T), then row-normalized. Every operator is formed per call/head before propagation; one pass only. 4 cells per track, 8 total.",
+  "reference": "W/REF and T/REF (one track-wise screen each); tie preference R3 > R1 > R2.",
+  "outcome": "REF won 5/5 on both tracks and nothing froze (OOF W 0.7875, T 0.8508). R1/R2 changed full-VOC mIoU only slightly (W 0.7913/0.7904 vs 0.7888) and R3 lowered it (0.7743).",
+  "unsure": ""
+ },
+ "sg10_seed_connected_bottleneck": {
+  "title": "SG10 seed-connected bottleneck propagation",
+  "sections": "75, 77, 79",
+  "what": "Tests whether pixels that propagation correctly adds are more strongly connected to the confident seed (by the widest-path, max-min bottleneck strength in the mean SA graph) than false-positive leakage. The ordinary one-pass map is kept as evidence and modulated by the rank-normalized bottleneck score; the operator, graph and seed-source quantile are varied on the class-word and released-token tracks.",
+  "names": "<track>/<cell>; W = class word, T = OVAM released token. seed = CA map alone; REF = mu = mean_i(A_i c), one observation-wise pass; P1 = two passes (reported only). Candidates <Op>_<G>_q<QQ>: qQQ = seed sources S_F are pixels with c >= the QQth percentile (q90/q95 = top 10/5%), used as sources only, never clamped. G1 = mean affinity A_bar as a directed graph; G2 = sqrt(A_bar * A_bar^T) (symmetric). Bn = exact widest-path strength from S_F on the dense 4096-node graph, converted to percentile rank (frozen from a smoke test before any score). Op: B1 = mu*Bn; B2a25 / B2a50 = mu*(alpha + (1-alpha)*Bn) with alpha 0.25 / 0.50; B3 = c + Bn*(mu - c) where mu > c, else mu (expansion gated by connectivity). L_<Op>_q<QQ> = the same operators on a local graph (G2 weights restricted to 4-neighbour edges); diagnostic only, never selectable. 16 candidates + seed, REF, P1 + 8 L cells = 27 per track, 54 total.",
+  "reference": "W/REF for SG10-W and T/REF for SG10-T, over the 16 candidates each (seed, P1 and L_* are reported only).",
+  "outcome": "The reference won 5/5 in both screens and nothing froze (OOF W/REF 0.7873, T/REF 0.8496). The best cell, B3, stays below REF (W 0.7824-0.7827 vs 0.7886), and the bottleneck AUC for new TP vs new FP is at or below chance (Section 79).",
+  "unsure": ""
+ },
+ "sg2_consensus_edges": {
+  "title": "SG2 consensus-edge SA graph",
+  "sections": "81, 85",
+  "what": "Tests whether reweighting each SA edge by how consistently the 248 observations agree on it reduces leakage while keeping object completion. Edges are reweighted, never pruned, by a reliability score r raised to a power gamma, either in one consensus mean graph or per observation, with one or two propagation passes; run on class-word and released-token tracks (the token track is diagnostic only under Section 82).",
+  "names": "<track>/<form>_<rel>_g<GG>_n<N>; W = class word, T = OVAM released token (diagnostic). rel = per-edge reliability: cv = mean_i A_i / sqrt(mean_i A_i^2) = 1/sqrt(1+CV^2) (1 when all observations agree); occ = (number of observations with A_i(p,q) > 1/4096, plus 0.5) / 249 (share of observations where the edge is above uniform). gGG = exponent gamma: g05 = 0.5, g10 = 1, g20 = 2; weights A * r^gamma. form: G = one consensus graph W = rownorm(A_bar * r^gamma), map W c (n1) or W(W c) (n2); O = per observation A~_i = rownorm(A_i * r^gamma), map mean_i A~_i c (n1) or mean_i A~_i^2 c (n2). nN = passes (1 or 2). Other cells: seed = CA alone; REF = mean_i(A_i c); P1 = mean_i(A_i^2 c); MG2 = A_bar^2 c (mean graph squared; diagnostic). 24 candidates + 4 = 28 per track, 56 total.",
+  "reference": "Four screens: one-pass candidates (n1) against REF and two-pass candidates (n2) against P1, per track. Tie order gamma 0.5 > 1 > 2, then cv > occ, then G > O.",
+  "outcome": "SG2-W-1pass froze W/G_cv_g20_n1 (5/5, OOF 0.7873 -> 0.7984, +0.0111; COCO 0.6234 vs 0.6173, paired +0.0158 [+0.0129, +0.0187]); SG2-W-2pass kept W/P1 (0.7997). The token diagnostic also froze T/G_cv_g20_n1 (0.8496 -> 0.8568); T 2-pass kept T/P1. The frozen one-pass cell matches, but does not beat, P1 (0.8005 full VOC).",
+  "unsure": ""
+ },
+ "sg4_region_labels": {
+  "title": "SG4 SA regions labelled by CA",
+  "sections": "81, 85",
+  "what": "Segments the image into regions using self-attention only (spectral or row clustering of the mean SA graph), then gives each region a single score from cross-attention evidence, producing a piecewise-constant map. Partition type, number of regions K and the region-labelling statistic are varied on class-word and released-token tracks (the token track is diagnostic only). A GT-majority oracle labelling measures how good the partitions themselves are.",
+  "names": "<track>/<PART><K>_<label>; W = class word, T = OVAM released token (diagnostic). PART: SPEC = k-means on the K leading row-normalized eigenvectors of D^-1/2 S D^-1/2 with S = (A_bar + A_bar^T)/2 (spectral clustering); ROWS = k-means on the L2-normalized rows of A_bar. K in {8, 16, 32} regions (deterministic k-means++, seed 0, 3 restarts, 30 iterations). label: cmean = region mean of the CA seed c; cmed = region median of c; rmean = region mean of the one-pass REF map. seed = CA alone; REF = mean_i(A_i c). 18 candidates + 2 = 20 per track, 40 total.",
+  "reference": "W/REF and T/REF (one screen per track). Tie order cmean > cmed > rmean, then SPEC > ROWS, then K 8 > 16 > 32.",
+  "outcome": "REF won 5/5 on both tracks (OOF W 0.7873, T 0.8496); the best W cell SPEC32_rmean reaches 0.7898 vs 0.7886 in-sample. The oracle-labelled partitions reach 0.80-0.88 mean-image IoU on VOC-Sim (SPEC32 0.8761) and 0.61-0.80 on COCO-Cap, so the bottleneck is labelling, not the partition.",
+  "unsure": ""
+ },
+ "training_free_backlog": {
+  "title": "Training-free Track-A backlog (14 families)",
+  "sections": "82, 83, 86",
+  "what": "One package that screens the 14 remaining training-free backlog ideas (diffusion kernels, multi-resolution propagation, background suppression, head weighting, DiffSeg-style and query-feature segmentation, SA mean field) against the class-word one-pass reference. Only frozen SD 1.5 class-word CA and module-15 SA (all 31 calls x 8 heads) are used; each family independently selects its parameter and threshold in the five VOC-Sim folds.",
+  "names": "Format <family>/<parameter>; numeric suffixes are the value x 100 as 3 digits (e.g. t050 = 0.5, w1000 = 10). A_bar = mean module-15 SA affinity; c = min-max CA seed. REF/one_pass = mean_i(A_i c). P3/tXXX = heat-kernel diffusion exp(t(A_bar - I)) c truncated at 8 terms (k = 0..8), diffusion time t = 0.5/1/2/4. P5/nK = K = 1..4 applications of the symmetric normalized graph D^-1/2 S D^-1/2, S = (A_bar + A_bar^T)/2. P9/sXXX_bgB = coarse-to-fine propagation through the mean graph of the last SA module at 8 -> 16 -> 32 -> 64 resolution, keeping the confident seed (c >= s, s = 0.5/0.7/0.9) as a floor after each step; bg1 multiplies by 1 - minmax(the same expansion of the start-token (BOS) CA map), bg0 does not. F2/aXXX = REF x (alpha + (1 - alpha) x minmax(column sums of A_bar)), alpha = 0/0.25/0.5/0.75. BG1/gXXX = binary mask REF > gamma x (A_bar applied to the BOS CA map), gamma = 0.5/0.75/1.0/1.25/1.5. W1/TXXX = weighted mean of the 248 observation maps z_i with weights proportional to (1/spatial entropy of z_i)^(1/T), T = 0.5/1/2. W2/kK = average of only the K = 2/4/6 of 8 heads whose call-mean propagated map has the highest Pearson correlation with c. W4/converged = iterate x <- minmax(A_bar x) from c until max change < 1e-4 (max 50 iterations). H1/proportional = one-step propagation of c through the last SA module at each of 8/16/32/64 resolution, averaged with weights proportional to resolution. G1/tauXXX = DiffSeg merging on A_bar (16x16 anchor grid, 3 symmetric-KL merge rounds, KL threshold tau = 0.9/1.1, no k-means refinement); each region scored by its mean REF. G4/sXXX = binary seeded region growing: 4-connected components of neighbouring pixels whose call-mean SA query features have cosine >= s (0.5/0.7/0.9), kept if they contain a CA peak (c >= 0.9). M1/ca_prototype = cosine of each pixel's SA query feature to one CA-weighted mean prototype. M2/kK = k-means (K = 2/3/4, 20 iterations) on query features of the top-20% CA pixels; score = max cosine to the K prototypes. R1/wXXX = 5 mean-field iterations q <- sigmoid(logit(minmax REF) + w A_bar (2q - 1)), pairwise weight w = 1/3/10. BG1 and G4 output binary masks, so the mask threshold does not affect them. 44 cells.",
+  "reference": "REF/one_pass (class-word one SA pass, mean_i(A_i c)), against which each of the 14 families is an independent screen.",
+  "outcome": "REF/one_pass won 5/5 in all 14 screens; nothing promoted (OOF 0.7875, COCO 0.6178). Best full-VOC cells: R1/w100 0.7929 and P5/n2 0.7895 vs REF 0.7888. The label-using diagnostic C1 (per-class thresholds) reaches 0.8348 but is excluded from the label-free pipeline.",
+  "unsure": "The protocol and config say only 'last sorted SA module at each resolution' for the 8/16/32 levels used by P9 and H1; the exact module names were not checked. Operator details (BOS map, 50-iteration cap for W4, CA-peak = min-max c >= 0.9 for G4, top-20% CA quantile for M2) were confirmed in configs/training_free_backlog.json and src/segmentation/training_free_backlog.py, not in the report."
+ },
+ "sg11_sg12_observation_reliability": {
+  "title": "SG11 robust consensus and SG12 reliable observations",
+  "sections": "84, 89",
+  "what": "Two class-word-only follow-ups to SG8. SG11 combines SG8's sign-agreement gate with a robust aggregate (median or 20% trimmed mean) in place of the plain mean. SG12 instead keeps only the most mutually consistent SA observations (by mean cosine similarity of their propagated maps to all other observations) and averages those. Each is an independent screen against the one-pass reference, with SG8 cells recomputed as controls.",
+  "names": "All cells are class-word (W). REF = one pass mean_i(A_i c), no DenseCRF. Controls recomputed from SG8: C/rho0p80 = SG8-C sign consensus at rho 0.80; A/trim20 and A/median = SG8-A robust aggregates. SG11/<agg>/rhoXpYY: per pixel, use the robust aggregate where max(r_up, r_down) >= rho, otherwise keep the seed c; agg = median (mean of the two central values of 248) or trim20 (drop floor(0.2*248) = 49 observations from each tail); r_up / r_down = fraction of observations with z_i > c / z_i < c; rho in {0.70, 0.80, 0.90} ('p' = decimal point). SG12/topNN: rank the 248 observations by mean cosine similarity of their raw propagated vector to all other observations (self excluded) and average the raw vectors of the top NN% (ceil(fraction*248): top50 = 124, top70 = 174, top80 = 199, top90 = 224). 14 cells.",
+  "reference": "W/REF (one pass without DenseCRF) for both screens; the SG8 controls are reported for context, not as references.",
+  "outcome": "Recovered after the finalizer audit (Sec. 89), from within-package V100 comparisons: SG11 froze W/SG11/trim20/rho0p80 (5/5, OOF 0.7873 -> 0.7984, +0.0111; COCO 0.6219 vs 0.6172) and SG12 froze W/SG12/top50 (5/5, OOF 0.7873 -> 0.7967, +0.0094; COCO 0.6272).",
+  "unsure": ""
+ },
+ "sg2_densecrf_confirmation": {
+  "title": "Locked SG2 + DenseCRF confirmation",
+  "sections": "87, 89",
+  "what": "A locked confirmation (no parameter search) of whether the promoted one-pass SG2 consensus graph, followed by OVAM's fixed DenseCRF, beats the final training-free pipeline FTF (two passes + DenseCRF). Six cells are computed from each single generation.",
+  "names": "All class-word (W). REF = mean_i(A_i c); P1 = mean_i(A_i^2 c); SG2 = the Section 85 winner W/G_cv_g20_n1 exactly: G = rownorm(A_bar * r^2), r = mean_i A_i / sqrt(mean_i A_i^2), map G c. +R2 = followed by OVAM's fixed DenseCRF on the thresholded mask; P1+R2 = FTF.",
+  "reference": "Primary: W/P1+R2 (FTF), candidate W/SG2+R2. Secondary: W/REF+R2, isolating SG2's contribution under identical postprocessing. The no-CRF cells check that SG2 reproduces.",
+  "outcome": "Recovered after the finalizer audit (Sec. 89): primary kept FTF with 0/5 candidate votes; locked SG2+R2 OOF 0.8111 vs FTF 0.8132 (-0.0021); COCO 0.6261 vs 0.6371. Secondary vs REF+R2: +0.0064 OOF (0.8047 -> 0.8111) but only 2/5 votes, so W/REF+R2 stays frozen.",
+  "unsure": ""
+ },
+ "sg13_target_region_inference": {
+  "title": "SG13 target-conditioned region labelling",
+  "sections": "88, 90",
+  "what": "Tests whether simple target-conditioned scores can label the fixed SPEC32 SA regions well enough to recover SG4's oracle headroom. Three fixed region-scoring rules (no learned components) threshold raw region scores into hard region masks; class-word only.",
+  "names": "All class-word (W). REF = one pass; P1 = two passes; SG4/SPEC32_rmean = legacy SG4 control (32 spectral regions, region mean of REF, min-max then bilinear, thresholds 0.30-0.70); C/rho0p80 = SG8-C consensus control. SG13/R1-R3 on the same SPEC32 partition, with per-region C = mean c, P = mean of raw one-pass mu, Q = mean of q = max(fraction z_i > c, fraction z_i < c), M = max c: R1 = P; R2 = P*Q; R3 = 0.5*M + 0.5*P*Q. The raw region score is thresholded (grid 0-1 in steps of 0.005), then region labels are nearest-expanded to annotation size. 7 cells.",
+  "reference": "W/REF; R1, R2, R3 screened individually and as a joint family (tie order R1 > R2 > R3).",
+  "outcome": "All four screens (R1, R2, R3, joint) kept W/REF 5/5, OOF 0.7875, gain 0. Full-VOC R1/R2/R3 = 0.7685/0.7537/0.7039 vs REF 0.7888; the same-generation majority oracle is 0.8758 (VOC) and 0.7928 (COCO) mean-image IoU.",
+  "unsure": "The report also lists a 'Historical selected SG2 (Section 85)' row (0.7984/0.6234); it is a copied historical comparator, not a configuration recomputed in this package."
+ },
+ "sg12_crf": {
+  "title": "Locked SG12 + DenseCRF confirmation",
+  "sections": "91, 92",
+  "what": "Locked confirmation of whether the frozen SG12 top-50% observation filter, followed by the fixed OVAM DenseCRF, beats the final training-free pipeline FTF (two passes + DenseCRF). No CRF or SG12 parameter is tuned.",
+  "names": "All class-word (W). REF = mean_i(A_i c); P1 = mean_i(A_i^2 c) (observation-wise, not (mean A)^2 c); SG12/top50 = mean of the raw propagated maps of the 124 of 248 observations with the highest leave-one-out mean cosine similarity to the others; +R2 = fixed OVAM DenseCRF (parameters 10, 80, 13, 3, 3, 5) on the thresholded mask. P1+R2 = FTF. 5 cells.",
+  "reference": "W/P1+R2 (FTF); candidate W/SG12/top50+R2. Unrefined SG12 is diagnostic.",
+  "outcome": "Protocol kept W/P1+R2 5/5; forced candidate OOF 0.811526 vs FTF 0.813209 (-0.0017); full VOC 0.813126 vs 0.813209; COCO 0.631503 vs 0.637141.",
+  "unsure": ""
+ },
+ "sg14": {
+  "title": "SG14 SG11 x SG12 complementarity",
+  "sections": "91, 92",
+  "what": "Tests whether SG12 (dropping globally unreliable observations) and SG11 (location-specific consensus gate with robust aggregation) are complementary. A single fixed combination is computed with no tuning: SG11's trim20/rho 0.80 rule applied only over SG12's top-50% observations. Success requires beating both parents, not just REF.",
+  "names": "All class-word (W). REF = one pass; SG11/trim20/rho0p80 = frozen SG11 cell (20% trimmed mean where max(r_up, r_down) >= 0.80, else seed c); SG12/top50 = frozen SG12 cell (mean of the 124 most consistent of 248 observations). SG14 = among SG12's 124 retained observations, compute r_up/r_down and a 20% trimmed mean (24 removed per tail); use the trimmed mean where max(r_up, r_down) >= 0.80, else c. No CRF. 4 cells.",
+  "reference": "Three screens: SG14 vs W/REF, vs W/SG11/trim20/rho0p80 and vs W/SG12/top50, plus a joint vote; success needed positive OOF and >= 4/5 votes against both parents.",
+  "outcome": "SG14 froze against REF (5/5, OOF 0.798651 vs 0.787280) but each parent was retained 5/5 in its own screen (SG11 0.798400, SG12 0.796658), and the joint screen kept SG11; COCO SG14 0.621678 vs SG11 0.621916 and SG12 0.627174. The complementarity criterion is not met.",
+  "unsure": ""
+ },
+ "sg15": {
+  "title": "SG15 prior-driven SPEC32 region refinement",
+  "sections": "91, 92, 93",
+  "what": "Instead of recognising the target from region statistics (SG13), SG15 uses an already-good pixelwise mask as the semantic prior and the fixed SPEC32 SA partition only as a spatial regulariser. Each region's fraction of prior-foreground pixels decides whether the region is projected to foreground, snapped, or left as is. Three frozen priors are refined separately, each at its own inherited threshold; Section 93 is a 20-image visual diagnostic of the same rules against the GT-majority oracle, not part of the table.",
+  "names": "<prior>[/SG15-<rule>]; all class-word (W). Priors: P1 = two passes mean_i(A_i^2 c); SG11/trim20/rho0p80 and SG12/top50 = the frozen SG11 and SG12 cells; REF = one pass (control). For each SPEC32 region, f = fraction of its annotation-resolution pixels in the thresholded prior mask (threshold inherited from the unrefined prior, never re-selected). SG15-A025 / A050 / A075 = majority projection: the whole region is foreground if f >= q, q = 0.25 / 0.50 / 0.75, else background (q chosen inside the VOC training folds in the A screen). SG15-B = confidence snapping: f >= 0.75 -> whole region foreground, f <= 0.25 -> whole region background, otherwise keep the prior's pixels. 16 cells.",
+  "reference": "Each refinement is screened against its own unrefined prior (W/P1, W/SG11/trim20/rho0p80, W/SG12/top50): six screens (3 priors x A, B).",
+  "outcome": "All six screens kept their prior 5/5. Best refinement SG11+B: OOF 0.798934 vs 0.798400, COCO 0.622023 vs 0.621916, no eligible vote; all A variants hurt OOF.",
+  "unsure": ""
+ },
+ "token_sg3_confirmation": {
+  "title": "Locked token-SG3 confirmation",
+  "sections": "72, 78, 80",
+  "what": "A locked confirmation of the strongest SG1/SG3 signal: the fixed token confidence-lock T/SG3/f95_b05_r0_n1, with and without OVAM's DenseCRF, against the one- and two-pass token references. No graph parameter is selected; only each fixed cell's mask threshold is chosen inside the folds.",
+  "names": "All on the T track (OVAM released optimized token, keys [<SoT>, token]). REF = observation-wise one SA pass; P1 = observation-wise two passes; SG3 = fixed confidence-locked candidate f95_b05_r0_n1: top-5% foreground and bottom-5% background anchors, no border band, one mean-graph step through SA module 15 with anchor values restored to the CA seed; +R2 = followed by OVAM's fixed DenseCRF. 6 cells.",
+  "reference": "Registered fixed comparisons: P1 vs REF, P1+R2 vs REF+R2, SG3 vs REF, SG3+R2 vs REF+R2, and SG3+R2 vs P1+R2; the key test is T/SG3+R2 vs T/REF+R2.",
+  "outcome": "T/SG3 vs T/REF OOF 0.8507 -> 0.8562 (+0.0056, paired +0.0059 [+0.0013, +0.0105]); T/SG3+R2 vs T/REF+R2 0.8643 -> 0.8674 (+0.0030, paired CI [-0.0020, +0.0076]); vs T/P1+R2 +0.0020 (CI crosses zero). COCO T/SG3+R2 0.7006 vs T/REF+R2 0.6850, transfer only; not promoted (Sections 78, 80).",
+  "unsure": "The package report.md and summary.json give only fixed-cell OOF comparisons, with no fold votes or 'frozen' field; the 'VOC does not promote it' decision is taken from protocol Sections 78 and 80."
+ },
+ "sg17": {
+  "title": "SG17 reliability-filtered second-pass additions",
+  "sections": "94, 95",
+  "what": "Asks whether the second SA propagation pass can be kept only where the individual observations agree that it should add foreground. Seed is the frozen class-word CA map; the 248 observations are 31 calls x 8 heads of SA module 15. Where the second pass lowers the score it is kept as is; a raw increase is kept only at pixels where at least a cutoff fraction of observations increase from pass 1 to pass 2. The cutoff (top 30/20/10% of VOC positive-increment pixels) is the only thing varied; CRF was to run only if a candidate was promoted.",
+  "names": "Prefix W/ = frozen training-free class-word CA seed. W/P1 = ordinary observation-wise two-pass map mean_i(A_i^2 c) over all 248 observations, calls 0-30 (in this older naming 'P1' is the two-pass map; SG22 later calls the same thing ALL-P2). W/SG17-Q70, -Q80, -Q90 = gated map y1 + min(y2-y1,0) + 1[q_up >= cutoff]*max(y2-y1,0), where y1 is the one-pass mean, y2 the two-pass mean and q_up the fraction of the 248 observations whose second-pass value exceeds the first; Q70/Q80/Q90 set the cutoff so that the top 30/20/10% of VOC positive-increment pixels pass. All three collapsed to the same cutoff (248/248 observations, 39.93% of increments retained), so the three rows are identical. No +R2 cells were run.",
+  "reference": "W/P1, the ungated two-pass map, i.e. the existing method that the gate tries to improve.",
+  "outcome": "W/P1 won all 5 VOC folds and was frozen; no SG17 cell promoted. Forced OOF 0.7991 vs 0.7998 (gain -0.0007), full VOC 0.8001 vs 0.8007, frozen COCO 0.6196 vs 0.6249; DenseCRF confirmation skipped because no cell was promoted.",
+  "key_results": [],
+  "unsure": "The 0.7991 OOF value is quoted from protocol Section 97; report.md gives only the -0.0007 gain."
+ },
+ "sg18_temporal_windowed": {
+  "title": "SG18 temporal-windowed one-pass propagation",
+  "sections": "96, 97",
+  "what": "Asks whether one-pass SA propagation improves when the per-observation maps are averaged over only part of the 31 denoising calls instead of all of them. Seed, SA module 15 and all 8 heads are fixed; only the call window changes (three preregistered windows). No CRF; the two-pass map is shown as an external benchmark but cannot win.",
+  "names": "Prefix W/ = class-word CA seed. All cells are one-pass means of A_i c over the listed calls x 8 heads of SA module 15. W/REF = calls 0-30 (248 observations). W/T1 = calls 10-20 (88 observations; the 'middle' window, later called MID-P1). W/T2 = calls 10-30 (168). W/T3 = calls 6-30 (200, drops the first six calls). W/P1 = two-pass all-call map mean_i(A_i^2 c) (later ALL-P2), external benchmark only, not eligible for selection.",
+  "reference": "W/REF, the one-pass all-call average the windows are meant to improve on.",
+  "outcome": "W/T1 won 5/5 VOC folds and was promoted. OOF 0.7939 vs REF 0.7873 (+0.0066); full VOC 0.7959 vs 0.7886; frozen COCO 0.6285 vs 0.6172. T2 and T3 had positive forced OOF gains but 0/5 votes.",
+  "key_results": [],
+  "unsure": ""
+ },
+ "sg18_t1_crf": {
+  "title": "SG18 follow-up: T1 window + DenseCRF",
+  "sections": "98",
+  "what": "Asks whether the promoted one-pass middle-window map (T1) plus the unchanged OVAM DenseCRF beats the established final pipeline, two-pass all-call propagation plus the same CRF (FTF). Four cells share each generated trajectory; no window or CRF parameter is selected.",
+  "names": "Prefix W/ = class-word CA seed. W/T1 = one-pass mean over SA calls 10-20 x 8 heads of module 15 (SG18 winner; later MID-P1). W/P1 = two-pass all-call map mean_i(A_i^2 c), calls 0-30 (later ALL-P2). Suffix +R2 = the fixed OVAM DenseCRF on the thresholded mask. W/P1+R2 is FTF.",
+  "reference": "W/P1+R2 (FTF), the then-final training-free pipeline.",
+  "outcome": "W/P1+R2 received 5/5 VOC fold votes; T1+R2 not promoted. Forced OOF 0.8106 vs 0.8135 (-0.0029); full VOC 0.8122 vs 0.8135; frozen COCO 0.6465 vs 0.6375 (transfer only).",
+  "key_results": [],
+  "unsure": ""
+ },
+ "sg21_structural": {
+  "title": "SG21 structural SA-head weighting",
+  "sections": "101",
+  "what": "Keeps the SG18/T1 setup (one pass, calls 10-20) but replaces the equal average over the 8 heads within each call with weights from a GT-free structural descriptor of each head's attention matrix. Four preregistered weightings; the 11 call outputs are still averaged equally. No CRF.",
+  "names": "SG18/T1 = equal-head one-pass mean, SA module 15, calls 10-20. SG21-LM = head weights proportional to raw radius-1 local attention mass. SG21-LM-RANK = weights proportional to ascending local-mass rank 1-8 (ties by physical head ID). SG21-ENT = weights proportional to (largest head entropy in that call - head's mean row entropy + 1e-8), favouring sharp heads. SG21-DIST = weights proportional to inverse mean query-key distance (+1e-8). Weights are normalized to sum to 1 within each call.",
+  "reference": "SG18/T1, same-generation; the method whose head average is being reweighted.",
+  "outcome": "T1 won 5/5 VOC folds; no structural weighting promoted. Forced OOF T1 0.7939, LM 0.7884, LM-RANK 0.7901, ENT 0.7872, DIST 0.7941 (+0.0002, below the promotion guard); DIST frozen COCO 0.6287 vs T1 0.6285.",
+  "key_results": [],
+  "unsure": ""
+ },
+ "sg22": {
+  "title": "SG22 call window x propagation depth factorial",
+  "sections": "102",
+  "what": "Full factorial crossing the SA call window (all 31 calls vs middle calls 10-20) with propagation depth (1, 2 or 3 passes of each observation's own SA matrix), each scored raw and after the fixed DenseCRF. Seed is the class-word CA map; module 15, all 8 heads. Raw and CRF levels are screened separately.",
+  "names": "Pattern WINDOW-Pk[+R2]. WINDOW: ALL = SA calls 0-30 (248 call/head observations); MID = calls 10-20 (88). Pk = mean over observations of A_i^k c, k = 1, 2, 3 passes (P1 = one pass, P2 = two passes, P3 = three). +R2 = fixed OVAM DenseCRF. Correspondences with older names: ALL-P1 = W/REF, ALL-P2 = old W/P1 (two-pass), ALL-P2+R2 = FTF, MID-P1 = SG18 W/T1, MID-P1+R2 = W/T1+R2. MID-P2+R2 is the operator used downstream from SG24 on.",
+  "reference": "Raw: ALL-P2 (two-pass all-call map). CRF: ALL-P2+R2 (FTF, the final pipeline at the time).",
+  "outcome": "Raw screen kept ALL-P2 (3/5 votes). CRF screen selected MID-P2+R2 (4/5 votes; selected OOF 0.8158 vs 0.8132); forced OOF 0.8168, full VOC 0.8185 vs 0.8132, frozen COCO 0.6438 vs 0.6372.",
+  "key_results": [],
+  "unsure": ""
+ },
+ "sg23": {
+  "title": "SG23 call window x reliability rule factorial",
+  "sections": "102",
+  "what": "Asks whether three earlier reliability-based aggregation rules (SG2 graph, SG11 trimmed consensus, SG12 top-half observations) still help once propagation is restricted to the middle calls. 2 windows x 4 aggregation rules, all one pass, raw and after the fixed DenseCRF, plus a same-generation FTF reference outside the factorial.",
+  "names": "Pattern WINDOW-RULE[+R2]. WINDOW: ALL = calls 0-30 (248 observations), MID = calls 10-20 (88). RULE (all one pass, module 15, 8 heads): R0 = ordinary mean of A_i c (MID-R0 = T1, ALL-R0 = REF); SG2 = locked consensus-edge graph G_cv_g20_n1, one pass through W = rownorm(mean_i A_i * r^2) with r = mean_i A_i / sqrt(mean_i A_i^2), i.e. each edge reweighted by its squared cross-observation agreement (gamma 2); SG11 = 20%-per-tail trimmed mean of the observation maps gated by directional consensus at rho 0.80; SG12 = mean of the top 50% observations by leave-one-out cosine (124 of 248 for ALL, 44 of 88 for MID). +R2 = fixed DenseCRF. ALL-P2 / ALL-P2+R2 = two-pass all-call map without / with CRF (ALL-P2+R2 = FTF), auxiliary references outside the factorial.",
+  "reference": "Raw: MID-R0 (= SG18/T1). Final: ALL-P2+R2 (FTF). MID-R0+R2 is reported separately.",
+  "outcome": "Raw screen selected MID-SG2 (5/5; OOF 0.7999 vs T1 0.7939; COCO 0.6292 vs 0.6287). CRF screen kept ALL-P2+R2 (4/5); no final cell promoted. Window x rule interactions are negative on VOC OOF and COCO.",
+  "key_results": [],
+  "unsure": "Exact SG11 gating operator (how the rho 0.80 consensus gate combines with the trimmed mean) was taken from the protocol wording, not re-derived from code."
+ },
+ "sg24_a": {
+  "title": "SG24-A automatic CA seed construction",
+  "sections": "103",
+  "what": "Changes only how the CA seed is built from the selected 11 CA modules (calls 0-30, all heads), testing four automatic weighting schemes adapted from GoCA-style ideas against equal aggregation. Each variant is scored as a CA-only map and through the final pipeline (MID-P2 + R2).",
+  "names": "Pattern Ak/LEVEL. Ak = CA construction: A0 = existing equal aggregation; A1 = per-pixel content-token mass rescaling (content tokens exclude special/padding tokens, punctuation and stopwords); A2 = projected-output CA head contribution weights (v_h = (A_h V_h) W_h^O, score s_h = v_h . sum_j v_j, GoCA dot-product normalization); A3 = pseudo-global / paired-SA similarity layer (module) weights: a pseudo-global map from the conditional Q of up_blocks.2.attentions.1 attn2 is compared with each layer's paired mean-head SA affinity, weights nonnegative and normalized within each call, calls averaged equally; A4 = A1+A2+A3 combined. LEVEL: /CA = CA-only seed map, thresholded directly (no SA, no CRF); /FINAL = seed -> MID-P2 (SA module 15, calls 10-20, 8 heads, two observation-wise passes) -> R2 DenseCRF.",
+  "reference": "A0/CA and A0/FINAL, same generation; A0/FINAL reproduces SG22 MID-P2+R2.",
+  "outcome": "CA-only screen kept A0 5/5; final screen kept A0 (A3 got 3/5 votes, selected-path OOF 0.81616 vs 0.81689). Forced A3/FINAL won 4/5 held-out folds, OOF 0.82297 vs 0.81689, full VOC 0.8243 vs 0.8185, COCO 0.6620 vs 0.6437; not a formal promotion, but the owner later adopted A3 -> MID-P2 -> R2 as the exploratory working default (protocol Section 103). A1/A4 score 0 on COCO because class-only prompts make content rescaling spatially constant. Caveat: A3's SA similarity uses a transposed affinity orientation relative to GoCA (protocol Sec. 107); on four images the correction changes per-call module weights by 0.9-2.0% (Sec. 114), and a corrected replay has not been run.",
+  "key_results": [],
+  "unsure": "Protocol Section 107 documents an implementation issue: A3's affinity similarity uses a transposed SA orientation relative to GoCA (scores M^T vs P). Section 114 measured it as changing per-call module weights by 0.9-2.0% relative on four images. So A3 is a transposed GoCA-style adaptation, not a faithful GoCA weighting."
+ },
+ "sg24_b": {
+  "title": "SG24-B CA module set: 11 vs all 16",
+  "sections": "103",
+  "what": "Asks whether adding back the five excluded CA modules (including all 32x32 modules) helps when layer weights are set automatically by A3. Because SG24-A promoted no automatic method, the preregistered fallback A3 was used, so this package is diagnostic and cannot promote anything.",
+  "names": "Pattern Bm-A3/LEVEL. B0 = the 11 selected CA modules; B1 = all 16 CA modules, including the 32x32 ones; -A3 = A3 automatic layer weighting (from SG24-A) recomputed over that module set; /CA = CA-only seed map; /FINAL = seed -> MID-P2 -> R2 (same as SG24-A).",
+  "reference": "B0-A3/CA and B0-A3/FINAL, the 11-module A3 seed (same as SG24-A's A3 cells, regenerated).",
+  "outcome": "B1-A3/FINAL lost all five VOC folds: OOF 0.8152 vs 0.8230, full VOC 0.8152 vs 0.8244; frozen COCO rose 0.6622 -> 0.6703 (transfer only, cannot override VOC). SG24-B is recorded as diagnostic (A3 fallback). Caveat: A3's SA similarity uses a transposed affinity orientation relative to GoCA (protocol Sec. 107); on four images the correction changes per-call module weights by 0.9-2.0% (Sec. 114), and a corrected replay has not been run.",
+  "key_results": [],
+  "unsure": "Per Section 107, the A3 transpose affects the 11 resized modules but not the five 32x32 modules, so B1 mixes two orientations; the reported ~31% weight on the 32x32 group is affected."
+ },
+ "sg25": {
+  "title": "SG25 multi-resolution SA propagation (+ Pre-SG26 first-arrival diagnostic)",
+  "sections": "104",
+  "what": "Asks whether coarser SA modules (16x16, 32x32), alone or paired with the fine 64x64 module, give better two-step propagation of the A3 seed than fine-only propagation. Each cell applies two propagation operations taken from the same diffusion call, with calls 10-20 and all heads; raw and after R2. The same run also records at which propagation depth (1-5) each fine-map pixel first becomes foreground (diagnostic only).",
+  "names": "All cells: A3 CA seed, SA calls 10-20, all 8 heads, two propagation operations, output at 64x64. FINE-P2 = both passes with the 64x64 module 15 (= MID-P2; A3/FINE-P2+R2 is the working default). COARSE16-P2 / COARSE32-P2 = seed area-downsampled to 16x16 / 32x32, both passes with the final up-path SA module at that size, result bilinearly upsampled to 64. 16-to-64 / 32-to-64 (shown as 16->64, 32->64) = first pass with the 16 / 32 module (its heads averaged), upsample, second pass with each 64x64 head. 64-to-16 = first pass 64x64, area-downsample, second pass 16x16, upsample. Modules: up_blocks.1/.2/.3 .attentions.2.transformer_blocks.0.attn1 for 16/32/64. +R2 = fixed DenseCRF.",
+  "reference": "FINE-P2 and FINE-P2+R2, the existing fine-only operator (same generation).",
+  "outcome": "Raw and R2 screens kept the fine reference in all five folds; nothing promoted. FINE-P2+R2 0.82425 VOC / 0.66210 COCO. Frozen COCO favoured 16-to-64+R2 (0.6975) and COARSE32-P2+R2 (0.6948), but both lost on VOC (forced OOF 0.8170 and 0.8138 vs 0.8228). First-arrival TP rate fell with depth: VOC 0.865 -> 0.223, COCO 0.708 -> 0.117 (depth 1 -> 5). Caveat: A3's SA similarity uses a transposed affinity orientation relative to GoCA (protocol Sec. 107); on four images the correction changes per-call module weights by 0.9-2.0% (Sec. 114), and a corrected replay has not been run.",
+  "key_results": [],
+  "unsure": "Inherits the A3 orientation caveat (Section 107/114)."
+ },
+ "sg26": {
+  "title": "SG26 coarse-gated fine SA",
+  "sections": "105",
+  "what": "Asks whether coarse SA can constrain fine SA without replacing it: the fine 64x64 attention matrices are multiplied elementwise by a gate lifted from the coarse (16 or 32) attention of the same call, then row-normalized. The gate is used on both passes or only on the second; raw and after R2, A3 seed, calls 10-20.",
+  "names": "S0 = FINE-P2 (two ordinary 64x64 passes). S1 = SG25 16-to-64. S2 = SG25 32-to-64 (repeat controls). Gated operator: per call, average the 8 coarse attention matrices at 16 (or 32), block-lift to the 64x64 grid (each fine pixel mapped to its coarse cell), multiply each fine head's matrix elementwise by the lifted gate, row-normalize. S3 / S4 = 16- / 32-gated fine SA on both passes. S5 / S6 = ordinary fine pass 1, then 16- / 32-gated fine pass 2. +R2 = fixed DenseCRF. These S numbers are unrelated to SG27's, except that S0-S2 are the same base maps.",
+  "reference": "S0 and S0+R2 (FINE-P2, the working default).",
+  "outcome": "Raw and R2 screens chose S0 in 5/5 folds; no gate promoted. Final VOC/COCO: S0 0.8242/0.6621, S3 0.7992/0.6817, S4 0.7993/0.6746, S5 0.8201/0.6821, S6 0.8193/0.6773. Caveat: A3's SA similarity uses a transposed affinity orientation relative to GoCA (protocol Sec. 107); on four images the correction changes per-call module weights by 0.9-2.0% (Sec. 114), and a corrected replay has not been run.",
+  "key_results": [],
+  "unsure": "Inherits the A3 orientation caveat."
+ },
+ "sg27": {
+  "title": "SG27 late fusion of three SA output maps",
+  "sections": "106, 109",
+  "what": "Asks whether a fixed, parameter-free pixelwise combination of three completed propagation maps (fine, 16->64, 32->64 from SG25) beats the fine map alone. Only the fusion formula varies (46 proposed, 42 numerically unique); every fused map is scored raw and after R2. No coarse attention modifies the fine SA matrices.",
+  "names": "Base maps, each min-max normalized before fusion: F = FINE-P2 (= S0), C16 = 16-to-64 (= S1), C32 = 32-to-64 (= S2); every fused map is min-max normalized again; +R2 = fixed DenseCRF. Pairwise operators in a fixed order: mean, geometric mean sqrt(ab), harmonic 2ab/(a+b+eps), RMS, max, min, product ab, soft OR a+b-ab, agreement-weighted first map a(1-|a-b|), agreement-weighted mean ((a+b)/2)(1-|a-b|). F with C16: S3 mean, S4 geometric, S5 harmonic, S6 RMS, S7 max, S8 min, S9 product, S10 soft OR, S13 F(1-|F-C16|), S14 agreement-weighted mean. F with C32: S16 mean, S17 geometric, S18 harmonic, S19 RMS, S20 max, S21 min, S22 product, S23 soft OR, S25 F(1-|F-C32|), S26 agreement-weighted mean. C16 with C32 (no fine map): S27 mean, S28 geometric, S29 harmonic, S30 max, S31 min, S32 soft OR. All three maps: S33 mean, S34 geometric (cube root of product), S35 harmonic, S36 RMS, S37 max, S38 min, S39 soft OR 1-(1-F)(1-C16)(1-C32), S40 median, S41 mean of the top two, S42 mean of the bottom two. Fine-anchored: S43 F(1-|F-(C16+C32)/2|), S44 F*sqrt((1-|F-C16|)(1-|F-C32|)), S45 max(F, (C16+C32)/2). S11, S12, S15, S24 were exact duplicates (S11 = S15 = S7, S12 = S8, S24 = S20) and were dropped, leaving 42 unique cells (84 with +R2), numbered S0-S45 with gaps.",
+  "reference": "S0 / S0+R2 = FINE-P2 alone (the working default, A3 -> FINE-P2 -> R2).",
+  "outcome": "Raw and R2 multi-candidate VOC screens selected S0 in 5/5 folds; S0+R2 stays at 0.8242 VOC / 0.6621 COCO. S8+R2 (F/C16 min) had the best full VOC (0.8258) and S38+R2 (three-way min) the best forced OOF (0.8256, +0.0028), both below the promotion gate. S9+R2 (F x C16 product) reached 0.7054 frozen COCO but lost VOC (forced OOF 0.8123; VOC threshold 0.300 at the grid edge). Caveat: A3's SA similarity uses a transposed affinity orientation relative to GoCA (protocol Sec. 107); on four images the correction changes per-call module weights by 0.9-2.0% (Sec. 114), and a corrected replay has not been run.",
+  "key_results": [],
+  "unsure": "The brief said S0..S41, but the cell names actually run S0-S45 with S11, S12, S15, S24 missing (42 unique cells). The handoff notes that S4 (geometric) and S9 (product) rank pixels identically and differ only through the discrete threshold grid. Inherits the A3 orientation caveat."
+ },
+ "sg28": {
+  "title": "SG28 PEARL-inspired components (Procrustes alignment, Laplacian smoothing)",
+  "sections": "110, 112",
+  "what": "Tests two independent, never-combined components adapted from PEARL on top of the working default A3 -> FINE-P2. (a) Recompute module-15 SA after per-head Q/K centering and/or Procrustes alignment of keys to queries. (b) Smooth the final normalized score on a 64x64 grid graph, optionally with image-boundary edge weights and/or cross-scale confidence. Raw and after R2.",
+  "names": "P0 = exact historical A3 -> FINE-P2 map (SA module 15, calls 10-20, 8 heads, two observation-wise passes). Caution: here P1-P3 are Procrustes variants, not propagation depths. PA branch: P1 = weighted query-norm centering then SVD Procrustes rotation K -> Q (rotation applied to uncentered K); P2 = weighted centering only; P3 = uniform centering then SVD Procrustes. Laplacian branch, solving (D_rho + L)F = D_rho f on the 4-neighbour grid with f = normalized P0 score: B1 = unit edges, rho = 1; B2 = image-boundary edge weights exp(-5|I_i - I_j|) from the grayscale generated image, rho = 1; C1 / C2 / C3 = unit edges with confidence rho = 1-|f-c16|, 1-|f-c32|, or 1 minus the average three-scale pairwise disagreement (c16/c32 = the coarse-path maps); D1 / D2 / D3 = the same rho with B2's boundary edges. +R2 = fixed DenseCRF.",
+  "reference": "P0 / P0+R2, the working default.",
+  "outcome": "Every selector kept P0 (raw) and P0+R2 (final) in 5/5 VOC folds; nothing promoted. Baseline after R2 0.8228 forced OOF / 0.8242 full VOC / 0.6621 COCO. Best component B2: raw forced OOF 0.8140 (+0.0043, below the +0.005 floor), raw COCO 0.6654; after R2 0.8230 (+0.0001) and COCO 0.6661. Caveat: A3's SA similarity uses a transposed affinity orientation relative to GoCA (protocol Sec. 107); on four images the correction changes per-call module weights by 0.9-2.0% (Sec. 114), and a corrected replay has not been run. SG28 has not yet been independently re-audited.",
+  "key_results": [],
+  "unsure": "Section 114 states SG28 had not yet been audited by Claude at that time."
+ },
+ "sg29": {
+  "title": "SG29 NERVE-inspired head weighting and stopped random walk",
+  "sections": "113",
+  "what": "Adapts ideas from NERVE to the working default: class-conditioned head weights from the spatial entropy of each head's output, a geometrically stopped (damped) random walk instead of exactly two passes, and a local Q/K 8-neighbour transition fused with the global SA. Seven main cells, raw and after R2, plus three walk-length diagnostics.",
+  "names": "All cells: historical A3 CA seed, SA module 15 at 64x64, calls 10-20, 8 heads; global transitions are the original SD softmax SA. N0 = exact historical observation-wise two-pass map (P2; = SG28 P0). N1 = N0 with class-conditioned head weights softmax(-3H) within each call, H = spatial entropy of the head's one-step output divided by log(4096). N2 = geometrically stopped walk sum_{d=0..10} 0.9^d A^d c / sum_d 0.9^d per head, heads averaged. N3 = the same walk on a local transition (8-neighbour (cos(Q,K)+1)/2 + 1e-6, plus 0.01 self weight, row-normalized). N4 = walk on the fused transition 0.8 x global + 0.2 x local. N5 = N1 head weights + N2 walk. N6 = all three (fused walk with entropy head weights). N2-L1 / -L2 / -L5 = N2 truncated at walk length 1 / 2 / 5 (diagnostic only). +R2 = fixed DenseCRF.",
+  "reference": "N0 / N0+R2, the exact historical working default (checked per image against SG28 counts).",
+  "outcome": "Registered; running (GPU array 237597 with dependent merge 237598, protocol Section 113). No results yet.",
+  "key_results": [],
+  "unsure": "Constants (alpha 0.9, beta 0.8, length 10, entropy concentration 3, self weight 0.01) come from configs/sg29.json and src/segmentation/sg29_nerve.py; the exact head-weight source for N6 (weights from the fused one-step output) was read from code but not cross-checked against the protocol text."
+ },
+ "pre_sg16_sg17": {
+  "title": "Pre-SG16 / Pre-SG17 region and second-pass diagnostics",
+  "sections": "94",
+  "what": "Diagnostic only (no method selected). Pre-SG16 asks whether any GT-free region statistic can tell which SPEC32 regions are really foreground, especially regions where the P1 prior is ambiguous (occupancy 0.2-0.8), scored by region ROC-AUC against a GT-majority label. Pre-SG17 asks whether observation agreement predicts whether a pixel change made by the second SA pass is useful (FN->TP, FP->TN) or harmful, at fixed threshold 0.45. Run on all 490 VOC / 707 COCO images.",
+  "names": "Region features: p1/sg11/sg12_occupancy = fraction of the region marked foreground by the frozen P1 (two-pass), SG11 or SG12 prior mask; occupancy_mean/max = across the three priors; ca_mean, p1_mean = mean raw score in the region; obs_all_* / obs_top50_* = a statistic (mean, median, trim20, r_max directional consensus, etc.) of the per-observation region means over all 248 observations or the SG12 top-124. Subsets: all, ambiguous_p1, wrong_p1, priors_agree/disagree. Pixel signals: second_q_direction = fraction of observations whose second pass moves in the proposed direction; *_median/_trim10_direction = median/trimmed change; top50_* = same on top-124 observations; support_reliability = SG12 reliability of supporting observations; first_r_max = first-pass consensus.",
+  "reference": "",
+  "outcome": "On ambiguous P1 regions the best simple prior-occupancy ROC-AUC is 0.686 VOC / 0.673 COCO vs 0.597 / 0.631 for the best observation statistic, so no SG16 recovery signal. Best second-pass signal (second_q_direction) gives useful/harmful ROC-AUC 0.617 VOC / 0.634 COCO, below the preregistered 0.65 SG17 bar.",
+  "key_results": [
+   [
+    "Ambiguous-P1 regions, best occupancy ROC-AUC, VOC",
+    "0.686"
+   ],
+   [
+    "Ambiguous-P1 regions, best occupancy ROC-AUC, COCO",
+    "0.673"
+   ],
+   [
+    "Ambiguous-P1 regions, best observation statistic ROC-AUC VOC / COCO",
+    "0.597 (obs_top50_median) / 0.631 (obs_all_median)"
+   ],
+   [
+    "All regions, p1_occupancy ROC-AUC VOC / COCO",
+    "0.951 / 0.907"
+   ],
+   [
+    "Second-pass useful vs harmful ROC-AUC, second_q_direction, VOC / COCO",
+    "0.617 / 0.634"
+   ],
+   [
+    "Preregistered SG17 go bar (ROC-AUC)",
+    "0.65"
+   ],
+   [
+    "COCO top VOC-frozen reliability decile: useful fraction vs overall",
+    "72.2% vs 39.0%"
+   ],
+   [
+    "Regions evaluated VOC / COCO",
+    "15,680 / 22,624"
+   ]
+  ],
+  "unsure": "The 39.0% overall COCO useful fraction was computed from pixel_event_totals.useful_all (1,825,138 / 4,678,663), matching the protocol's quoted figure. Pixel-signal name glosses follow protocol Section 94 wording, not code. SPEC32 construction details (SG4 partition) not re-derived here."
+ },
+ "pre_sg18_sg21": {
+  "title": "Pre-SG18 / Pre-SG21 temporal and head-role diagnostics",
+  "sections": "96",
+  "what": "Diagnostic only. For every one of the 248 call/head observations of SA module 15 (one-pass A_i c from the class-word seed), and for fixed early/middle/late call stages, measures how many CA-relative true and false positive pixels it adds at fixed threshold 0.45, plus temporal features of each pixel's trajectory and structural descriptors of each head (entropy, local mass, attention distance, reciprocity). Motivated the SG18 window test and the SG21 head weighting.",
+  "names": "Stages: early = calls 0-9, middle = calls 10-20, late = calls 21-30. tp_add / fp_add = CA-relative added TP / FP pixels; fp_gt16_fraction / fp_separate_fraction = fraction of added FP more than 16 px from GT / in a component not touching GT. Temporal features (per-pixel statistics of the 31-call trajectory relative to CA, e.g. middle_up_fraction, temporal_median, longest_up_run) are ranked by ROC-AUC. Stage counts are separate comparisons against CA and do not sum to the all-call mean's counts.",
+  "reference": "",
+  "outcome": "Middle and late stages add far more TP per FP than early calls (VOC TP/FP 1.354 / 3.494 / 3.228; COCO 0.509 / 0.941 / 0.935). Head/call behaviour is highly stable across datasets (Spearman 0.902 for TP/FP ratio over 248 cells), and structural descriptors (local mass, entropy) correlate strongly (|rho| about 0.94) with head FP behaviour on COCO. The best temporal pixel feature, middle_up_fraction, reaches ROC-AUC only 0.617 on both datasets.",
+  "key_results": [
+   [
+    "Stage TP/FP ratio early / middle / late, VOC",
+    "1.354 / 3.494 / 3.228"
+   ],
+   [
+    "Stage TP/FP ratio early / middle / late, COCO",
+    "0.509 / 0.941 / 0.935"
+   ],
+   [
+    "Added FP >16 px fraction early / middle / late, VOC",
+    "0.643 / 0.456 / 0.438"
+   ],
+   [
+    "Added FP >16 px fraction early / middle / late, COCO",
+    "0.804 / 0.776 / 0.774"
+   ],
+   [
+    "Best temporal feature ROC-AUC (middle_up_fraction) VOC / COCO",
+    "0.617 / 0.617"
+   ],
+   [
+    "VOC-to-COCO rank stability of 248 head/call cells, tp_fp_ratio (Spearman rho)",
+    "0.902"
+   ],
+   [
+    "Strongest structural correlation, COCO (local_mass_r1 vs fp_separate_fraction)",
+    "0.949"
+   ],
+   [
+    "Images VOC / COCO",
+    "490 / 707"
+   ]
+  ],
+  "unsure": "Individual temporal feature names (e.g. middle_up_fraction) were glossed from protocol Section 96 only, not checked in code."
+ },
+ "pre_sg19_late_support": {
+  "title": "Pre-SG19 late-call support of middle-stage additions",
+  "sections": "99",
+  "what": "Diagnostic only. Takes the pixels that the middle-call map (calls 10-20) adds over the CA seed and asks whether late calls (21-30) can tell the true additions from false ones, which would justify a late-stage veto (SG19). Uses a GPU replay to get all 80 late observations per pixel; feature direction and decile edges are fixed on VOC and transferred to COCO.",
+  "names": "Candidate pixels: raw M > c, CA background at 0.45, middle foreground at 0.425 (0.45 control). Features: late_score = raw late map L; late_minus_ca = L - c; late_minus_middle = L - M; retention_ratio = (L - c)/(M - c + 1e-8); late_up_consensus = fraction of the 80 late observations above c; late_vs_middle_consensus = fraction above M; late_median, late_trimmed_mean (20%), late_std, late_mad over the 80 late observations. Contrasts: TP vs all FP, vs FP >16 px, >64 px, separate-component FP.",
+  "reference": "",
+  "outcome": "Raw late score separates middle-added TP from FP with ROC-AUC 0.586 VOC / 0.675 COCO, but the specifically temporal features are weak (L - c 0.535 / 0.564) and VOC-person's best signal does not transfer (0.695 -> 0.481). Verdict: mixed, not a clear go; no SG19 mask was tested.",
+  "key_results": [
+   [
+    "Candidate middle-added pixels VOC / COCO",
+    "6,837,692 / 12,671,265"
+   ],
+   [
+    "late_score TP vs FP ROC-AUC VOC / COCO (threshold 0.425)",
+    "0.586 / 0.675"
+   ],
+   [
+    "late_minus_ca ROC-AUC VOC / COCO",
+    "0.535 / 0.564"
+   ],
+   [
+    "late_up_consensus ROC-AUC VOC / COCO",
+    "0.556 / 0.530"
+   ],
+   [
+    "late_score decile TP/FP ratio, lowest to highest bin, VOC",
+    "2.71 to 9.57"
+   ],
+   [
+    "Same VOC decile edges on COCO, TP/FP ratio",
+    "0.55 to 7.68"
+   ],
+   [
+    "VOC person best feature (late_minus_middle) ROC-AUC VOC -> COCO",
+    "0.695 -> 0.481"
+   ],
+   [
+    "Fraction of candidates with L > c, VOC / COCO",
+    "96.8% / 96.1%"
+   ]
+  ],
+  "unsure": ""
+ },
+ "pre_sg19_score_controls": {
+  "title": "Pre-SG19 raw-score control",
+  "sections": "100",
+  "what": "Diagnostic only, CPU, from saved SG18 maps. Checks whether the late-score signal in Pre-SG19 is really late-specific, by scoring the same middle-added candidate pixels with five raw scores: the CA seed, the middle map, the late map, and their min and mean.",
+  "names": "Scores, all raw bilinearly resized values on the same candidate pixels: ca = CA seed c; middle = M, one-pass mean over calls 10-20; late = L, calls 21-30; min_middle_late = min(M, L); mean_middle_late = (M + L)/2. Contrasts: TP vs all FP, FP >16 px, FP >64 px, separate-component FP.",
+  "reference": "",
+  "outcome": "The middle score beats the late score on both datasets and every contrast (TP/FP ROC-AUC 0.6081 / 0.6861 vs 0.5835 / 0.6733); min and mean do not beat middle. The apparent late signal is explained by general score strength, so the SG19 late veto is not justified.",
+  "key_results": [
+   [
+    "TP vs FP ROC-AUC, CA c, VOC / COCO",
+    "0.5590 / 0.6198"
+   ],
+   [
+    "TP vs FP ROC-AUC, middle M, VOC / COCO",
+    "0.6081 / 0.6861"
+   ],
+   [
+    "TP vs FP ROC-AUC, late L, VOC / COCO",
+    "0.5835 / 0.6733"
+   ],
+   [
+    "TP vs FP ROC-AUC, min(M,L), VOC / COCO",
+    "0.6006 / 0.6784"
+   ],
+   [
+    "TP vs FP ROC-AUC, (M+L)/2, VOC / COCO",
+    "0.5973 / 0.6814"
+   ],
+   [
+    "TP vs FP average precision, middle vs late, VOC",
+    "0.8417 vs 0.8262"
+   ],
+   [
+    "TP vs FP average precision, middle vs late, COCO",
+    "0.7099 vs 0.6931"
+   ],
+   [
+    "Candidate pixels reconstructed VOC / COCO",
+    "6,816,320 / 12,665,100"
+   ]
+  ],
+  "unsure": ""
+ },
+ "sg15_label_oracle_20": {
+  "title": "SG15 region labels vs GT-majority oracle on 20 VOC images",
+  "sections": "93",
+  "what": "Visual diagnostic on 20 VOC-Sim images (the first annotated image of each class, fixed before scoring). For three frozen priors, compares the current SG15 region-relabelling rules with an oracle that labels each SPEC32 region by its GT majority, to see how much headroom hard region decisions have. Not an inference method, no selection, no COCO.",
+  "names": "Priors (rows): W/P1 = two-pass all-call map (threshold 0.450); W/SG11/trim20/rho0p80 = SG11 trimmed-consensus prior (0.425); W/SG12/top50 = SG12 top-50% observations prior (0.450). Region rules: A050 = hard majority projection (a SPEC32 region is foreground iff at least 50% of its pixels are foreground in the prior); B = confidence snapping (region foreground if occupancy >= 0.75, background if <= 0.25, otherwise the prior's pixels are kept). Oracle = region foreground iff at least half its pixels are GT foreground. SPEC32 = the canonical 32-region partition from SG4/SG13.",
+  "reference": "",
+  "outcome": "Averaged over the 20 images, the GT-majority oracle (0.869 mean IoU) is above every prior and both current rules, while A050 and B both score slightly below the unrefined prior for all three priors. Protocol Section 93 says the oracle values must be presented only as diagnostic upper bounds for hard region decisions on these 20 images.",
+  "key_results": [
+   [
+    "Mean IoU over 20 images, W/P1: prior / A050 / B / oracle (computed)",
+    "0.8031 / 0.7879 / 0.7946 / 0.8690"
+   ],
+   [
+    "Mean IoU, W/SG11/trim20/rho0p80: prior / A050 / B / oracle (computed)",
+    "0.7864 / 0.7659 / 0.7838 / 0.8690"
+   ],
+   [
+    "Mean IoU, W/SG12/top50: prior / A050 / B / oracle (computed)",
+    "0.7905 / 0.7761 / 0.7875 / 0.8690"
+   ],
+   [
+    "Images where oracle IoU > prior IoU, P1 / SG11 / SG12 (computed)",
+    "15 / 17 / 15 of 20"
+   ],
+   [
+    "Images",
+    "20 (one per VOC class)"
+   ]
+  ],
+  "unsure": "No aggregate numbers exist in the package; every key_results value is an unweighted per-image mean or count that I computed from per_image_iou.csv, not copied. Protocol Section 107 lists the Section 93 visuals as 'Not verifiable' at that review (outputs were not yet committed at the time). The exact SPEC32 construction was not re-derived."
+ },
+ "sg18_late_diagnostic": {
+  "title": "SG18 middle vs late call-window diagnostic",
+  "sections": "98",
+  "what": "Diagnostic only, CPU, from the cached SG18 maps. Compares one-pass maps from the middle calls (10-20), the late calls (21-30) and both (10-30) at fixed thresholds 0.425 (primary, T1's frozen threshold) and 0.45, and counts which pixels flip when the late calls are added to the middle window. Asks why adding late calls did not help.",
+  "names": "Rows: middle = calls 10-20 (= W/T1); late = calls 21-30, computed as (21*T2 - 11*T1)/10; middle_plus_late = calls 10-30 (= W/T2). Columns: CA-relative TP/FP additions, distant FP >16 px, separate-component FP; 'threshold crossings' = pixels whose mask changes from middle to middle_plus_late (TP gained/lost, FP gained/removed).",
+  "reference": "",
+  "outcome": "At 0.425, mIoU middle / late / middle+late is 0.7959 / 0.7890 / 0.7936 on VOC and 0.6285 / 0.6191 / 0.6240 on COCO. Adding late calls nets more false positives on VOC but mostly loses true positives on COCO, so protocol Section 98 concludes the effect differs by dataset and cannot be reduced to a single leakage story.",
+  "key_results": [
+   [
+    "mIoU @0.425 middle / late / middle+late, VOC",
+    "0.7959 / 0.7890 / 0.7936"
+   ],
+   [
+    "mIoU @0.425 middle / late / middle+late, COCO",
+    "0.6285 / 0.6191 / 0.6240"
+   ],
+   [
+    "VOC middle -> middle+late @0.425: TP gained / lost",
+    "261,001 / 255,053"
+   ],
+   [
+    "VOC middle -> middle+late @0.425: FP gained / removed",
+    "399,322 / 226,040"
+   ],
+   [
+    "COCO middle -> middle+late @0.425: TP gained / lost",
+    "178,332 / 581,249"
+   ],
+   [
+    "COCO middle -> middle+late @0.425: FP gained / removed",
+    "674,271 / 929,652"
+   ],
+   [
+    "mIoU @0.45 middle / late / middle+late, VOC",
+    "0.7941 / 0.7868 / 0.7916"
+   ],
+   [
+    "mIoU @0.45 middle / late / middle+late, COCO",
+    "0.6343 / 0.6251 / 0.6307"
+   ]
+  ],
+  "unsure": ""
+ },
+ "finalizer_reference_audit": {
+  "title": "Finalizer reference audit (SG11/SG12 and SG2+DenseCRF recovery)",
+  "sections": "89",
+  "what": "Audit, not an experiment. The SG11/SG12 and SG2+DenseCRF finalizers stopped because new V100 masks did not match historical A100 masks within 0.2% of pixels at every threshold. This package compares the REF (one-pass) and other control counts across packages and GPU types, and binds the evidence by SHA256, so that within-package V100 comparisons could be recovered without changing any measurement.",
+  "names": "Comparisons: SG11_REF_vs_SG8 = W/REF counts in the new SG11/SG12 package (V100) vs historical SG8 (A100); SG11_C_vs_SG8_C = the same for the SG8 consensus cell W/C/rho0p80; Dense_REF_vs_SG2 = W/REF in the SG2+DenseCRF confirmation package vs the original SG2 package; Dense_REF_vs_SG11 = W/REF across the two new V100 packages; Dense_SG2_vs_oldSG2 = new W/SG2 vs original W/G_cv_g20_n1; A100_SG8_vs_SG13_REF = W/REF in SG8 vs SG13 (both A100). max_pixels = largest per-image count difference at any threshold; above_0.002 = images over the 0.2% gate.",
+  "reference": "",
+  "outcome": "Within-package V100 comparisons were recovered; historical pixel-level reproduction was not. Same-hardware runs agree within a few pixels, while cross-hardware REF differences reach 8,185 px (VOC) / 39,917 px (COCO) per image, yet REF mIoU at 0.45 moves by under 0.001. Recovered outcomes (protocol Section 89): SG11 OOF 0.787280 -> 0.798400, SG12 -> 0.796658, SG2+CRF does not beat FTF (0.811095 vs 0.813209).",
+  "key_results": [
+   [
+    "Max per-image REF difference, SG11 (V100) vs SG8 (A100), VOC / COCO",
+    "8,185 / 39,917 px"
+   ],
+   [
+    "Images above the 0.2% gate, SG11 vs SG8 REF, VOC / COCO",
+    "65 / 168"
+   ],
+   [
+    "Max per-image REF difference, two V100 packages (Dense vs SG11), VOC / COCO",
+    "1 / 2 px"
+   ],
+   [
+    "Max per-image REF difference, A100 SG8 vs SG13, VOC / COCO",
+    "4 / 4 px"
+   ],
+   [
+    "Max per-image REF difference, SG2+CRF package vs original SG2, VOC / COCO",
+    "26,282 / 18,171 px"
+   ],
+   [
+    "REF mIoU @0.45, SG11 V100 vs SG8 A100, VOC",
+    "0.788440 vs 0.788656"
+   ],
+   [
+    "REF mIoU @0.45, SG11 V100 vs SG8 A100, COCO",
+    "0.625872 vs 0.626588"
+   ],
+   [
+    "Live V100 replay (job 234952) of 4 worst samples",
+    "SG11/SG12 and raw SG2 counts reproduced exactly"
+   ]
+  ],
+  "unsure": ""
+ }
+}

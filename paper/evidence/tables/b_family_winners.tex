@@ -1,0 +1,52 @@
+{\scriptsize\setlength{\tabcolsep}{3pt}
+\begin{longtable}{>{\raggedright\arraybackslash}p{1.40cm}>{\raggedright\arraybackslash}p{3.67cm}r>{\raggedright\arraybackslash}p{5.74cm}r}
+\caption{Exploratory VOC-Sim experiments: best configuration per family (in-sample, 490 images)}\label{tab:b_family_winners}\\
+\toprule
+Exp. & Family & Configurations & Best configuration & Best mIoU \\
+\midrule
+\endfirsthead
+\toprule
+Exp. & Family & Configurations & Best configuration & Best mIoU \\
+\midrule
+\endhead
+B8 & baseline & 1 & ovam\_\allowbreak{}unoptimized & 0.6540 \\
+B8 & layers & 24 & mid\_\allowbreak{}up & 0.6828 \\
+B8 & resolution & 15 & r8\_\allowbreak{}r16 & 0.7122 \\
+B8 & self\_\allowbreak{}attention/\allowbreak{}progressive\_\allowbreak{}16-32 & 229 & iter4\_\allowbreak{}\_\allowbreak{}non\_\allowbreak{}residual\_\allowbreak{}\_\allowbreak{}seed\_\allowbreak{}t0.30\_\allowbreak{}\_\allowbreak{}foreground & 0.7413 \\
+B8 & self\_\allowbreak{}attention/\allowbreak{}progressive\_\allowbreak{}16-32-64 & 229 & iter2\_\allowbreak{}\_\allowbreak{}non\_\allowbreak{}residual\_\allowbreak{}\_\allowbreak{}seed\_\allowbreak{}t0.30\_\allowbreak{}\_\allowbreak{}foreground & 0.7577 \\
+B8 & self\_\allowbreak{}attention/\allowbreak{}progressive\_\allowbreak{}16-8 & 229 & iter1\_\allowbreak{}\_\allowbreak{}residual\_\allowbreak{}a0.50\_\allowbreak{}\_\allowbreak{}seed\_\allowbreak{}t0.30\_\allowbreak{}\_\allowbreak{}background\_\allowbreak{}difference & 0.6913 \\
+B8 & self\_\allowbreak{}attention/\allowbreak{}progressive\_\allowbreak{}32-16 & 229 & iter2\_\allowbreak{}\_\allowbreak{}residual\_\allowbreak{}a0.50\_\allowbreak{}\_\allowbreak{}seed\_\allowbreak{}t0.30\_\allowbreak{}\_\allowbreak{}background\_\allowbreak{}difference & 0.7201 \\
+B8 & self\_\allowbreak{}attention/\allowbreak{}progressive\_\allowbreak{}32-16-8 & 229 & iter2\_\allowbreak{}\_\allowbreak{}residual\_\allowbreak{}a0.50\_\allowbreak{}\_\allowbreak{}seed\_\allowbreak{}t0.30\_\allowbreak{}\_\allowbreak{}background\_\allowbreak{}difference & 0.6944 \\
+B8 & self\_\allowbreak{}attention/\allowbreak{}progressive\_\allowbreak{}32-64 & 229 & iter4\_\allowbreak{}\_\allowbreak{}non\_\allowbreak{}residual\_\allowbreak{}\_\allowbreak{}seed\_\allowbreak{}t0.30\_\allowbreak{}\_\allowbreak{}foreground & 0.7683 \\
+B8 & self\_\allowbreak{}attention/\allowbreak{}progressive\_\allowbreak{}64-32 & 229 & iter4\_\allowbreak{}\_\allowbreak{}residual\_\allowbreak{}a0.75\_\allowbreak{}\_\allowbreak{}seed\_\allowbreak{}t0.70\_\allowbreak{}\_\allowbreak{}background\_\allowbreak{}difference & 0.7558 \\
+B8 & self\_\allowbreak{}attention/\allowbreak{}progressive\_\allowbreak{}64-32-16 & 229 & iter4\_\allowbreak{}\_\allowbreak{}residual\_\allowbreak{}a0.50\_\allowbreak{}\_\allowbreak{}seed\_\allowbreak{}t0.70\_\allowbreak{}\_\allowbreak{}background\_\allowbreak{}difference & 0.7282 \\
+B8 & self\_\allowbreak{}attention/\allowbreak{}progressive\_\allowbreak{}64-32-16-8 & 229 & iter4\_\allowbreak{}\_\allowbreak{}residual\_\allowbreak{}a0.50\_\allowbreak{}\_\allowbreak{}seed\_\allowbreak{}t0.30\_\allowbreak{}\_\allowbreak{}background\_\allowbreak{}difference & 0.7000 \\
+B8 & self\_\allowbreak{}attention/\allowbreak{}progressive\_\allowbreak{}8-16 & 229 & iter1\_\allowbreak{}\_\allowbreak{}non\_\allowbreak{}residual\_\allowbreak{}\_\allowbreak{}seed\_\allowbreak{}t0.80\_\allowbreak{}\_\allowbreak{}background\_\allowbreak{}ratio & 0.7005 \\
+B8 & self\_\allowbreak{}attention/\allowbreak{}progressive\_\allowbreak{}8-16-32 & 229 & iter1\_\allowbreak{}\_\allowbreak{}non\_\allowbreak{}residual\_\allowbreak{}\_\allowbreak{}seed\_\allowbreak{}t0.80\_\allowbreak{}\_\allowbreak{}background\_\allowbreak{}ratio & 0.7264 \\
+B8 & self\_\allowbreak{}attention/\allowbreak{}progressive\_\allowbreak{}8-16-32-64 & 229 & iter4\_\allowbreak{}\_\allowbreak{}residual\_\allowbreak{}a0.75\_\allowbreak{}\_\allowbreak{}seed\_\allowbreak{}t0.30\_\allowbreak{}\_\allowbreak{}background\_\allowbreak{}difference & 0.7474 \\
+B8 & self\_\allowbreak{}attention/\allowbreak{}r16 & 778 & all\_\allowbreak{}modules\_\allowbreak{}all\_\allowbreak{}steps\_\allowbreak{}\_\allowbreak{}iter1\_\allowbreak{}\_\allowbreak{}seed\_\allowbreak{}t0.30\_\allowbreak{}\_\allowbreak{}foreground\_\allowbreak{}residual\_\allowbreak{}a0.50 & 0.7161 \\
+B8 & self\_\allowbreak{}attention/\allowbreak{}r32 & 778 & module\_\allowbreak{}\_\allowbreak{}up\_\allowbreak{}blocks.2.attentions.2.transformer\_\allowbreak{}blocks.0.attn1\_\allowbreak{}\_\allowbreak{}iter4\_\allowbreak{}\_\allowbreak{}co & 0.7641 \\
+B8 & self\_\allowbreak{}attention/\allowbreak{}r64 & 778 & module\_\allowbreak{}\_\allowbreak{}up\_\allowbreak{}blocks.3.attentions.2.transformer\_\allowbreak{}blocks.0.attn1\_\allowbreak{}\_\allowbreak{}iter4\_\allowbreak{}\_\allowbreak{}co & 0.7777 \\
+B8 & self\_\allowbreak{}attention/\allowbreak{}r8 & 238 & window\_\allowbreak{}\_\allowbreak{}steps\_\allowbreak{}26\_\allowbreak{}30\_\allowbreak{}\_\allowbreak{}iter1\_\allowbreak{}\_\allowbreak{}continuous\_\allowbreak{}\_\allowbreak{}residual\_\allowbreak{}a0.75 & 0.7034 \\
+B8 & stage1/\allowbreak{}fusion & 118 & resolution\_\allowbreak{}weights\_\allowbreak{}\_\allowbreak{}16-1\_\allowbreak{}32-0.5\_\allowbreak{}64-2\_\allowbreak{}8-0.5 & 0.6770 \\
+B8 & stage1/\allowbreak{}heads & 212 & per\_\allowbreak{}layer\_\allowbreak{}top\_\allowbreak{}4\_\allowbreak{}heads & 0.6830 \\
+B8 & stage1/\allowbreak{}postprocessing & 18 & fill\_\allowbreak{}holes & 0.6661 \\
+B8 & stage1/\allowbreak{}time\_\allowbreak{}layer & 237 & all16\_\allowbreak{}\_\allowbreak{}cumulative\_\allowbreak{}00\_\allowbreak{}25 & 0.6844 \\
+B8 & threshold\_\allowbreak{}normalization & 204 & all\_\allowbreak{}16\_\allowbreak{}layers\_\allowbreak{}\_\allowbreak{}percentile\_\allowbreak{}01\_\allowbreak{}99\_\allowbreak{}\_\allowbreak{}t0.40 & 0.6975 \\
+B8 & time\_\allowbreak{}resolution & 105 & all\_\allowbreak{}00\_\allowbreak{}30\_\allowbreak{}\_\allowbreak{}r8\_\allowbreak{}r16 & 0.7122 \\
+B8 & time\_\allowbreak{}window & 7 & steps\_\allowbreak{}15\_\allowbreak{}20 & 0.6752 \\
+B9 & focused/\allowbreak{}cross\_\allowbreak{}attention\_\allowbreak{}seeds & 6 & top4\_\allowbreak{}heads\_\allowbreak{}percentile & 0.6831 \\
+B9 & focused/\allowbreak{}output\_\allowbreak{}calibration & 936 & top4\_\allowbreak{}heads\_\allowbreak{}percentile\_\allowbreak{}\_\allowbreak{}r64\_\allowbreak{}\_\allowbreak{}iter2\_\allowbreak{}\_\allowbreak{}percentile\_\allowbreak{}01\_\allowbreak{}99\_\allowbreak{}\_\allowbreak{}t0.45 & 0.7922 \\
+B9 & focused/\allowbreak{}postprocessing & 90 & best12\_\allowbreak{}percentile\_\allowbreak{}\_\allowbreak{}r64\_\allowbreak{}\_\allowbreak{}iter4\_\allowbreak{}\_\allowbreak{}percentile\_\allowbreak{}01\_\allowbreak{}99\_\allowbreak{}\_\allowbreak{}t0.45\_\allowbreak{}\_\allowbreak{}remove\_\allowbreak{}fractio & 0.7780 \\
+B9 & focused/\allowbreak{}sa\_\allowbreak{}heads & 108 & iter3\_\allowbreak{}\_\allowbreak{}leave\_\allowbreak{}head\_\allowbreak{}6 & 0.7797 \\
+B9 & focused/\allowbreak{}sa\_\allowbreak{}time & 348 & iter3\_\allowbreak{}\_\allowbreak{}trailing\_\allowbreak{}10\_\allowbreak{}30 & 0.7801 \\
+B9 & focused/\allowbreak{}seed\_\allowbreak{}operator & 144 & top4\_\allowbreak{}heads\_\allowbreak{}percentile\_\allowbreak{}\_\allowbreak{}r64\_\allowbreak{}\_\allowbreak{}iter2 & 0.7922 \\
+B10 & joint/\allowbreak{}joint\_\allowbreak{}head\_\allowbreak{}time\_\allowbreak{}threshold & 3900 & iter3\_\allowbreak{}\_\allowbreak{}leave\_\allowbreak{}3\_\allowbreak{}7\_\allowbreak{}\_\allowbreak{}steps\_\allowbreak{}15\_\allowbreak{}20\_\allowbreak{}\_\allowbreak{}t0.40 & 0.7991 \\
+B10 & joint/\allowbreak{}joint\_\allowbreak{}postprocessing & 780 & iter4\_\allowbreak{}\_\allowbreak{}leave\_\allowbreak{}3\_\allowbreak{}7\_\allowbreak{}\_\allowbreak{}trailing\_\allowbreak{}15\_\allowbreak{}30\_\allowbreak{}\_\allowbreak{}t0.45\_\allowbreak{}\_\allowbreak{}remove\_\allowbreak{}fraction\_\allowbreak{}0.01 & 0.7997 \\
+B15 & heads & 255 & heads\_\allowbreak{}0\_\allowbreak{}2\_\allowbreak{}3\_\allowbreak{}4\_\allowbreak{}5\_\allowbreak{}6\_\allowbreak{}7 & 0.6764 \\
+B15 & layers\_\allowbreak{}structured & 39 & down\_\allowbreak{}middle & 0.6818 \\
+B15 & resolution & 15 & r8\_\allowbreak{}r16\_\allowbreak{}r64 & 0.6957 \\
+B15 & time & 79 & cumulative\_\allowbreak{}00\_\allowbreak{}20 & 0.6752 \\
+B15 & time\_\allowbreak{}resolution & 1185 & cumulative\_\allowbreak{}00\_\allowbreak{}25\_\allowbreak{}\_\allowbreak{}r8\_\allowbreak{}r16 & 0.6968 \\
+\bottomrule
+\end{longtable}}

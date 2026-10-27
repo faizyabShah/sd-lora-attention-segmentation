@@ -1,12 +1,12 @@
 \section{Protocol}
 \label{sec:supp_protocol}
-The full protocol, with every registration, result and review in the order they happened, is \texttt{docs/ATTENTION\_SEGMENTATION\_EXPERIMENT\_PROTOCOL.md} (113 sections); the registry of experiment families is \texttt{docs/ATTENTION\_FUSION\_AND\_TOKEN\_IDEAS.md}. This section summarizes the rules that every reported number obeys.
+The full protocol, with every registration, result and review in the order they happened, is \texttt{docs/\allowbreak{}ATTENTION\_\allowbreak{}SEGMENTATION\_\allowbreak{}EXPERIMENT\_\allowbreak{}PROTOCOL.md} (113 sections); the registry of experiment families is \texttt{docs/\allowbreak{}ATTENTION\_\allowbreak{}FUSION\_\allowbreak{}AND\_\allowbreak{}TOKEN\_\allowbreak{}IDEAS.md}. This section summarizes the rules that every reported number obeys.
 
 \paragraph{Fixed conditions.}
 Stable Diffusion 1.5 generates every image from its released prompt and seed, with 30 scheduler steps, classifier-free guidance 7.5, a float32 model and float16 storage of compact attention. ``Calls 0--30'' are the 31 recorded UNet call indices, inclusive. CA uses the conditional branch for query and key, a softmax over all 77 positions of the padded attribution prompt, and the mean over every tokenizer piece of the class name within each head. All maps are combined on a $64\times64$ grid. Generated images and attention tensors are discarded after scoring; per-image TP, FP and FN at every threshold of the grid are kept, so that folds, bootstrap intervals and later analyses need no regeneration.
 
 \paragraph{Folds.}
-\texttt{configs/voc\_sim\_folds.csv} assigns the 490 VOC-Sim images to five class-stratified folds (about five images per class per fold), with a fixed seed, committed before any run. In each outer fold, the method parameter and the mask threshold are chosen on the other four folds and scored on the held-out fold; the reference is treated the same way.
+\texttt{configs/\allowbreak{}voc\_\allowbreak{}sim\_\allowbreak{}folds.csv} assigns the 490 VOC-Sim images to five class-stratified folds (about five images per class per fold), with a fixed seed, committed before any run. In each outer fold, the method parameter and the mask threshold are chosen on the other four folds and scored on the held-out fold; the reference is treated the same way.
 
 \paragraph{Decision rule (v1.2).}
 A candidate is promoted if it improves training-fold mIoU by at least 0.010, or by 0.005--0.0099 with at least 12 of 20 classes improved and no class losing more than 0.05; it must win at least four of five fold votes and give a positive pooled OOF gain. Within 0.002, the simpler setting wins (the reference, then fewer added operations, then fewer free parameters). Each family is screened against its own reference; family winners then go to a combined confirmation.

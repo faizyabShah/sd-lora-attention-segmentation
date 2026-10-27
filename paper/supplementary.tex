@@ -5,6 +5,8 @@
 \usepackage[review]{cvpr}
 
 \input{preamble}
+\usepackage{longtable}
+\usepackage{float}
 
 \definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
 \usepackage[pagebackref,breaklinks,colorlinks,allcolors=cvprblue]{hyperref}
@@ -18,6 +20,7 @@
 
 \begin{document}
 \maketitlesupplementary
+{\small\setcounter{tocdepth}{2}\tableofcontents}
 
 \input{sec/supp/A_protocol}
 \input{sec/supp/B_controlled_packages}
@@ -25,6 +28,7 @@
 \input{sec/supp/D_exploratory}
 \input{sec/supp/E_reproducibility}
 \input{sec/supp/F_gallery}
+\input{sec/supp/G_record}
 
 {
     \small

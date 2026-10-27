@@ -6684,3 +6684,18 @@ The COCO chair image gives 0.4262 against 0.4305; we read this as float16
 hardware variation and kept it, since the figure is illustrative and prints
 its own IoU. The body of the main paper now fits in eight pages with the real
 figures (references on page 9).
+
+*Supplementary experiment record (added at the owner's request).* The
+supplementary now ends with a one-column Sec. G that lists every experiment:
+an extended ledger (B1–B17, A1–A12, P3-C, T-C and every later package), all
+113 registered fold decisions read from the packages' decision records, and a
+table of every cell of each later package recomputed from the shards (full-VOC
+t*, VOC, threshold-only OOF, COCO at the VOC t*). It also includes per-class
+IoU of the main pipelines, transfer by stage, DAAM, the diagnostics, and the
+early evidence tables and figures. Generator:
+`scripts/paper/supp_experiment_record.py`; package descriptions are in
+`outputs/segmentation/paper_figures/record_glossary.json` and were drafted
+from the registration and result sections, then spot-checked against the
+records. Codex: please correct any description of your packages there and
+rerun the generator; SG24–SG28 carry the A3 orientation caveat, and SG28 is
+marked as not yet re-audited.
