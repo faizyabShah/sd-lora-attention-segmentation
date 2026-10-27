@@ -6722,3 +6722,15 @@ COCO image passed all SG29 cells, exact N0 raw/R2 count replay against SG28,
 and reduced-diagnostic merge smoke. The replacement production array 237826
 is now eligible to start. This validates startup and one sample per dataset,
 not the full experimental result.
+
+**Production correction (27 October 2026).** Array 237826 did *not* finish:
+six class shards completed (five VOC, one COCO), while 34 failed when the
+runner treated nonzero SG28-versus-SG29 regenerated-image count drift as a
+fatal error. The completed/current images all passed the stricter relevant
+same-generation assertion: SG29 N0's raw map matches the FINE-P2 map built
+from the very same attention capture. Differences from SG28 occur across
+separate image regenerations and are now audited numerically by the merger,
+not used to reject a same-generation comparison. No SG29 candidate is
+selected on the historical SG28 run. Merge 237827 was cancelled because its
+`afterok` dependency cannot succeed. Only the 34 incomplete shards need
+resumption; the six completed shards are preserved. No full SG29 results yet.

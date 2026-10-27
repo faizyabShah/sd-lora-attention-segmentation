@@ -18,7 +18,7 @@ if str(ROOT) not in sys.path:
 from scripts.finalize_sg22_sg23 import forced_oof, metrics
 from scripts.run_sg27 import CHANGE_FIELDS
 from scripts.run_sg29 import BASE, NAMES, RAW, SIDE_FIELDS, SPEC_PATH
-from scripts.select_propagation_cv import best_threshold, run_screen
+from scripts.select_propagation_cv import best_threshold, image_ious, pooled_miou, run_screen
 from src.segmentation import controlled_cv as cv, sg29_nerve
 
 
@@ -99,6 +99,32 @@ def diagnostics(result,data):
     return output
 
 
+def historical_replay(result, dataset: str, thresholds: tuple[float, ...]) -> dict:
+    """Audit regeneration drift separately from SG29's same-generation control."""
+    root=ROOT/"outputs/segmentation/controlled_attention_cv/sg28"/dataset/"shards"
+    files=sorted(p for p in root.glob("class_*.npz") if not p.name.endswith(".diagnostics.npz"))
+    old=cv.load_results(files)
+    if len(files)!=20 or set(old.image_ids)!=set(result.image_ids):
+        raise ValueError("SG28 historical replay coverage does not match SG29")
+    if tuple(old.configurations[:2])!=("P0","P0+R2") or old.thresholds!=thresholds:
+        raise ValueError("SG28 historical replay controls changed")
+    old_index={image_id:i for i,image_id in enumerate(old.image_ids)}
+    ordered=np.asarray([old_index[image_id] for image_id in result.image_ids])
+    prior=old.counts[:2,ordered]
+    current=result.counts[:2]
+    diff=np.abs(current.astype(np.int64)-prior.astype(np.int64))
+    at=thresholds.index(.45)
+    return {"images":len(result.image_ids),"exact_raw_images":int(np.all(diff[0]==0,axis=(1,2)).sum()),
+            "exact_R2_images":int(np.all(diff[1]==0,axis=(1,2)).sum()),
+            "median_max_count_difference_per_image":float(np.median(diff.max(axis=(0,2,3)))),
+            "maximum_count_difference":int(diff.max()),
+            "raw_mean_absolute_image_iou_difference_at_0p45":float(np.mean(np.abs(
+                image_ious(current[0,:,at])-image_ious(prior[0,:,at])))),
+            "raw_SG29_miou_at_0p45":pooled_miou(current[0,:,at],result.classes),
+            "raw_SG28_miou_at_0p45":pooled_miou(prior[0,:,at],result.classes),
+            "interpretation":"cross-generation replay audit; all SG29 candidate comparisons use current-generation N0"}
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--output-dir",type=Path,default=BASE)
@@ -122,6 +148,8 @@ def main():
     summary={"spec":spec,"selection":screens,"forced_oof":oof,"cells":cells,
              "walk_depth_mass":sg29_nerve.walk_mass(spec["alpha"],spec["default_walk_length"]).tolist(),
              "diagnostics":{"voc":diagnostics(voc,vd),"coco":diagnostics(coco,cd)},
+             "historical_replay":{"voc":historical_replay(voc,"voc",voc.thresholds),
+                                   "coco":historical_replay(coco,"coco",coco.thresholds)},
              "voc_thresholds_frozen_for_coco":True,"N2_short_lengths_diagnostic_only":True}
     out=args.output_dir;out.mkdir(parents=True,exist_ok=True)
     (out/"results.json").write_text(json.dumps(summary,indent=2,allow_nan=False)+"\n")
