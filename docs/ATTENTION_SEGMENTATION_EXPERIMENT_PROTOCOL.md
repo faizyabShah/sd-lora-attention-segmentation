@@ -6709,3 +6709,10 @@ to eight heads, matching the historical global operator, and a CPU regression
 checks equality against explicit expansion. A live VOC/COCO GPU smoke is
 required before replacement production; the array will depend on that smoke
 and the merge will depend on the array. No result or promotion claim is made.
+
+**Replacement submission.** Live VOC/COCO smoke **237825** uses the fixed
+operator and checks N0 against SG28. Production array **237826** (40 class
+shards, at most four concurrent, four hours per shard) has
+`afterok:237825`; CPU merge **237827** has `afterok:237826`. Thus a smoke
+failure prevents a second invalid full-array run. There are still no SG29
+performance results until the merge validates complete coverage.
