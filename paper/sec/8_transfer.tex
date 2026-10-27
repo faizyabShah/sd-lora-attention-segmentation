@@ -1,13 +1,7 @@
 \section{Transfer and published comparison}
 \label{sec:transfer}
-We now freeze every choice on VOC-Sim and score COCO-Cap. The confirmed all-call training-free pipeline gives 0.637 mIoU; the later joint temporal selection gives 0.644. COCO-Cap includes captions in which the queried class name is absent, so separate class-word attribution is important. Neither the temporal window nor the threshold is chosen on COCO-Cap.
+\emph{Question: does the VOC-selected system transfer, and does anything beyond it?} We now freeze every choice on VOC-Sim and score COCO-Cap. The confirmed all-call training-free pipeline gives 0.637 mIoU; the later joint temporal selection gives 0.644. COCO-Cap includes captions in which the queried class name is absent, so separate class-word attribution is important. Neither the temporal window nor the threshold is chosen on COCO-Cap.
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=.87\textwidth]{figures/temporal_class_effects.pdf}
-\caption{\textbf{The middle-call gain is heterogeneous.} Per-class IoU change for MID-P2+R2 versus ALL-P2+R2 in the same SG22 evaluation, with the threshold chosen on VOC only. Chair improves on both datasets; VOC person loses 0.016. Positive overall mIoU does not imply every class improves.}
-\label{fig:temporal_classes}
-\end{figure*}
 
 \begin{table}[t]
 \centering
@@ -27,15 +21,20 @@ DatasetDM & .803 & .593 \\
 \midrule
 \multicolumn{3}{@{}l}{\emph{Ours, regenerated images / released annotations}}\\
 All-call P2+R2 & .813$^{\dagger}$ & .637$^{*}$ \\
-Middle-call P2+R2 & .817$^{\dagger}$ & .644$^{*}$ \\
-A3 middle-call P2+R2$^{\ddagger}$ & .823$^{\dagger}$ & .662$^{*}$ \\
+Middle-call P2+R2 & .816$^{\dagger}$ & .644$^{*}$ \\
+A3 middle-call P2+R2$^{\ddagger}$ & .823 & .662$^{*}$ \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Class-word results against the numbers reported by OVAM}~\cite{marcosmanchon2024ovam}; optimized-token rows are deliberately excluded. OVAM Table 1 evaluates each baseline on its authors' renders and annotations, whereas our attention requires regeneration from prompts and seeds and uses the released annotations. Thus cross-block differences are indicative, not a paired head-to-head estimate. $^{\dagger}$VOC OOF; $^*$COCO with VOC-frozen threshold and method. $^{\ddagger}$Exploratory forced-OOF A3 result; it was not the registered multi-candidate winner and uses the implemented transposed-affinity score.}
+\caption{\textbf{Class-word results against the numbers reported by OVAM}~\cite{marcosmanchon2024ovam}; optimized-token rows are deliberately excluded. OVAM Table 1 evaluates each baseline on its authors' renders and annotations, whereas our attention requires regeneration from prompts and seeds and uses the released annotations. Thus cross-block differences are indicative, not a paired head-to-head estimate. $^{\dagger}$VOC OOF of the registered selection path; $^*$COCO with VOC-frozen threshold and method. $^{\ddagger}$Exploratory forced-OOF A3 result; it was not the registered multi-candidate winner and uses the implemented transposed-affinity score.}
 \label{tab:published_comparison}
 \end{table}
 
-The published OVAM table is the appropriate literature context, but its rows cannot be interpreted as a controlled paired test of our operator: different generation settings can alter the image, and OVAM's evaluation adapts prompt-bound methods to an attribution prompt on COCO-Cap. We additionally re-scored released masks with available evaluation code; those scores and their method-specific conditions remain in the artifact registry rather than replacing the paper's published numbers.
+Re-scored released masks of the published methods, with their method-specific conditions, are in the artifact registry; they do not replace the published numbers.
 
-\paragraph{What later extensions show.}
-After the validated MID-P2+R2 choice, the SG24 A3 weighted CA seed reaches 0.823 forced OOF versus 0.817 for its same-run unweighted reference and 0.662 versus 0.644 on COCO-Cap. Its full-VOC threshold gives 0.824, which is an in-sample score and is not used as the main VOC estimate. A subsequent multiscale SA experiment keeps A3 fixed: 16-to-64-pixel propagation plus R2 gives 0.818 VOC OOF and 0.697 frozen COCO, while the 64-pixel reference gives 0.823 and 0.662. It is a transfer observation, not the VOC-selected method. A broad SG27 fusion screen also retains the fine-scale reference in all five folds; its largest COCO score is not promoted because it loses VOC and has a boundary threshold. These studies expose a meaningful scale-versus-transfer tradeoff without changing the confirmed paper result.
+\paragraph{Class-level transfer is weak.}
+Aggregate gains transfer more reliably than their class pattern. Across fourteen within-run comparisons, the correlation between a change's per-class effect on VOC-Sim and on COCO-Cap ranges from $-0.01$ to $+0.46$ (supplementary material). The middle-call window, for instance, improves 16 VOC and 17 COCO classes, but VOC person loses (supplementary material). A class that a change helps on one benchmark is therefore weak evidence that it helps on the other.
+
+\paragraph{Beyond the validated system.}
+After SG22 the open question moved back to the seed and to SA scale; each study keeps the validated SA and DenseCRF. A CA module weighting (SG24-A) scores the agreement of each CA module's query--key affinity with a paired SA affinity. Its registered multi-candidate selector kept the unweighted reference; the A3 variant nonetheless scores 0.823 forced OOF versus 0.817 for the same-run reference, and 0.662 versus 0.644 on COCO-Cap, and was retained as the working default by owner decision. Its full-VOC threshold gives 0.824, which is in-sample and is not used as the main VOC estimate. Restoring the five 32-pixel CA modules under A3 (SG24-B) loses 0.8 forced-OOF VOC points and wins no fold, while gaining 0.8 on COCO-Cap.
+
+The studies that follow, all on the A3 seed, share one pattern: coarser SA helps transfer and hurts selection. Propagating through a 16-pixel SA module before the 64-pixel one (SG25) raises frozen COCO-Cap from 0.662 to 0.698 and improves 19 of 20 COCO classes, yet scores 0.818 VOC OOF against 0.823 and improves only 9 VOC classes. Coarse-guided SA (SG26) repeats this: after DenseCRF, each new cell loses 0.4--2.5 forced-OOF VOC points and gains 1.3--2.0 COCO-Cap points. A 46-formula late-fusion screen (SG27) retains the fine-scale reference in all five folds; its best COCO cell, 0.705, loses VOC and sits at the edge of the threshold grid. A PEARL-inspired study (SG28, \cite{pei2026pearl}) found one boundary-aware Laplacian that gains 0.4 raw VOC points, but only $+0.0001$ after DenseCRF, so again the gain does not survive refinement. A NERVE-inspired study (SG29, \cite{mahatha2025nerve}) is running. These results suggest that COCO-Cap's cluttered scenes benefit from coarser context that the simpler VOC-Sim scenes do not reward. Under the registered rule, they do not change the selected system.

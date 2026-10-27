@@ -1,6 +1,17 @@
-\section{Negative and null results}
+\section{Per-class effects}
 \label{sec:supp_negative}
-\owner{Claude (artifact audit)}
-\TODO{$\sa^\top\ca$; CA-H, SA-T, SA-R and SA-H failing in combination; the
-closest joint-audit alternative; the 65{,}535-subset searches as exploratory
-maxima.}
+Figure~\ref{fig:supp_class_deltas} shows the per-class change of fourteen within-run comparisons, from the committed per-class tables (\texttt{scripts/narmyn/attention/cross\_package\_classes.py}). Three observations support the main text. First, the promoted raw-stage operators (top block) resemble the second pass on VOC-Sim: over the 20 classes, the change from SG2 correlates with the change from a second pass at 0.88 and that from SG12 at 0.82 (SG11: 0.44; SG8: 0.34). This is consistent with their acting through the same mechanism, object completion. Second, after DenseCRF (bottom block) the pattern weakens, and only the middle-call window and A3 keep a positive VOC-Sim mean. Third, a change's per-class effect on VOC-Sim predicts its effect on COCO-Cap poorly: the correlation over classes is between $-0.01$ and $+0.46$ for every comparison. Person is the most volatile class on VOC-Sim, with seven gains and seven losses beyond $\pm0.005$; potted plant and chair lose most often (eight comparisons each), and bicycle loses twice as often as it gains; on COCO-Cap, dining table loses in nine of fourteen comparisons. Figure~\ref{fig:supp_temporal_classes} gives the class detail of the SG22 middle-call decision.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/supp_class_deltas.pdf}
+\caption{\textbf{Per-class IoU change, candidate minus same-run reference.} Rows: fourteen comparisons, raw operators above the line and complete pipelines with DenseCRF below; VOC-Sim at each cell's full-VOC threshold, COCO-Cap at that threshold (frozen). Blue: gain; red: loss; colour saturates at $\pm0.15$.}
+\label{fig:supp_class_deltas}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=.87\textwidth]{figures/temporal_class_effects.pdf}
+\caption{\textbf{The middle-call gain is heterogeneous.} Per-class IoU change for MID-P2+R2 versus ALL-P2+R2 in the same SG22 evaluation, with the threshold chosen on VOC only. Chair improves on both datasets; VOC person loses 0.016.}
+\label{fig:supp_temporal_classes}
+\end{figure*}

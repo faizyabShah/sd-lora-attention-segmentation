@@ -1,8 +1,10 @@
-\section{Every controlled package}
+\section{Every registered family}
 \label{sec:supp_packages}
-\owner{each package owner}
-\TODO{One subsection per package (CA A/B, CA-C, SA A/B, SA-C, joint audit,
-phase 3): fold choices, OOF table, calibration, AP, per-class changes, and the
-number of configurations searched. Full per-configuration CSVs are in the
-evidence package.}
-\source{evidence package A1--A6}
+Table~\ref{tab:supp_families} lists the 45 comparisons of Fig.~2 of the main paper with their reference, plotted cell, number of candidates and both changes. Every value is recomputed from the committed per-image shards of the named package (\texttt{scripts/paper/figure\_decision\_map.py}; values in \texttt{outputs/segmentation/paper\_figures/decision\_map.csv}). Three choices keep the comparison uniform. Each point compares two cells of one run, so no environment difference enters. Each cell is scored at its own full-VOC threshold on the 17-point grid, which places the point but is in-sample; the promotion decision is the out-of-fold rule of the protocol section given. Cells that repeat another package's operator by design (SG26 S1/S2, SG27 S1/S2, which reproduce SG25) are excluded from the best-variant choice.
+
+\input{tables/generated/decision_map_families}
+
+\paragraph{What each family tested.}
+\emph{Graph restriction.} SG1 estimates, for each uncertain pixel, the probability that a walk reaches confident foreground before confident background. SG3 preserves pixels on which the call--head observations agree and propagates mainly elsewhere. SG9 replaces each affinity by a reciprocal form of $A$ and $A^\top$ (geometric mean, minimum or soft gate). SG10 scores each pixel by its widest-path (bottleneck) connectivity to the confident seed. SG4 and SG13 partition the SA graph into regions and label whole regions from CA evidence. \emph{Backlog} (Sec.~83): seeded progressive expansion (P9), a propagated background map (BG1), iteration to convergence (W4), multi-resolution fusion (H1), DiffSeg-style attention merging (G1), seeded region growing (G4), CA-weighted single and multiple prototypes (M1, M2), DenseCRF with SA edges (R1), a heat kernel over pass counts (P3), a symmetric normalized affinity (P5), a column-mass gate (F2), entropy-weighted observations (W1) and per-image head selection by agreement with the seed (W2).
+\emph{Observation reliability.} SG2 weights each SA edge by its consistency across observations; SG8 combines the 248 propagated maps by per-pixel trimmed means, variance gating or sign agreement (promoted: sign agreement of a fraction $\rho=0.8$); SG11 aggregates observations robustly (trimmed mean, median) where they agree; SG12 discards the least consistent observations. SG14 and SG15 combine or refine SG11. SG17 filters the second pass's additions by their reliability.
+\emph{Time, heads and scale.} SG18 restricts SA to call windows; SG21 weights SA heads by structural roles; SG22 and SG23 cross the window with the number of passes and with the reliability operators, before and after DenseCRF. SG24 weights CA modules by their agreement with SA (A) or restores the 32-pixel CA modules (B). SG25--SG27 propagate through coarser SA modules alone, as guidance, or as late fusion. SG28 adds PEARL-inspired components (Procrustes alignment, boundary-aware Laplacians, cross-scale trust)~\cite{pei2026pearl}.

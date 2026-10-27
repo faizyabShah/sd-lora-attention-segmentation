@@ -1,6 +1,18 @@
 \section{Protocol}
 \label{sec:supp_protocol}
-\owner{Codex (protocol Section 29)}
-\TODO{Fixed conditions, fold construction, decision rule, registry rules
-R1--R11, deviations.}
-\source{protocol Sections 2--6; registry Section 0}
+The full protocol, with every registration, result and review in the order they happened, is \texttt{docs/ATTENTION\_SEGMENTATION\_EXPERIMENT\_PROTOCOL.md} (113 sections); the registry of experiment families is \texttt{docs/ATTENTION\_FUSION\_AND\_TOKEN\_IDEAS.md}. This section summarizes the rules that every reported number obeys.
+
+\paragraph{Fixed conditions.}
+Stable Diffusion 1.5 generates every image from its released prompt and seed, with 30 scheduler steps, classifier-free guidance 7.5, a float32 model and float16 storage of compact attention. ``Calls 0--30'' are the 31 recorded UNet call indices, inclusive. CA uses the conditional branch for query and key, a softmax over all 77 positions of the padded attribution prompt, and the mean over every tokenizer piece of the class name within each head. All maps are combined on a $64\times64$ grid. Generated images and attention tensors are discarded after scoring; per-image TP, FP and FN at every threshold of the grid are kept, so that folds, bootstrap intervals and later analyses need no regeneration.
+
+\paragraph{Folds.}
+\texttt{configs/voc\_sim\_folds.csv} assigns the 490 VOC-Sim images to five class-stratified folds (about five images per class per fold), with a fixed seed, committed before any run. In each outer fold, the method parameter and the mask threshold are chosen on the other four folds and scored on the held-out fold; the reference is treated the same way.
+
+\paragraph{Decision rule (v1.2).}
+A candidate is promoted if it improves training-fold mIoU by at least 0.010, or by 0.005--0.0099 with at least 12 of 20 classes improved and no class losing more than 0.05; it must win at least four of five fold votes and give a positive pooled OOF gain. Within 0.002, the simpler setting wins (the reference, then fewer added operations, then fewer free parameters). Each family is screened against its own reference; family winners then go to a combined confirmation.
+
+\paragraph{Registry rules.}
+R1: only VOC-Sim selects; COCO-Cap is scored once per frozen pipeline. R2: the frozen CA/SA pair is the reference input. R3: folds and thresholds as above, on the 17-point grid 0.30--0.70. R4--R5: the decision and tie rules above. R6: per-image records, commit and environment for every shard. R7: each package runs in one environment and compares only with its own reference. R8: grids are committed before the run; later changes are logged and labelled post hoc. R9: every package reports fold choices, OOF scores, paired bootstrap intervals, per-class changes and the number of configurations searched. R10: training-free, few-shot and external-segmenter tracks are reported separately. R11: no token is trained on an image of the fold it is scored on.
+
+\paragraph{Deviations.}
+Four departures from these rules affect reported numbers, and each is labelled where it appears. (i) The A3 CA weighting was retained by owner decision after the registered selector kept its reference (SG24-A); all later studies (SG25--SG29) build on it. (ii) SG13's candidate cells use a 0--1 threshold grid by 0.005, registered before the run; its controls keep the 17-point grid. (iii) SG22--SG24 shards ran on a mix of V100 and A100 nodes, against R7 (Sec.~\ref{sec:supp_reproducibility}). (iv) SG23's raw promotion depends on the order of tied candidates, which the registration did not fix (Sec.~\ref{sec:supp_reproducibility}).

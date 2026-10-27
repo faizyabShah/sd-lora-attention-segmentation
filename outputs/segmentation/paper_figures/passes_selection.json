@@ -1,0 +1,53 @@
+{
+  "source": "outputs/segmentation/controlled_attention_cv/sg22 (raw, threshold 0.45)",
+  "picks": {
+    "voc_completion": {
+      "dataset": "voc",
+      "rule": "completion: q0.90 of IoU(ALL-P2)-IoU(ALL-P1) at 0.45",
+      "image_id": "ovam-voc-sim-373",
+      "class": "person",
+      "delta": 0.05615122841109488,
+      "sg22_iou": {
+        "ALL-P1": 0.6616656479795339,
+        "ALL-P2": 0.7178168763906287,
+        "ALL-P3": 0.7937637532716696
+      }
+    },
+    "voc_leakage": {
+      "dataset": "voc",
+      "rule": "leakage: q0.10 of IoU(ALL-P3)-IoU(ALL-P2) at 0.45",
+      "image_id": "ovam-voc-sim-251",
+      "class": "dining-table",
+      "delta": -0.017450388015920526,
+      "sg22_iou": {
+        "ALL-P1": 0.21736532058396654,
+        "ALL-P2": 0.19339337358009215,
+        "ALL-P3": 0.17594298556417162
+      }
+    },
+    "coco_completion": {
+      "dataset": "coco",
+      "rule": "completion: q0.90 of IoU(ALL-P2)-IoU(ALL-P1) at 0.45",
+      "image_id": "ovam-coco-273098-person-1695899095",
+      "class": "person",
+      "delta": 0.04266490787214092,
+      "sg22_iou": {
+        "ALL-P1": 0.11195901595602753,
+        "ALL-P2": 0.15462392382816845,
+        "ALL-P3": 0.19263303988410613
+      }
+    },
+    "coco_leakage": {
+      "dataset": "coco",
+      "rule": "leakage: q0.10 of IoU(ALL-P3)-IoU(ALL-P2) at 0.45",
+      "image_id": "ovam-coco-453219-train-279470692",
+      "class": "train",
+      "delta": -0.028252808359803372,
+      "sg22_iou": {
+        "ALL-P1": 0.19697317505082967,
+        "ALL-P2": 0.16990552161122427,
+        "ALL-P3": 0.1416527132514209
+      }
+    }
+  }
+}

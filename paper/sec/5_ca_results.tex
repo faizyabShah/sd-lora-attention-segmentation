@@ -1,15 +1,12 @@
 \section{Semantic localization: selecting the CA seed}
 \label{sec:ca}
-A CA map should identify a reliable semantic core before any SA expansion. We first hold propagation aside and screen denoising calls, resolutions, modules, heads and attribution conventions. This separates a weak seed from an overly aggressive graph operation.
+\emph{Question: does CA give the queried class a reliable semantic core?} A CA map should identify that core before any SA expansion. We first hold propagation aside and screen denoising calls, resolutions, modules, heads and attribution conventions. This separates a weak seed from an overly aggressive graph operation.
 
 \paragraph{Spatial scale matters more than a preferred head.}
-Removing the five $32\times32$ CA modules raises OOF mIoU from 0.665 to 0.691 in the combined CA confirmation; four folds choose it. The paired mean-image IoU change is $+0.022$ (95\% bootstrap interval $[+0.014,+0.029]$). The effect persists at 0.35, 0.45 and 0.55, although average precision falls from 0.922 to 0.913: the chosen seed is more selective at the operating threshold, not a universal improvement in pixel ranking. Figure~\ref{fig:ca_example} shows why scale is a substantive choice: the example's 32-pixel map highlights only a narrow part of the airplane, while the retained scales offer complementary extent and detail. This is an illustration, not evidence that every 32-pixel layer is poor.
+Removing the five $32\times32$ CA modules raises OOF mIoU from 0.665 to 0.691 in the combined CA confirmation; four folds choose it. The paired mean-image IoU change is $+0.022$ (95\% bootstrap interval $[+0.014,+0.029]$). The effect persists at 0.35, 0.45 and 0.55, although average precision falls from 0.922 to 0.913: the chosen seed is more selective at the operating threshold, not a universal improvement in pixel ranking. An example in the supplementary material shows why scale is a substantive choice: the example's 32-pixel map highlights only a narrow part of the airplane, while the retained scales offer complementary extent and detail. This is an illustration, not evidence that every 32-pixel layer is poor.
 
 On separate screens, removing CA head 1 and some module subsets appeared useful. Once crossed with the resolution choice, the extra head restriction changes mIoU by only $+0.0004$ and lies inside the 0.002 tie band. We therefore keep all eight heads. The conditional-query attribution convention, with the softmax over 77 text positions and the mean of all pieces of the class word, also survives; the tested OVAM-style unconditional/first-piece alternative is 0.016 lower in its own screen. Denoising-call restriction is not retained in this initial CA stage.
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{figures/ca_airplane.pdf}
-\caption{\textbf{Why CA resolution is a real design choice.} One VOC-Sim airplane generated image and annotation (left), followed by representative head-averaged CA modules from the same image and all calls. All heatmaps use one color scale. The selected seed retains 8, 16 and 64-pixel modules and omits the 32-pixel group. This visual example motivates the controlled resolution test; the fold-level evidence is in Tab.~\ref{tab:stage_decisions}.}
-\label{fig:ca_example}
-\end{figure*}
+\paragraph{Decision and next question.}
+We freeze the seed: eleven CA modules at 8, 16 and 64 pixels, all calls and heads, conditional queries and the mean over word pieces. A later test of contrastive seeds (SG5), which compare the class-word attention with the start-of-text, non-target or padding positions, use OVAM's two-key normalization, or average fixed synonyms, was retained by the reference in all five folds, both for the raw seed and inside the final pipeline; its best variant lost 2.7 COCO-Cap points (Fig.~\ref{fig:decision_map}a). The frozen seed is selective but incomplete (Fig.~\ref{fig:pipeline_stages}, second row): it marks the most class-specific parts of the object and leaves the rest weak. That raises the next question, how to complete the object from this core.
+

@@ -1,0 +1,67 @@
+{
+  "rule": "Pipeline: FTF (two observation-wise SA passes + OVAM DenseCRF) at its frozen threshold\n0.45, from the committed SG5 package (``W/P1+R2``; same environment as the regeneration).",
+  "pipeline": "W/P1+R2",
+  "threshold": 0.45,
+  "datasets": {
+    "voc": [
+      {
+        "class": "sofa",
+        "class_quantile": 1.0,
+        "class_iou": 0.958,
+        "image_id": "ovam-voc-sim-446",
+        "image_iou": 0.9659,
+        "images_in_class": 25
+      },
+      {
+        "class": "bottle",
+        "class_quantile": 0.667,
+        "class_iou": 0.8793,
+        "image_id": "ovam-voc-sim-118",
+        "image_iou": 0.9442,
+        "images_in_class": 25
+      },
+      {
+        "class": "tv",
+        "class_quantile": 0.333,
+        "class_iou": 0.776,
+        "image_id": "ovam-voc-sim-499",
+        "image_iou": 0.8829,
+        "images_in_class": 22
+      },
+      {
+        "class": "dining-table",
+        "class_quantile": 0.0,
+        "class_iou": 0.4507,
+        "image_id": "ovam-voc-sim-250",
+        "image_iou": 0.3374,
+        "images_in_class": 25
+      }
+    ],
+    "coco": [
+      {
+        "class": "bus",
+        "class_quantile": 1.0,
+        "class_iou": 0.9049,
+        "image_id": "ovam-coco-215153-bus-2869477059",
+        "image_iou": 0.9156,
+        "images_in_class": 37
+      },
+      {
+        "class": "aeroplane",
+        "class_quantile": 0.5,
+        "class_iou": 0.6343,
+        "image_id": "ovam-coco-196984-aeroplane-3878063291",
+        "image_iou": 0.8713,
+        "images_in_class": 49
+      },
+      {
+        "class": "person",
+        "class_quantile": 0.0,
+        "class_iou": 0.2304,
+        "image_id": "ovam-coco-180769-person-1255158167",
+        "image_iou": 0.1622,
+        "images_in_class": 52
+      }
+    ]
+  }
+}

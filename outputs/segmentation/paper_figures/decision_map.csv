@@ -1,0 +1,46 @@
+family,panel,status,protocol_section,package,reference,plotted_cell,candidates,voc_ref,voc_cell,voc_delta,coco_ref,coco_cell,coco_delta
+P1 two passes,a,promoted,43,sg2_densecrf_confirmation,W/REF,W/P1,1,0.7886,0.8006,0.012,0.6172,0.6245,0.0073
+R2 DenseCRF,a,promoted,44,sg2_densecrf_confirmation,W/REF,W/REF+R2,1,0.7886,0.8047,0.0161,0.6172,0.6348,0.0177
+SG1 absorbing walk,a,rejected,71,sg1_sg3_graph_refinement,W/REF,W/SG1/f90_b10_r1,12,0.7886,0.7456,-0.043,0.6172,0.535,-0.0822
+SG3 confidence lock,a,rejected,71,sg1_sg3_graph_refinement,W/REF,W/SG3/f95_b05_r0_n1,24,0.7886,0.7767,-0.012,0.6172,0.6193,0.0021
+SG5 contrastive seed,a,rejected,70,sg5_contrastive_seed,W/REF,WN/REF,5,0.7886,0.7948,0.0062,0.6173,0.5907,-0.0266
+SG8 observation consensus,a,promoted,78,sg8_observation_consensus,W/REF,W/C/rho0p80,15,0.7888,0.7969,0.0081,0.6178,0.6213,0.0035
+SG9 reciprocal links,a,rejected,78,sg9_reciprocal_propagation,W/REF,W/R1_geometric,3,0.7888,0.7913,0.0026,0.6178,0.6187,0.0009
+SG10 bottleneck,a,rejected,79,sg10_seed_connected_bottleneck,W/REF,W/B3_G2_q95,16,0.7886,0.7827,-0.0059,0.6173,0.6151,-0.0022
+SG2 consensus graph,a,promoted,85,sg2_consensus_edges,W/REF,W/G_cv_g20_n1,12,0.7886,0.7984,0.0098,0.6173,0.6234,0.0061
+SG4 SA regions,a,rejected,85,sg4_region_labels,W/REF,W/SPEC32_rmean,18,0.7886,0.7898,0.0012,0.6173,0.6107,-0.0066
+SG11 robust consensus,a,promoted,89,sg11_sg12_observation_reliability,W/REF,W/SG11/trim20/rho0p80,6,0.7886,0.7984,0.0098,0.6172,0.6219,0.0048
+SG12 observation filtering,a,promoted,89,sg11_sg12_observation_reliability,W/REF,W/SG12/top50,4,0.7886,0.7986,0.0099,0.6172,0.6272,0.01
+SG13 region inference,a,rejected,90,sg13_target_region_inference,W/REF,W/SG13/R1,3,0.7888,0.7685,-0.0203,0.6178,0.6012,-0.0166
+R1 (backlog),a,rejected,83,training_free_backlog,REF/one_pass,R1/w100,3,0.7888,0.7929,0.0041,0.6178,0.63,0.0122
+M2 (backlog),a,rejected,83,training_free_backlog,REF/one_pass,M2/k2,3,0.7888,0.5822,-0.2066,0.6178,0.4146,-0.2032
+M1 (backlog),a,rejected,83,training_free_backlog,REF/one_pass,M1/ca_prototype,1,0.7888,0.3913,-0.3975,0.6178,0.2729,-0.3448
+G4 (backlog),a,rejected,83,training_free_backlog,REF/one_pass,G4/s070,3,0.7888,0.3729,-0.4159,0.6178,0.2554,-0.3624
+G1 (backlog),a,rejected,83,training_free_backlog,REF/one_pass,G1/tau090,2,0.7888,0.6963,-0.0925,0.6178,0.5356,-0.0822
+H1 (backlog),a,rejected,83,training_free_backlog,REF/one_pass,H1/proportional,1,0.7888,0.7813,-0.0075,0.6178,0.627,0.0092
+W4 (backlog),a,rejected,83,training_free_backlog,REF/one_pass,W4/converged,1,0.7888,0.6113,-0.1775,0.6178,0.367,-0.2508
+W2 (backlog),a,rejected,83,training_free_backlog,REF/one_pass,W2/k6,3,0.7888,0.7848,-0.004,0.6178,0.6183,0.0005
+W1 (backlog),a,rejected,83,training_free_backlog,REF/one_pass,W1/T050,3,0.7888,0.7889,0.0002,0.6178,0.6181,0.0003
+BG1 (backlog),a,rejected,83,training_free_backlog,REF/one_pass,BG1/g050,5,0.7888,0.7339,-0.0549,0.6178,0.574,-0.0438
+F2 (backlog),a,rejected,83,training_free_backlog,REF/one_pass,F2/a075,4,0.7888,0.7818,-0.007,0.6178,0.614,-0.0037
+P9 (backlog),a,rejected,83,training_free_backlog,REF/one_pass,P9/s050_bg0,6,0.7888,0.7783,-0.0105,0.6178,0.649,0.0312
+P5 (backlog),a,rejected,83,training_free_backlog,REF/one_pass,P5/n2,4,0.7888,0.7895,0.0007,0.6178,0.6058,-0.0119
+P3 (backlog),a,rejected,83,training_free_backlog,REF/one_pass,P3/t400,4,0.7888,0.7872,-0.0016,0.6178,0.605,-0.0127
+SG14 combined consensus (vs SG11),a,rejected,92,sg14,W/SG11/trim20/rho0p80,W/SG14,1,0.7984,0.7987,0.0003,0.6219,0.6217,-0.0002
+SG15 refinement (vs SG11),a,rejected,92,sg15,W/SG11/trim20/rho0p80,W/SG11/trim20/rho0p80/SG15-B,4,0.7984,0.7989,0.0005,0.6219,0.6131,-0.0088
+SG17 filtered 2nd pass (vs P1),a,rejected,97,sg17,W/P1,W/SG17-Q70,3,0.8007,0.8001,-0.0006,0.6249,0.6196,-0.0052
+SG18 middle calls,a,promoted,97,sg18_temporal_windowed,W/REF,W/T1,3,0.7886,0.7959,0.0073,0.6172,0.6285,0.0113
+SG21 head weighting (vs T1),a,rejected,101,sg21_structural,SG18/T1,SG21-DIST,4,0.7959,0.7941,-0.0019,0.6285,0.6287,0.0002
+SG23 middle-call SG2 (vs MID one-pass),a,borderline,102,sg23,MID-R0,MID-SG2,3,0.7959,0.802,0.0061,0.6287,0.6292,0.0006
+SG28 PEARL-inspired (vs A3 P2),a,rejected,112,sg28,P0,B2,11,0.8114,0.814,0.0027,0.6599,0.6654,0.0055
+SG2 + CRF (vs FTF),b,rejected,89,sg2_densecrf_confirmation,W/P1+R2,W/SG2+R2,1,0.8132,0.8111,-0.0021,0.6371,0.6261,-0.011
+SG12 + CRF (vs FTF),b,rejected,92,sg12_crf,W/P1+R2,W/SG12/top50+R2,1,0.8132,0.8131,-0.0001,0.6371,0.6315,-0.0056
+T1 + CRF (vs FTF),b,rejected,98,sg18_t1_crf,W/P1+R2,W/T1+R2,1,0.8135,0.8122,-0.0013,0.6375,0.6465,0.0089
+SG22 middle calls + CRF (vs FTF),b,promoted,102,sg22,ALL-P2+R2,MID-P2+R2,3,0.8132,0.8185,0.0053,0.6372,0.6438,0.0067
+SG23 middle-call SG2/11/12 + CRF,b,rejected,102,sg23,ALL-P2+R2,MID-SG11+R2,6,0.8133,0.8178,0.0045,0.6373,0.6405,0.0032
+SG24-A CA weighting (A3),b,override,103,sg24_a,A0/FINAL,A3/FINAL,4,0.8185,0.8243,0.0058,0.6437,0.662,0.0183
+SG24-B 16 CA modules,b,rejected,103,sg24_b,B0-A3/FINAL,B1-A3/FINAL,1,0.8244,0.8152,-0.0093,0.6622,0.6703,0.0082
+SG25 multi-resolution SA,b,rejected,104,sg25,FINE-P2+R2,32-to-64+R2,5,0.8242,0.8228,-0.0014,0.6621,0.6717,0.0096
+SG26 coarse-guided SA,b,rejected,105,sg26,S0+R2,S5+R2,4,0.8242,0.8201,-0.0042,0.6621,0.6821,0.02
+SG28 PEARL-inspired + CRF,b,rejected,112,sg28,P0+R2,P3+R2,11,0.8242,0.8234,-0.0008,0.6621,0.6543,-0.0078
+SG27 late fusion,b,rejected,109,sg27,S0+R2,S8+R2,39,0.8242,0.8258,0.0016,0.6621,0.6743,0.0122

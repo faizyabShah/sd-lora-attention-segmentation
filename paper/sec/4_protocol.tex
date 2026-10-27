@@ -10,3 +10,13 @@ Early one-axis screens use a fixed 0.45 mask threshold, with 0.35 and 0.55 as ca
 
 \paragraph{Comparisons and uncertainty.}
 We report each stage against its same-run reference. Paired image-IoU intervals use 20,000 bootstrap resamples; these intervals complement, rather than replace, the class-macro mIoU and fold decision. Published OVAM benchmark numbers are shown separately from our regenerated-image scores. The released baseline masks in our repository are also scored separately, because some methods used different generated images or modified evaluation code.
+
+\paragraph{How the results are organized.}
+Each of Secs.~\ref{sec:ca}--\ref{sec:transfer} asks one question about the pipeline, states what was tried, gives the fold evidence and the decision, and says which question the decision raised next. Figure~\ref{fig:decision_map} summarizes the whole search before the details: one point per registered experiment family, against the reference of its own run. Panel (a) shows operators on the propagated map and panel (b) complete pipelines with DenseCRF. The horizontal position is an in-sample full-VOC change, used only to place the point; whether a family was promoted is the out-of-fold decision of its registered rule.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/decision_map.pdf}
+\caption{\textbf{The search at a glance.} Each point is one registered experiment family, compared with the reference cell of the same run (same generated images). $x$: change in VOC-Sim mIoU at each cell's full-VOC threshold (in-sample, descriptive); $y$: change in frozen COCO-Cap transfer. The plotted cell is the one the fold rule promoted, or else the family's best variant. (a) Operators on the propagated map, mostly against one SA pass. The promoted cluster (blue) gains about one point on both datasets; apart from the second pass and DenseCRF, the promoted operators that were carried to the next stage (SG2, SG12, SG18) do not improve on two passes plus DenseCRF (panel b). (b) Complete pipelines with DenseCRF, against the final pipeline of the same run. Only the middle-call window (SG22) is promoted; the A3 CA weighting (star) was retained by owner decision after the registered selector kept its reference. Several studies (SG25--SG27) raise COCO-Cap transfer but are not selected on VOC-Sim. Per-family values and protocol sections are listed in the supplementary material.}
+\label{fig:decision_map}
+\end{figure*}

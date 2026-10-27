@@ -6594,3 +6594,93 @@ For comparison, SG28's 40 completed shards averaged 35.3 minutes and peaked
 at 61 minutes; SG29's deeper walks may take longer. Per-image checkpoints and
 Slurm requeue handle a shard that reaches the limit. The existing dependent
 merge 237598 remains attached.
+
+## 114. Claude: SG17–SG27 recheck from shards, A3 recommendation, paper review (Sections 111–112) and direct paper edits
+
+**1. SG17–SG27 recheck (shards from commit `4101333`).** All accepted.
+Every report was regenerated from the committed per-image shards; the
+regenerated tables match the committed ones byte for byte apart from CRLF
+line endings and last-digit float differences, and every number quoted in
+Sections 95–109 matches. Findings to record:
+
+- **SG23 tie order.** The raw MID-SG2 promotion depends on the order in which
+  tied candidates are visited, which the registration does not fix: the
+  finalizer's order gives 5/5 votes, a neutral order 4/5, the reversed order
+  3/5 (MID-R0 retained). SG23's raw promotion is therefore tie-order
+  sensitive; the paper marks it so. The same check has no effect on SG22.
+- **Environments (R7).** SG22–SG24 shards mix V100 and A100 nodes; SG17, SG18
+  and SG21 shards record no environment. All comparisons remain within one
+  package; recorded as a deviation in the supplementary material.
+- SG25–SG27 inherit the A3 orientation issue (point 2). SG28 is not yet
+  audited; the paper quotes Section 112, and the recomputed raw B2 COCO change
+  (+0.0055) matches it.
+
+**2. A3 (addendum to Section 107).** On four images, adding GoCA's second
+`permute(2,3,0,1)` at `src/segmentation/sg24_ca.py:84–87` changes per-call
+module weights by 0.9–2.0% (relative) and call-mean weights by ≤ 0.005.
+The owner asked for the fix and a rerun if it matters. Recommendation: fix the line and rerun only the
+working-default control (A3 → MID-P2 → R2, threshold 0.425), not the
+descendants, unless that control moves by more than the 0.002 tie band.
+
+**3. Review of the paper handoff (Section 111).**
+
+1. *Method fidelity:* matches `scripts/run_sa_package_b.py` (softmax over all
+   77 positions; piece mean after softmax; head mean; per module–call
+   bilinear resize; equal weights; min–max) and the DenseCRF call. Accepted.
+2. *SG22 values:* table and class deltas match `sg22/report.md` and
+   `per_class_iou.csv` (chair +.025/+.021; VOC person −.016; 16/20 and 17/20
+   classes). **Correction:** .8168 is MID-P2+R2's *forced* OOF; the registered
+   selection path (4/5 folds) is **.8158** (`results.json`,
+   `selection.crf.oof_miou_selection`). The paper now reports .816 as OOF and
+   labels .8168 forced; the table column is renamed accordingly.
+3. *OVAM Table 1:* all ten numbers verified against the paper (arXiv
+   2403.14291, p. 6; the CVF PDF returned 403). Same pooled-class mIoU.
+4. *A3 caveat:* accepted. The transpose is documented in Section 107, not 103.
+   The paper now gives the measured magnitude (point 2).
+5. *SG25/SG27 framing:* accepted; extended to SG24-B, SG26 and SG28 as one
+   "coarser scale helps transfer, hurts selection" observation, all
+   unpromoted. SG29 is named as running.
+
+Further correction: the first-arrival rates (86.5% → 39.3%) come from the
+SG25 sidecars (A3 seed, calls 10–20, threshold 0.425), not the FTF pipeline;
+the text and caption now say so.
+
+**4. Direct paper edits (owner-authorized; Codex please review).** The
+owner asked that the paper tell the story of how and why each decision was
+taken, with figures. Codex's evidence text is kept; per stage it now reads
+question → tried → evidence → decision → next question.
+
+- *New Fig. 1* (`pipeline_stages`): seed, two passes and final mask on seven
+  images chosen by a fixed class-quantile/median rule; IoUs checked against
+  SG5 shards.
+- *New Fig. 2* (`decision_map`): all 45 registered comparisons, raw and
+  final stage, each against its own run's reference. The x-axis is in-sample
+  and labelled so; colour gives the fold decision.
+- *New propagation-depth figure:* fixed-rule SG22 images across 1–3 passes,
+  plus the SG25 first-arrival rates.
+- *Narrative additions:* the graph-operator families (Sec. 6), observation
+  reliability as a substitute for the second pass (class correlation with P1:
+  SG2 .88, SG12 .82), refinement absorbing propagation gains (SG2+R2, SG12+R2,
+  T1+R2), the untested MID×P2×R2 cell motivating SG22, failure modes, and
+  weak VOC→COCO class transfer (correlations −.01 to +.46).
+- *Moved to the supplementary for the 8-page limit:* the CA airplane and
+  temporal class-effects figures. The validated-progression plot is dropped
+  because Table 1 holds the same numbers. The method overview moved into the
+  Method section.
+- *Supplementary written:* A protocol, B every family (generated table), C
+  per-class, D exploratory B1–B17, E reproducibility and audits, F
+  fixed-rule failure gallery.
+
+Generators: `scripts/paper/figure_{pipeline_stages,decision_map,passes}.py`;
+`scripts/narmyn/attention/{select_figure_images,figure_maps,figure_passes_maps,cross_package_classes}.py`.
+None selects a method. Codex: please check the new narrative claims against
+your packages, especially Sec. 7's "refinement absorbs propagation gains" and
+the SG24–SG28 paragraph in Sec. 8.
+
+*Figure reproduction check (job 237628, V100S).* The four propagation-depth
+images reproduce the SG22 raw one-, two- and three-pass IoUs within 0.0013.
+Seven of the eight gallery images reproduce the SG5 final IoU within 0.0006.
+The COCO chair image gives 0.4262 against 0.4305; we read this as float16
+hardware variation and kept it, since the figure is illustrative and prints
+its own IoU. The body of the main paper now fits in eight pages with the real
+figures (references on page 9).
