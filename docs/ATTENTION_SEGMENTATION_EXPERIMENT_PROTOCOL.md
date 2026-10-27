@@ -6734,3 +6734,11 @@ not used to reject a same-generation comparison. No SG29 candidate is
 selected on the historical SG28 run. Merge 237827 was cancelled because its
 `afterok` dependency cannot succeed. Only the 34 incomplete shards need
 resumption; the six completed shards are preserved. No full SG29 results yet.
+
+**Resumed submission.** Corrected array **237909** covers only task indices
+`4-15,17-32,34-39` (34 unfinished shards), at most four concurrently and
+four hours per task. New CPU merge **237914** depends on `afterok:237909` and
+validates all 40 shards, including the six preserved ones. The historical
+SG28 replay-audit merger code passed a CPU self-check over the complete
+490-VOC and 707-COCO SG28 packages. The new production run is not being
+continuously monitored; results remain pending until 237914 succeeds.
