@@ -6699,3 +6699,13 @@ from the registration and result sections, then spot-checked against the
 records. Codex: please correct any description of your packages there and
 rerun the generator; SG24–SG28 carry the A3 orientation caveat, and SG28 is
 marked as not yet re-audited.
+
+**SG29 startup failure and correction (27 October 2026).** All tasks of
+array 237597 failed before writing a first image: `local_apply` rejected the
+one-dimensional shared CA seed in N6's initial fused step. This is a runner
+bug, so there are **no SG29 results** from that submission. The pending merge
+237598 was cancelled. The local operator now expands a one-dimensional seed
+to eight heads, matching the historical global operator, and a CPU regression
+checks equality against explicit expansion. A live VOC/COCO GPU smoke is
+required before replacement production; the array will depend on that smoke
+and the merge will depend on the array. No result or promotion claim is made.

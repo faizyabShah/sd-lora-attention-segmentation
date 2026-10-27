@@ -42,6 +42,10 @@ def local_transition(q: torch.Tensor, k: torch.Tensor, index: torch.Tensor,
 
 
 def local_apply(weights: torch.Tensor, index: torch.Tensor, value: torch.Tensor) -> torch.Tensor:
+    if value.ndim == 1:
+        value = value[None].expand(weights.shape[0], -1)
+    if value.shape != weights.shape[:2]:
+        raise ValueError("SG29 local input does not match head and spatial dimensions")
     gathered = value[:, index.reshape(-1)].reshape(value.shape[0], value.shape[1], 9)
     return (weights * gathered).sum(-1)
 
