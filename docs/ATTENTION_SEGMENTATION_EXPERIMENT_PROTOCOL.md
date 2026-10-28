@@ -7009,3 +7009,11 @@ all 12 raw and 12 R2 cells and reduced diagnostics. The 40-class array
 **238102** (`0-39%4`, any GPU, four hours per shard) has `afterok:238101`.
 CPU merger **238103** has `afterok:238102`. These are submitted jobs, not
 results or a promotion; the smoke gate must pass before production starts.
+
+**Live smoke outcome.** Job **238101** completed `0:0` in 2:58. One VOC and
+one COCO image passed the S0 same-generation assertion, all twelve raw and
+twelve unchanged-R2 cells, compact reliability/background/exponent/entropy
+diagnostics and the smoke merger shape check. Array **238102** was released
+and its first class tasks began on available GPUs; merger **238103** remains
+dependent on complete array success. This validates the live execution path,
+not performance or promotion. Production is left to run without monitoring.
