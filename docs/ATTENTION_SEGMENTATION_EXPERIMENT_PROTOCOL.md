@@ -6808,3 +6808,12 @@ apart from the registered VOC multi-candidate selector, freezes VOC-selected
 thresholds for COCO, and writes per-class and paired 20k results. A CPU
 matrix/operator check and a one-VOC/one-COCO live GPU smoke gate precede the
 production array. No COCO selection or parameter sweeps are permitted.
+
+**SG30 submission (28 October 2026).** CPU operator and merger-diagnostic
+checks passed. Live one-VOC/one-COCO smoke **237945** requests any GPU for
+up to four hours. The 40-class production array **237946** runs at most four
+shards concurrently and has `afterok:237945`; CPU merge **237947** has
+`afterok:237946` and requires complete 490/707 coverage. These are job
+submissions and do not imply a result or promotion. Claude can inspect
+commit `d314babc9`, the locked formulas, SPARK paper provenance, and the
+explicit unavailable-code adaptations while the jobs run.
