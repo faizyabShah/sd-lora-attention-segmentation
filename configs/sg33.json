@@ -1,0 +1,19 @@
+{
+  "experiment": "SG33 hierarchical residual SA refinement and coarse Markov semantic reachability",
+  "version": 1,
+  "cells": ["S0", "H0", "H1", "H2", "H3", "H4", "M1", "M2", "M3", "C1", "C2", "C3"],
+  "ca": "frozen A3: SD1.5, selected eleven CA modules, calls 0-30, all heads, class-word W, no restored 32x32 CA",
+  "sa": "SG25 modules 16/32/64, matched calls 10-20 inclusive, eight heads; sequential call-wise head-mean hierarchy",
+  "s0": "same-generation SG27 FINE-P2 global control",
+  "h0": "SG31 S2 sequential 16 to 32 to 64 hierarchy control",
+  "residuals": "per-call minmax stage normalization; H1 equal, H2 .2/.3/.5, H3 1/9 5/9 3/9, H4 max(r64,.5r32,.25r16)",
+  "markov_tau": 0.3,
+  "temperature": 0.65,
+  "markov_cap": 256,
+  "ipf_tolerance": 1e-5,
+  "ipf_max_iterations": 100,
+  "diagnostic_threshold": 0.45,
+  "thresholds": [0.3, 0.325, 0.35, 0.375, 0.4, 0.425, 0.45, 0.475, 0.5, 0.525, 0.55, 0.575, 0.6, 0.625, 0.65, 0.675, 0.7],
+  "selection": "five frozen VOC folds; raw/R2 separately; forced OOF, pairwise wins and registered multi-candidate selector; VOC full threshold frozen to COCO",
+  "storage": "resumable counts, compact per-image Markov/stage diagnostics and small representative visual sheets only; no generated images, dense maps, QK or affinity cache"
+}

@@ -802,3 +802,21 @@ Full locked formulas, compact GT-post-hoc diagnostics, control tolerances,
 and Claude review points are in `configs/sg32.json` and protocol Section
 121. Same-generation controls use `atol=1e-5, rtol=1e-4` to tolerate
 float32 reduction-order differences while still rejecting material drift.
+
+## 22. SG33 hierarchical residuals and coarse Markov semantic reachability (Codex; 29 October 2026)
+
+SG33 is the locked next experiment. It adapts two external ideas while keeping
+our sequential 16→32→64 SA hierarchy. FA-Seg (Huy Che and Vinh-Tiep Nguyen,
+arXiv:2506.23323v6) motivates retaining intermediate hierarchical states as
+residual semantic support; its own fusion is parallel and is not reproduced.
+M2N2 (Markus Karmann and Onay Urfalioglu, CVPR 2025, arXiv:2411.10411v2)
+motivates first-arrival Markov maps, IPF and T=0.65; SG33 uses a class-word
+CA probability seed instead of a click and changes only the 16×16 stage.
+
+Freeze A3 CA, SG25 matched calls 10–20 and all eight SA heads. Compare S0
+FINE-P2, H0 ordinary sequential hierarchy, four residual variants, three
+Markov variants, and three Markov-plus-equal-residual variants, all raw and
+with unchanged R2. Select on five fixed VOC folds; COCO is frozen transfer.
+No parameter sweep or new cell may be added after results. Full definitions,
+diagnostics, stop rules and Claude review points are in `configs/sg33.json`,
+`scripts/run_sg33.py`, and protocol Section 122. Results are pending.

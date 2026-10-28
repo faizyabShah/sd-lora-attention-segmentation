@@ -7017,3 +7017,43 @@ diagnostics and the smoke merger shape check. Array **238102** was released
 and its first class tasks began on available GPUs; merger **238103** remains
 dependent on complete array success. This validates the live execution path,
 not performance or promotion. Production is left to run without monitoring.
+
+## 122. SG33 locked hierarchical residual and coarse Markov experiment (Codex; 29 October 2026)
+
+The owner supplied a locked SG33 specification. **Claude: please review this
+implementation and its eventual results before any promotion or manuscript
+performance claim.** FA-Seg (Che and Nguyen, arXiv:2506.23323v6) motivates
+residual retention of intermediate SA resolutions; M2N2 (Karmann and
+Urfalioglu, CVPR 2025, arXiv:2411.10411v2) motivates Markov first-arrival,
+IPF, and T=0.65. SG33 adapts these ideas to our sequential 16→32→64
+hierarchy with class-word CA, not a reproduction of either paper.
+
+A3 CA and matched SG25 SA calls 10–20, modules 16/32/64, all eight heads are
+frozen. S0 is same-generation FINE-P2; H0 replays SG31 S2. H1–H3 add fixed
+normalized stage residuals (equal, .2/.3/.5, and 1/9:5/9:3/9); H4 adds
+max(r64,.5r32,.25r16). M1 uses 16² first-arrival reachability from a
+normalized CA seed, threshold .3 and cap256; M2 adds IPF tolerance 1e-5,
+100 iterations; M3 adds T=.65 before IPF. C1–C3 add equal residuals to
+M1–M3. Every cell is raw and with the unchanged R2. No sweep is allowed.
+
+The runner stores only resumable metric counts, compact stage/Markov/IPF
+diagnostics and small VOC representative sheets. It frees generated images,
+SA QK and dense maps each image. The merger requires 40 class shards and
+490 VOC/707 COCO images, uses five fixed VOC folds and 17 thresholds,
+reports forced OOF, pairwise fold wins and registered selector separately,
+freezes full-VOC thresholds to COCO, and checks historical SG31 replay.
+No COCO selection or GT-guided inference occurs. Markov cap512 is diagnostic
+only if cap256 leaves >5% nodes unreached for a call. Before evaluating a
+promotion, apply the locked branch stop rules in the supplied specification.
+
+Claude should check matrix orientation, per-call head averaging and order,
+per-stage normalization before residual fusion, H0 replay, Markov t=0 and
+unreached handling, IPF row/column convergence, raw/R2 order, GT diagnostic
+boundaries, and caption-presence split. Code is in `src/segmentation/sg33_hierarchy.py`,
+`scripts/run_sg33.py`, `scripts/finalize_sg33.py`, and `configs/sg33.json`.
+**Submitted (29 October 2026).** CPU syntax/serialization and operator checks
+passed. Live one-VOC/one-COCO GPU smoke **238107** is pending scheduling. The
+40-class array **238108** (`0-39%4`, any GPU, six hours per shard, requeue on
+time signal) has `afterok:238107`. CPU merger **238109** has `afterok:238108`.
+These are submitted jobs, not results. The smoke gate must succeed before
+production can start. Its outcome will be recorded after it finishes.
