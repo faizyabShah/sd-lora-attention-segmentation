@@ -723,3 +723,32 @@ metric counts and reduced graph, edge-quartile, GT-post-hoc and iteration
 diagnostics. Exact formulas and provenance are locked in `configs/sg30.json`
 and protocol Section 116. Claude should review the unavailable-code caveat,
 pruning fallback, feature source, same-generation S0 replay and final results.
+
+## 20. SG31 SeeDiff-inspired re-seeding and background propagation (Codex; 28 October 2026)
+
+**Owner:** Codex submits and runs; Claude audits implementation and merged results.
+Source: Park, Jo, and Baik, [*SeeDiff: Off-the-Shelf Seeded Mask Generation from
+Diffusion Models*](https://doi.org/10.1609/aaai.v39i6.32686), AAAI 2025,
+BibTeX `park2025seediff`; [authors' code](https://github.com/BAIKLAB/SeeDiff).
+This is **SeeDiff-inspired mechanisms adapted to our A3 class-conditioned SD1.5
+attention segmentation pipeline**, not a SeeDiff reproduction. SeeDiff uses a
+different SD backbone and CA source. The paper supplies fixed alpha=0.5 and
+selected-SA-row expansion. We preserve our A3, calls 10–20, all heads, 17
+thresholds, and unchanged R2.
+
+Provenance: GoCA inspired A3 CA weighting; PEARL led to SG28 geometry tests
+(unpromoted); NERVE led to SG29 head/stop/local tests (unpromoted); SPARK led
+to concurrent SG30 graph tests; SeeDiff motivates SG31 hard coarse-to-fine
+re-seeding and independently propagated background support. SG25 already
+tested continuous 16→64; SG31 compares that exact path and a continuous
+16→32→64 path against selected-row hard/soft variants.
+
+Locked S0–S10: original FINE-P2; SG25 16→64; continuous 16→32→64; hard
+16→32→64; hard 32→64; soft row-weighted 16→32→64; FINE plus one-step
+background; FINE plus P2 background; hard 16→32→64 plus one-step background;
+hard 32→64 plus one-step background; normalized F² sharpening control. All
+are scored raw and +R2 on VOC and frozen COCO. Seed-count, component,
+fallback, expansion area, foreground transition, background precision/removal,
+distance/component leakage, per-class and caption-presence diagnostics are
+compact sidecars. GT enters diagnostics only. Exact definitions and Claude
+review checklist are in `configs/sg31.json` and protocol Section 117.

@@ -6825,3 +6825,50 @@ sidecar merge smoke. Array **237946** was released by its `afterok` gate and
 has begun class tasks on available GPU nodes. CPU merge **237947** remains
 dependent on all array tasks succeeding. This is validation of the live
 operator path, not an experimental score.
+
+## 117. SG31 locked SeeDiff-inspired experiment and Claude handoff (Codex; 28 October 2026)
+
+The owner asked Codex to submit SG31 concurrently with SG30. Claude should
+audit code, provenance, diagnostics and results before interpretation or
+promotion. The paper is Park et al., *SeeDiff: Off-the-Shelf Seeded Mask
+Generation from Diffusion Models* (AAAI 2025, DOI
+10.1609/aaai.v39i6.32686); citation `park2025seediff` is in
+`paper/references.bib`. The authors' repository is BAIKLAB/SeeDiff. This is
+an adaptation to our A3 SD1.5 class-word pipeline, not SeeDiff end-to-end.
+The GoCA→A3, PEARL→SG28, NERVE→SG29 and SPARK→SG30 provenance chain is in
+ideas Section 20. SG30 and SG31 are independent runs.
+
+Freeze A3 11 CA modules, calls 0–30, all heads, class-word W and existing
+normalization. Use SG25 16/32/64 SA modules, same-call pairing, calls 10–20,
+all eight heads. The 0.5 seed threshold comes from SeeDiff; no threshold or
+scale order tuning. Selected-row expansion literally averages A[p,:] for
+chosen seed rows, which has a different orientation from historical A @ c.
+Every step uses spatial minmax before the next scale. Empty seed sets use a
+deterministic top-1 fallback and are counted. Details for S0–S10 and all
+operators are locked in `configs/sg31.json`.
+
+S0 is exact same-generation FINE-P2; S1 exact SG25 16→64. S2 is continuous
+16→32→64. S3/S4 are hard selected-row re-seeding through 16→32→64 and
+32→64. S5 is soft weighted-row control. S6/S7 add selected-row or P2
+background support to S0. S8/S9 add selected-row background support to S3/S4.
+S10 is normalized F² sharpening control. Each is scored raw and +R2 using
+the unchanged 17-threshold grid. Separate five-fold VOC screens, forced OOF,
+paired held-out wins, full VOC thresholds and frozen COCO transfer are required.
+The COCO caption-presence split is descriptive only. Store only per-image
+metric counts and compact per-call seed, foreground-change and background
+diagnostics; no generated images, maps, masks or Q/K.
+
+Claude should inspect selected-row orientation, per-scale normalization, S0/S1
+same-generation assertions, BG seed from F≤0.5, final minmax and R2 ordering,
+the 20-class/490-VOC/707-COCO merge and whether foreground/background gains
+survive the F² control. GT is used for post-hoc diagnostics only. The paper
+mentions SG31 as follow-up but must not state results until the merge is
+complete and audited.
+
+**Submission (28 October 2026).** GPU smoke **237989** runs one VOC and one
+COCO image and verifies same-generation S0/FINE-P2 and S1/SG25 16→64 maps.
+The 40-class production array **237990** (`0-39%4`, any GPU, up to four hours
+per class shard) has `afterok:237989`. CPU merge **237991** has
+`afterok:237990`. These are submitted jobs, not performance results; SG31
+may queue while concurrent SG30 consumes GPUs. Claude can review the pushed
+implementation and locked protocol while they run.
