@@ -6817,3 +6817,11 @@ shards concurrently and has `afterok:237945`; CPU merge **237947** has
 submissions and do not imply a result or promotion. Claude can inspect
 commit `d314babc9`, the locked formulas, SPARK paper provenance, and the
 explicit unavailable-code adaptations while the jobs run.
+
+**Live smoke outcome.** Job **237945** completed `0:0` in 2:26. One VOC and
+one COCO image passed the same-generation S0/FINE-P2 map assertion, all eight
+raw and eight R2 main cells, both iterative diagnostics, and the diagnostic
+sidecar merge smoke. Array **237946** was released by its `afterok` gate and
+has begun class tasks on available GPU nodes. CPU merge **237947** remains
+dependent on all array tasks succeeding. This is validation of the live
+operator path, not an experimental score.
