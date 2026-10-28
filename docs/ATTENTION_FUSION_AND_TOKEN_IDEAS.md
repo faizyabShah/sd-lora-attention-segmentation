@@ -724,6 +724,15 @@ diagnostics. Exact formulas and provenance are locked in `configs/sg30.json`
 and protocol Section 116. Claude should review the unavailable-code caveat,
 pruning fallback, feature source, same-generation S0 replay and final results.
 
+**Completed outcome (28 October 2026).** All 490 VOC and 707 COCO images
+merged successfully. The registered selector kept S0/S0+R2 in all five VOC
+folds. S2+R2 reached .6855 frozen COCO (versus S0+R2 .6623), but lost .0106
+forced VOC OOF and won only one pairwise VOC fold. S6+R2 reached .6836 COCO
+but lost .0087 forced VOC OOF. No SG30 cell is promoted. The full class,
+paired-image and graph analysis is in protocol Section 118 and
+`outputs/segmentation/analysis/SG30_CHATGPT_HANDOFF.md`. Claude audit is
+requested before manuscript claims.
+
 ## 20. SG31 SeeDiff-inspired re-seeding and background propagation (Codex; 28 October 2026)
 
 **Owner:** Codex submits and runs; Claude audits implementation and merged results.
