@@ -6960,3 +6960,52 @@ must not be described as intervals on 20-class macro mIoU.
 numerical tolerance repair, complete metrics and diagnostic interpretations
 before putting SG31 findings into the manuscript. Keep historical S1
 distinct from new SG31 methods and avoid COCO-based promotion.
+
+## 121. SG32 locked adaptive-second-pass experiment and Claude handoff (Codex; 29 October 2026)
+
+The owner requested the complete ChatGPT SG32 specification and less brittle
+same-generation numerical checks. Codex owns implementation/submission;
+Claude audits locked formulas and all merged evidence before promotion or
+empirical manuscript claims. SG32 is an original hypothesis motivated by
+SG22/SG27/SG30/SG31; Section 21 of the ideas registry records external
+paper provenance separately from the new combined method.
+
+Freeze the historical A3 class-word CA seed, SG25 16/32/64 SA modules,
+calls 10–20, eight heads, 17 VOC thresholds and unchanged R2. Within each
+call, first-pass `u=A c` is unchanged for every fine head. Head-mean fine,
+32 and 16 first-pass maps are separately spatially minmax normalized.
+C16, pairwise three-scale, and range reliability are defined exactly in
+the pasted SG32 specification and `configs/sg32.json`; background is the
+normalized mean SA row over fine-first-pass background seeds (`f<=.5`).
+Combined reliability is pair×background or range×background. Reliability
+is per call, shared across eight fine heads, clamped to [0,1], and never
+renormalized. S0=P2, S1=SG30-S2 sharp second pass. S2–S6 use convex
+row-wise interpolation between A and A^sharp. S7–S11 use row-wise exponent
+`r=1+1.6(1-R)` and stochastic normalization. Average only after each
+observation's second propagation. No sweep or COCO selection is permitted.
+
+The run writes raw/R2 counts and compact per-image diagnostics: fixed
+reliability bins with GT/FP and distance, region means, exponent distribution
+summaries, sampled-row entropy/reliability correlation, temporal mean/variance,
+scale-vs-background contribution, S10-vs-S1 and all-cell prediction changes,
+and post-hoc caption presence. Full-image maps/QK/generated images are
+released after each image, never saved. The merger requires all 40 shards,
+490 VOC and 707 COCO images; it reports forced OOF, pairwise fold wins and
+the registered multi-candidate selector separately, with full-VOC thresholds
+frozen for COCO. Historical SG30 S0/S2 count replay is an audit only because
+separate regenerations can differ.
+
+The shared same-generation control check now uses **atol=1e-5, rtol=1e-4**
+for SG31 and SG32, replacing the overly tight 2e-6 check. It continues to
+fail meaningful control-map drift; SG32 S0 is replaced by the same-generation
+SG27 reference map after the assertion. The check does not alter already
+completed SG31 results. Claude should examine SA row/query orientation,
+per-call versus per-head reliability, normalizations, background support,
+control tolerances, the raw/R2 ordering and diagnostic-vs-selection split.
+
+**Submission (29 October 2026).** CPU operator, serialization, syntax and
+configuration checks passed. Live one-VOC/one-COCO GPU smoke **238101** runs
+all 12 raw and 12 R2 cells and reduced diagnostics. The 40-class array
+**238102** (`0-39%4`, any GPU, four hours per shard) has `afterok:238101`.
+CPU merger **238103** has `afterok:238102`. These are submitted jobs, not
+results or a promotion; the smoke gate must pass before production starts.

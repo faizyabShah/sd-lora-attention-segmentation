@@ -773,3 +773,32 @@ Historical SG25 continuous S1+R2 is strongest on COCO at .6977, but loses
 .0058 VOC OOF. No SG31 cell is promoted. See protocol Section 120 and
 `outputs/segmentation/analysis/SG31_CHATGPT_HANDOFF.md`; Claude audit is
 requested before empirical manuscript claims.
+
+## 21. SG32 reliability-adaptive second SA pass (Codex; 29 October 2026)
+
+**Owner:** Codex implements and submits; Claude independently audits code,
+selection and mechanism diagnostics before any paper claim. SG32 is a new
+candidate mechanism synthesized from our findings: SG22 pass-depth tradeoff,
+SG27 cross-scale reliability, SG30 precision gain from second-pass-only
+inflation, and SG31's accurate-but-costly propagated background support.
+The background source is SeeDiff-inspired, SG30 sharpening SPARK-inspired,
+and A3 historically GoCA-inspired; **the combined SG32 method is our own
+hypothesis**, not attributed to any one paper. PEARL/SG28 and NERVE/SG29
+were separate unpromoted tests.
+
+Freeze A3 class-word CA and 16/32/64 same-call SA from calls 10–20. For each
+call, compute normalized first-pass fine, middle and coarse semantic maps.
+Build reliability from C16 agreement, pairwise three-scale agreement, range
+agreement and selected-row background support. Combined reliability is
+scale×background. Keep first pass `u=A c` untouched; use reliability only
+to interpolate ordinary/sharp second-pass transitions or to assign each
+query row an exponent in [1,2.6]. Reliability is per call and shared across
+eight fine heads, with no extra minmax on R. S0 is historical P2; S1 is
+SG30's fixed sharp second pass; S2–S6 are five convex cells; S7–S11 are
+five spatial-temperature cells. All are evaluated raw and +R2, with VOC
+five-fold selection and frozen COCO transfer. No parameters are swept.
+
+Full locked formulas, compact GT-post-hoc diagnostics, control tolerances,
+and Claude review points are in `configs/sg32.json` and protocol Section
+121. Same-generation controls use `atol=1e-5, rtol=1e-4` to tolerate
+float32 reduction-order differences while still rejecting material drift.

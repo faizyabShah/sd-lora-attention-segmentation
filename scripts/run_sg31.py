@@ -16,6 +16,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts import run_coco_cap_transfer as transfer, sg27_runtime
+from scripts.control_checks import assert_control_close
 from scripts.run_sg24 import atomic_npz
 from scripts.run_sg27 import change_diagnostics
 from src.segmentation import controlled_cv as cv, sg31_seediff
@@ -112,10 +113,8 @@ def main():
             image = np.asarray(sample.generated_image, np.uint8)
             maps, seed_stats, support = sg31_seediff.aggregate(sa, seed)
             if args.verify_controls:
-                torch.testing.assert_close(maps["S0"], previous["S0"], rtol=1e-5, atol=2e-6)
-                # S1 is independently accumulated before minmax; a few GPU
-                # rounding units can differ from SG27's 16->64 accumulator.
-                torch.testing.assert_close(maps["S1"], previous["S1"], rtol=1e-5, atol=1e-5)
+                assert_control_close(maps["S0"], previous["S0"], "SG31 S0/FINE")
+                assert_control_close(maps["S1"], previous["S1"], "SG31 S1/16-to-64")
             maps["S0"] = previous["S0"]
             maps["S1"] = previous["S1"]
             raw_counts, raw_ap = cv.score_maps(torch.stack([maps[n] for n in RAW]).cpu(),
