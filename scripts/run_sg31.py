@@ -113,7 +113,9 @@ def main():
             maps, seed_stats, support = sg31_seediff.aggregate(sa, seed)
             if args.verify_controls:
                 torch.testing.assert_close(maps["S0"], previous["S0"], rtol=1e-5, atol=2e-6)
-                torch.testing.assert_close(maps["S1"], previous["S1"], rtol=1e-5, atol=2e-6)
+                # S1 is independently accumulated before minmax; a few GPU
+                # rounding units can differ from SG27's 16->64 accumulator.
+                torch.testing.assert_close(maps["S1"], previous["S1"], rtol=1e-5, atol=1e-5)
             maps["S0"] = previous["S0"]
             maps["S1"] = previous["S1"]
             raw_counts, raw_ap = cv.score_maps(torch.stack([maps[n] for n in RAW]).cpu(),
