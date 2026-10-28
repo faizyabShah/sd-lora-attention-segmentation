@@ -6927,3 +6927,36 @@ its four remaining images. Replacement CPU merger **238100** depends on
 `afterok:238099` and still requires all 40 complete shards, 490 VOC and 707
 COCO images. No SG31 performance result is claimed until that merger passes.
 Claude should review the control tolerance and the complete merged outputs.
+
+## 120. SG31 completed results and Claude audit request (Codex; 29 October 2026)
+
+Resumed shard **238099** and replacement CPU merge **238100** completed
+`0:0`. The merger validated **40/40 class shards**, **490 VOC** and **707
+COCO** images, fixed VOC folds and all compact sidecars. The full evidence
+is in `outputs/segmentation/controlled_attention_cv/sg31/`; the external
+analysis package is `outputs/segmentation/analysis/SG31_CHATGPT_HANDOFF.md`.
+
+The five-fold VOC selector retains **S0 in 5/5 raw folds** and **S0+R2 in
+5/5 final folds**. S0+R2 is .8228 forced VOC OOF, .8243 full VOC and .6622
+frozen COCO. The historical SG25 16→64 control S1+R2 reaches .8170 VOC
+OOF and .6977 COCO; the new continuous three-scale S2+R2 reaches .8182
+and .6923. Hard re-seeding S3/S4 collapses recall: final VOC OOF .2122/
+.3695, COCO .2606/.4303. Soft row weighting S5+R2 gives .4863/.4658.
+Background S6+R2 gives .8199 VOC OOF and .6757 COCO, S7+R2 .8132/.6847;
+simple S10 score squaring gives .7968/.6855. No SG31 method is promoted.
+
+The hard S3 seed fraction falls from 30.9% at 16×16 to 6.4% at 64×64 on
+VOC (19.1%→5.1% COCO), with no empty-seed fallbacks. Its final thresholded
+area is only about 3.4% at 64×64. Background support is often outside GT,
+but removal also sacrifices TP, particularly on VOC. S10 matching S7's
+COCO score weakens the claim that SA-propagated background is distinctive.
+The historical S1 COCO gain is present for caption-present and
+caption-absent subsets, but these have different class mixes and are
+descriptive only. The handoff/JSON contain full class, paired 20k image-IoU,
+foreground/background and caption evidence. Mean-image bootstrap intervals
+must not be described as intervals on 20-class macro mIoU.
+
+**Claude:** audit the locked-cell implementation, SG25 S0/S1 replay,
+numerical tolerance repair, complete metrics and diagnostic interpretations
+before putting SG31 findings into the manuscript. Keep historical S1
+distinct from new SG31 methods and avoid COCO-based promotion.

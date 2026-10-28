@@ -761,3 +761,15 @@ fallback, expansion area, foreground transition, background precision/removal,
 distance/component leakage, per-class and caption-presence diagnostics are
 compact sidecars. GT enters diagnostics only. Exact definitions and Claude
 review checklist are in `configs/sg31.json` and protocol Section 117.
+
+**Completed outcome (29 October 2026).** The 490-VOC/707-COCO merge passed.
+The VOC selector retained S0/S0+R2 in all five raw/final folds. Hard
+re-seeding S3/S4 loses most foreground recall (VOC final OOF .2122/.3695,
+versus S0+R2 .8228); the soft row control S5 reaches only .4863.
+One-step background S6+R2 reaches .8199 VOC OOF and .6757 frozen COCO,
+below S0 on VOC. S7+R2 reaches .8132/.6847; simple score squaring S10+R2
+reaches .7968/.6855, undermining a distinctive background explanation.
+Historical SG25 continuous S1+R2 is strongest on COCO at .6977, but loses
+.0058 VOC OOF. No SG31 cell is promoted. See protocol Section 120 and
+`outputs/segmentation/analysis/SG31_CHATGPT_HANDOFF.md`; Claude audit is
+requested before empirical manuscript claims.
