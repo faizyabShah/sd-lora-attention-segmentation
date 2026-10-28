@@ -16,7 +16,7 @@ ROOT=Path(__file__).resolve().parents[1]
 SPEC=ROOT/"configs/sg27.json"
 
 
-def make_runtime(model:str):
+def make_runtime(model:str, recorder_class=None):
     spec=json.loads(SPEC.read_text())
     sg24=json.loads((ROOT/"configs/sg24.json").read_text())
     sg25=json.loads((ROOT/"configs/sg25.json").read_text())
@@ -32,7 +32,7 @@ def make_runtime(model:str):
     available={n.removesuffix(".processor") for n in pipe.unet.attn_processors if n.endswith(".attn1.processor")}
     if set(modules.values())-available:
         raise ValueError("SG27 coarse/fine module missing")
-    recorder_class=sg25_sa.SG25Recorder
+    recorder_class=recorder_class or sg25_sa.SG25Recorder
     recorder_class.pipe=pipe
     recorder_class.ca_modules=tuple(ca_modules[i] for i in frozen["modules"])
     recorder_class.selected_modules=recorder_class.ca_modules
@@ -48,7 +48,7 @@ def make_runtime(model:str):
     recorder_class.__init__=tracked_init
     live.CompactAttentionRecorder=recorder_class
     return {"pipe":pipe,"modules":modules,"ca_modules":recorder_class.ca_modules,
-            "recorders":recorders,"model":model,"spec":spec}
+            "recorders":recorders,"model":model,"spec":spec,"recorder_class":recorder_class}
 
 
 @contextmanager
@@ -58,8 +58,8 @@ def live_maps(runtime,row,dataset):
     ids=pipe.tokenizer(prompt,padding="max_length",max_length=77,truncation=True)["input_ids"]
     class_ids=pipe.tokenizer(row["classname"],add_special_tokens=False)["input_ids"]
     target=find_token_subsequence(ids,class_ids)
-    sg25_sa.SG25Recorder.content=sg24_ca.content_positions(pipe.tokenizer,prompt,tuple(target))
-    sg25_sa.SG25Recorder.attribution_prompt=prompt
+    runtime["recorder_class"].content=sg24_ca.content_positions(pipe.tokenizer,prompt,tuple(target))
+    runtime["recorder_class"].attribution_prompt=prompt
     recorders=runtime["recorders"]
     recorders.clear()
     manifest=transfer.EVAL/("ovam/voc_sim" if dataset=="voc" else "ovam/coco_captions")

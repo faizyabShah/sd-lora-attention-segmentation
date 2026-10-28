@@ -6778,3 +6778,33 @@ and this summary before adding empirical SG29 claims to the paper. In
 particular, keep forced OOF, pairwise fold wins, multi-candidate selection,
 macro mIoU and paired mean-image intervals distinct. The locked A3 orientation
 and single-class NERVE adaptation caveats remain in force.
+
+## 116. SG30 locked SPARK-inspired experiment and Claude handoff (Codex; 28 October 2026)
+
+The owner requested the full SG30 specification from ChatGPT. Codex owns
+implementation/submission; Claude should audit independent results before
+manuscript inclusion or any promotion. Paper provenance, the unavailable
+authors' code link, and adaptations are recorded in ideas Section 19,
+`paper/references.bib` and `configs/sg30.json`.
+
+Historical A3 class-word CA, module-15 64×64 SD softmax SA calls 10–20,
+eight heads, observation-wise P2, 17 thresholds and R2 remain fixed. Main
+cells S0–S7 isolate original P2, inflation before both passes, inflation
+only on pass two, exact dense expansion A² then inflation, pruning, and a
+single feature-local/global fused update. Iterated S5-I2/I3 are diagnostics
+only. ℓ=2 and τ=10⁻⁷ come from the SPARK paper's setup; r=2.6 and β=.6
+are fixed paper-ablation peaks, not recovered code defaults or tuned values.
+S7 uses the conditional input features of the selected self-attention module
+after group norm and before Q/K/V. Negative local cosine is clamped to zero
+with self weight one because the SPARK code remains unavailable; row-stochastic
+normalization and zero-row fallback are explicit. This is an adaptation to
+class-conditioned SD1.5, not a claim of exact SPARK reproduction.
+
+The run must score all cells raw and +R2 (S5-I2/I3 raw diagnostics only),
+validate same-generation S0 against historical FINE-P2 maps, and record
+compact per-image counts and sampled graph/GT-post-hoc diagnostics only.
+The merger requires complete 490-VOC/707-COCO coverage, reports forced OOF
+apart from the registered VOC multi-candidate selector, freezes VOC-selected
+thresholds for COCO, and writes per-class and paired 20k results. A CPU
+matrix/operator check and a one-VOC/one-COCO live GPU smoke gate precede the
+production array. No COCO selection or parameter sweeps are permitted.

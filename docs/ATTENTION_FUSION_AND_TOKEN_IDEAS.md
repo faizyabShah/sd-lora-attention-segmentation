@@ -686,3 +686,40 @@ walks lose about .009–.013 final forced VOC OOF despite exploratory COCO
 macro gains up to +.0082; N3 local-only fails strongly. No component is
 promoted. Full evidence and the Claude audit request are in protocol Section
 115 and `outputs/segmentation/analysis/SG29_CHATGPT_HANDOFF.md`.
+
+## 19. SG30 SPARK-inspired nonlinear affinity sharpening (Codex; 28 October 2026)
+
+**Owner:** Codex implements and submits; Claude independently audits code,
+provenance and completed results before paper interpretation. Source:
+Mahatha, Dolz, and Desrosiers,
+[*SPARK: Stochastic Propagation via Affinity-guided Random walK for
+Training-free Unsupervised Segmentation*](https://arxiv.org/abs/2602.00516)
+(arXiv:2602.00516, 2026), BibTeX `mahatha2026spark`. The [authors' project
+page](https://kunal-mahatha.github.io/spark/) still says “Code (Coming
+Soon)”; its linked `spark-code` repository returned 404 on 28 October 2026.
+
+Provenance history: GoCA→historical A3 CA, PEARL→SG28 Procrustes and
+Laplacian components (unpromoted), NERVE→SG29 entropy/local/stopped-walk
+tests (unpromoted), SPARK→SG30 expansion/inflation/pruning on the existing
+class-conditioned SD1.5 SA graph. SG30 is **not** SPARK end-to-end: SPARK
+clusters an unlabeled diffusion-feature graph, while SG30 keeps our A3
+class-word seed and original softmax SA as the global transition.
+
+Locked cells S0 historical P2; S1 inflated graph for both passes; S2 ordinary
+first pass followed by inflated second pass; S3/S4 expand A² then inflate,
+applied to seed/ordinary first-pass result; S5/S6 add pruning; S7 fuses
+feature-based local affinity with global SA, then one sharpening update.
+S5-I2/I3 are fixed two-/three-update diagnostics, not selectable methods.
+The paper states expansion ℓ=2 and τ=10⁻⁷; its reported ADE20K ablation
+peaks r=2.6 and β=.6, used as single paper-derived values without tuning.
+S7 features are selected module-15 self-attention input after group norm,
+before Q/K/V projections. Because code is unavailable, negative local cosine
+is clamped to zero and the self affinity set to one before row normalization;
+this is an explicit SG30 adaptation, not a recovered SPARK implementation.
+
+All eight main cells receive raw and unchanged R2 evaluation with the fixed
+VOC five-fold selector and frozen COCO transfer. Each image yields only compact
+metric counts and reduced graph, edge-quartile, GT-post-hoc and iteration
+diagnostics. Exact formulas and provenance are locked in `configs/sg30.json`
+and protocol Section 116. Claude should review the unavailable-code caveat,
+pruning fallback, feature source, same-generation S0 replay and final results.

@@ -195,6 +195,12 @@ class RecordingAttnProcessor:
 
             if attn.group_norm is not None:
                 capture_hidden = attn.group_norm(capture_hidden.transpose(1, 2)).transpose(1, 2)
+            # Optional compact capture for experiments that need the feature
+            # vectors entering a selected self-attention module. Existing
+            # recorders do not implement this hook and retain prior behavior.
+            capture_features = getattr(self.recorder, "capture_sa_features", None)
+            if self.kind == "self" and capture_features is not None:
+                capture_features(self.module_name, capture_hidden)
             query = attn.to_q(capture_hidden)
             if encoder is None:
                 encoder = capture_hidden
