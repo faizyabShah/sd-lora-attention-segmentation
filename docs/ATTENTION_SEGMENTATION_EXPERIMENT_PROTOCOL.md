@@ -6742,3 +6742,39 @@ validates all 40 shards, including the six preserved ones. The historical
 SG28 replay-audit merger code passed a CPU self-check over the complete
 490-VOC and 707-COCO SG28 packages. The new production run is not being
 continuously monitored; results remain pending until 237914 succeeds.
+
+## 115. SG29 completed results and Claude audit request (Codex; 28 October 2026)
+
+Resumed GPU array **237909** and CPU merge **237914** completed `0:0`.
+The merger validated **40/40 class shards**, **490 VOC** and **707 COCO**
+images. Complete compact metrics and reduced diagnostics are under
+`outputs/segmentation/controlled_attention_cv/sg29/`; a focused external
+handoff is `outputs/segmentation/analysis/SG29_CHATGPT_HANDOFF.md`.
+
+The registered VOC selector retains **N0 in 5/5 raw folds** and **N0+R2 in
+5/5 final folds**. N0+R2 gives .8229 forced VOC OOF, .8243 full VOC and
+.6623 frozen COCO. N1's entropy weights are almost uniform (effective
+7.998/8 heads on VOC, 7.997/8 on COCO); its final forced OOF gain is only
++.0001, so its 5/5 *pairwise* wins do not imply promotion. N2 stopped walk
+falls to .8135 final VOC OOF (−.0094) but reaches .6696 COCO (+.0073);
+N4 global/local reaches .8103 VOC OOF (−.0126) and .6704 COCO (+.0081).
+N6 adds entropy weights with negligible change: .8104 VOC OOF, .6705 COCO.
+N3 local-only is markedly worse: .7278 VOC OOF and .6118 COCO after R2.
+The L=1/2/5 N2 cells are diagnostics only; L=5+R2 reaches .6748 COCO
+but loses .0121 forced VOC OOF. No SG29 cell is promoted.
+
+The COCO macro gains for stopped walks are class-heterogeneous: N4+R2
+improves 15/20 classes but loses .0356 person IoU, and its paired mean-image
+IoU delta is −.00184 with a 95% interval crossing zero. For N2/N4/N6,
+the within-call mean correlation of negative spatial entropy with head AP
+is negative; N1 cannot reliably identify better heads in this adaptation.
+The global/local graph has much shorter transition distance, but that
+spatial change does not rescue VOC. N0's SG28 replay differs on some
+regenerated images, yet the raw mIoU at threshold .45 changes by under
+.00006 on either dataset. All SG29 pairwise comparisons use the same-run N0.
+
+**Claude:** audit the full result JSON, class CSV, bootstrap interpretation,
+and this summary before adding empirical SG29 claims to the paper. In
+particular, keep forced OOF, pairwise fold wins, multi-candidate selection,
+macro mIoU and paired mean-image intervals distinct. The locked A3 orientation
+and single-class NERVE adaptation caveats remain in force.

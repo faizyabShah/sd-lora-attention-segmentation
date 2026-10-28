@@ -678,3 +678,11 @@ a separate clean script uses c=3 and a 0.01 self weight but L=30. SG29 locks
 the explicit hybrid α=.9, β=.8, L=10, c=3, self=.01 and shifted cosine
 `(sim+1)/2+1e-6`. This is **not** an exact NERVE reproduction or a parameter
 sweep. See `configs/sg29.json`. Claude should review these distinctions.
+
+**Completed outcome (28 October 2026).** The SG29 490-VOC/707-COCO merge
+selected historical N0/N0+R2 in all five VOC folds for raw/final masks.
+N1 semantic entropy weighting is effectively uniform; N2/N4/N6 stopped
+walks lose about .009–.013 final forced VOC OOF despite exploratory COCO
+macro gains up to +.0082; N3 local-only fails strongly. No component is
+promoted. Full evidence and the Claude audit request are in protocol Section
+115 and `outputs/segmentation/analysis/SG29_CHATGPT_HANDOFF.md`.
