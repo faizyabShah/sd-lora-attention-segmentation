@@ -7067,3 +7067,10 @@ blocked array 238108 and merge 238109 were canceled. Replacement smoke
 **238147**, array **238148** (`afterok:238147`), and merge **238149**
 (`afterok:238148`) are submitted. The replacement smoke uses a clean output
 directory; production outputs remain separate. Results are still pending.
+
+**Replacement smoke outcome.** Job **238147** completed `0:0` in 3:04.
+One VOC and one COCO image passed both same-generation controls, all twelve
+raw and twelve R2 cells, Markov/IPF diagnostics, visual-sheet output and
+smoke merger validation. Array **238148** was released; its first four class
+shards started on GPUs. Merger **238149** remains dependent on complete array
+success. This validates execution, not accuracy or promotion.
