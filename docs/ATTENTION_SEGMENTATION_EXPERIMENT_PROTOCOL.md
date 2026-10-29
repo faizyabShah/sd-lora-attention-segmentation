@@ -7150,6 +7150,17 @@ ratio, rho-endpoint, zero-proposal fallback and bounded-completion identities,
 plus diagnostic/visual-sheet checks passed. One-VOC/one-COCO live GPU smoke
 **238181** is submitted. The 40-shard array **238182** (`0-39%4`, any GPU,
 six hours per shard) has `afterok:238181`; merger **238183** has
-`afterok:238182`. These are submitted jobs, not outcome claims. The smoke
-gate must pass to release production. Its result will be recorded after the
-short validation run finishes.
+`afterok:238182`. The smoke test **238181 failed** at the C1/SG31
+same-generation control (maximum map
+difference 0.00754). C1 had normalized each call to unit mass before the
+across-call average; SG31 instead averages raw call maps, then normalizes the
+result. This changed relative call weights. C1 now follows SG31 exactly;
+C2–C9 retain transport-space normalization as specified. The blocked array
+and merger are being replaced with a fresh smoke-gated submission.
+
+**Replacement submission (29 October 2026).** The blocked jobs 238182 and
+238183 were canceled. Corrected smoke **238283** writes to an isolated
+`_r2` smoke directory. Production array **238284** (`0-39%4`, any GPU,
+six hours per shard) depends on its success, and merger **238285** depends
+on the production array. These are submitted jobs; live smoke validation
+is still pending.

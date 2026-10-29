@@ -98,8 +98,10 @@ def aggregate(sa_qk:dict[int,list],seed:torch.Tensor):
     beta=torch.zeros((3,),dtype=torch.float64)
     fallback_bg=0;bg_fraction=0.
     for call in range(11):
-        a16=_attention(sa_qk[16][call],16).mean(0)
-        a32=_attention(sa_qk[32][call],32).mean(0)
+        heads16=_attention(sa_qk[16][call],16)
+        heads32=_attention(sa_qk[32][call],32)
+        a16=heads16.mean(0)
+        a32=heads32.mean(0)
         fine_heads=_attention(sa_qk[64][call],64)
         a64=fine_heads.mean(0)
         u=_apply(fine_heads,c64)
@@ -107,7 +109,14 @@ def aggregate(sa_qk:dict[int,list],seed:torch.Tensor):
         fine_first=score(u.mean(0))
         background,fb,fraction=background_support(fine_heads,fine_first)
         fallback_bg+=int(fb);bg_fraction+=fraction/11
-        x16=distribution(a16@c16)
+        # C1 is the historical SG31 S2 control.  Its raw observations must
+        # be averaged across calls before min-max normalization.  Normalizing
+        # each call to a distribution changes the relative call weights.
+        raw16=_apply(heads16,c16).mean(0)
+        raw32=_apply(heads32,_resize(raw16,16,32).reshape(-1)).mean(0)
+        raw64=_apply(fine_heads,_resize(raw32,32,64).reshape(-1)).mean(0)
+        sums["C1"]+=raw64/11
+        x16=distribution(raw16)
         # All proposals use exactly the established SG25 resize/alignment.
         q32=distribution(a32@_resize(x16,16,32).reshape(-1))
         p32,st32=project(x16,q32,16,rho=1.)
@@ -118,7 +127,7 @@ def aggregate(sa_qk:dict[int,list],seed:torch.Tensor):
         c3,st3=project(q32,q64_ordinary,32,rho=1.)
         c4,st4=project(p32,q64_from_projected,32,rho=1.)
         c5,st5=project(r32,q64_from_relaxed,32,rho=.5)
-        cores={"C1":q64_ordinary,"C2":q64_from_projected,
+        cores={"C2":q64_from_projected,
                "C3":c3,"C4":c4,"C5":c5}
         for name,value in cores.items():sums[name]+=value/11
         # C2/C3/C4/C5 have one or two constraints.  Unused transitions
@@ -130,7 +139,7 @@ def aggregate(sa_qk:dict[int,list],seed:torch.Tensor):
         ratio_stats[1]+=torch.tensor(st4["ratio"],dtype=torch.float64)/11
         entropy_stats[0]+=torch.tensor(st32["entropy"],dtype=torch.float64)/11
         entropy_stats[1]+=torch.tensor(st4["entropy"],dtype=torch.float64)/11
-        for si,values in enumerate(((x16,q32,q64_ordinary),(x16,p32,c4),(x16,r32,c5))):
+        for si,values in enumerate(((raw16,raw32,raw64),(x16,p32,c4),(x16,r32,c5))):
             for j,(value,side) in enumerate(zip(values,(16,32,64))):
                 stages[si,j]+=_resize(value,side,64).reshape(64,64)/11
         # Completion is computed from each same-call semantic core, not from
@@ -145,7 +154,7 @@ def aggregate(sa_qk:dict[int,list],seed:torch.Tensor):
         for i,(d,g) in enumerate(((delta,g7),(delta,g8),(deltar,g9))):
             beta[i]+=float((d*g).sum()/d.sum().clamp_min(EPS))/11
         first+=torch.stack((p1,p2,delta,background,g8)).reshape(5,64,64)/11
-        del a16,a32,a64,fine_heads,u
+        del a16,a32,a64,heads16,heads32,fine_heads,u
     maps={name:value.reshape(64,64) for name,value in sums.items()}
     transport_stats[0,1]=float("nan") # C2 has no 32→64 constraint
     transport_stats[1,0]=float("nan") # C3 has no 16→32 constraint
