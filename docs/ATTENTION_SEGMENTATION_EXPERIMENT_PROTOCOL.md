@@ -7094,3 +7094,62 @@ raw and twelve R2 cells, Markov/IPF diagnostics, visual-sheet output and
 smoke merger validation. Array **238148** was released; its first four class
 shards started on GPUs. Merger **238149** remains dependent on complete array
 success. This validates execution, not accuracy or promotion.
+
+## 123. SG-combined-v1 locked constrained transport and budgeted completion (Codex; 29 October 2026)
+
+The owner authorized implementation and submission of ChatGPT's
+**SG-combined-v1** specification. **Claude: please review the operator,
+same-generation controls and eventual results before any manuscript claim.**
+This is our own unified mechanism proposal, not a reproduction of an
+external paper. SG33 remained in progress and had no selected Markov source
+when this code cycle began; optional C10 is excluded and will not be added
+after inspecting SG-combined-v1 outcomes.
+
+Frozen: A3 class-word CA, selected eleven modules, calls 0–30, all heads,
+existing orientation caveat; SG25/SG33 16/32/64 SA sources, matched calls
+10–20, all eight heads; historical observation-wise FINE-P2 C0; unchanged
+R2. The ten cells are C0 FINE-P2, C1 ordinary 16→32→64, C2 exact KL
+projection 16→32 only, C3 exact 32→64 only, C4 exact both, C5 rho=.5
+relaxed both, C6 C4 plus unconditional fine completion, C7 C4 plus
+background-only positive-residual budget, C8 C4 plus semantic/background
+odds budget, and C9 C5 plus odds budget. No further cells or parameter
+sweeps are permitted in v1.
+
+Transport stages are nonnegative sum-normalized distributions. Each 2×2
+fine child group is projected onto its coarse parent's mass using the
+closed-form KL solution and uniform fallback when the proposal group mass
+is near zero. Minmax scoring occurs only after transport. Completion uses
+same-call head-mean fine SA; its P1 and P2 scores are independently
+normalized before the positive residual. SG32 background support is built
+from ordinary first-pass fine SA `A64 c64`, with the same .5 selected-row
+rule. It gates **new positive P2 support** only; it never subtracts from
+the semantic core. Raw and R2 screens are separate.
+
+The runner stores one resumable metric shard and one compact diagnostic
+sidecar per class/dataset, plus one post-hoc VOC visual sheet per class.
+Diagnostics include per-parent mass and ratio errors, child entropy,
+hierarchical TP/FP changes, incorrect coarse-parent retention, error-type
+cross tabs, completion residual and budget bins, TP/FP efficiency, beta
+distribution and correlations, per-class audits, and COCO caption-presence
+split. GT enters these only after inference. The merger requires all 40
+class shards, 490 VOC/707 COCO images, 20 visuals, five fixed VOC folds,
+the historical 17 thresholds, forced OOF, pairwise wins and registered
+multi-candidate selectors. Full-VOC thresholds are frozen for COCO.
+
+Claude should check parent-child alignment, mass normalization versus
+segmentation normalization, exact/relaxed rho endpoints, fallback, C1
+replay against SG31 S2, C0 replay against FINE-P2, SG32 background-map
+provenance, C6/C7/C8/C9 same-call ordering, R2, sidecar coverage,
+and the diagnostic-only nature of GT-dependent quantities. Files:
+`src/segmentation/sg_combined_v1.py`, `scripts/run_sg_combined_v1.py`,
+`scripts/finalize_sg_combined_v1.py`, `configs/sg_combined_v1.json`.
+CPU operator and smoke outcomes and submission IDs follow once validated.
+
+**Submission (29 October 2026).** Python/JSON/shell syntax, CPU KL-mass,
+ratio, rho-endpoint, zero-proposal fallback and bounded-completion identities,
+plus diagnostic/visual-sheet checks passed. One-VOC/one-COCO live GPU smoke
+**238181** is submitted. The 40-shard array **238182** (`0-39%4`, any GPU,
+six hours per shard) has `afterok:238181`; merger **238183** has
+`afterok:238182`. These are submitted jobs, not outcome claims. The smoke
+gate must pass to release production. Its result will be recorded after the
+short validation run finishes.

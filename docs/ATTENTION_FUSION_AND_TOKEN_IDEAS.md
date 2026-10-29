@@ -820,3 +820,27 @@ with unchanged R2. Select on five fixed VOC folds; COCO is frozen transfer.
 No parameter sweep or new cell may be added after results. Full definitions,
 diagnostics, stop rules and Claude review points are in `configs/sg33.json`,
 `scripts/run_sg33.py`, and protocol Section 122. Results are pending.
+
+## 23. SG-combined-v1: our unified transport and completion hypothesis (Codex; 29 October 2026)
+
+The owner supplied a locked ten-cell experiment called **SG-combined-v1**.
+Unlike isolated paper-inspired SG screens, it tests one proposed mechanism:
+coarse semantic evidence is conserved across 16→32→64 refinement, whereas
+new evidence from a second fine SA pass is admitted only through an explicit
+completion budget. The exact parent-wise KL projection has closed form
+`z_child = q_child * parent_mass / sum(q_children)`, with a uniform fallback
+for near-zero child proposals. C1 is the unconstrained hierarchy; C2/C3
+constrain one transition each; C4 constrains both; C5 relaxes both by .5.
+C6 adds an unconditional second pass to C4. C7 retains positive completion
+in proportion to one minus SG32 background support. C8 also incorporates
+the first-pass foreground score in odds form. C9 applies the C8 rule to C5.
+C0 is historical FINE-P2. Every cell runs raw and with unchanged R2.
+
+A3 CA, SG25/SG33 SA sources, calls 10–20, all eight heads, five fixed VOC
+folds and frozen COCO transfer remain unchanged. Transport uses normalized
+nonnegative mass; segmentation uses the established spatial minmax only
+after the hierarchy. The selected-row background signal is exactly SG32's
+first-fine-pass construction. SG33 had no selected Markov source before
+submission, so optional C10 is excluded. Full implementation, diagnostics
+and review points are in `configs/sg_combined_v1.json` and protocol Section
+123. These are pending hypotheses, not results or promotion claims.

@@ -1,0 +1,20 @@
+{
+  "experiment": "SG-combined-v1 constrained hierarchical semantic transport and budgeted completion",
+  "version": 1,
+  "cells": ["C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9"],
+  "ca": "frozen A3 class-word W: SD1.5, selected eleven CA modules, calls 0-30, all heads, no restored 32x32 CA",
+  "sa": "SG25/SG33 sources 16/32/64, matched calls 10-20 inclusive, eight heads; head-mean within each call for hierarchy; C0 historical observation-wise fine P2",
+  "transport": "nonnegative sum-normalized distributions; 2x2 parentwise KL projection with deterministic uniform fallback; no minmax between stages; rho=0.5 only for C5/C9",
+  "completion": "same-call mean fine SA on normalized completed core; SG32 first-pass selected-row background map; positive residual only; C7 background-only, C8/C9 foreground-background odds",
+  "epsilon_transport": 1e-12,
+  "epsilon_completion": 1e-6,
+  "rho_relaxed": 0.5,
+  "background_selection_threshold": 0.5,
+  "diagnostic_threshold": 0.45,
+  "diagnostic_odds_bins": [0, 0.2, 0.4, 0.6, 0.8, 1],
+  "diagnostic_positive_residual_bins": [0, 0.05, 0.1, 0.2, 0.4, 1],
+  "thresholds": [0.3, 0.325, 0.35, 0.375, 0.4, 0.425, 0.45, 0.475, 0.5, 0.525, 0.55, 0.575, 0.6, 0.625, 0.65, 0.675, 0.7],
+  "selection": "five frozen VOC folds, raw/R2 screens separately, forced OOF and pairwise wins distinct, registered promotion guard, full-VOC thresholds frozen for COCO",
+  "sg33_c10": "excluded: SG33 had no selected Markov coarse source before SG-combined-v1 submission",
+  "storage": "resumable per-image confusion counts, compact transport/completion diagnostics, and one post-hoc visual sheet per VOC class; no generated image, mask, dense map, QK or affinity cache"
+}
