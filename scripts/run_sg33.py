@@ -124,8 +124,15 @@ def save_side(path,rows):
 
 
 def visual_sheet(path,image,truth,visual,classname,image_id):
-    from matplotlib import colormaps
-    palette=colormaps["magma"]
+    # Keep this diagnostic independent of matplotlib: the cluster's training
+    # environment intentionally has only NumPy and Pillow for image output.
+    stops=np.asarray(((0.0,0,0,4),(0.25,74,16,112),
+                      (0.5,183,55,121),(0.75,251,139,75),
+                      (1.0,252,253,191)),dtype=np.float32)
+    def palette(values):
+        x=np.clip(values,0,1)
+        return np.stack([np.interp(x,stops[:,0],stops[:,channel])
+                         for channel in (1,2,3)],axis=-1).astype(np.uint8)
     source=Image.fromarray(np.asarray(image,np.uint8)).resize((256,256))
     panels=[("image",source)]
     for title,key in (("A3 CA","seed"),("A16 c","ordinary16"),
@@ -133,7 +140,7 @@ def visual_sheet(path,image,truth,visual,classname,image_id):
                       ("M3 T+IPF","M3_16"),("M3 final","M3_final64")):
         tensor=visual[key].float()
         normalized=sg33_hierarchy.norm(tensor).numpy()
-        rgb=(palette(normalized)[...,:3]*255).astype(np.uint8)
+        rgb=palette(normalized)
         panels.append((title,Image.fromarray(rgb).resize((256,256),Image.Resampling.BILINEAR)))
     panels.append(("GT",Image.fromarray((truth.astype(np.uint8)*255)).convert("RGB").resize((256,256))))
     sheet=Image.new("RGB",(256*len(panels),290),"white")

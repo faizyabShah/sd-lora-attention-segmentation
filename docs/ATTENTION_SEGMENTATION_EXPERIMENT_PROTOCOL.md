@@ -7057,3 +7057,13 @@ passed. Live one-VOC/one-COCO GPU smoke **238107** is pending scheduling. The
 time signal) has `afterok:238107`. CPU merger **238109** has `afterok:238108`.
 These are submitted jobs, not results. The smoke gate must succeed before
 production can start. Its outcome will be recorded after it finishes.
+
+**Smoke failure and replacement (29 October 2026).** Smoke 238107 failed
+after generating its first VOC image because the optional diagnostic-sheet
+code imported `matplotlib`, which is absent from the `trdp` environment.
+The inference and metrics path had not failed. The sheet now uses a fixed
+NumPy/Pillow color palette; a CPU sheet test and syntax check passed. The
+blocked array 238108 and merge 238109 were canceled. Replacement smoke
+**238147**, array **238148** (`afterok:238147`), and merge **238149**
+(`afterok:238148`) are submitted. The replacement smoke uses a clean output
+directory; production outputs remain separate. Results are still pending.
