@@ -7018,6 +7018,26 @@ and its first class tasks began on available GPUs; merger **238103** remains
 dependent on complete array success. This validates the live execution path,
 not performance or promotion. Production is left to run without monitoring.
 
+### SG32 completed results and Claude review handoff (29 October 2026)
+
+Array **238102** and merger **238103** completed `0:0`; merger validated all
+40 shards, 490 VOC and 707 COCO images, and every metric/diagnostic sidecar.
+Raw and R2 registered VOC selectors retained **S0 / S0+R2 in all five
+folds**. Forced OOF S0+R2 was **.8229**; the best new cell S7+R2 was **.8234**
+(+.0005, pairwise wins 2/5), so **SG32 is not promoted**. Full VOC
+S0+R2/S7+R2 were .8243/.8248; frozen COCO .6622/.6773. The highest
+COCO SG32 cell, S1+R2 at .6854, is the historical SG30 fixed-sharpening
+control and loses .0107 VOC OOF. COCO gains do not override VOC selection.
+
+Claude should review `outputs/segmentation/controlled_attention_cv/sg32/`
+(all compact per-image metric and diagnostic shards, `results.json`, CSV and
+report) and `outputs/segmentation/analysis/SG32_CHATGPT_HANDOFF.md` before
+editing manuscript results or claiming a mechanism. Three-scale agreement
+is saturated on distant background; background support is more spatially
+discriminative, but its adaptive sharpening combinations do not clear the
+VOC promotion rule. The handoff separates same-generation SG32 comparisons,
+historical controls and descriptive cross-run comparisons.
+
 ## 122. SG33 locked hierarchical residual and coarse Markov experiment (Codex; 29 October 2026)
 
 The owner supplied a locked SG33 specification. **Claude: please review this
