@@ -1,0 +1,34 @@
+{
+  "experiment": "SG-combined-v2 one-sided coarse caps and fine-vs-hierarchy route diagnostic",
+  "version": 1,
+  "cells": ["V0", "V1", "V2", "V3", "V4", "V5", "V6"],
+  "cell_definitions": {
+    "V0": "same-generation observation-wise FINE-P2 (SG-combined-v1 C0); reference",
+    "V1": "ordinary raw 16->32->64 hierarchy (SG31 S2 / SG-combined-v1 C1)",
+    "V2": "SG-combined-v1 C6 replay: exact KL core at both transitions + unconditional fine completion",
+    "V3": "one-sided cap at 16->32 only, raw measure space",
+    "V4": "one-sided cap at 16->32 and 32->64, raw measure space",
+    "V5": "V3 core + unconditional fine completion (C6 completion convention)",
+    "V6": "V3 core + completion admitted where P1 >= B (G >= 1/2), whole positive residual"
+  },
+  "cap": "z_j = q_j * min(1, p_g / (mean_{k in g} q_k + eps)) on 2x2 groups; generalized-KL projection onto groupwise upper-mass constraints sum_g z <= 4 p_g in non-normalized measure space; clipped mass discarded, not redistributed; not a probability-simplex projection; no per-call renormalization",
+  "epsilon_cap": 1e-12,
+  "ca": "frozen A3 class-word W: SD1.5, selected eleven CA modules, calls 0-30, all heads",
+  "sa": "SG25/SG33 sources 16/32/64, matched calls 10-20 inclusive, eight heads; head-mean within each call for the hierarchy; V0 observation-wise fine P2",
+  "completion": "same-call head-mean fine SA on the min-max normalized core; SG32 first-pass selected-row background (threshold 0.5); positive residual only",
+  "route_diagnostic": {
+    "selectable": false,
+    "score": "R_I = sum_i B_i [F_i - H_i]_+ / (sum_i [F_i - H_i]_+ + 1e-8) on min-max normalized pre-CRF 64x64 maps; B = call-mean background support",
+    "primary_pair": ["V0", "V2"],
+    "secondary_pairs": [["V0", "V1"], ["V0", "V3"], ["V0", "V5"]],
+    "target": "1[IoU(H+R2) > IoU(F+R2)] per image; VOC uses training-fold thresholds of each held-out fold, COCO uses full-VOC thresholds; ties excluded and counted",
+    "direction": "higher R_I predicts H better; AUC is never flipped",
+    "go_no_go": "a routed cell may be registered later only if ROC-AUC >= 0.65 on VOC OOF and on frozen COCO; its cutoff would then be chosen inside VOC training folds"
+  },
+  "diagnostic_threshold": 0.45,
+  "thresholds": [0.3, 0.325, 0.35, 0.375, 0.4, 0.425, 0.45, 0.475, 0.5, 0.525, 0.55, 0.575, 0.6, 0.625, 0.65, 0.675, 0.7],
+  "selection": "five frozen VOC folds; raw and R2 screens separately versus same-generation V0; forced OOF, pairwise wins and selector reported separately; registered promotion guard; full-VOC thresholds frozen for COCO; no COCO tuning",
+  "diagnostics": "raw-map AP and best-threshold mIoU per cell (diagnostic only); cap binding fraction and removed-mass fraction per transition; fixed-0.45 TP/FP change accounting for V1->V3, V3->V4, V3->V5, V5->V6, V2->V5",
+  "excluded": "SG33 M2 coarse source (only as a separately registered add-on if C10 earns it); geometric soft conservation",
+  "storage": "resumable per-image confusion counts and compact diagnostics; no generated image, mask, dense map, QK or affinity cache"
+}

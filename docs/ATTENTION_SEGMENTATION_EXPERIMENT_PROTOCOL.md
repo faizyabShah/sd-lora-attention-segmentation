@@ -7333,3 +7333,111 @@ same-generation SG-combined-v2 job:
 All SG1–SG-combined-v1 promotion decisions stand exactly as registered. A
 generated, annotated third evaluation set is an open owner-level decision
 and does not block v2.
+
+## 126. SG-combined-v2 locked one-sided coarse caps and route diagnostic (Claude on Faiz's account; 30 October 2026)
+
+**Registered before any v2 result exists.** Faiz authorized the Section 125
+plan, with ChatGPT's refinement: the cap is tested at 16→32 only and at both
+transitions. **Narmeen's Claude: please review the operator, controls and
+eventual results before any promotion or manuscript claim.** This is a new
+prospective experiment. It does not reinterpret SG1–SG-combined-v1, whose
+decisions stand exactly as registered. SG33 M2 is excluded; it enters only as
+a separately registered add-on if C10 earns one.
+
+**Frozen inputs.** As in SG-combined-v1:
+- CA: A3 class-word W, selected eleven modules, calls 0–30, all heads, with
+  the Section 107 orientation caveat.
+- SA: matched 16/32/64 modules, calls 10–20, all eight heads, head-mean per
+  call for the hierarchy.
+- Refinement: unchanged R2.
+- Selection: five fixed VOC folds and the 17-value threshold grid.
+
+**Cells** (each raw and +R2):
+
+| Cell | Definition |
+|---|---|
+| V0 | same-generation observation-wise FINE-P2 (reference) |
+| V1 | ordinary raw 16→32→64 hierarchy (SG31 S2, v1 C1) |
+| V2 | v1 C6 replay: exact KL core at both transitions + unconditional completion |
+| V3 | one-sided cap at 16→32 only |
+| V4 | one-sided cap at 16→32 and 32→64 |
+| V5 | V3 core + unconditional completion (C6 convention) |
+| V6 | V3 core + completion admitted where `P1 ≥ B` (`G ≥ 1/2`), whole positive residual |
+
+**Cap.**
+- Formula: `z_j = q_j · min(1, p_g / (mean_{k∈g} q_k + ε))` on 2×2 groups,
+  with ε = 1e-12.
+- *What it is:* the generalized-KL projection onto the groupwise upper-mass
+  constraints `Σ_{k∈g} z_k ≤ 4 p_g`, in non-normalized measure space.
+  Bilinear upsampling preserves local means, so `4 p_g` is the parent's mass
+  at child resolution.
+- *What it is not:* clipped mass is discarded, not redistributed, and it is
+  not a projection on the probability simplex.
+- *Measure space:* the cap acts on the raw hierarchy maps (q = the raw 32×32
+  map `a32 · upsample(raw16)` and, for V4, its 64×64 successor). No call is
+  renormalized, so relative call weights equal V1's.
+- *Identity:* if no group binds, V3 and V4 equal V1 exactly, so V3 − V1
+  isolates the cap. This removes the call-weighting confound between v1's
+  C1 (raw) and C2–C5 (per-call distributions).
+- *V4's second cap* uses the capped 32×32 map as the parent.
+
+**Completion.** V5/V6 use the v1 C6 conventions: same-call head-mean fine SA
+on the min-max normalized core, and SG32 first-pass selected-row background
+(threshold 0.5). Only positive residuals are used.
+
+**Selection.**
+- Raw and R2 screens are run separately against same-generation V0, with
+  candidates V1–V6.
+- Rules are unchanged: registered promotion bands and class guard, at least
+  4/5 votes, positive OOF guard.
+- Forced OOF, pairwise fold wins and selector votes are reported separately.
+- Registered contrasts (raw and R2): V3 vs V1 (cap), V4 vs V3 (fine cap),
+  V5 vs V3 (completion), V6 vs V5 (P1 ≥ B gate), V5 vs V2 (capped vs exact
+  core).
+- Full-VOC thresholds are frozen for COCO, and COCO selects nothing.
+
+**Diagnostics** (none selects anything):
+- raw-map AP with paired bootstrap, and best-threshold mIoU, per cell
+  (the Section 125 views);
+- cap binding-group fraction and removed-mass fraction per transition;
+- fixed-0.45 TP/FP change accounting for each registered contrast.
+
+**Route diagnostic (non-selectable).**
+- *Score:* `R_I = Σ B_i [F_i − H_i]_+ / (Σ [F_i − H_i]_+ + 1e-8)` on min-max
+  normalized pre-CRF maps, with B the call-mean background support.
+- *Pairs:* primary F = V0, H = V2; secondary (V0, V1), (V0, V3), (V0, V5).
+  E (fine-exclusive mean) and D (mean |F − H|) are stored as secondary
+  scores.
+- *Target:* `1[IoU(H+R2) > IoU(F+R2)]`. VOC uses each held-out fold's
+  training-fold thresholds; COCO uses the full-VOC thresholds. Ties are
+  excluded and counted. Raw-stage targets are secondary.
+- *Direction:* higher R_I predicts H better. The AUC is never flipped.
+- *Calibration view:* VOC-defined deciles of R applied unchanged to COCO.
+- *Go/no-go:* a routed cell may be registered later only if the primary R
+  AUC is at least 0.65 on VOC OOF **and** on frozen COCO. Its cutoff would
+  then be chosen inside VOC training folds. Otherwise routing is closed, and
+  no route feature is tuned on COCO.
+
+**Validation before production.**
+- *CPU tests* (`tests/test_sg_combined_v2.py`, all pass):
+  - the cap is one-sided, does not redistribute, and leaves non-binding and
+    uncapped proposals unchanged;
+  - `P1 ≥ B` completion and the route-score definition are correct;
+  - on synthetic full-size 11-call Q/K, V0/V1/V2 equal v1 C0/C1/C6 and the
+    uncapped V3/V4 equal V1.
+- *Finalizer integration:* run on a synthetic fixture (real v1 counts
+  relabelled, random sidecars; not a result). It reproduced v1's C0/C1/C2/C6
+  values exactly.
+- *Live smoke* (one VOC and one COCO image) asserts: V0 = FINE-P2, V1 = SG31
+  S2 and v1 C1, V2 = v1 C6, and uncapped V3/V4 = V1.
+
+**Files.**
+- `configs/sg_combined_v2.json`
+- `src/segmentation/sg_combined_v2.py`
+- `scripts/run_sg_combined_v2.py`
+- `scripts/finalize_sg_combined_v2.py`
+- `jobs/{run,merge}_sg_combined_v2.slurm`
+- Output: `outputs/segmentation/controlled_attention_cv/sg_combined_v2/`
+
+Only confusion counts and compact diagnostics are stored. Job IDs follow on
+submission.
