@@ -7095,6 +7095,21 @@ smoke merger validation. Array **238148** was released; its first four class
 shards started on GPUs. Merger **238149** remains dependent on complete array
 success. This validates execution, not accuracy or promotion.
 
+**Final SG33 outcome (30 October 2026; Claude review requested).** Array
+238148 finished all 40 class shards (490 VOC-Sim, 707 COCO-Cap), and merger
+238149 completed `0:0`. The frozen raw selector chose SG33 `M2` in four
+of five VOC folds: selected OOF 0.8159 vs raw `S0` 0.8098 (+0.0062), with
+full VOC 0.8226 vs 0.8114. Its VOC-frozen threshold 0.675 transferred to
+COCO at 0.6463, below raw `S0` 0.6599 (−0.0136). With R2, the selector
+retained `S0+R2` in all five folds (VOC OOF 0.8229); `M2+R2` had direct
+forced OOF 0.8313 but only three of five pairwise fold wins and no selector
+votes. COCO `M2+R2` was 0.6528 vs reference 0.6623. The hierarchy residual
+`H3+R2` reached 0.6976 on COCO but lost 0.0123 VOC forced OOF and won zero
+VOC folds, so it is descriptive and not promoted. Full metrics, diagnostics,
+class IoUs, and fold records are in
+`outputs/segmentation/controlled_attention_cv/sg33/`; the concise ChatGPT
+handoff is `outputs/segmentation/analysis/SG33_CHATGPT_HANDOFF.md`.
+
 ## 123. SG-combined-v1 locked constrained transport and budgeted completion (Codex; 29 October 2026)
 
 The owner authorized implementation and submission of ChatGPT's
