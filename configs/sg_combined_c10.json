@@ -1,0 +1,17 @@
+{
+  "experiment": "SG-combined-v1 C10 add-on: SG33 M2 coarse source",
+  "version": 1,
+  "cells": ["C10a", "C10b", "C10c"],
+  "reference": "same-generation S0 FINE-P2, raw and R2",
+  "source": "SG33 M2 IPF-balanced 16x16 Markov first-arrival support; tau=0.3, cap=256, T=1, IPF tolerance=1e-5 and at most 100 iterations",
+  "ca": "frozen A3 class-word W, selected eleven CA modules, calls 0-30, all heads",
+  "sa": "matched 16/32/64 observations on calls 10-20, all eight heads, same-call hierarchy",
+  "transport": "C10a ordinary SG33 M2 path; C10b/c exact KL 2x2 parent conservation at both transitions; positive sum-normalized transport states",
+  "completion": "C10c same-call second fine pass with SG32 background rows and foreground-background odds; C10b P2 is diagnostic-only, not a selectable fourth cell",
+  "diagnostic_threshold": 0.45,
+  "coarse_support_threshold": 0.45,
+  "thresholds": [0.3, 0.325, 0.35, 0.375, 0.4, 0.425, 0.45, 0.475, 0.5, 0.525, 0.55, 0.575, 0.6, 0.625, 0.65, 0.675, 0.7],
+  "selection": "five frozen VOC folds; raw and R2 separately versus same-generation S0; VOC thresholds frozen for COCO; no COCO tuning",
+  "diagnostics": "coarse AUC uses native 16x16 sampled GT and per-call negative arrival; stage AUC uses sampled 64x64 GT for both routes; retention uses 0.45 on upsampled coarse M2 and final stage; full-resolution changes use 0.45 on normalized final maps",
+  "storage": "resumable confusion counts and compact per-image diagnostics; no generated images, masks, QK or dense attention matrices"
+}

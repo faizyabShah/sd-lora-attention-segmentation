@@ -7179,3 +7179,43 @@ and merger are being replaced with a fresh smoke-gated submission.
 six hours per shard) depends on its success, and merger **238285** depends
 on the production array. These are submitted jobs; live smoke validation
 is still pending.
+
+## 124. SG-combined-v1 C10 add-on: SG33 M2 coarse source (Codex; 30 October 2026)
+
+The owner requested three additional cells after SG33 completed, without
+altering the ten registered SG-combined-v1 cells or waiting for their result.
+**Claude: please review the SG33 M2 replay, KL projection, scale-retention
+diagnostics, and VOC-only selection before any promotion claim.**
+
+`C10a` replays SG33 M2's IPF-balanced 16×16 first-arrival source through
+ordinary same-call 16→32→64 SA. Live smoke compares its final map with
+same-generation SG33 M2. `C10b` starts from that source and uses exact
+parentwise KL projection at both 16→32 and 32→64 transitions. `C10c` adds
+the existing SG32 background-row/foreground-odds positive completion rule
+to `C10b`. A same-generation `S0` raw/R2 reference is stored, but only
+`C10a/b/c` are candidates. A second fine pass on `C10b` is measured only
+as a completion-efficiency diagnostic; it is not a fourth candidate.
+
+All three cells run raw and with unchanged R2. The five frozen VOC folds
+select candidates and 17 thresholds; those thresholds transfer unchanged to
+COCO. The registered selection rule remains unchanged. No new temperature,
+residual, Markov, or transport sweep is introduced. Inputs and settings are
+locked in `configs/sg_combined_c10.json` and copied into every shard.
+
+Diagnostics use GT only after inference: per-call AUC of negative M2 arrival
+at native 16×16 sampled GT; ordinary/constrained stage AUC at 16, 32 and 64
+against the same 64×64 sampled GT; and the fraction of coarse-M2-supported
+GT foreground/background retained at 64. Fixed 0.45 full-resolution masks
+give C10b−C10a TP/FP changes in 0–16, 16–64 and >64 px background bands.
+C10c−C10b and diagnostic ordinary-P2−C10b give TP/FP and distant-FP
+completion efficiency. The finalizer reports these alongside full VOC/COCO
+mIoU, per-class IoU, recall/precision, fold votes and paired comparisons.
+No generated images, masks, QK, or dense affinity matrices are persisted.
+
+**Submitted (30 October 2026).** Python, JSON and Slurm syntax checks and
+CPU diagnostic/merger-shape checks passed. Live one-VOC/one-COCO smoke job
+**238418** is pending GPU scheduling. The 40-class production array
+**238419** (`0-39%4`, any GPU, six hours per shard) has `afterok:238418`;
+CPU merger **238420** has `afterok:238419`. The smoke checks C10a against
+SG33 M2 on the same generated images. These are submitted jobs, not result
+or live-validation claims.
