@@ -7249,3 +7249,87 @@ same-generation SG33 M2 replay and C10 diagnostic merger. Production array
 **238473** (`0-39%4`, six hours per shard) was submitted only after that
 pass; CPU merger **238477** depends on the array. This fixes the execution
 error without rerunning the completed main experiment.
+
+## 125. Calibration and ranking audit of SG25–SG-combined-v1 (Claude on Faiz's account; diagnostic only; 30 October 2026)
+
+At Faiz's request, before SG-combined-v2 is registered. This is a CPU-only
+re-read of committed compact shards. No image is regenerated. No registered
+result, threshold, selection or promotion decision is changed or reinterpreted.
+Script: `scripts/audit_calibration_ap.py`. Output:
+`outputs/segmentation/analysis/calibration_ap_audit/` (`report.md`,
+`cells.csv`, `results.json`).
+
+**Scope and checks.** Every cell of SG25, SG27, SG30, SG31, SG32, SG33 and
+SG-combined-v1 is audited (204 cells, raw and R2), not only the cells
+named in the request. The recomputed frozen VOC and COCO mIoU of every cell
+equals its registered `results.json` value to 1e-9; the script aborts on
+any mismatch. Deltas are always against the same package's same-stage
+reference (raw vs raw, R2 vs R2).
+
+**Diagnostic quantities, beside the registered frozen transfer.**
+
+- *Best-threshold mIoU:* each cell and its reference independently take
+  their best of the 17 thresholds on that dataset's own labels. It uses
+  labels, is optimistic, and is never a result. The VOC column is in-sample.
+- *Raw-map AP:* mean per-image AP of the 64×64 map, with a 20,000-resample
+  paired bootstrap. It is threshold free, so it measures spatial ranking
+  rather than calibration. It is undefined for binary R2 masks.
+- Frozen and best-threshold deltas are compared descriptively only.
+  Threshold and map geometry interact, so their difference is not an
+  exact causal split.
+
+**Findings.**
+
+1. *The fine reference is miscalibrated on COCO in every package.* Its VOC
+   threshold (0.425 with R2, 0.45 raw) sits below its COCO best (0.525). That
+   gap is worth +0.027 (R2) and +0.020 (raw) COCO mIoU. Any candidate whose
+   VOC-selected threshold is higher inherits part of that gap.
+2. *Structural hierarchy cells keep a COCO gain at matched thresholds.*
+   COCO best-threshold Δ after R2: SG25 16→64 +0.022, SG33 H2/H3
+   +0.021/+0.020, combined C2 +0.024, C6 +0.026, H0/C1 +0.017 (frozen
+   Δ +0.030 to +0.044). Raw AP rises significantly for 16→64 (+0.007),
+   H2/H3 (+0.009) and C2 (+0.004). For H0/C1 the AP interval spans zero.
+3. *Several COCO wins are calibration only.* SG30 S2 and SG32 S1
+   (sharpening) go from +0.023 frozen to about 0.000 at matched thresholds.
+   SG31 S6, S7 and S10 go to ≤ 0. S10 is score squaring, a monotone transform:
+   its AP Δ is exactly 0 while its frozen Δ is +0.023. This is an internal
+   check that the audit separates ranking from calibration. SG27 S9 (product
+   fusion, VOC threshold at the 0.300 grid edge) shrinks from +0.043 to +0.016.
+4. *Final gain without better raw ranking.* Combined C5, C6 and C8 raise
+   matched-threshold COCO IoU after R2, while their raw COCO AP falls
+   (C6 −0.006, C8 −0.016). Their benefit arises at the decision/CRF stage,
+   not in global ranking.
+5. *SG33 M2 ranks worse on COCO* (raw AP −0.037, VOC −0.015).
+6. Of 53 R2 cells with a frozen COCO Δ of at least +0.015, 34 keep at least
+   +0.015 and 49 stay positive at matched thresholds.
+
+**Implications (proposals; nothing registered).** The defensible claim is
+that the sequential coarse→fine hierarchy improves cluttered-scene
+segmentation beyond calibration, while generic sharpening and suppression
+do not. SG-combined-v2 should report raw AP and matched-threshold
+diagnostics for every cell next to the registered frozen transfer. Any
+correction of the cross-dataset threshold mismatch must be label free and
+registered on VOC; COCO stays transfer-only.
+
+**Plan agreed with Faiz (ChatGPT-reviewed), prospective only.** Wait for
+the C10 merge (238477) before fixing v2's coarse source. Then run one
+same-generation SG-combined-v2 job:
+
+- *Controls:* V0 C0, V1 C1, V2 C6 replay.
+- *Main candidate:* V3, a one-sided coarse cap
+  `z_j = q_j · min(1, p_g / (Q_g + ε))` at both transitions. This is a
+  generalized-KL projection onto groupwise upper-mass constraints in
+  non-normalized measure space; clipped mass is discarded, not
+  redistributed, and it is not a projection on the probability simplex.
+- *Mechanistic interpolation point only:* V4, `z_j = q_j · (p_g / (Q_g + ε))^{1/2}`.
+- *Completion cells:* V5, V3 with ordinary completion; V6, V3 with
+  completion admitted where `P1 ≥ B`.
+- *Route diagnostic:* the background-weighted fine-exclusive support
+  `R_I = Σ B_i [F_i − H_i]_+ / (Σ [F_i − H_i]_+ + ε)`, scored by ROC-AUC
+  against `1[IoU(H) > IoU(F)]` on VOC OOF and then, unchanged, on frozen COCO.
+  A routed cell is built only if both AUCs are about 0.65 or higher, with its
+  cutoff chosen inside VOC training folds. Otherwise routing is closed.
+
+All SG1–SG-combined-v1 promotion decisions stand exactly as registered. A
+generated, annotated third evaluation set is an open owner-level decision
+and does not block v2.
