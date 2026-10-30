@@ -7219,3 +7219,15 @@ CPU diagnostic/merger-shape checks passed. Live one-VOC/one-COCO smoke job
 CPU merger **238420** has `afterok:238419`. The smoke checks C10a against
 SG33 M2 on the same generated images. These are submitted jobs, not result
 or live-validation claims.
+
+**C10 smoke correction and verified relaunch (30 October 2026).** The main
+SG-combined-v1 merger **238285 completed** and wrote 490 VOC/707 COCO
+results; it did not block C10. The C10 smoke **238418** failed when a
+diagnostic-only ordinary-P2 map stayed on CPU while the compared C10b map
+was on GPU. The map is now moved to the C10b device before comparison.
+Blocked production **238419** and merger **238420** were canceled. Fresh
+smoke **238471** passed `0:0` on one VOC and one COCO image, including the
+same-generation SG33 M2 replay and C10 diagnostic merger. Production array
+**238473** (`0-39%4`, six hours per shard) was submitted only after that
+pass; CPU merger **238477** depends on the array. This fixes the execution
+error without rerunning the completed main experiment.

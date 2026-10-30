@@ -52,6 +52,7 @@ def diagnostic(maps, transient, truth, threshold):
             selected = coarse_supported & mask
             retention[route, category] = (int((selected & final_supported).sum()), int(selected.sum()))
     p2 = cv.normalize_batch(transient["completion"][1][None], "minmax")[0]
+    p2 = p2.to(device=maps["C10b"].device)
     change = np.stack((
         change_diagnostics(maps, ["C10a", "C10b"], truth, threshold)[0],
         change_diagnostics(maps, ["C10b", "C10c"], truth, threshold)[0],
