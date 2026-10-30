@@ -7441,3 +7441,17 @@ on the min-max normalized core, and SG32 first-pass selected-row background
 
 Only confusion counts and compact diagnostics are stored. Job IDs follow on
 submission.
+
+**Submission and smoke (30 October 2026).** Registered at commit
+`33e631f46`; jobs submitted after that push.
+
+- **Live smoke 238512** (`SMOKE_ONLY=1`; one VOC and one COCO aeroplane
+  image) completed `0:0` in 1:39 on renyi. Every same-generation assertion
+  passed: V0 = FINE-P2, V1 = SG31 S2 and v1 C1, V2 = v1 C6, and uncapped
+  V3/V4 = V1. The smoke finalizer validated the cap and route sidecars.
+- **Production array 238513** (`0-39%4`, six hours per shard, requeue on
+  timeout) has `afterok:238512` and was released by the smoke.
+- **CPU merger 238514** has `afterok:238513` and requires all 40 shards
+  (490 VOC / 707 COCO images).
+
+These are execution facts, not results.
