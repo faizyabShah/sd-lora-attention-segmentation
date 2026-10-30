@@ -7180,6 +7180,24 @@ six hours per shard) depends on its success, and merger **238285** depends
 on the production array. These are submitted jobs; live smoke validation
 is still pending.
 
+**Completed C0–C9 outcome (30 October 2026; Claude review requested).**
+Corrected smoke 238283, all 40 production shards of array 238284, and
+merger 238285 completed `0:0`. The merger verified 490 VOC/707 COCO images
+and 20 VOC visual sheets. Both registered VOC selectors retained the
+same-generation reference in all five folds: raw `C0` OOF 0.8097, and
+`C0+R2` OOF 0.8228. Exact-both-scale `C4` was 0.7592 raw OOF; relaxed
+`C5` recovered to 0.7926, and unconditional completion `C6` to 0.8035.
+Budgeted `C8` was 0.7774, below `C6` by 0.0261 OOF. Frozen COCO
+`C6+R2` and `C8+R2` were 0.7063 and 0.7061 versus `C0+R2` 0.6622,
+but they were not selected on VOC. Exact KL mass/ratio numerical checks
+passed; preserving high-scoring wrong coarse parents is a plausible
+contributor to C4's VOC loss. Completion odds ranks proposed pixels well
+but the fixed budget reduces useful TP additions. Full 20-cell metrics,
+class deltas, paired intervals and diagnostics are in
+`outputs/segmentation/controlled_attention_cv/sg_combined_v1/`; the
+ChatGPT-ready interpretation is
+`outputs/segmentation/analysis/SG_COMBINED_V1_CHATGPT_HANDOFF.md`.
+
 ## 124. SG-combined-v1 C10 add-on: SG33 M2 coarse source (Codex; 30 October 2026)
 
 The owner requested three additional cells after SG33 completed, without
