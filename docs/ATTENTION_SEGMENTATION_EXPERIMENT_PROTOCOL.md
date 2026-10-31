@@ -8046,3 +8046,69 @@ undoes it. This matches the earlier calibration-vs-structure finding
   The class guard still blocks it.
 - Paper framing: describe V3's contribution as cross-image calibration of
   the coarse→fine propagation, not as better localisation.
+
+## 135. Owner override: V3+R2 becomes the working default (Faiz; recorded by Claude; 31 October 2026)
+
+**Owner decision.** Faiz overrides the registered protocol and adopts
+**A3 → V3 → R2** as the working default for subsequent training-free method
+development and for the paper's proposed method. This is the override
+announced in Section 127 ("if no future cell earns a proper registered
+promotion"). It was taken after SG-A3G, SG-combined-v3 and SG-threshold
+(Sections 131–134) produced no registered promotion.
+
+This is an **explicit, labelled owner override, not a registered
+promotion**:
+- No registered rule, threshold, class guard or past decision is changed or
+  relaxed.
+- Every registered selector involved (Sections 127, 132 and 134) kept
+  R0+R2 / S0+R2.
+- The registered training-free FTF pipeline (VOC 0.8135 OOF, COCO 0.637)
+  stays the protocol's registered result.
+- The superseded A3 → FINE-P2 → R2 working default (Sections 103 and 127)
+  stays the comparison reference.
+
+**Pipeline** (`configs/owner_default_v3.json`):
+- **Seed:** historical A3 seed c64 (Section 107 orientation; the GoCA
+  orientation is immaterial, Section 131). Selected 11 CA modules, calls
+  0–30, all heads.
+- **Hierarchy:** c16 = D(c64); r16_t = Ā^16_t c16;
+  z32_t = cap(r16_t, Ā^32_t U r16_t); V3 = (1/11)Σ_{t=10..20} Ā^64_t U z32_t.
+  The cap is the one-sided raw-space cap of Section 126.
+- **Refinement and threshold:** R2 at threshold 0.55.
+- **Code:** `src/segmentation/sg_combined_v3.py`, map R1 (identical to
+  `sg_combined_v2` V3).
+
+**Evidence for the override** (SG-combined-v3 run, R1+R2 vs R0+R2):
+
+| | V3+R2 | A3 → FINE-P2 → R2 | Δ |
+|---|---:|---:|---:|
+| VOC forced OOF | 0.8293 | 0.8230 | +0.0063 (5/5 folds, CI [+0.0010, +0.0115]) |
+| VOC full (threshold) | 0.8303 (0.55) | 0.8244 (0.425) | +0.0059 |
+| Frozen COCO-Cap | 0.6964 | 0.6623 | **+0.0341** |
+| VOC precision / recall | 0.890 / 0.910 | 0.883 / 0.916 | |
+| COCO precision / recall | 0.747 / 0.886 | 0.703 / 0.889 | |
+
+The gain is reproduced in three generations: v2 (+0.0073), SG-A3G
+(+0.0063; +0.0075 on the GoCA seed) and v3 (+0.0063).
+
+**Why it is not a registered pass.** V3+R2 fails the −0.050 worst-class
+guard in every fold. Training-fold Δ is +0.0039 to +0.0071 and the worst
+class loses 0.057 to 0.104 (Section 127). On full VOC:
+- **Sheep −0.092.** Sections 132 and 134 trace this to the shared global
+  threshold on frame-filling sheep, not to mass removed by the cap. No
+  label-free per-image rule removes it without giving back V3's gain.
+- **Dining-table −0.033.**
+- The 0.55 threshold is the full-VOC optimum, so full-VOC numbers are in
+  sample. COCO-Cap is a clean frozen transfer.
+
+**Reporting obligations.**
+- The paper labels V3+R2 as an owner-selected method, chosen after the
+  registered screens.
+- It reports the registered selector outcomes alongside: R0+R2 retained;
+  forced OOF +0.0063.
+- It reports the sheep and dining-table losses and the per-image-threshold
+  ceiling: R0+R2 and V3+R2 tie at 0.896 / 0.895. The paper therefore
+  describes V3's gain as cross-image calibration (Section 134).
+- Later SG experiments use V3+R2 (R1+R2) as the reference for new
+  candidates. Each also reports R0+R2, so results stay comparable with the
+  registered history.

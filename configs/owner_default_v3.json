@@ -1,0 +1,25 @@
+{
+  "name": "owner_default_v3",
+  "status": "owner override (Faiz, 31 October 2026; protocol Section 135); NOT a registered promotion",
+  "replaces": "A3 -> FINE-P2 -> R2 working default (Sections 103, 127); the registered training-free FTF pipeline is unchanged",
+  "pipeline": "A3 class-word CA seed -> V3 capped coarse-to-fine SA hierarchy -> R2 (OVAM DenseCRF)",
+  "ca_seed": "historical A3 (Section 107 orientation; GoCA orientation immaterial, Section 131): SD1.5, configs/controlled_sa_seed_frozen.json modules 0,1,4,5,6,7,8,9,13,14,15, calls 0-30, all heads, SG24 pseudo-global per-call layer weights",
+  "sa": "SG25/SG33 sources at 16/32/64 px, matched calls 10-20, eight heads averaged per module; no head pairing across modules",
+  "hierarchy": "c16 = area-down(c64); r16_t = mean_h A16_{t,h} c16; z32_t = cap(r16_t, mean_h A32_{t,h} up(r16_t)); V3 = mean_t mean_h A64_{t,h} up(z32_t)",
+  "cap": "one-sided raw-space cap, z_k = q_k min(1, p_g / (m_g + 1e-12)), m_g = 2x2 child mean, clipped mass discarded (src/segmentation/sg_combined_v2.py cap)",
+  "implementation": "src/segmentation/sg_combined_v3.py aggregate, map R1 (equals sg_combined_v2 V3)",
+  "refinement": "R2: min-max, bilinear to annotation size, threshold, OVAM DenseCRF",
+  "threshold": 0.55,
+  "threshold_note": "full-VOC optimum (in-sample on VOC); frozen for COCO-Cap",
+  "results": {
+    "voc_forced_oof": 0.8293,
+    "voc_forced_oof_delta_vs_A3_FINE_P2_R2": 0.0063,
+    "voc_fold_wins": "5/5",
+    "voc_paired_mean_image_ci": [0.0010, 0.0115],
+    "voc_full": 0.8303,
+    "coco_frozen": 0.6964,
+    "coco_frozen_delta_vs_A3_FINE_P2_R2": 0.0341,
+    "source": "outputs/segmentation/controlled_attention_cv/sg_combined_v3 (R1+R2 vs R0+R2)"
+  },
+  "known_failure": "sheep -0.092 and dining-table -0.033 VOC full-set IoU vs A3 -> FINE-P2 -> R2; fails the -0.050 worst-class guard in every fold"
+}
