@@ -7937,3 +7937,63 @@ loses either recall (high threshold) or precision (low threshold).
 - W1, W2 and W3 are closed.
 - A class-agnostic, per-image threshold or normalization is the candidate
   follow-up. It is not registered here.
+
+## 133. SG-threshold registration: label-free per-image thresholds (Claude on Faiz's account; 31 October 2026)
+
+Faiz approved a CPU-only study of threshold selection, following the Section
+132 finding that the sheep loss comes from the shared global threshold. No
+generation is run. The source is the SG-combined-v3 count shards (17-point
+grid, raw and R2) and the fp16 min-max 64×64 dense maps for R0 (FINE-P2)
+and R1 (V3).
+
+**Why this is exact.** A rule computes τ_I from image I's stored map only.
+τ_I is snapped to the nearest grid threshold (0.30–0.70, step 0.025). The
+v3 counts at that index are then exactly what that pipeline would score: raw
+maps are bilinearly resized and thresholded, and R2 is DenseCRF applied to
+the mask at that same threshold. The stored maps reproduce the counted
+predicted area (Pearson ≥ 0.9997 on VOC and COCO; mean |Δarea| ≤ 0.003).
+
+**Rules** (none sees GT, the class or COCO; y is the min-max map):
+- **T0 global:** the registered fixed threshold (reference rule).
+- **T1 Otsu:** 256 bins on [0, 1]. Parameter-free.
+- **T2 two-Gaussian:** EM initialised from the Otsu split; τ_I is the
+  crossing of the weighted densities between the two means (Otsu if none).
+  Parameter-free.
+- **T3 mean + k·std:** τ_I = μ_I + kσ_I, k ∈ {−1.00, …, 3.00} (step 0.25).
+- **T4 most stable:** the interior grid threshold minimising
+  A(t_{j−1}) − A(t_{j+1}), where A is the map area ≥ t; ties go to the
+  value nearest 0.45. Parameter-free.
+- **T5 R0 area (R1 only):** keep R1's top pixels with the area of
+  R0 ≥ t_j; t_j is the parameter.
+- **T6 Otsu + offset:** τ_I = τ_Otsu + d, d ∈ {−0.20, …, 0.20} (step 0.025).
+
+Each one-parameter rule exposes its 17 values on the threshold axis. The
+unchanged selector therefore picks the parameter per training fold exactly
+as it picks a global threshold. The full-VOC choice is frozen for COCO.
+
+**Cells.** {R0, R1} × rules (no R0.T5), each raw and +R2: 13 cells per
+stage. Reference R0.T0 (= v3 R0 / R0+R2).
+
+**Selection and decisions (fixed now).**
+- **Promotion:** the unchanged registered selector, raw and R2 separately,
+  with all 12 other same-stage cells as candidates (equal inclusiveness).
+  A cell frozen by the R2 selector is a registered promotion over R0+R2.
+  The class guard is unchanged.
+- **Threshold effect:** a rule helps a map if it beats that map's T0 in
+  ≥ 4/5 folds with the paired interval above zero (raw or R2).
+- **Reported:** frozen COCO, sheep and worst class, grid-edge share, the
+  selected parameter, GT-area bins, and a per-image best-grid ceiling. The
+  ceiling and the bins are diagnostic only.
+
+**Files and checks.**
+- `configs/sg_threshold.json`
+- `src/segmentation/sg_threshold.py`
+- `scripts/finalize_sg_threshold.py`
+- `tests/test_sg_threshold.py`, which checks: snapping and edges; Otsu and
+  two-Gaussian splitting two modes; T4 in the histogram gap; the quantile
+  area match; T5 on R0 itself reproducing the grid; monotone T3/T6 axes.
+
+A pipeline smoke on the first 40 VOC images (single class, not a result)
+checked the loading, alignment and selector plumbing before this
+registration. The rule set was fixed before the smoke and is not changed
+after it.

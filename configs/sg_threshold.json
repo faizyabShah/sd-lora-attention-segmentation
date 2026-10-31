@@ -1,0 +1,24 @@
+{
+  "experiment": "SG-threshold: label-free per-image threshold rules on SG-combined-v3 maps (CPU only)",
+  "version": 1,
+  "source": "outputs/segmentation/controlled_attention_cv/sg_combined_v3 counts (raw and R2, 17-point grid) and fp16 min-max 64x64 dense maps; no generation",
+  "maps": ["R0", "R1"],
+  "rules": {
+    "T0": "global threshold, slot j = grid threshold t_j (registered rule)",
+    "T1": "Otsu, 256 bins on [0,1]; parameter-free",
+    "T2": "two-Gaussian EM from the Otsu split; crossing of weighted densities between the means, Otsu if none; parameter-free",
+    "T3": "tau = mean + k std of the map, k = -1.00..3.00 step 0.25 (fold-selected)",
+    "T4": "most stable threshold: interior grid t_j minimising A(t_{j-1}) - A(t_{j+1}), A = map area >= t; ties to nearest 0.45; parameter-free",
+    "T5": "R1 only: keep R1's top pixels with the area of R0 >= t_j; t_j fold-selected",
+    "T6": "tau = Otsu + d, d = -0.20..0.20 step 0.025 (fold-selected)"
+  },
+  "snapping": "tau_I to the nearest grid threshold 0.30..0.70; R2 counts are read at the same snapped tau_I; grid-edge share reported",
+  "thresholds": [0.3, 0.325, 0.35, 0.375, 0.4, 0.425, 0.45, 0.475, 0.5, 0.525, 0.55, 0.575, 0.6, 0.625, 0.65, 0.675, 0.7],
+  "selection": "unchanged registered selector on five frozen VOC folds, raw and R2 separately, reference R0.T0 (= v3 R0, FINE-P2) with all 12 other same-stage cells as candidates (inclusiveness equal); parameter slots chosen like thresholds; full-VOC slot frozen for COCO",
+  "decision_rules": {
+    "promotion": "a cell frozen by the R2 selector is a registered promotion over R0+R2 (the raw selector is reported alongside)",
+    "threshold_effect": "a rule helps a map if it beats the same map's T0 in >=4/5 folds with paired interval above zero (raw or R2)",
+    "sheep": "reported for every cell; the class guard is unchanged"
+  },
+  "diagnostics": "per-image best-grid ceiling for R0/R1, sheep and worst class, GT-area bins vs reference, selected parameter, grid-edge share, map/count alignment; diagnostic only"
+}
