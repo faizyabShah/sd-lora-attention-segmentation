@@ -7455,3 +7455,106 @@ submission.
   (490 VOC / 707 COCO images).
 
 These are execution facts, not results.
+
+## 127. C10 and SG-combined-v2 results (Claude on Faiz's account; 31 October 2026)
+
+Both mergers completed `0:0`: C10 **238477** and SG-combined-v2 **238514**.
+Each covers 40 complete class shards (490 VOC / 707 COCO images). The
+same-generation references agree across runs (S0 = V0 = 0.8098 VOC forced
+OOF; frozen COCO 0.6599 vs 0.6598). No registered rule, threshold or decision
+is changed below. AP and best-threshold values are diagnostic only (Section
+125). Outputs: `outputs/segmentation/controlled_attention_cv/sg_combined_c10/`
+and `.../sg_combined_v2/` (`results.json`, `report.md`, `per_class_iou.csv`).
+
+### C10 (Section 124)
+
+| Cell | VOC forced OOF (Δ, fold wins) | Full VOC thr | Frozen COCO |
+|---|---:|---:|---:|
+| S0 / S0+R2 | 0.8098 / 0.8231 | 0.450 / 0.425 | 0.6599 / 0.6623 |
+| C10a | 0.8216 (+0.0118, 5/5) | 0.675 | 0.6465 |
+| C10a+R2 | 0.8313 (+0.0083, 3/5) | 0.675 | 0.6529 |
+| C10b | 0.6444 (−0.1654, 0/5) | 0.425 | 0.5150 |
+| C10c | 0.7622 (−0.0476, 0/5) | 0.700 | 0.6177 |
+
+- **Registered outcome.** The raw selector froze **C10a**: 4/5 votes and the
+  OOF guard passed (OOF gain +0.0061; paired OOF mean +0.0024, CI
+  [−0.0056, +0.0107]). The R2 (final) selector kept **S0+R2** 5/5.
+- **Transfer.** C10a's VOC threshold sits at or next to the grid top
+  (0.675–0.700). On COCO it is worse at every readout: frozen −0.013;
+  best-threshold 0.653 vs 0.681 (−0.028, best threshold 0.70 at the grid
+  edge); raw AP 0.836 vs 0.873 (−0.037, matching the Section 125 M2 audit).
+- **C10b.** Exact two-sided KL projection of the M2 source lowers 64×64
+  stage AUC from 0.975 (C10a) to 0.888. It is the same failure mode as
+  SG-combined-v1 C2–C5. C10c's completion recovers only part of it.
+- **Decision for v2.** C10 does not earn a separately registered M2 add-on.
+  M2 stays excluded from SG-combined-v2 follow-ups.
+
+### SG-combined-v2 (Section 126)
+
+| Cell | VOC forced OOF Δ vs V0 (wins) | Paired OOF CI | Frozen COCO | COCO best-thr Δ | COCO raw AP Δ |
+|---|---:|---|---:|---:|---:|
+| V1 | −0.0037 (1/5) | | 0.6783 | +0.0169 | +0.0011 |
+| V1+R2 | −0.0046 (1/5) | [−0.0083, +0.0042] | 0.6925 | +0.0170 | — |
+| V2 | −0.0061 (0/5) | | 0.6932 | +0.0202 | −0.0061 |
+| V2+R2 | −0.0027 (2/5) | [−0.0059, +0.0049] | 0.7063 | +0.0253 | — |
+| **V3** | **+0.0059 (5/5)** | [+0.0006, +0.0121] | 0.6821 | +0.0173 | −0.0005 |
+| **V3+R2** | **+0.0073 (5/5)** | [+0.0017, +0.0125] | **0.6966** | +0.0176 | — |
+| V4 | +0.0052 (5/5) | [+0.0000, +0.0122] | 0.6890 | +0.0124 | −0.0011 |
+| V4+R2 | +0.0059 (4/5) | [+0.0000, +0.0121] | 0.6964 | +0.0153 | — |
+| V5 | +0.0033 (3/5) | | 0.6652 | +0.0006 | −0.0185 |
+| V5+R2 | −0.0021 (3/5) | | 0.6647 | −0.0025 | — |
+| V6 | +0.0045 (3/5) | [−0.0010, +0.0117] | 0.6765 | +0.0104 | −0.0103 |
+| V6+R2 | +0.0025 (4/5) | | 0.6792 | +0.0091 | — |
+
+V0 / V0+R2 is 0.8098 / 0.8231 VOC OOF and 0.6598 / 0.6622 frozen COCO.
+V3+R2 full VOC is 0.8304 at threshold 0.550.
+
+- **Registered outcome.** The raw and R2 selectors both kept **V0** 5/5
+  ("no eligible candidate" in every fold). **No v2 cell is promoted.**
+- **Why V3 is not eligible.** Recomputed training-fold assessments: V3's
+  delta is +0.0052 to +0.0084 (≥ the +0.005 conditional bar in every fold),
+  with 11–13/20 classes improved. The worst class loses 0.050–0.092, failing
+  the −0.050 worst-class guard in every fold. V3+R2 is similar (+0.0039 to
+  +0.0071; worst −0.057 to −0.104). On full VOC the failing class is
+  **sheep** (V3 −0.069, V3+R2 −0.092), then dining-table (−0.046 / −0.033).
+  Every hierarchy cell loses sheep (V2+R2 −0.116). This is the registered
+  guard working as written; it is not relaxed retroactively.
+- **Cap effect (V3 vs V1).** +0.0096 raw / +0.0119 R2 VOC OOF, 5/5 folds,
+  paired CI [+0.0039, +0.0106] / [+0.0057, +0.0127]. On COCO, V3 vs V0 is
+  paired mean +0.022 raw / +0.028 R2 (CI excludes 0). The best-threshold
+  gain (+0.017/+0.018) keeps most of the frozen gain, and raw AP is neutral.
+  The cap therefore changes mask extent at matched thresholds rather than
+  pixel ranking. COCO precision rises 0.708 → 0.731 raw and 0.703 → 0.747
+  R2, with recall 0.882 → 0.889 raw and 0.889 → 0.886 R2.
+- **Cap statistics.** At 16→32 the cap binds in 58% (VOC) / 65% (COCO) of
+  2×2 groups but removes only 7.6% / 8.3% of the raw mass (mean binding
+  factor 0.84–0.85): a mild trim, not a re-shaping.
+- **Second cap (V4 vs V3).** −0.0007 raw / −0.0013 R2, 2/5 wins, CI spans
+  0. It adds nothing; closed.
+- **Completion.** V5+R2 vs V3+R2 is −0.0094, 0/5 wins, CI [−0.0133,
+  −0.0035], and V5 erases V3's COCO gain (0.6647). Gating (V6 vs V5) recovers
+  +0.0046 R2 (5/5) but stays below V3. V5 vs V2 is +0.0094 raw but +0.0005
+  R2. Reading: on a capped core, fine completion re-adds mostly false
+  positives. The v1 C6 completion appears to have compensated for the
+  over-tight exact-KL core. The completion line is closed for the capped
+  hierarchy.
+- **Route diagnostic (non-selectable).** Primary V2+R2 vs V0+R2 R AUC is
+  0.554 on VOC OOF and 0.594 on frozen COCO; E is 0.576 / 0.623. Oracle
+  per-image headroom exists (+0.015 VOC, +0.045 COCO mean-image IoU), but R
+  does not predict it. **Go/no-go: no-go.** Routing is closed under the
+  registered rule.
+
+### Status and open choices
+
+V3+R2 (VOC OOF 0.8304, frozen COCO 0.6966) is the strongest training-free
+structural cell to date. It is a single isolated operator with a 5/5
+same-generation gain over both V0 and V1. It is **not protocol-promoted**.
+The FTF frozen pipeline and the A3 working default are unchanged.
+
+Open owner-level choices, neither taken here:
+1. Adopt V3+R2 as an exploratory working default, labelled "not
+   protocol-promoted", in the same way as A3.
+2. First run a CPU-only per-image diagnosis of the sheep / dining-table
+   loss, then decide whether a separately registered study is justified.
+
+The A3 transpose issue (`src/segmentation/sg24_ca.py:84-87`) remains open.
