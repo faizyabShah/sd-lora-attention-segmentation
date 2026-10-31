@@ -13,4 +13,4 @@ source ~/.bashrc
 conda activate "${CONDA_ENV:-trdp}"
 set -u
 export PYTHONDONTWRITEBYTECODE=1 HF_HUB_OFFLINE=1 OMP_NUM_THREADS=4
-python scripts/paper/figure_story_maps.py --cache "${CACHE:-/home/shafa/paper_cache/story_maps}"
+python scripts/paper/figure_story_maps.py --cache "${CACHE:-/home/shafa/paper_cache/story_maps}" ${EXTRA_ARGS:-}

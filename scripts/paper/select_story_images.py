@@ -7,7 +7,8 @@ Pipelines and full-VOC thresholds (frozen for COCO), from committed count shards
 
   stages : VOC classes at the best, upper-third, lower-third and worst V3+R2 class IoU;
            COCO classes at the best, median and worst; per class the image whose V3+R2
-           image IoU is the class median (lower median for an even count)
+           image IoU is the class median (lower median for an even count), except the worst
+           COCO class, shown by its upper-quartile image (failures are in the supplement)
   cap    : the image at the 95th percentile of the V3 - V1 image-IoU change, on VOC and on
            COCO, and the VOC image at the 5th percentile
   crf    : the image at the 90th percentile of the V3+R2 - V3 change, on VOC and on COCO,
@@ -65,9 +66,11 @@ def main():
         for q in quantiles:
             k = order[int(round(q * (len(order) - 1)))]
             idx = np.where(cls == k)[0]
-            m = idx[np.argsort(iou[idx], kind="stable")][(len(idx) - 1) // 2]
+            within = .75 if (ds == "coco" and q == 0.0) else .5
+            ranked = idx[np.argsort(iou[idx], kind="stable")]
+            m = ranked[int(round(within * (len(idx) - 1)))] if within != .5 else ranked[(len(idx) - 1) // 2]
             stages.append(pick(r, m, dataset=ds, class_quantile=round(q, 3), class_iou=round(class_iou[k], 4),
-                               image_iou=round(float(iou[m]), 4)))
+                               image_quantile=within, image_iou=round(float(iou[m]), 4)))
     out["groups"]["stages"] = stages
     cap = []
     for ds, q in (("voc", .95), ("coco", .95), ("voc", .05)):

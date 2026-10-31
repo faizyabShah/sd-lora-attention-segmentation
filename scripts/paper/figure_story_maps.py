@@ -99,6 +99,7 @@ def main():
     p.add_argument("--cache", type=Path, required=True)
     p.add_argument("--model", default="stable-diffusion-v1-5/stable-diffusion-v1-5")
     p.add_argument("--crf-site", type=Path, default=ROOT / "outputs/dependencies/simplecrf_py310")
+    p.add_argument("--missing-only", action="store_true", help="skip images already in the cache")
     args = p.parse_args()
     selection = json.loads(SELECTION.read_text())
     wanted = {}
@@ -112,6 +113,8 @@ def main():
     args.cache.mkdir(parents=True, exist_ok=True)
     report = {}
     for image_id, item in wanted.items():
+        if args.missing_only and (args.cache / f"{image_id}.npz").exists():
+            continue
         ds = item["dataset"]
         target = item["class"]
         for s in range(20):
@@ -151,6 +154,8 @@ def main():
             np.savez_compressed(args.cache / f"{image_id}.npz", **out)
         report[image_id] = check
         print(image_id, {k: tuple(round(x, 4) for x in v) for k, v in check.items()}, flush=True)
+    if args.missing_only and (args.cache / "check.json").exists():
+        report = json.loads((args.cache / "check.json").read_text()) | report
     (args.cache / "check.json").write_text(json.dumps(report, indent=2) + "\n")
     worst = max(abs(a - b) for v in report.values() for a, b in v.values())
     print(f"max |regenerated - counted| image IoU: {worst:.4f}")
