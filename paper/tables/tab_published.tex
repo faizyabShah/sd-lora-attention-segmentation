@@ -16,7 +16,7 @@ DatasetDM & .803 & .593 \\
 \midrule
 \multicolumn{3}{@{}l}{\emph{Ours, training-free, class word}}\\
 fine-only propagation + DenseCRF & .823 & .662 \\
-\textbf{coarse-to-fine + cap + DenseCRF} & \textbf{.829} & \textbf{.696} \\
+\textbf{BRACE (coarse-to-fine + cap + DenseCRF)} & \textbf{.829} & \textbf{.696} \\
 \bottomrule
 \end{tabular}
 \caption{\textbf{Comparison with published class-word results} on the benchmarks released by OVAM~\cite{marcosmanchon2024ovam}; optimized-token rows are excluded. Ours: forced out-of-fold VOC-Sim, frozen COCO-Cap. We regenerate each image from its released prompt and seed, so cross-block differences are indicative rather than paired.}
