@@ -14,7 +14,6 @@ plain hierarchy & $\checkmark$ & & & & & & 1/5 & .8061 & .8184 & .6925 \\
 conservation & $\checkmark$ & $\checkmark$ & & & & & 2/5 & .8034 & .8185 & .7038 \\
 conservation & $\checkmark$ & & $\checkmark$ & & & & 0/5 & .7894 & .8135 & .7022 \\
 conservation & $\checkmark$ & $\checkmark$ & $\checkmark$ & & & & 0/5 & .7592 & .7917 & .6851 \\
-relaxed conservation & $\checkmark$ & $\tfrac12$ & $\tfrac12$ & & & & 1/5 & .7926 & .8149 & .7059 \\
 conservation + completion & $\checkmark$ & $\checkmark$ & $\checkmark$ & & & $\checkmark$ & 2/5 & .8037 & .8204 & \textbf{.7063} \\
 \midrule
 \multicolumn{11}{@{}l}{\emph{One-sided: children may not exceed the parent's mass}} \\
@@ -23,6 +22,6 @@ cap & $\checkmark$ & & & $\checkmark$ & $\checkmark$ & & 4/5 & .8151 & .8290 & .
 cap + completion & $\checkmark$ & & & $\checkmark$ & & $\checkmark$ & 3/5 & .8131 & .8209 & .6647 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{How the coarse level should constrain the finer one.} All rows share one generation of the 490 VOC-Sim and 707 COCO-Cap images, the A3 seed and SA calls 10--20. \emph{C2F}: coarse-to-fine propagation $16\!\rightarrow\!32\!\rightarrow\!64$ px (otherwise 64-px SA only). \emph{Conserve} forces each $2{\times}2$ child group to carry exactly its parent's mass (closed-form KL projection); $\tfrac12$ moves halfway to that projection. \emph{Cap} only removes mass above the parent (Eq.~\ref{eq:cap}). \emph{Compl.}: fine-SA completion re-adds positive residuals. VOC: forced OOF mIoU; \emph{wins}: held-out folds in which a row beats fine-only after R2; COCO-Cap: VOC-frozen threshold. Forcing parent mass onto children loses up to 5 VOC points. Capping at $16\!\rightarrow\!32$ is the only variant that beats both references in every fold (vs.\ plain hierarchy: $+0.012$ after R2, paired 95\% CI $[+0.006,+0.013]$).}
+\caption{\textbf{How the coarse level should constrain the finer one.} All rows share one generation of the 490 VOC-Sim and 707 COCO-Cap images, the A3 seed and SA calls 10--20. \emph{C2F}: coarse-to-fine propagation $16\!\rightarrow\!32\!\rightarrow\!64$ px (otherwise 64-px SA only). \emph{Conserve} forces each $2{\times}2$ child group to carry exactly its parent's mass (closed-form KL projection). \emph{Cap} only removes mass above the parent (Eq.~\ref{eq:cap}). \emph{Compl.}: fine-SA completion re-adds positive residuals. VOC: forced OOF mIoU; \emph{wins}: held-out folds in which a row beats fine-only after R2; COCO-Cap: VOC-frozen threshold. Forcing parent mass onto children loses up to 5 VOC points. Capping at $16\!\rightarrow\!32$ is the only variant that beats both references in every fold (vs.\ plain hierarchy: $+0.012$ after R2, paired 95\% CI $[+0.006,+0.013]$).}
 \label{tab:hierarchy}
 \end{table*}
