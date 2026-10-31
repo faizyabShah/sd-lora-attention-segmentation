@@ -1,0 +1,27 @@
+{
+  "experiment": "SG-combined-v3: single changes to the V3 capped hierarchy (per-head cap, native coarse seed, temporal cap)",
+  "version": 1,
+  "cells": ["R0", "R1", "W1", "W2", "W3"],
+  "cell_definitions": {
+    "R0": "same-generation observation-wise FINE-P2 (v2 V0); registered selection reference",
+    "R1": "SG-combined-v2 V3 replay: r16_t = mean_h A16 c16, z32_t = cap(r16_t, mean_h A32 U r16_t), R1 = mean_t mean_h A64 U z32_t; local mechanism reference",
+    "W1": "R1 with every 32-px head capped against the head-mean parent before averaging: z32_t = mean_h cap(r16_t, A32_h U r16_t)",
+    "W2": "R1 started from c16* = minmax(S_<=16), the native 8/16-px share of the selected A3 sum with unchanged A3 weights (S = S_64 + S_<=16), instead of c16 = area-downsampled c64",
+    "W3": "R1 with a temporal cap: z_t = cap(D_64->32(mean_{t'<t} v_t'), v_t) for calls after the first, v_t = R1's per-call map; first call unchanged"
+  },
+  "seed": "historical A3 (Section 107 orientation), owner decision 31 October 2026; A3G only if a later result warrants it",
+  "cap": "SG-combined-v2 one-sided raw-space cap, epsilon 1e-12, clipped mass discarded",
+  "ca": "frozen A3 class-word W: SD1.5, selected eleven CA modules (64-px 0,1,13,14,15; 16-px 4,5,7,8,9; 8-px 6), calls 0-30, all heads",
+  "sa": "SG25/SG33 sources 16/32/64, matched calls 10-20, eight heads; no head pairing across modules",
+  "thresholds": [0.3, 0.325, 0.35, 0.375, 0.4, 0.425, 0.45, 0.475, 0.5, 0.525, 0.55, 0.575, 0.6, 0.625, 0.65, 0.675, 0.7],
+  "selection": "five frozen VOC folds; raw and R2 screens separately versus same-generation R0 with candidates R1, W1, W2, W3; registered promotion guard unchanged; full-VOC thresholds frozen for COCO; no COCO tuning",
+  "mechanism_table": "W1, W2, W3 versus R1, raw and R2: forced OOF delta, fold wins, paired mean-image interval, frozen and best-threshold COCO delta, raw AP; reported separately from the selector",
+  "decision_rules": {
+    "W2": "final-method candidate if it beats R1 in >=4/5 folds with paired interval above zero (raw or R2) and sheep IoU does not fall versus R1",
+    "W1": "closed if sheep IoU falls versus R1",
+    "W3": "temporal capping closed unless it beats R1 in >=4/5 folds with paired interval above zero"
+  },
+  "diagnostics": "GT cap loss at 16->32 for R1, W1 (head-wise) and W2: gamma_GT (GT-weighted binding share), L_GT and L_background (removed proposal-mass shares), by class; cap binding/removed-mass per cell; c16*/c16 Pearson r and mean absolute difference; IoU change by GT area bin; worst class; raw AP and best-threshold mIoU. Diagnostic only",
+  "dense_maps": "fp16 min-max 64x64 pre-CRF maps of all five cells for every image in the diagnostic sidecar (owner-approved departure from the no-dense-map rule)",
+  "storage": "resumable per-image confusion counts plus the compact and dense diagnostic sidecar; no generated image, QK or affinity cache"
+}

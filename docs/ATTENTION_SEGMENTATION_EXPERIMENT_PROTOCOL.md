@@ -7667,3 +7667,82 @@ mean |A3G − A3| = 0.0005 / 0.0010, Pearson r = 1.0000 / 0.99999, call-mean
 107 four-image check, but it is not a result. **Production array 238557**
 (`0-39%4`) was released by the smoke. **CPU merger 238558** has
 `afterok:238557`.
+
+## 129. SG-combined-v3 registration: single changes to the V3 capped hierarchy (Claude on Faiz's account; 31 October 2026)
+
+Faiz approved three hypotheses, each changing exactly one thing relative to
+v2 V3. The design was cross-checked with ChatGPT, which added the
+mechanism table against V3, the GT cap-loss diagnostic and the dense-map
+sidecar. **Seed: historical A3** (owner decision). A3G will be used only if a
+later result warrants it; SG-A3G (Section 128) still runs independently.
+
+**Notation.** SA calls t = 10–20; A^s_{t,h} is row-stochastic SA at
+s ∈ {16, 32, 64}; Ā is the head mean; U is bilinear up; D is area down. The
+cap is v2's: z_k = q_k·min(1, p_g/(m_g + ε)), with m_g the 2×2 child mean
+and clipped mass discarded. c16 = D(c64).
+
+**Cells** (each raw and with unchanged R2):
+- **R0:** FINE-P2 (v2 V0), (1/11)Σ_t (1/8)Σ_h A^64_{t,h} A^64_{t,h} c64.
+  Registered selection reference.
+- **R1:** v2 V3 replay. r16_t = Ā^16_t c16; z32_t = cap(r16_t, Ā^32_t U r16_t);
+  R1 = (1/11)Σ_t Ā^64_t U z32_t. Local mechanism reference.
+- **W1 (per-head cap):** z32_t = (1/8)Σ_h cap(r16_t, A^32_{t,h} U r16_t). The
+  parent remains the head mean, so no head pairing across modules is
+  invented. By concavity of min(·, p), W1 removes at least as much mass as
+  R1, and equals R1 when all heads lie on the same side of every parent.
+- **W2 (native coarse seed):** c16* = minmax(S≤16), where
+  S≤16 = Σ_{t'=0..30} Σ_{m∈{4,5,6,7,8,9}} w_{t',m} R_{s_m→16}(a_{t',m})/31 with
+  the unchanged A3 weights (so S = S64 + S≤16 exactly). The R1 chain then
+  starts from c16* instead of c16. The 64-px CA no longer enters the
+  hierarchy.
+- **W3 (temporal cap):** with v_t = R1's per-call map, z_10 = v_10 and, for
+  t > 10, z_t = cap(D_{64→32}(mean_{t'<t} v_{t'}), v_t); W3 = mean_t z_t.
+
+**Selection.** Unchanged registered rule: five frozen VOC folds; raw and R2
+screened separately against same-generation R0 with candidates R1, W1, W2
+and W3. Full-VOC thresholds are frozen for COCO.
+
+**Mechanism table (reported separately).** W1, W2 and W3 vs R1, raw and R2:
+forced-OOF Δ, fold wins, paired interval, frozen and best-threshold COCO
+Δ, raw AP, and VOC sheep Δ.
+
+**Decision rules (fixed now).**
+- **W2:** final-method candidate if it beats R1 in ≥ 4/5 folds with the
+  paired interval above zero (raw or R2) and VOC sheep does not fall vs R1.
+- **W1:** closed if VOC sheep falls vs R1.
+- **W3:** temporal capping closed unless it beats R1 in ≥ 4/5 folds with the
+  interval above zero.
+
+**Diagnostics (no selection role).**
+- GT cap loss at 16→32 for R1, W1 (head-wise) and W2, with GT area-pooled
+  to 32×32 as g:
+  - γ_GT = Σ g·B / Σ g (B = 1 where the 2×2 group binds);
+  - L_GT = Σ g(q − z)/Σ g·q;
+  - L_background, the same with 1 − g.
+  These are reported by class, with sheep against non-sheep.
+- Cap binding and removed mass per cell.
+- c16*/c16 Pearson r and mean absolute difference.
+- IoU change by GT area bin; worst class; raw AP and best-threshold mIoU.
+- **Dense-map sidecar (owner-approved departure):** fp16 64×64 pre-CRF maps
+  of all five cells for every image, used to locate where frame-filling
+  recall is lost.
+
+**Code and tests.**
+- `SG24Recorder.coarse_seed` accumulates S≤16 natively at 16×16 alongside
+  the unchanged 64×64 sums; `coarse_seeds()` returns c16*.
+- `src/segmentation/sg_combined_v3.py`, `tests/test_sg_combined_v3.py`
+  (passing):
+  - R0 and R1 equal v2 V0 and V3;
+  - W2 fed c16 equals R1;
+  - uncapped R1, W1 and W3 equal v2 V1;
+  - the head-wise cap removes at least as much mass and is equal when the
+    heads agree;
+  - W3 ≤ R1;
+  - γ/L definitions on a fixture.
+- The finalizer on relabelled v2 counts (fixture, not a result) reproduces
+  v2 V4−V3 (−0.0007) and V3+R2−V0+R2 (+0.0073).
+- The live smoke (one VOC and one COCO image) asserts R0 = FINE-P2, R0/R1
+  = v2 V0/V3 on the same generation and the uncapped identities, and
+  checks every sidecar. Files: `configs/sg_combined_v3.json`,
+  `scripts/{run,finalize}_sg_combined_v3.py`,
+  `jobs/{run,merge}_sg_combined_v3.slurm`.

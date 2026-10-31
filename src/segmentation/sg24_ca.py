@@ -116,6 +116,8 @@ class SG24Recorder(CompactAttentionRecorder):
     content: tuple[int, ...] = ()
     # Also accumulate "selected/A3G": A3 with GoCA-oriented layer weights.
     dual_orientation = False
+    # Also accumulate the <=16-px share of selected A3 natively at 16x16.
+    coarse_seed = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -131,6 +133,7 @@ class SG24Recorder(CompactAttentionRecorder):
         self.reference_query = None
         self.sa_qk = []
         self.sums = defaultdict(lambda: torch.zeros((64, 64), device=self.pipe.device))
+        self.coarse_sum = torch.zeros((16, 16), device=self.pipe.device)
         self.weights = []
         self.content_mass = []
         self.content_mass_map = torch.zeros((64, 64), device=self.pipe.device)
@@ -243,14 +246,26 @@ class SG24Recorder(CompactAttentionRecorder):
                     source = self.pending_ca[module][name]
                     up = F.interpolate(source, size=(64,64), mode="bilinear", align_corners=False)[0,0]
                     self.sums[f"{label}/{name}"] += up * (weights[i] if use_weight else 1/len(modules)) / 31
+                    if self.coarse_seed and label == "selected" and name == "A3" and source.shape[-1] <= 16:
+                        # Same weight as the 64x64 sum, so S = S_64 + S_<=16 exactly.
+                        native = source if source.shape[-1] == 16 else F.interpolate(
+                            source, size=(16,16), mode="bilinear", align_corners=False)
+                        self.coarse_sum += native[0,0] * weights[i] / 31
         self.pending_ca.clear(); self.pending_self.clear(); self.reference_query = None
         self.steps[-1].clear()
 
     def seeds(self):
         return {name: cv.normalize_batch(tensor[None], "minmax")[0] for name,tensor in self.sums.items()}
 
+    def coarse_seeds(self):
+        """Min-max c16* from the 8/16-px selected-A3 modules (SG-combined-v3 W2)."""
+        if not self.coarse_seed:
+            raise ValueError("coarse A3 seed was not accumulated")
+        return cv.normalize_batch(self.coarse_sum[None], "minmax")[0]
+
     def clear(self):
         super().clear()
         self.pending_ca.clear(); self.pending_self.clear(); self.sa_qk.clear()
         self.sums.clear(); self.weights.clear(); self.content_mass.clear()
+        self.coarse_sum = None
         self.content_mass_map = None; self.target_top_map = None
