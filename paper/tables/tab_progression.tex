@@ -1,0 +1,20 @@
+\begin{table}[t]
+\centering
+\footnotesize\setlength{\tabcolsep}{2.4pt}
+\begin{tabular}{@{}ccccccc|ccc@{}}
+\toprule
+\rotatebox{90}{no 32-px CA} & \rotatebox{90}{SA 64 px} & \rotatebox{90}{2 passes} & \rotatebox{90}{DenseCRF} & \rotatebox{90}{calls 10--20} & \rotatebox{90}{A3 weights} & \rotatebox{90}{C2F + cap} & VOC & $\Delta$ & COCO \\
+\midrule
+ & & & & & & & .665 & & -- \\
+$\checkmark$ & & & & & & & .691 & +.026 & -- \\
+$\checkmark$ & $\checkmark$ & & & & & & .789 & +.033$^a$ & -- \\
+$\checkmark$ & $\checkmark$ & $\checkmark$ & & & & & .800 & +.012 & .625 \\
+$\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & & & & .813 & +.014 & .637 \\
+$\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & & & .817 & +.004 & .644 \\
+$\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & & .823 & +.006 & .662 \\
+$\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & \textbf{.829} & +.006 & \textbf{.696} \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{The pipeline, one decision at a time.} VOC: OOF mIoU; $\Delta$: gain over the previous row \emph{measured in the same run} (same generated images); COCO-Cap: VOC-frozen transfer. The first three rows come from early one-axis screens at a fixed threshold 0.45 (CA only, then one SA pass); $^a$against one pass through all sixteen SA modules (.756). Later rows select thresholds inside the training folds. Runs differ by at most 0.0003 on a shared reference.}
+\label{tab:progression}
+\end{table}

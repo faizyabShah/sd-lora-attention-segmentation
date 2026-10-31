@@ -1,0 +1,125 @@
+{
+  "rule": "Pipelines and full-VOC thresholds (frozen for COCO), from committed count shards:\n  V3+R2 = SG-combined-v3 R1+R2 at 0.55; V3 = R1 at 0.55; R0+R2 = FINE-P2+R2 at 0.425;\n  cap contrast = SG-combined-v2 V3 (0.55) vs V1 (uncapped hierarchy, 0.525), raw.",
+  "groups": {
+    "stages": [
+      {
+        "image_id": "ovam-voc-sim-428",
+        "class": "sofa",
+        "dataset": "voc",
+        "class_quantile": 1.0,
+        "class_iou": 0.9575,
+        "image_iou": 0.9716
+      },
+      {
+        "image_id": "ovam-voc-sim-112",
+        "class": "bottle",
+        "dataset": "voc",
+        "class_quantile": 0.667,
+        "class_iou": 0.8845,
+        "image_iou": 0.9404
+      },
+      {
+        "image_id": "ovam-voc-sim-357",
+        "class": "person",
+        "dataset": "voc",
+        "class_quantile": 0.333,
+        "class_iou": 0.8103,
+        "image_iou": 0.8492
+      },
+      {
+        "image_id": "ovam-voc-sim-250",
+        "class": "dining-table",
+        "dataset": "voc",
+        "class_quantile": 0.0,
+        "class_iou": 0.423,
+        "image_iou": 0.3334
+      },
+      {
+        "image_id": "ovam-coco-747764-bus-1153908552",
+        "class": "bus",
+        "dataset": "coco",
+        "class_quantile": 1.0,
+        "class_iou": 0.9234,
+        "image_iou": 0.9155
+      },
+      {
+        "image_id": "ovam-coco-648452-dog-3246206399",
+        "class": "dog",
+        "dataset": "coco",
+        "class_quantile": 0.5,
+        "class_iou": 0.753,
+        "image_iou": 0.8856
+      },
+      {
+        "image_id": "ovam-coco-449734-person-516411791",
+        "class": "person",
+        "dataset": "coco",
+        "class_quantile": 0.0,
+        "class_iou": 0.2819,
+        "image_iou": 0.2546
+      }
+    ],
+    "cap": [
+      {
+        "image_id": "ovam-voc-sim-379",
+        "class": "potted-plant",
+        "dataset": "voc",
+        "quantile": 0.95,
+        "v3_iou": 0.6766,
+        "v1_iou": 0.6078
+      },
+      {
+        "image_id": "ovam-coco-323618-cat-2077420055",
+        "class": "cat",
+        "dataset": "coco",
+        "quantile": 0.95,
+        "v3_iou": 0.8103,
+        "v1_iou": 0.7418
+      },
+      {
+        "image_id": "ovam-voc-sim-257",
+        "class": "dining-table",
+        "dataset": "voc",
+        "quantile": 0.05,
+        "v3_iou": 0.2408,
+        "v1_iou": 0.2655
+      }
+    ],
+    "crf": [
+      {
+        "image_id": "ovam-voc-sim-318",
+        "class": "horse",
+        "dataset": "voc",
+        "quantile": 0.9,
+        "r2_iou": 0.9761,
+        "raw_iou": 0.9178
+      },
+      {
+        "image_id": "ovam-coco-130105-boat-13312362",
+        "class": "boat",
+        "dataset": "coco",
+        "quantile": 0.9,
+        "r2_iou": 0.583,
+        "raw_iou": 0.5124
+      },
+      {
+        "image_id": "ovam-voc-sim-203",
+        "class": "chair",
+        "dataset": "voc",
+        "quantile": 0.1,
+        "r2_iou": 0.5227,
+        "raw_iou": 0.5381
+      }
+    ],
+    "sheep": [
+      {
+        "image_id": "ovam-voc-sim-412",
+        "class": "sheep",
+        "dataset": "voc",
+        "quantile": 0.5,
+        "v3_r2_iou": 0.9469,
+        "r0_r2_iou": 0.9554
+      }
+    ]
+  }
+}

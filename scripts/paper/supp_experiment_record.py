@@ -61,7 +61,8 @@ PACKAGES = [
     ("sg29", "SG29", "late", "115"), ("sg30", "SG30", "late", "118"), ("sg31", "SG31", "late", "119, 120"),
     ("sg32", "SG32", "late", "121"), ("sg33", "SG33", "late", "122"),
     ("sg_combined_v1", "SG-combined-v1", "late", "123"), ("sg_combined_c10", "SG-combined C10", "late", "124, 127"),
-    ("sg_combined_v2", "SG-combined-v2", "late", "126, 127"),
+    ("sg_combined_v2", "SG-combined-v2", "late", "126, 127"), ("sg_a3g", "SG-A3G", "late", "128, 131"),
+    ("sg_combined_v3", "SG-combined-v3", "late", "129, 132"), ("sg_threshold", "SG-threshold", "late", "133, 134"),
 ]
 STAGES = {"ca": "Cross-attention seed", "sa": "Self-attention module",
           "prop": "Propagation, refinement and tokens", "graph": "Graph, seed and observation operators",

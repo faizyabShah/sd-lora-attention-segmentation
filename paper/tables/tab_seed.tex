@@ -1,0 +1,28 @@
+\begin{table}[t]
+\centering
+\footnotesize\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{@{}cccc|cc@{}}
+\toprule
+\multicolumn{4}{c|}{CA resolutions (px)} & \multicolumn{2}{c}{CA seed only, VOC-Sim}\\
+8 & 16 & 32 & 64 & mIoU@.45 & AP \\
+\midrule
+$\checkmark$ & & & & .563 & .846 \\
+ & $\checkmark$ & & & .649 & .906 \\
+ & & $\checkmark$ & & .300 & .822 \\
+ & & & $\checkmark$ & .173 & .560 \\
+$\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & .666 & .922 \\
+$\checkmark$ & $\checkmark$ & & & .693 & .917 \\
+$\checkmark$ & $\checkmark$ & & $\checkmark$ & \textbf{.696} & .913 \\
+\bottomrule
+\end{tabular}\\[3pt]
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Module weights $w_{t,m}$ & CA only & + propagation, R2 & COCO \\
+\midrule
+uniform & .714 & .817 & .644 \\
+A3 (SA agreement, Eq.~\ref{eq:a3}) & .705 & \textbf{.823} & \textbf{.662} \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Building the semantic seed.} \emph{Top:} CA-only mIoU at threshold 0.45 and average precision for resolution subsets (all calls and heads; full VOC-Sim, descriptive). Each scale alone is weak and 64-px CA is nearly unusable alone, but 8, 16 and 64 px are complementary; dropping the 32-px modules raises out-of-fold (OOF) mIoU from 0.665 to 0.691 (4/5 folds). \emph{Bottom:} module weighting, forced OOF in one run (MID-P2 propagation of Sec.~\ref{sec:exp}). A3 lowers the CA-only score yet improves the final mask in 4/5 folds and on COCO-Cap: it favours modules whose spatial structure SA can propagate.}
+\label{tab:seed}
+\end{table}

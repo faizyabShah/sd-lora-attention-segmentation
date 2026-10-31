@@ -1,0 +1,21 @@
+\begin{table*}[t]
+\centering
+\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llccc@{}}
+\toprule
+Run & Variant & VOC raw & VOC + R2 & COCO + R2 \\
+\midrule
+v1 & exact conservation (both) + background-only completion budget (C7) & .7785 & .8047 & .7054 \\
+v1 & exact conservation (both) + semantic/background odds budget (C8) & .7774 & .8031 & .7061 \\
+v1 & relaxed conservation + odds budget (C9) & .7951 & .8140 & .7057 \\
+v2 & one-sided cap + completion only where $P_1\ge B$ (V6) & .8143 & .8256 & .6792 \\
+\midrule
+v3 & one-sided cap, reference (R1, = v2 V3) & .8157 & .8293 & .6964 \\
+v3 & head-wise cap: $z=\frac18\sum_h\operatorname{cap}(r,A^{32}_hUr)$ (W1) & .8161 & .8294 & .6972 \\
+v3 & native 16-px CA seed $c^\ast_{16}$ instead of $D(c)$ (W2) & .8155 & .8281 & .6975 \\
+v3 & temporal cap by the mean of earlier calls (W3) & .8116 & .8261 & .6828 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Remaining hierarchy variants} (VOC forced OOF, COCO-Cap frozen; each run has its own same-generation references, which agree with Table~3 of the main paper to 0.0003). Against R1 after R2: W1 $+0.0001$ (CI spans 0), W2 $-0.0012$ (2/5), W3 $-0.0032$ (1/5). The head-wise cap removes almost the same mass (7.7\% vs.\ 7.6\%). The native seed correlates 0.996 with $D(c)$. The temporal cap hurts most on small objects ($-0.016$ in the smallest GT-area bin).}
+\label{tab:supp_hier}
+\end{table*}

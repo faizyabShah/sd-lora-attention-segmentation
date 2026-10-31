@@ -1,0 +1,13 @@
+\section{Discussion and limitations}
+\label{sec:discussion}
+\paragraph{What the negative results taught us.}
+Before arriving at the hierarchy, we registered and ran 45 comparisons of alternative operators, most of them on top of fine-only propagation (supplementary material). These included absorbing random walks, confidence-locked or reciprocal propagation, SA region labelling, graph sharpening, observation-reliability weighting, stopped random walks, re-seeding between scales and Markov arrival times. Several improved the raw map, but apart from the SA call window none survived DenseCRF: refinement absorbed gains that only completed objects. This is why the present pipeline is simple, and why we select on the \emph{refined} mask. The capped hierarchy is the largest change that survived refinement in every fold and also transferred.
+
+\paragraph{Failure modes.}
+The pipeline inherits SA's notion of an object. When co-occurring objects share coarse affinity (the dining table and its chairs) or the seed is weak (the COCO person), propagation fills the wrong region (Figs.~\ref{fig:stages} and \ref{fig:cap}). Frame-filling objects lose under one global threshold (Sec.~\ref{sec:calibration}).
+
+\paragraph{Scope.}
+Both benchmarks contain generated images, regenerated from released prompts and seeds; renders can differ slightly from the annotated ones. All choices are made on VOC-Sim with one backbone, Stable Diffusion~1.5. Two components were adopted after the registered rule kept a simpler reference (Sec.~\ref{sec:exp}). We report forced OOF estimates for them and the registered outcomes alongside. Their gains hold in 4/5 and 5/5 held-out folds and transfer to COCO-Cap, but they are not pre-registered promotions.
+
+\section{Conclusion}
+Training-free segmentation from diffusion attention works best when each scale does what it is good at. Coarse CA and SA decide \emph{where} the object is; finer SA decides \emph{exactly where} its boundary lies, but only within the mass that the coarse level allows; and DenseCRF aligns that boundary with the image. The one-sided cap is the piece that makes this division of labour work, and it improves cross-image calibration, the main bottleneck of a single global threshold.

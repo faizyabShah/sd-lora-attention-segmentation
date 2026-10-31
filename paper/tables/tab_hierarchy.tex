@@ -1,0 +1,25 @@
+\begin{table*}[t]
+\centering
+\footnotesize\setlength{\tabcolsep}{4.2pt}
+\begin{tabular}{@{}l|ccc|ccc|cc|ccc@{}}
+\toprule
+& \multicolumn{3}{c|}{SA levels} & \multicolumn{3}{c|}{transition $16\!\rightarrow\!32$ / $32\!\rightarrow\!64$} & & & \multicolumn{3}{c}{mIoU}\\
+Variant & 16 & 32 & 64 & conserve ($=$) & cap ($\le$) & cap $32\!\rightarrow\!64$ & completion & wins & VOC raw & VOC + R2 & COCO + R2 \\
+\midrule
+fine only (FINE-P2) & & & $\checkmark$ & & & & & -- & .8098 & .8231 & .6622 \\
+plain hierarchy & $\checkmark$ & $\checkmark$ & $\checkmark$ & & & & & 1/5 & .8061 & .8184 & .6925 \\
+\midrule
+conservation at $16\!\rightarrow\!32$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $16\!\rightarrow\!32$ & & & & 2/5 & .8034 & .8185 & .7038 \\
+conservation at $32\!\rightarrow\!64$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $32\!\rightarrow\!64$ & & & & 0/5 & .7894 & .8135 & .7022 \\
+conservation at both & $\checkmark$ & $\checkmark$ & $\checkmark$ & both & & & & 0/5 & .7592 & .7917 & .6851 \\
+relaxed conservation ($\rho{=}.5$) & $\checkmark$ & $\checkmark$ & $\checkmark$ & both, $\rho{=}.5$ & & & & 1/5 & .7926 & .8149 & .7059 \\
+conservation + completion & $\checkmark$ & $\checkmark$ & $\checkmark$ & both & & & $\checkmark$ & 2/5 & .8037 & .8204 & \textbf{.7063} \\
+\midrule
+\textbf{one-sided cap (ours)} & $\checkmark$ & $\checkmark$ & $\checkmark$ & & $\checkmark$ & & & \textbf{5/5} & \textbf{.8157} & \textbf{.8304} & .6966 \\
+cap at both transitions & $\checkmark$ & $\checkmark$ & $\checkmark$ & & $\checkmark$ & $\checkmark$ & & 4/5 & .8151 & .8290 & .6964 \\
+cap + completion & $\checkmark$ & $\checkmark$ & $\checkmark$ & & $\checkmark$ & & $\checkmark$ & 3/5 & .8131 & .8209 & .6647 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{How the coarse level should constrain the finer one.} All rows share one generation of the 490 VOC-Sim and 707 COCO-Cap images, the A3 seed and SA calls 10--20. VOC columns are forced OOF mIoU; wins counts the held-out folds in which a row beats FINE-P2 after R2; COCO-Cap uses the VOC-frozen threshold. \emph{Conserve} forces every $2{\times}2$ child group to carry exactly its parent's mass (closed-form KL projection); \emph{cap} only removes mass above the parent (Eq.~\ref{eq:cap}). \emph{Completion} re-adds positive fine-SA residuals. Forcing parent mass onto children loses up to 5 VOC points; capping is the only change that beats both the fine-only and the plain hierarchy in every fold (vs.\ plain hierarchy: $+0.012$ after R2, paired 95\% CI $[+0.006,+0.013]$).}
+\label{tab:hierarchy}
+\end{table*}

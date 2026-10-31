@@ -1,0 +1,5 @@
+\section{Comparison with published methods}
+\label{sec:comparison}
+Table~\ref{tab:published} places the pipeline beside the class-word results reported by OVAM on the same benchmarks. With class words only and no training, it exceeds OVAM by 0.125 on VOC-Sim and 0.114 on COCO-Cap. It also exceeds DatasetDM, which trains an extra decoder, on both benchmarks. Most of the COCO-Cap margin over our own fine-only pipeline (0.662$\to$0.696) comes from the capped hierarchy, consistent with Sec.~\ref{sec:envelope}: cluttered scenes benefit most from a coarse envelope. Because we regenerate the images, the published rows are a contextual comparison rather than a paired one; scores of the released baseline masks under our evaluation are in the supplementary material.
+
+\input{tables/tab_published}

@@ -1,0 +1,16 @@
+\begin{table}[t]
+\centering
+\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Cell (+R2) & VOC forced OOF & folds vs.\ V0 & COCO \\
+\midrule
+historical A3 $\rightarrow$ fine only (V0) & .8228 & -- & .6623 \\
+GoCA-oriented A3 $\rightarrow$ fine only (G0) & .8228 & 3/5 & .6617 \\
+historical A3 $\rightarrow$ hierarchy + cap (V3) & .8292 & 5/5 & .6967 \\
+GoCA-oriented A3 $\rightarrow$ hierarchy + cap (G3) & .8304 & 5/5 & .6961 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{A3 orientation (paired rerun).} Both seeds come from the same diffusion run. G0 $-$ V0 $=-0.0000$ (CI $[-0.0001,+0.0001]$); G3 $-$ G0 $=+0.0075$ (5/5, CI $[+0.0020,+0.0128]$); G3 $-$ V3 $=+0.0012$ (4/5).}
+\label{tab:supp_a3g}
+\end{table}
