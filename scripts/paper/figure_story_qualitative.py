@@ -3,7 +3,7 @@
 
 Images are those of ``story_selection.json`` (fixed rules, no image inspected):
 
-  pipeline_c2f.pdf     generated image, A3 CA seed, coarse 16-px SA, cap + fine SA (V3), final
+  pipeline_c2f.pdf     generated image, CA seed, coarse 16-px SA, cap + fine SA (V3), final
                        mask after DenseCRF (stages group); supp_pipeline_c2f.pdf adds the 32-px
                        proposal and the capped 32-px map
   method_overview.pdf  the pipeline with one image's real intermediate maps and the operators
@@ -126,11 +126,11 @@ def overview(cache, pick):
     fig = plt.figure(figsize=(7.0, 1.5))
     ax = fig.add_axes([0, 0, 1, 1]); ax.set_xlim(0, 14); ax.set_ylim(.5, 3.5); ax.axis("off")
     over, _ = it.mask("crf_V3")
-    panels = [(it.img, "generated image\n+ class word $w$"), (it.heat("seed_a3"), "CA seed $c$\n(A3, 8/16/64 px)"),
-              (it.heat("r16"), "coarse SA 16 px\n$r_{16}=\\bar A^{16}c_{16}$"),
-              (it.heat("q32"), "32-px proposal\n$q=\\bar A^{32}U r_{16}$"),
-              (it.heat("z32"), "one-sided cap\n$z=\\mathrm{cap}(r_{16},q)$"),
-              (it.heat("V3"), "fine SA 64 px\n$\\bar A^{64}U z$"), (over, "threshold\n+ DenseCRF")]
+    panels = [(it.img, "generated image\n+ class word $w$"), (it.heat("seed_a3"), "CA seed $c$\n(weighted 8/16/64 px)"),
+              (it.heat("r16"), "coarse SA 16 px\n$r=\\bar A^{16}D(c)$"),
+              (it.heat("q32"), "32-px proposal\n$q=\\bar A^{32}U(r)$"),
+              (it.heat("z32"), "one-sided cap\n$z=\\mathrm{cap}(q;r)$"),
+              (it.heat("V3"), "fine SA 64 px\n$y=\\bar A^{64}U(z)$"), (over, "threshold\n+ DenseCRF")]
     x0, w, gap = .1, 1.72, .27
     for k, (tile, text) in enumerate(panels):
         x = x0 + k * (w + gap)
@@ -166,7 +166,7 @@ def cap_mechanism(cache, picks):
 
 
 def crf_effect(cache, picks):
-    cols = ["image + GT", "V3 map", "V3 mask ($\\tau$=0.55)", "+ DenseCRF"]
+    cols = ["image + GT", "map $y$", "mask ($\\tau$=0.55)", "+ DenseCRF"]
     fig, axes = grid(len(picks), len(cols), 1.2, 1.15)
     for i, p in enumerate(picks):
         it = Item(cache, p["image_id"])
@@ -183,7 +183,7 @@ def crf_effect(cache, picks):
 
 
 def ca_seeds(cache, picks):
-    cols = ["image + GT", "CA 8 px", "CA 16 px", "CA 64 px", "uniform seed", "A3 seed"]
+    cols = ["image + GT", "CA 8 px", "CA 16 px", "CA 64 px", "uniform weights", "SA-guided weights"]
     fig, axes = grid(len(picks), len(cols), 1.05, 1.05)
     for i, p in enumerate(picks):
         it = Item(cache, p["image_id"])
@@ -199,7 +199,7 @@ def ca_seeds(cache, picks):
 
 def sheep_case(cache, pick):
     it = Item(cache, pick["image_id"])
-    cols = ["image + GT", "FINE-P2 map", "FINE-P2 + R2 ($\\tau$=0.425)", "V3 map", "V3 + R2 ($\\tau$=0.55)"]
+    cols = ["image + GT", "fine-only map", "fine only + CRF ($\\tau$=0.425)", "coarse-to-fine map", "coarse-to-fine + CRF ($\\tau$=0.55)"]
     fig, axes = grid(1, len(cols), 1.3, 1.3)
     tiles = [(it.outlined(), None), (it.heat("R0"), None), it.mask("crf_R0"), (it.heat("V3"), None), it.mask("crf_V3")]
     for j, (t, iou) in enumerate(tiles):

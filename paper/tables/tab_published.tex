@@ -15,10 +15,10 @@ Grounded Diffusion & .621 & .502 \\
 DatasetDM & .803 & .593 \\
 \midrule
 \multicolumn{3}{@{}l}{\emph{Ours, training-free, class word}}\\
-fine-only propagation + R2 & .823 & .662 \\
-\textbf{coarse-to-fine + cap + R2} & \textbf{.829} & \textbf{.696} \\
+fine-only propagation + DenseCRF & .823 & .662 \\
+\textbf{coarse-to-fine + cap + DenseCRF} & \textbf{.829} & \textbf{.696} \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Comparison with published class-word results} on the two benchmarks released by OVAM~\cite{marcosmanchon2024ovam} (same prompts, seeds and annotations; optimized-token rows are excluded because they use mask supervision). Our VOC-Sim values are forced out-of-fold estimates; COCO-Cap is frozen transfer. Because our method records attention during generation, we regenerate each image from its released prompt and seed; renders can differ slightly from those annotated, so cross-block differences are indicative rather than paired.}
+\caption{\textbf{Comparison with published class-word results} on the benchmarks released by OVAM~\cite{marcosmanchon2024ovam}; optimized-token rows are excluded. Ours: forced out-of-fold VOC-Sim, frozen COCO-Cap. We regenerate each image from its released prompt and seed, so cross-block differences are indicative rather than paired.}
 \label{tab:published}
 \end{table}

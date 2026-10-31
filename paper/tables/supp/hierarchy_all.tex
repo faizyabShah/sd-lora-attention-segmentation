@@ -3,7 +3,7 @@
 \footnotesize\setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}llccc@{}}
 \toprule
-Run & Variant & VOC raw & VOC + R2 & COCO + R2 \\
+Run & Variant & VOC raw & VOC + CRF & COCO + CRF \\
 \midrule
 v1 & relaxed conservation, halfway to the projection at both transitions (C5) & .7926 & .8149 & .7059 \\
 v1 & exact conservation (both) + background-only completion budget (C7) & .7785 & .8047 & .7054 \\
@@ -17,6 +17,6 @@ v3 & native 16-px CA seed $c^\ast_{16}$ instead of $D(c)$ (W2) & .8155 & .8281 &
 v3 & temporal cap by the mean of earlier calls (W3) & .8116 & .8261 & .6828 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Remaining hierarchy variants} (VOC forced OOF, COCO-Cap frozen; each run has its own same-generation references, which agree with Table~3 of the main paper to 0.0003). Against R1 after R2: W1 $+0.0001$ (CI spans 0), W2 $-0.0012$ (2/5), W3 $-0.0032$ (1/5). The head-wise cap removes almost the same mass (7.7\% vs.\ 7.6\%). The native seed correlates 0.996 with $D(c)$. The temporal cap hurts most on small objects ($-0.016$ in the smallest GT-area bin).}
+\caption{\textbf{Remaining hierarchy variants} (VOC forced OOF, COCO-Cap frozen; each run has its own same-generation references, which agree with Table~3 of the main paper to 0.0003). Against R1 after DenseCRF: W1 $+0.0001$ (CI spans 0), W2 $-0.0012$ (2/5), W3 $-0.0032$ (1/5). The head-wise cap removes almost the same mass (7.7\% vs.\ 7.6\%). The native seed correlates 0.996 with $D(c)$. The temporal cap hurts most on small objects ($-0.016$ in the smallest GT-area bin).}
 \label{tab:supp_hier}
 \end{table*}

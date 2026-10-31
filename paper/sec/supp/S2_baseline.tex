@@ -10,7 +10,7 @@ For each call--head observation $i$, the fine-only map is
 \begin{equation}
 p_2=\frac1{|\mathcal I|}\sum_{i\in\mathcal I}A_i^2c .
 \end{equation}
-The square is taken within each observation before averaging, which is a different operator from $(\frac1{|\mathcal I|}\sum_iA_i)^2c$. A second pass raises OOF mIoU from 0.788 to 0.800, especially for chair ($+0.078$) and person ($+0.030$); a third pass is not promoted. Figure~\ref{fig:supp_depth} shows the trade-off between completion and leakage. In a later diagnostic (A3 seed, calls 10--20, threshold 0.425), pixels first accepted at depth one are 86.5\% true positives on VOC-Sim and 70.8\% on COCO-Cap, but pixels first accepted at depth three are only 39.3\% and 14.0\%.
+The square is taken within each observation before averaging, which is a different operator from $(\frac1{|\mathcal I|}\sum_iA_i)^2c$. A second pass raises OOF mIoU from 0.788 to 0.800, especially for chair ($+0.078$) and person ($+0.030$); a third pass is not promoted. Figure~\ref{fig:supp_depth} shows the trade-off between completion and leakage. In a later diagnostic (SA-guided seed, calls 10--20, threshold 0.425), pixels first accepted at depth one are 86.5\% true positives on VOC-Sim and 70.8\% on COCO-Cap, but pixels first accepted at depth three are only 39.3\% and 14.0\%.
 
 \begin{figure*}[t]
 \centering
@@ -30,7 +30,7 @@ Selecting on the refined mask found one change: SA calls 10--20 instead of 0--30
 \footnotesize\setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}lccccc@{}}
 \toprule
-Setting & P2 & R2 & Mid & Forced OOF & COCO \\
+Setting & 2 passes & CRF & calls 10--20 & Forced OOF & COCO \\
 \midrule
 One pass & -- & -- & -- & .7873 & .6172 \\
 Two passes & $\checkmark$ & -- & -- & .7997 & .6246 \\
@@ -38,7 +38,7 @@ Two passes & $\checkmark$ & -- & -- & .7997 & .6246 \\
 + calls 10--20 & $\checkmark$ & $\checkmark$ & $\checkmark$ & .8168 & .6438 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{The fine-only baseline in one run} (SG22, uniform seed). The registered selector chose MID-P2+R2 in four of five folds (selection path 0.8158 OOF).}
+\caption{\textbf{The fine-only baseline in one run} (SG22, uniform seed). The registered selector chose the last row in four of five folds (selection path 0.8158 OOF).}
 \label{tab:supp_sg22}
 \end{table}
 

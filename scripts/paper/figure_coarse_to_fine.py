@@ -93,8 +93,8 @@ def threshold_curves():
     fig, axes = plt.subplots(1, 2, figsize=(3.45, 1.75), sharey=False)
     for ax, ds, title in ((axes[0], "voc", "VOC-Sim"), (axes[1], "coco", "COCO-Cap")):
         counts, cfg, classes, thr = load("sg_combined_v3", ds)
-        for name, label, color, ls in (("R0", "FINE-P2", BLUE, "--"), ("R0+R2", "FINE-P2 + R2", BLUE, "-"),
-                                       ("R1", "V3", GREEN, "--"), ("R1+R2", "V3 + R2", GREEN, "-")):
+        for name, label, color, ls in (("R0", "fine only", BLUE, "--"), ("R0+R2", "fine only + CRF", BLUE, "-"),
+                                       ("R1", "coarse-to-fine", GREEN, "--"), ("R1+R2", "coarse-to-fine + CRF", GREEN, "-")):
             ax.plot(thr, class_miou(counts[cfg.index(name)], classes), ls, color=color, lw=1.2, label=label)
         ceil = tres["ceiling_diagnostic_only"][ds]
         for name, color in (("R0+R2", BLUE), ("R1+R2", GREEN)):
@@ -137,7 +137,7 @@ def sheep_curves():
     counts, cfg, classes, thr = load("sg_combined_v3", "voc")
     m = classes == "sheep"
     fig, axes = plt.subplots(1, 2, figsize=(4.6, 1.8))
-    for name, label, color, ls in (("R0+R2", "FINE-P2 + R2", BLUE, "-"), ("R1+R2", "V3 + R2", GREEN, "-")):
+    for name, label, color, ls in (("R0+R2", "fine only + CRF", BLUE, "-"), ("R1+R2", "coarse-to-fine + CRF", GREEN, "-")):
         c = counts[cfg.index(name)][m].astype(float)
         iou = (c[..., 0] / np.maximum(c[..., :3].sum(-1), 1)).mean(0)
         fp = c[..., 1].sum(0) / (c[..., 0] + c[..., 2]).sum(0)

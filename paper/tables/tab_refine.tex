@@ -4,7 +4,7 @@
 \begin{tabular}{@{}cc|ccc|ccc@{}}
 \toprule
 \multicolumn{2}{c|}{} & \multicolumn{3}{c|}{VOC-Sim} & \multicolumn{3}{c}{COCO-Cap}\\
-C2F+cap & R2 & mIoU & P / R & img $\uparrow$/$\downarrow$ & mIoU & P / R & img $\uparrow$/$\downarrow$ \\
+\shortstack{coarse-\\to-fine} & CRF & mIoU & P / R & img $\uparrow$/$\downarrow$ & mIoU & P / R & img $\uparrow$/$\downarrow$ \\
 \midrule
  & & .811 & .880 / .904 & & .660 & .708 / .882 & \\
  & $\checkmark$ & .824 & .883 / .916 & 291/132 & .662 & .703 / .889 & 354/243 \\
@@ -12,6 +12,6 @@ $\checkmark$ & & .817 & .875 / .915 & & .682 & .731 / .889 & \\
 $\checkmark$ & $\checkmark$ & \textbf{.830} & \textbf{.890} / .910 & 278/97 & \textbf{.696} & \textbf{.747} / .886 & 427/105 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{What DenseCRF adds, and why it pairs with the cap.} Full-VOC mIoU, pooled precision/recall and the number of images whose IoU rises/falls by more than 0.005 when R2 is added (same run; thresholds from VOC-Sim, frozen for COCO-Cap). On fine-only maps R2 mainly recovers recall and barely helps COCO-Cap ($+0.002$). On capped coarse-to-fine maps it raises precision and helps COCO-Cap six times more ($+0.014$, 18 of 20 classes): with far-away mass removed, the remaining errors lie near object boundaries, where appearance decides.}
+\caption{\textbf{What DenseCRF adds, and why it pairs with the cap.} Full-VOC mIoU, pooled precision/recall and the number of images whose IoU rises/falls by more than 0.005 when DenseCRF is added (same run; thresholds from VOC-Sim, frozen for COCO-Cap). On fine-only maps DenseCRF mainly recovers recall and barely helps COCO-Cap ($+0.002$). On capped coarse-to-fine maps it raises precision and helps COCO-Cap six times more ($+0.014$, 18 of 20 classes): with far-away mass removed, the remaining errors lie near object boundaries, where appearance decides.}
 \label{tab:refine}
 \end{table}
