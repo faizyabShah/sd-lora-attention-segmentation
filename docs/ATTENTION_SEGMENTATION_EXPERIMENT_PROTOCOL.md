@@ -7657,3 +7657,13 @@ and G3. Full-VOC thresholds are frozen for COCO.
 reproduces v2's V3/V0 (+0.0059) and V4/V3 R2 (−0.0013) forced-OOF contrasts.
 The live smoke (one VOC and one COCO image) asserts V0 = same-generation
 FINE-P2 and checks the seed sidecar. Job IDs follow on submission.
+
+**SG-A3G submission and smoke (31 October 2026).** Registered at commit
+`2035ae18c`. **Live smoke 238556** (one VOC and one COCO aeroplane image)
+completed `0:0`. V0 matched same-generation FINE-P2, and the finalizer
+validated the seed sidecar. On these two images the seeds barely differ:
+mean |A3G − A3| = 0.0005 / 0.0010, Pearson r = 1.0000 / 0.99999, call-mean
+|Δweight| = 0.0008 / 0.0022 (VOC / COCO). This is consistent with the Section
+107 four-image check, but it is not a result. **Production array 238557**
+(`0-39%4`) was released by the smoke. **CPU merger 238558** has
+`afterok:238557`.
