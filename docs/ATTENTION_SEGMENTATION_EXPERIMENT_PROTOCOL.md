@@ -7746,3 +7746,12 @@ forced-OOF Δ, fold wins, paired interval, frozen and best-threshold COCO
   checks every sidecar. Files: `configs/sg_combined_v3.json`,
   `scripts/{run,finalize}_sg_combined_v3.py`,
   `jobs/{run,merge}_sg_combined_v3.slurm`.
+
+**Submission (31 October 2026).** Registered at commit `79a1d9c3d`. Jobs
+are chained behind SG-A3G so that they start automatically:
+- **Live smoke 238579** has `afterany:238557` (SG-A3G GPU array).
+- **Production array 238580** (`0-39%4`) has `afterok:238579`, so it runs
+  only if the smoke passes.
+- **CPU merger 238581** has `afterok:238580`.
+
+These are submissions, not results.
