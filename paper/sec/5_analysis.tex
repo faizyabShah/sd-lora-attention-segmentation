@@ -5,7 +5,7 @@ Figure~\ref{fig:stages} shows the pipeline on images chosen by a fixed rule, and
 \begin{figure*}[t]
 \centering
 \includegraphics[width=.8\textwidth]{figures/pipeline_c2f.pdf}
-\caption{\textbf{From seed to mask.} Columns are chosen by a fixed rule, without inspecting any image: the VOC-Sim classes at the best, upper-third, lower-third and worst class IoU of the final pipeline, and the COCO-Cap classes at the best, median and worst, each shown by its median-IoU image. Rows: generated image; CA seed $c$ (Eq.~\ref{eq:seed}); after coarse 16-pixel SA ($r$); after the cap and fine 64-pixel SA ($y$); final mask after DenseCRF (blue) with the annotation outline (yellow). The VOC dining table shows the main failure mode: SA groups the table with its chairs.}
+\caption{\textbf{From seed to mask.} Columns are chosen by a fixed rule, without inspecting any image: the VOC-Sim classes at the best, upper-third, lower-third and worst class IoU of the final pipeline, and the COCO-Cap classes at the best, median and worst, each shown by its median-IoU image. Rows: generated image; CA seed $c$ (Eq.~\ref{eq:weights}); after coarse 16-pixel SA ($r$); after the cap and fine 64-pixel SA ($y$); final mask after DenseCRF (blue) with the annotation outline (yellow). The VOC dining table shows the main failure mode: SA groups the table with its chairs.}
 \label{fig:stages}
 \end{figure*}
 

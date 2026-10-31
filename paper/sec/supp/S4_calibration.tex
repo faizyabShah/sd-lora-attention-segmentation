@@ -5,26 +5,26 @@ If the hierarchy's gain is calibration, could a per-image threshold computed fro
 
 \begin{table}[t]
 \centering
-\footnotesize\setlength{\tabcolsep}{2.6pt}
+\scriptsize\setlength{\tabcolsep}{2.2pt}
 \begin{tabular}{@{}llcccc@{}}
 \toprule
-Map (+ DenseCRF) & Rule & VOC OOF & vs.\ same map T0 & sheep $\Delta$ & COCO \\
+Map & Rule & VOC OOF & vs.\ same map T0 & sheep $\Delta$ & COCO \\
 \midrule
 fine only & T0 global & .8230 & -- & -- & .6623 \\
 fine only & T1 Otsu & .8283 & +.0054 (4/5) & $-$.041 & .6411 \\
 fine only & T4 stable & .8255 & +.0026 (2/5) & $-$.042 & .6809 \\
 fine only & T6 Otsu$+d$ & .8276 & +.0046 (3/5) & $-$.041 & .6411 \\
 \midrule
-C2F + cap & T0 global & \textbf{.8293} & -- & $-$.092 & \textbf{.6964} \\
-C2F + cap & T1 Otsu & .8238 & $-$.0055 (1/5) & $-$.079 & .6359 \\
-C2F + cap & T2 two-Gauss. & .8031 & $-$.0262 (0/5) & $-$.080 & .6258 \\
-C2F + cap & T3 $\mu{+}k\sigma$ & .7864 & $-$.0429 (0/5) & $-$.254 & .6498 \\
-C2F + cap & T4 stable & .8239 & $-$.0054 (1/5) & $-$.108 & .6722 \\
-C2F + cap & T5 fine-only area & .8246 & $-$.0047 (0/5) & $-$.007 & .6659 \\
-C2F + cap & T6 Otsu$+d$ & .8297 & +.0004 (2/5) & $-$.090 & .6586 \\
+C2F & T0 global & \textbf{.8293} & -- & $-$.092 & \textbf{.6964} \\
+C2F & T1 Otsu & .8238 & $-$.0055 (1/5) & $-$.079 & .6359 \\
+C2F & T2 two-Gauss. & .8031 & $-$.0262 (0/5) & $-$.080 & .6258 \\
+C2F & T3 $\mu{+}k\sigma$ & .7864 & $-$.0429 (0/5) & $-$.254 & .6498 \\
+C2F & T4 stable & .8239 & $-$.0054 (1/5) & $-$.108 & .6722 \\
+C2F & T5 fine-only area & .8246 & $-$.0047 (0/5) & $-$.007 & .6659 \\
+C2F & T6 Otsu$+d$ & .8297 & +.0004 (2/5) & $-$.090 & .6586 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Per-image threshold rules} (after DenseCRF; sheep $\Delta$ vs.\ fine-only T0). Both registered selectors kept the fine-only global threshold. Per-image oracle (best grid threshold per image, using ground truth): 0.896 fine-only vs.\ 0.895 C2F + cap on VOC-Sim.}
+\caption{\textbf{Per-image threshold rules} (all after DenseCRF; C2F: coarse-to-fine with cap; sheep $\Delta$ vs.\ fine-only T0). Both registered selectors kept the fine-only global threshold. Per-image oracle (best grid threshold per image, using ground truth): 0.896 fine-only vs.\ 0.895 C2F + cap on VOC-Sim.}
 \label{tab:supp_threshold}
 \end{table}
 

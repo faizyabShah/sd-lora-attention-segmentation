@@ -127,10 +127,10 @@ def overview(cache, pick):
     ax = fig.add_axes([0, 0, 1, 1]); ax.set_xlim(0, 14); ax.set_ylim(.5, 3.5); ax.axis("off")
     over, _ = it.mask("crf_V3")
     panels = [(it.img, "generated image\n+ class word $w$"), (it.heat("seed_a3"), "CA seed $c$\n(weighted 8/16/64 px)"),
-              (it.heat("r16"), "coarse SA 16 px\n$r=\\bar A^{16}D(c)$"),
-              (it.heat("q32"), "32-px proposal\n$q=\\bar A^{32}U(r)$"),
-              (it.heat("z32"), "one-sided cap\n$z=\\mathrm{cap}(q;r)$"),
-              (it.heat("V3"), "fine SA 64 px\n$y=\\bar A^{64}U(z)$"), (over, "threshold\n+ DenseCRF")]
+              (it.heat("r16"), "coarse SA 16 px\n$r=S_{16}\\,c_{16}$"),
+              (it.heat("q32"), "32-px proposal\n$q=S_{32}{\\uparrow}r$"),
+              (it.heat("z32"), "one-sided cap\n$z=\\mathrm{cap}(q,r)$"),
+              (it.heat("V3"), "fine SA 64 px\n$y=S_{64}{\\uparrow}z$"), (over, "threshold\n+ DenseCRF")]
     x0, w, gap = .1, 1.72, .27
     for k, (tile, text) in enumerate(panels):
         x = x0 + k * (w + gap)
