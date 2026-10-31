@@ -64,17 +64,25 @@ def head_weights(prob: torch.Tensor, value: torch.Tensor, out_weight: torch.Tens
                        torch.full_like(scores, 1.0 / heads))
 
 
-def affinity_similarity(query: torch.Tensor, key: torch.Tensor, reference: torch.Tensor) -> torch.Tensor:
+def affinity_similarity(query: torch.Tensor, key: torch.Tensor, reference: torch.Tensor,
+                        *, both: bool = False) -> torch.Tensor:
     """Dot product of pseudo-global F affinity and paired mean-head SA affinity.
 
     Like GoCA, resize key axes bilinearly and query axes by nearest-neighbor.
     Heads are streamed so a 64x64 module never retains eight 4096x4096 maps.
+
+    The resize path omits GoCA's second ``permute(2, 3, 0, 1)``, so a resized
+    matrix is indexed [key, query] and the score is <M^T, P> (protocol Section
+    107). That historical score is kept as the default. ``both=True`` returns
+    ``(as implemented, GoCA orientation <M, P>)``; they coincide when no resize
+    is needed.
     """
     ref_hw = math.isqrt(reference.shape[0])
     hw = math.isqrt(query.shape[-2])
     if ref_hw * ref_hw != reference.shape[0] or hw * hw != query.shape[-2]:
         raise ValueError("non-square spatial attention")
     similarity = torch.zeros((), device=reference.device)
+    goca = torch.zeros((), device=reference.device)
     for h in range(query.shape[0]):
         q, k = query[h].to(reference.device).float(), key[h].to(reference.device).float()
         matrix = torch.softmax(q @ k.T / math.sqrt(q.shape[-1]), dim=-1)
@@ -85,8 +93,14 @@ def affinity_similarity(query: torch.Tensor, key: torch.Tensor, reference: torch
             matrix = F.interpolate(matrix.reshape(1, ref_hw*ref_hw, hw, hw),
                                    size=(ref_hw, ref_hw), mode="nearest")
             matrix = matrix.reshape(ref_hw*ref_hw, ref_hw*ref_hw)
+            if both:
+                goca += (matrix * reference.T).sum()  # <M^T,P^T> = <M,P>
+        elif both:
+            goca += (matrix * reference).sum()
         similarity += (matrix * reference).sum()
         del q, k, matrix
+    if both:
+        return similarity / query.shape[0], goca / query.shape[0]
     return similarity / query.shape[0]
 
 
@@ -100,6 +114,8 @@ class SG24Recorder(CompactAttentionRecorder):
     experiment = "a"
     enabled = ("A0", "A1", "A2", "A3", "A4")
     content: tuple[int, ...] = ()
+    # Also accumulate "selected/A3G": A3 with GoCA-oriented layer weights.
+    dual_orientation = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -191,12 +207,25 @@ class SG24Recorder(CompactAttentionRecorder):
             raise ValueError("SG24 missed CA module or reference feature")
         ref = self.reference_query
         pseudo = torch.softmax(ref @ ref.T / math.sqrt(ref.shape[-1]), dim=-1)
-        similarities = {}
+        similarities, goca = {}, {}
         for module in self.ca_modules:
             if module not in self.pending_self:
                 raise ValueError(f"missing paired self attention for {module}")
             q, k = self.pending_self[module]
-            similarities[module] = affinity_similarity(q, k, pseudo)
+            if self.dual_orientation:
+                similarities[module], goca[module] = affinity_similarity(q, k, pseudo, both=True)
+            else:
+                similarities[module] = affinity_similarity(q, k, pseudo)
+        if self.dual_orientation:
+            selected = torch.stack([goca[m] for m in self.selected_modules]).clamp_min(0)
+            weights = selected / selected.sum().clamp_min(1e-20)
+            if float(selected.sum()) <= 1e-20:
+                weights.fill_(1 / len(self.selected_modules))
+            self.weights.append((step, "selected-goca", weights.cpu().numpy().copy()))
+            for i, module in enumerate(self.selected_modules):
+                up = F.interpolate(self.pending_ca[module]["A3"], size=(64,64),
+                                   mode="bilinear", align_corners=False)[0,0]
+                self.sums["selected/A3G"] += up * weights[i] / 31
         for modules, label in ((self.selected_modules, "selected"),
                                (self.ca_modules, "expanded")):
             if label == "expanded" and self.experiment != "b":

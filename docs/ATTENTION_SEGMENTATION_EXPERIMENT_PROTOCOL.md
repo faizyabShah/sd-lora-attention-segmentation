@@ -7558,3 +7558,102 @@ Open owner-level choices, neither taken here:
    loss, then decide whether a separately registered study is justified.
 
 The A3 transpose issue (`src/segmentation/sg24_ca.py:84-87`) remains open.
+
+## 128. Sheep diagnosis and SG-A3G registration (Claude on Faiz's account; 31 October 2026)
+
+Faiz asked for two steps: (1) a CPU diagnosis of V3's sheep / dining-table
+loss, and (2) the A3 orientation fix with a rerun of the control and V3.
+Step (1) reads only the committed v2 shards. Nothing below changes Section
+127's registered outcome.
+
+### 1. Sheep / dining-table diagnosis (CPU, diagnostic only)
+
+V3+R2 at 0.550 vs V0+R2 at 0.425 on full VOC (25 sheep images):
+
+- **Sheep loss is recall, not leakage.** TP −294,665 px; FP +12,173 px.
+  Class IoU 0.840 → 0.749. 22/25 images are worse, but the median image
+  changes only −0.009. The loss is concentrated: the five worst images lose
+  0.13–0.30 IoU each, and four of them have GT covering 79–96% of the frame.
+  In those images FP falls slightly while FN grows by 34k–69k px.
+- **It is not caused by the cap.** V3+R2 vs V1+R2 improves sheep (0.722 →
+  0.749; 6/25 worse). The uncapped hierarchy already has the loss; the cap
+  recovers part of it.
+- **Not threshold-only.** At V0+R2's best sheep threshold (0.30) V0+R2 gives
+  0.910 sheep IoU. V3+R2's best is 0.821 (0.30) / 0.802 (0.375).
+- **Dining-table is the opposite failure:** FP +234,060 px, with TP almost
+  unchanged (−10,292). The hierarchy spills beyond table surfaces.
+- **The pattern is general, by GT area fraction** (mean-image IoU change,
+  V3+R2 vs V0+R2):
+
+  | GT fraction | VOC n | VOC Δ | COCO n | COCO Δ |
+  |---|---:|---:|---:|---:|
+  | < 0.10 | 21 | −0.013 | 184 | +0.022 |
+  | 0.10–0.25 | 160 | +0.014 | 285 | +0.031 |
+  | 0.25–0.50 | 189 | +0.010 | 175 | +0.034 |
+  | 0.50–0.75 | 85 | −0.002 | 42 | +0.039 |
+  | ≥ 0.75 | 35 | −0.015 | 21 | −0.021 |
+
+  The hierarchy helps mid-sized objects and loses recall on frame-filling
+  objects in both datasets. Sheep (mean GT fraction 0.50, against 0.37 over
+  classes) is simply the class with the most close-ups.
+
+**Reading.** V3's guard failure is a frame-filling-object recall failure of
+the coarse→fine hierarchy as a whole. It is not a defect of the cap, and it
+is not instance merging. This gives any later registered cell a specific
+target: recall on objects that fill most of the frame. No such cell is
+registered here. That waits for the A3G result below, because the
+seed may change.
+
+### 2. SG-A3G: GoCA-oriented A3 and paired rerun (registered)
+
+**Code.** `affinity_similarity` in `src/segmentation/sg24_ca.py` gains
+`both=True`, which returns `(historical <Mᵀ,P>, GoCA <M,P>)`. GoCA's second
+`permute(2,3,0,1)` makes the resized matrix the transpose of the historical
+one, so ⟨M,P⟩ = ⟨M_hist, Pᵀ⟩. The default call is bit-identical to before, so
+no historical runner changes. With `SG24Recorder.dual_orientation = True`,
+one recorder accumulates both `selected/A3` and `selected/A3G` in the same
+diffusion run. The two seeds differ only in the per-call CA module weights
+of resized modules, which gives an exactly paired comparison per image.
+
+**Tests** (`tests/test_a3_orientation.py`, passing):
+- The default score is unchanged and equals `both[0]`.
+- `both[1]` equals an explicit GoCA construction with the second permute,
+  for upsampled (8→16) and downsampled (32→16) modules.
+- The historical score equals the GoCA score of Pᵀ.
+- The two orientations coincide without a resize.
+
+**Cells** (`configs/sg_a3g.json`): `V0` historical A3 → FINE-P2 (reference);
+`V3` historical A3 → v2 V3; `G0` A3G → FINE-P2; `G3` A3G → v2 V3. Each cell
+is run raw and with unchanged R2. The SA operators come unchanged from
+`src/segmentation/sg_combined_v2.py`. There is no new parameter.
+
+**Questions, fixed in advance.**
+1. Does G0+R2 − V0+R2 (VOC forced OOF) exceed the ±0.002 tie band (Section
+   107 addendum)? If yes, A3's descendants are owed a rerun on A3G. If no,
+   the historical results stand, with the orientation documented.
+2. Does the V3 gain survive the corrected seed (G3 vs G0, G3 vs V3, raw and
+   R2)?
+
+**Selection.** Unchanged registered rule: five frozen VOC folds; raw and
+R2 screened separately against same-generation V0, with candidates V3, G0
+and G3. Full-VOC thresholds are frozen for COCO.
+
+**Diagnostics only.**
+- Per image: mean |A3G − A3| on min-max seeds, Pearson r, and call-mean
+  absolute layer-weight difference.
+- Raw AP and best-threshold mIoU.
+- Mean-image IoU change by GT area fraction bin.
+- Worst class per cell.
+
+**Files.**
+- `configs/sg_a3g.json`
+- `scripts/run_sg_a3g.py`
+- `scripts/finalize_sg_a3g.py`
+- `jobs/{run,merge}_sg_a3g.slurm`
+- `tests/test_a3_orientation.py`
+- Output: `outputs/segmentation/controlled_attention_cv/sg_a3g/`
+
+**Finalizer check.** On relabelled v2 counts (a fixture, not a result) it
+reproduces v2's V3/V0 (+0.0059) and V4/V3 R2 (−0.0013) forced-OOF contrasts.
+The live smoke (one VOC and one COCO image) asserts V0 = same-generation
+FINE-P2 and checks the seed sidecar. Job IDs follow on submission.

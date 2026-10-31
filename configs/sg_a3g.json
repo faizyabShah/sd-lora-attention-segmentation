@@ -1,0 +1,22 @@
+{
+  "experiment": "SG-A3G: GoCA-oriented A3 layer score, paired control and V3 robustness",
+  "version": 1,
+  "cells": ["V0", "V3", "G0", "G3"],
+  "cell_definitions": {
+    "V0": "historical A3 seed (Section 107 orientation, <M^T,P>) -> observation-wise FINE-P2; same-generation reference",
+    "V3": "historical A3 seed -> SG-combined-v2 V3 (one-sided raw cap at 16->32)",
+    "G0": "GoCA-oriented A3G seed (<M,P>, second permute(2,3,0,1) restored) -> FINE-P2",
+    "G3": "A3G seed -> SG-combined-v2 V3"
+  },
+  "seed_pairing": "A3 and A3G are accumulated by one recorder during one diffusion run per image; they differ only in the per-call CA module weights of resized modules",
+  "ca": "frozen A3 class-word W: SD1.5, selected eleven CA modules, calls 0-30, all heads; A3G changes only the affinity orientation",
+  "sa": "unchanged SG-combined-v2 sources and operators (src/segmentation/sg_combined_v2.py), no new parameter",
+  "primary_questions": [
+    "G0+R2 vs V0+R2: does the working-default control move by more than the 0.002 tie band (Section 107 addendum)?",
+    "G3 vs G0 and G3 vs V3, raw and R2: does the V3 gain survive the corrected seed?"
+  ],
+  "thresholds": [0.3, 0.325, 0.35, 0.375, 0.4, 0.425, 0.45, 0.475, 0.5, 0.525, 0.55, 0.575, 0.6, 0.625, 0.65, 0.675, 0.7],
+  "selection": "five frozen VOC folds; raw and R2 screens separately versus same-generation V0 with candidates V3, G0, G3; registered promotion guard unchanged; forced OOF, pairwise wins and selector reported separately; full-VOC thresholds frozen for COCO; no COCO tuning",
+  "diagnostics": "per-image seed difference (mean absolute min-max seed difference, Pearson r) and call-mean absolute layer-weight difference; raw-map AP and best-threshold mIoU; mean-image IoU change by GT area fraction bin (0-0.1, 0.1-0.25, 0.25-0.5, 0.5-0.75, >=0.75); worst class per cell. Diagnostic only",
+  "storage": "resumable per-image confusion counts and compact diagnostics; no generated image, mask, dense map, QK or affinity cache"
+}
