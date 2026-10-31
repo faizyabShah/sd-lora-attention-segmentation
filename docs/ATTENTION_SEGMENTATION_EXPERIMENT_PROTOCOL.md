@@ -7997,3 +7997,52 @@ A pipeline smoke on the first 40 VOC images (single class, not a result)
 checked the loading, alignment and selector plumbing before this
 registration. The rule set was fixed before the smoke and is not changed
 after it.
+
+## 134. SG-threshold results: no rule helps V3; V3's gain is cross-image calibration (Claude on Faiz's account; 31 October 2026)
+
+Run on CPU after the Section 133 registration (commit `4b1c9c330`) over all
+490 VOC / 707 COCO images. The stored maps match the counts (Pearson
+0.99985 VOC, 0.99991 COCO). No registered rule, threshold or decision is
+changed. Outputs: `outputs/segmentation/controlled_attention_cv/sg_threshold/`.
+
+| Cell (+R2) | VOC forced OOF | Δ vs R0.T0+R2 (wins) | Δ vs same-map T0 (wins, CI) | Sheep Δ | Frozen COCO |
+|---|---:|---:|---:|---:|---:|
+| R0.T0 (reference) | 0.8230 | — | — | — | 0.6623 |
+| R0.T1 Otsu | 0.8283 | +0.0054 (4/5) | +0.0054 (4/5, [−0.0012, +0.0123]) | −0.041 | 0.6411 |
+| R0.T4 stable | 0.8255 | +0.0026 (2/5) | same | −0.042 | 0.6809 |
+| R0.T6 Otsu+d | 0.8276 | +0.0046 (3/5) | same | −0.041 | 0.6411 |
+| R1.T0 (V3) | 0.8293 | +0.0063 (5/5) | — | −0.092 | 0.6964 |
+| R1.T1 Otsu | 0.8238 | +0.0009 (2/5) | −0.0055 (1/5) | −0.079 | 0.6359 |
+| R1.T4 stable | 0.8239 | +0.0009 (2/5) | −0.0054 (1/5) | −0.108 | 0.6722 |
+| R1.T5 R0 area | 0.8246 | +0.0016 (5/5) | −0.0047 (0/5) | **−0.007** | 0.6659 |
+| R1.T6 Otsu+d | 0.8297 | +0.0067 (3/5) | +0.0004 (2/5) | −0.090 | 0.6586 |
+
+T2 (two-Gaussian) and T3 (mean + k·std) are far below the reference in
+every cell (−0.017 to −0.043 with R2). They hit the grid edge on 20–87% of
+images. Raw cells follow the same pattern (`report.md`).
+
+- **Registered selection.** The raw selector kept R0.T0 5/5. The R2
+  selector kept R0.T0+R2 (4/5; one fold chose R1.T6+R2). **No promotion.**
+- **Threshold effect.** Only R0.T6 raw passes (+0.0057, 5/5, CI
+  [+0.0005, +0.0141]; d = +0.025). It does not transfer: frozen COCO is
+  0.635 vs 0.660. **No rule helps R1, raw or with R2.**
+- **T5 (R0's area, R1's ranking)** removes the sheep loss (−0.007 vs
+  −0.092) but gives back almost all of V3's gain (−0.0047 vs R1.T0+R2,
+  0/5). On frame-filling images, V3's advantage and its sheep loss are the
+  same area change.
+- **Ceiling (diagnostic).** With the per-image best grid threshold, R0 and
+  R1 are equal: pooled VOC mIoU 0.887 vs 0.884 raw, 0.896 vs 0.895 with
+  R2. COCO raw AP is also unchanged (Section 132: R1 − R0 = −0.0006).
+
+**Reading.** V3 does not rank pixels better within an image. Its gain is
+calibration across images: one global threshold fits more images on R1 than
+on R0. Per-image rules cannot add to that, and the rule that fixes sheep (T5)
+undoes it. This matches the earlier calibration-vs-structure finding
+(Section 125).
+
+**Decision.**
+- Per-image thresholding is closed for this hierarchy.
+- V3+R2 stays the best fixed-threshold pipeline and the owner fallback.
+  The class guard still blocks it.
+- Paper framing: describe V3's contribution as cross-image calibration of
+  the coarse→fine propagation, not as better localisation.
