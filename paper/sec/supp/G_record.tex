@@ -9,7 +9,7 @@ This section lists every experiment of the study, including those the paper ment
 \item \textbf{Full-VOC} mIoU: a cell at its best threshold on all 490 images. It is in-sample and only describes the cell.
 \item \textbf{COCO-Cap} mIoU: frozen transfer at the threshold chosen on VOC-Sim. Nothing is ever chosen on COCO-Cap.
 \end{itemize}
-Experiments come in three groups: exploratory runs before the fold protocol (B1--B17, Sec.~\ref{sec:supp_record_exploratory}); the controlled screens of the first three phases (A1--A12, P3-C, T-C, Sec.~\ref{sec:supp_record_early}); and the later registered packages (SG1--SG28 and the training-free backlog, Sec.~\ref{sec:supp_record_cells}). Table~\ref{tab:record_ledger} lists all of them; Table~\ref{tab:record_screens} lists every registered fold decision.
+Experiments come in three groups: exploratory runs before the fold protocol (B1--B17, Sec.~\ref{sec:supp_record_exploratory}); the controlled screens of the first three phases (A1--A12, P3-C, T-C, Sec.~\ref{sec:supp_record_early}); and the later registered packages (SG1--SG33, the SG-combined studies and the training-free backlog, Sec.~\ref{sec:supp_record_cells}). Table~\ref{tab:record_ledger} lists all of them; Table~\ref{tab:record_screens} lists every registered fold decision.
 
 \subsection{Ledger and registered decisions}
 \input{tables/generated/record/record_ledger}
@@ -176,6 +176,12 @@ Each package below is described in its own registration and result sections of t
 These analyses select nothing; they motivated or explained the registered packages.
 
 \input{tables/generated/record/record_diagnostics}
+\input{tables/generated/record/record_calibration}
+
+\subsection{Registered, results pending}
+These packages are registered and submitted; no result is reported until their merge completes and is audited.
+
+\input{tables/generated/record/record_pending}
 
 \subsection{Exploratory record (B1--B17)}
 \label{sec:supp_record_exploratory}

@@ -1599,7 +1599,7 @@ Tests two independent, never-combined components adapted from PEARL on top of th
 
 \emph{Reference.} P0 / P0+R2, the working default.
 
-\emph{Decision.} Every selector kept P0 (raw) and P0+R2 (final) in 5/5 VOC folds; nothing promoted. Baseline after R2 0.8228 forced OOF / 0.8242 full VOC / 0.6621 COCO. Best component B2: raw forced OOF 0.8140 (+0.0043, below the +0.005 floor), raw COCO 0.6654; after R2 0.8230 (+0.0001) and COCO 0.6661. Caveat: A3's SA similarity uses a transposed affinity orientation relative to GoCA (protocol Sec. 107); on four images the correction changes per-call module weights by 0.9-2.0\% (Sec. 114), and a corrected replay has not been run. SG28 has not yet been independently re-audited.
+\emph{Decision.} Every selector kept P0 (raw) and P0+R2 (final) in 5/5 VOC folds; nothing promoted. Baseline after R2 0.8228 forced OOF / 0.8242 full VOC / 0.6621 COCO. Best component B2: raw forced OOF 0.8140 (+0.0043, below the +0.005 floor), raw COCO 0.6654; after R2 0.8230 (+0.0001) and COCO 0.6661. Caveat: A3's SA similarity uses a transposed affinity orientation relative to GoCA (protocol Sec. 107); on four images the correction changes per-call module weights by 0.9-2.0\% (Sec. 114), and a corrected replay has not been run. Independent audit (protocol Sec. 130): all 24 cells recomputed from the per-image shards match the report; P0 and P0+R2 equal the historical SG27 S0 counts on all 490 VOC and 707 COCO images. The +0.005 floor applies to each fold's training gain, which for B2 is only +0.0017 to +0.0030. Raw B2 on COCO gains +0.0068 [+0.0050, +0.0086] in paired mean image IoU; after R2 the interval includes zero. Centering K cancels in the softmax, so P2 is effectively query centering only; the cross-scale trust saturates because all three maps share the final fine-scale pass from the same seed.
 
 {\scriptsize\setlength{\tabcolsep}{4pt}
 \begin{longtable}{@{}>{\raggedright\arraybackslash}p{5.2cm}rrrrrr@{}}
@@ -1640,5 +1640,364 @@ Cell & $t^*$ & VOC & $\Delta$ & OOF & COCO & $\Delta$ \\
 \texttt{D2+\allowbreak{}R2} & 0.450 & 0.8228 & -0.14 & 0.8228 & 0.6659 & +0.38 \\
 \texttt{D3} & 0.475 & 0.8140 & +0.26 & 0.8140 & 0.6653 & +0.54 \\
 \texttt{D3+\allowbreak{}R2} & 0.450 & 0.8228 & -0.15 & 0.8228 & 0.6659 & +0.38 \\
+\end{longtable}}
+
+\subsubsection{Paper-inspired propagation, hierarchy and combined studies}
+\paragraph{SG29: SG29 NERVE-inspired head weighting and stopped random walk (Sec.~113, 115).}
+Adapts three ideas from NERVE to the working default A3 $\rightarrow$ FINE-P2: class-conditioned head weights from the spatial entropy of each head's one-step output, a geometrically stopped random walk instead of exactly two passes, and a local Q/K 8-neighbour transition fused with the global SA. Seven main cells, raw and after R2, plus three walk-length diagnostics. Single-class spatial entropy replaces NERVE's multiclass entropy, so this is an adaptation, not a reproduction.
+
+\emph{Cell names.} All cells: historical A3 CA seed, SA module 15 at 64x64, calls 10-20, 8 heads; global transitions are the original SD softmax SA. N0 = exact historical observation-wise two-pass map (FINE-P2; = SG28 P0). N1 = N0 with class-conditioned head weights softmax(-3H) within each call, H = spatial entropy of the head's one-step output divided by log(4096). N2 = geometrically stopped walk sum\_{d=0..10} 0.9\^{}d A\^{}d c / sum\_d 0.9\^{}d per head, heads averaged. N3 = the same walk on a local transition only (8-neighbour (cos(Q,K)+1)/2 + 1e-6, plus 0.01 self weight, row-normalized). N4 = walk on the fused transition 0.8 x global + 0.2 x local. N5 = N1 head weights + N2 walk. N6 = N4 walk + entropy head weights computed from the fused one-step output. N2-L1 / N2-L2 / N2-L5 = N2 truncated at walk length 1 / 2 / 5 (diagnostic only, not selectable). +R2 = fixed DenseCRF.
+
+\emph{Reference.} N0 / N0+R2, the exact historical working default (checked per image against same-generation FINE-P2; SG28 counts were a replay audit only).
+
+\emph{Decision.} Every selector kept N0 (raw) and N0+R2 (final) in 5/5 VOC folds; nothing promoted. N0+R2: 0.8229 forced OOF / 0.8243 full VOC / 0.6623 COCO. N1+R2 won 5/5 pairwise folds but gained only +0.0001 forced OOF; entropy weights are near uniform (7.998/8 effective heads) and do not rank heads within a call. Stopped walks trade VOC for COCO: N2+R2 0.8135 / 0.8147 / 0.6696, N4+R2 0.8103 / 0.8110 / 0.6704, N6+R2 0.8104 / 0.8110 / 0.6705; N4+R2's COCO gain loses 0.0356 person IoU and its paired mean-image interval crosses zero. Local-only N3+R2 fails (0.7278 / 0.7278 / 0.6118). Caveat: A3's SA similarity uses a transposed affinity orientation relative to GoCA (protocol Sec. 107); on four images the correction changes per-call module weights by 0.9-2.0\% (Sec. 114), and a corrected replay has not been run. Owner-reported; not yet independently audited.
+
+{\scriptsize\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{5.2cm}rrrrrr@{}}
+\caption{\textbf{SG29: every cell} (20 cells). Screen references (\texttt{N0}, \texttt{N0+R2}) in bold; promoted cell marked $\star$. $\Delta$ in mIoU points against the reference of the screen that lists the cell.}\label{tab:record_sg29}\\
+\toprule
+Cell & $t^*$ & VOC & $\Delta$ & OOF & COCO & $\Delta$ \\
+\midrule
+\endfirsthead
+\toprule
+Cell & $t^*$ & VOC & $\Delta$ & OOF & COCO & $\Delta$ \\
+\midrule
+\endhead
+\midrule\multicolumn{7}{r}{\emph{continued}}\\
+\endfoot
+\bottomrule
+\endlastfoot
+\textbf{\texttt{N0}} & 0.450 & 0.8114 & +0.00 & 0.8098 & 0.6598 & +0.00 \\
+\textbf{\texttt{N0+\allowbreak{}R2}} & 0.425 & 0.8243 & +0.00 & 0.8229 & 0.6623 & +0.00 \\
+\texttt{N1} & 0.450 & 0.8114 & +0.00 & 0.8098 & 0.6602 & +0.04 \\
+\texttt{N1+\allowbreak{}R2} & 0.425 & 0.8243 & +0.01 & 0.8229 & 0.6627 & +0.04 \\
+\texttt{N2} & 0.450 & 0.7994 & -1.20 & 0.7994 & 0.6610 & +0.11 \\
+\texttt{N2+\allowbreak{}R2} & 0.425 & 0.8147 & -0.96 & 0.8135 & 0.6696 & +0.73 \\
+\texttt{N3} & 0.400 & 0.6999 & -11.14 & 0.6988 & 0.5784 & -8.14 \\
+\texttt{N3+\allowbreak{}R2} & 0.425 & 0.7278 & -9.65 & 0.7278 & 0.6118 & -5.05 \\
+\texttt{N4} & 0.450 & 0.7949 & -1.64 & 0.7949 & 0.6600 & +0.02 \\
+\texttt{N4+\allowbreak{}R2} & 0.425 & 0.8110 & -1.32 & 0.8103 & 0.6704 & +0.81 \\
+\texttt{N5} & 0.450 & 0.7994 & -1.20 & 0.7994 & 0.6611 & +0.13 \\
+\texttt{N5+\allowbreak{}R2} & 0.425 & 0.8147 & -0.96 & 0.8136 & 0.6697 & +0.74 \\
+\texttt{N6} & 0.450 & 0.7950 & -1.64 & 0.7950 & 0.6601 & +0.03 \\
+\texttt{N6+\allowbreak{}R2} & 0.425 & 0.8110 & -1.32 & 0.8104 & 0.6705 & +0.82 \\
+\texttt{N2-\allowbreak{}L1} & 0.400 & 0.7537 & -5.77 & 0.7525 & 0.6226 & -3.73 \\
+\texttt{N2-\allowbreak{}L1+\allowbreak{}R2} & 0.400 & 0.7794 & -3.20 & 0.7794 & 0.6522 & -0.77 \\
+\texttt{N2-\allowbreak{}L2} & 0.425 & 0.7745 & -3.69 & 0.7745 & 0.6425 & -1.74 \\
+\texttt{N2-\allowbreak{}L2+\allowbreak{}R2} & 0.400 & 0.7958 & -1.56 & 0.7958 & 0.6623 & +0.25 \\
+\texttt{N2-\allowbreak{}L5} & 0.425 & 0.7934 & -1.79 & 0.7922 & 0.6537 & -0.61 \\
+\texttt{N2-\allowbreak{}L5+\allowbreak{}R2} & 0.425 & 0.8108 & -0.06 & 0.8108 & 0.6748 & +1.49 \\
+\end{longtable}}
+
+\paragraph{SG30: SG30 SPARK-inspired nonlinear affinity sharpening (Sec.~116, 118).}
+Adapts SPARK's expansion, inflation and pruning of a random-walk graph to the fine SA graph of A3 $\rightarrow$ FINE-P2 (module 15, calls 10-20, 8 heads, observation-wise). Varies where an elementwise power r = 2.6 is applied, whether A is first expanded to A\^{}2, pruning at tau = 1e-7, and one feature-local/global fused update. Constants are fixed from the paper, no sweep; author code was unavailable, so the local graph is an explicit adaptation. Eight cells raw and after R2, plus two raw iteration diagnostics.
+
+\emph{Cell names.} Infl(X) = elementwise power X\^{}2.6 then row normalization. S0 = historical observation-wise P2 mean\_i(A\_i\^{}2 c) (same-generation FINE-P2). S1 = Infl(A) used for both passes. S2 = ordinary first pass, Infl(A) on the second pass. S3 = Infl(A\^{}2) applied once to c. S4 = ordinary first pass Ac, then Infl(A\^{}2). S5 = S3 with entries of the unnormalized power below tau = 1e-7 pruned and rows renormalized (an emptied row falls back to its pre-pruned row). S6 = S4 with the same pruning. S7 = one SPARK-like update (expand, inflate, prune) on 0.6 x global SA + 0.4 x a local graph from module-15 input features (after group norm, before Q/K/V; negative cosine clamped to 0, self weight 1, row-normalized), applied to c. S5-I2 / S5-I3 = the S5 update repeated two / three times (raw diagnostics only). +R2 = fixed DenseCRF. Caution: apart from S0 = FINE-P2, S cells here are unrelated to SG31's or SG32's same-numbered cells; SG30 S2 reappears as SG32 S1.
+
+\emph{Reference.} S0 / S0+R2 = same-generation FINE-P2, the working default.
+
+\emph{Decision.} Every selector kept S0 (raw) and S0+R2 (final) in 5/5 VOC folds; nothing promoted. S0+R2: 0.8231 forced OOF / 0.8244 full VOC / 0.6623 COCO. Second-pass inflation S2+R2 reached 0.6855 COCO but 0.8125 forced OOF (1/5 pairwise wins) / 0.8156 full VOC; S6+R2 0.8144 / 0.8144 / 0.6836; S4+R2 0.8187 / 0.8200 / 0.6732. S1, S5 and feature-local S7 (S7+R2 0.7356 / 0.7356 / 0.6206) fail. Inflation concentrates mass (top-quartile edge mass 0.825 $\rightarrow$ 0.976), yet graph purity does not predict masks; S6 pruning removes about 99\% of entries. S2 trades recall for precision. Caveat: A3's SA similarity uses a transposed affinity orientation relative to GoCA (protocol Sec. 107); on four images the correction changes per-call module weights by 0.9-2.0\% (Sec. 114), and a corrected replay has not been run. Owner-reported; not yet independently audited.
+
+{\scriptsize\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{5.2cm}rrrrrr@{}}
+\caption{\textbf{SG30: every cell} (18 cells). Screen references (\texttt{S0}, \texttt{S0+R2}) in bold; promoted cell marked $\star$. $\Delta$ in mIoU points against the reference of the screen that lists the cell.}\label{tab:record_sg30}\\
+\toprule
+Cell & $t^*$ & VOC & $\Delta$ & OOF & COCO & $\Delta$ \\
+\midrule
+\endfirsthead
+\toprule
+Cell & $t^*$ & VOC & $\Delta$ & OOF & COCO & $\Delta$ \\
+\midrule
+\endhead
+\midrule\multicolumn{7}{r}{\emph{continued}}\\
+\endfoot
+\bottomrule
+\endlastfoot
+\textbf{\texttt{S0}} & 0.450 & 0.8115 & +0.00 & 0.8098 & 0.6600 & +0.00 \\
+\textbf{\texttt{S0+\allowbreak{}R2}} & 0.425 & 0.8244 & +0.00 & 0.8231 & 0.6623 & +0.00 \\
+\texttt{S1} & 0.400 & 0.7634 & -4.80 & 0.7634 & 0.6378 & -2.22 \\
+\texttt{S1+\allowbreak{}R2} & 0.400 & 0.7841 & -4.03 & 0.7841 & 0.6623 & +0.00 \\
+\texttt{S2} & 0.450 & 0.7997 & -1.17 & 0.7997 & 0.6674 & +0.74 \\
+\texttt{S2+\allowbreak{}R2} & 0.450 & 0.8156 & -0.89 & 0.8125 & 0.6855 & +2.32 \\
+\texttt{S3} & 0.425 & 0.7892 & -2.23 & 0.7880 & 0.6587 & -0.13 \\
+\texttt{S3+\allowbreak{}R2} & 0.400 & 0.8069 & -1.75 & 0.8056 & 0.6697 & +0.74 \\
+\texttt{S4} & 0.450 & 0.8048 & -0.67 & 0.8032 & 0.6664 & +0.64 \\
+\texttt{S4+\allowbreak{}R2} & 0.425 & 0.8200 & -0.45 & 0.8187 & 0.6732 & +1.09 \\
+\texttt{S5} & 0.425 & 0.7632 & -4.82 & 0.7620 & 0.6402 & -1.98 \\
+\texttt{S5+\allowbreak{}R2} & 0.425 & 0.7806 & -4.38 & 0.7795 & 0.6619 & -0.04 \\
+\texttt{S6} & 0.450 & 0.7978 & -1.37 & 0.7964 & 0.6638 & +0.37 \\
+\texttt{S6+\allowbreak{}R2} & 0.450 & 0.8144 & -1.00 & 0.8144 & 0.6836 & +2.12 \\
+\texttt{S7} & 0.400 & 0.7069 & -10.46 & 0.7069 & 0.5866 & -7.34 \\
+\texttt{S7+\allowbreak{}R2} & 0.425 & 0.7356 & -8.89 & 0.7356 & 0.6206 & -4.17 \\
+\texttt{S5-\allowbreak{}I2} & 0.475 & 0.7235 & -8.80 & 0.7216 & 0.6248 & -3.53 \\
+\texttt{S5-\allowbreak{}I3} & 0.475 & 0.7031 & -10.84 & 0.7031 & 0.6046 & -5.54 \\
+\end{longtable}}
+
+\paragraph{SG31: SG31 SeeDiff-inspired re-seeding and background propagation (Sec.~117, 119, 120).}
+Adapts SeeDiff's coarse-to-fine re-seeding and explicit background expansion to A3 with the SG25 16/32/64 SA modules (same call, calls 10-20, 8 heads). Hard 0.5 seed sets from SeeDiff are expanded by averaging selected SA rows, then re-thresholded scale by scale; separate cells gate the fine map by propagated background support. Includes historical controls and a score-squaring control. Eleven cells raw and after R2. A shard stopped on a too-tight float tolerance in the S1 control and was resumed after relaxing it.
+
+\emph{Cell names.} F = normalized fine map; selected-row expansion E(S) = mean over p in S of head-mean A[p,:] (SeeDiff orientation, not A @ c); every scale step is spatially min-max normalized. S0 = same-generation FINE-P2. S1 = historical SG25 16$\rightarrow$64 continuous path. S2 = continuous 16$\rightarrow$32$\rightarrow$64 (three same-call SA applications). S3 = hard selected-row re-seeding 16$\rightarrow$32$\rightarrow$64 (seed = normalized map $>$ 0.5 at each scale; empty sets fall back to top-1). S4 = the same hard re-seeding 32$\rightarrow$64 only. S5 = soft control, rows weighted by the nonnegative score, 16$\rightarrow$32$\rightarrow$64. Background seeds F $\leq$ 0.5; B = their normalized support; gated maps are minmax(F(1-B)). S6 = S0 gated by one-step selected-row B. S7 = S0 gated by observation-wise A64\^{}2 background. S8 / S9 = S3 / S4 gated by selected-row B. S10 = normalized F\^{}2 (monotone sharpening control). +R2 = fixed DenseCRF. Caution: apart from S0 = FINE-P2, S cells are unrelated to SG30's or SG32's same-numbered cells; SG31 S2 is the ordinary hierarchy replayed as SG33 H0, SG-combined-v1 C1 and v2 V1.
+
+\emph{Reference.} S0 / S0+R2 = same-generation FINE-P2, the working default.
+
+\emph{Decision.} Every selector kept S0 (raw) and S0+R2 (final) in 5/5 VOC folds; nothing promoted. S0+R2: 0.8228 forced OOF / 0.8243 full VOC / 0.6622 COCO. Historical S1+R2: 0.8170 / 0.8183 / 0.6977; continuous S2+R2: 0.8182 / 0.8193 / 0.6923. Hard re-seeding collapses recall (S3+R2 0.2122 / 0.2122 / 0.2606; seed fraction 30.9\% at 16x16 $\rightarrow$ 6.4\% at 64x64 on VOC). Background S6+R2 0.8199 / 0.8209 / 0.6757; score squaring S10+R2 0.7968 / 0.7968 / 0.6855, matching S7's COCO gain and weakening the case that propagated background is distinctive. Caveat: A3's SA similarity uses a transposed affinity orientation relative to GoCA (protocol Sec. 107); on four images the correction changes per-call module weights by 0.9-2.0\% (Sec. 114), and a corrected replay has not been run. Owner-reported; not yet independently audited.
+
+{\scriptsize\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{5.2cm}rrrrrr@{}}
+\caption{\textbf{SG31: every cell} (22 cells). Screen references (\texttt{S0}, \texttt{S0+R2}) in bold; promoted cell marked $\star$. $\Delta$ in mIoU points against the reference of the screen that lists the cell.}\label{tab:record_sg31}\\
+\toprule
+Cell & $t^*$ & VOC & $\Delta$ & OOF & COCO & $\Delta$ \\
+\midrule
+\endfirsthead
+\toprule
+Cell & $t^*$ & VOC & $\Delta$ & OOF & COCO & $\Delta$ \\
+\midrule
+\endhead
+\midrule\multicolumn{7}{r}{\emph{continued}}\\
+\endfoot
+\bottomrule
+\endlastfoot
+\textbf{\texttt{S0}} & 0.450 & 0.8114 & +0.00 & 0.8097 & 0.6600 & +0.00 \\
+\textbf{\texttt{S0+\allowbreak{}R2}} & 0.425 & 0.8243 & +0.00 & 0.8228 & 0.6622 & +0.00 \\
+\texttt{S1} & 0.525 & 0.8033 & -0.81 & 0.8020 & 0.6870 & +2.70 \\
+\texttt{S1+\allowbreak{}R2} & 0.500 & 0.8183 & -0.60 & 0.8170 & 0.6977 & +3.54 \\
+\texttt{S2} & 0.525 & 0.8075 & -0.39 & 0.8060 & 0.6782 & +1.82 \\
+\texttt{S2+\allowbreak{}R2} & 0.525 & 0.8193 & -0.50 & 0.8182 & 0.6923 & +3.01 \\
+\texttt{S3} & 0.300 & 0.2465 & -56.49 & 0.2465 & 0.2846 & -37.54 \\
+\texttt{S3+\allowbreak{}R2} & 0.300 & 0.2122 & -61.20 & 0.2122 & 0.2606 & -40.16 \\
+\texttt{S4} & 0.300 & 0.3907 & -42.06 & 0.3907 & 0.4425 & -21.75 \\
+\texttt{S4+\allowbreak{}R2} & 0.300 & 0.3695 & -45.48 & 0.3695 & 0.4303 & -23.20 \\
+\texttt{S5} & 0.300 & 0.4920 & -31.93 & 0.4920 & 0.4601 & -19.99 \\
+\texttt{S5+\allowbreak{}R2} & 0.300 & 0.4863 & -33.80 & 0.4863 & 0.4658 & -19.64 \\
+\texttt{S6} & 0.350 & 0.8083 & -0.31 & 0.8075 & 0.6729 & +1.29 \\
+\texttt{S6+\allowbreak{}R2} & 0.300 & 0.8209 & -0.34 & 0.8199 & 0.6757 & +1.35 \\
+\texttt{S7} & 0.300 & 0.8078 & -0.35 & 0.8078 & 0.6785 & +1.85 \\
+\texttt{S7+\allowbreak{}R2} & 0.300 & 0.8132 & -1.10 & 0.8132 & 0.6847 & +2.25 \\
+\texttt{S8} & 0.300 & 0.2130 & -59.84 & 0.2130 & 0.2479 & -41.21 \\
+\texttt{S8+\allowbreak{}R2} & 0.300 & 0.1785 & -64.58 & 0.1785 & 0.2224 & -43.99 \\
+\texttt{S9} & 0.300 & 0.3405 & -47.09 & 0.3405 & 0.3978 & -26.22 \\
+\texttt{S9+\allowbreak{}R2} & 0.300 & 0.3126 & -51.16 & 0.3126 & 0.3801 & -28.22 \\
+\texttt{S10} & 0.300 & 0.7907 & -2.06 & 0.7907 & 0.6768 & +1.68 \\
+\texttt{S10+\allowbreak{}R2} & 0.300 & 0.7968 & -2.75 & 0.7968 & 0.6855 & +2.33 \\
+\end{longtable}}
+
+\paragraph{SG32: SG32 reliability-adaptive second SA pass (Sec.~121).}
+An original hypothesis from SG22/SG27/SG30/SG31: keep the first fine pass u = A c and sharpen the second pass only where a per-pixel reliability signal is low. Reliability comes from cross-scale agreement of first-pass maps (16/32/64) and/or selected-row background support, per call and shared across the 8 heads. Two forms: convex blend of ordinary and sharpened second passes, or a row-wise exponent. Twelve cells raw and after R2; no sweep.
+
+\emph{Cell names.} A\^{}sharp = row-wise power 2.6, row-normalized (SG30). Per call, f, m, k = separately min-max normalized head-mean first-pass maps at 64, 32$\rightarrow$64 and 16$\rightarrow$64. Reliability R (clamped to [0,1]): c16 = 1-$|$f-k$|$; pair = 1 - mean of the three pairwise $|$differences$|$; range = 1 - (max - min) of the three; bg = 1 - B, with B = normalized mean SA row over first-pass background seeds f $\leq$ 0.5; pair x bg; range x bg. S0 = ordinary P2, A u = A(Ac) (= FINE-P2). S1 = SG30-S2 fixed sharpening, A\^{}sharp u. Convex cells R x A u + (1-R) x A\^{}sharp u: S2 c16, S3 pair, S4 bg, S5 pair x bg, S6 range x bg. Row-temperature cells, per-row exponent r = 1 + 1.6(1-R) then row normalization: S7 c16, S8 pair, S9 bg, S10 pair x bg, S11 range x bg. Low reliability means more sharpening. +R2 = fixed DenseCRF. Caution: apart from S0 = FINE-P2, S cells are unrelated to SG30's or SG31's same-numbered cells.
+
+\emph{Reference.} S0 / S0+R2 = same-generation FINE-P2, the working default.
+
+\emph{Decision.} Every selector kept S0 (raw) and S0+R2 (final) in 5/5 VOC folds; nothing promoted. S0+R2: 0.8229 forced OOF / 0.8243 full VOC / 0.6622 COCO. Best new cell S7+R2 (c16 temperature): 0.8234 forced OOF (+0.0005, 2/5 pairwise wins) / 0.8248 / 0.6773. The highest COCO cell is the historical sharpening control S1+R2 (0.8122 / 0.8153 / 0.6854), which loses 0.0107 forced OOF. Three-scale agreement saturates on distant background; background support is more spatially discriminative, but no adaptive combination clears the VOC rule. The same-generation control tolerance was set to atol 1e-5, rtol 1e-4. Caveat: A3's SA similarity uses a transposed affinity orientation relative to GoCA (protocol Sec. 107); on four images the correction changes per-call module weights by 0.9-2.0\% (Sec. 114), and a corrected replay has not been run. Owner-reported; not yet independently audited.
+
+{\scriptsize\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{5.2cm}rrrrrr@{}}
+\caption{\textbf{SG32: every cell} (24 cells). Screen references (\texttt{S0}, \texttt{S0+R2}) in bold; promoted cell marked $\star$. $\Delta$ in mIoU points against the reference of the screen that lists the cell.}\label{tab:record_sg32}\\
+\toprule
+Cell & $t^*$ & VOC & $\Delta$ & OOF & COCO & $\Delta$ \\
+\midrule
+\endfirsthead
+\toprule
+Cell & $t^*$ & VOC & $\Delta$ & OOF & COCO & $\Delta$ \\
+\midrule
+\endhead
+\midrule\multicolumn{7}{r}{\emph{continued}}\\
+\endfoot
+\bottomrule
+\endlastfoot
+\textbf{\texttt{S0}} & 0.450 & 0.8114 & +0.00 & 0.8097 & 0.6598 & +0.00 \\
+\textbf{\texttt{S0+\allowbreak{}R2}} & 0.425 & 0.8243 & +0.00 & 0.8229 & 0.6622 & +0.00 \\
+\texttt{S1} & 0.450 & 0.7996 & -1.18 & 0.7996 & 0.6673 & +0.75 \\
+\texttt{S1+\allowbreak{}R2} & 0.450 & 0.8153 & -0.90 & 0.8122 & 0.6854 & +2.32 \\
+\texttt{S2} & 0.475 & 0.8101 & -0.13 & 0.8088 & 0.6693 & +0.95 \\
+\texttt{S2+\allowbreak{}R2} & 0.450 & 0.8239 & -0.04 & 0.8223 & 0.6750 & +1.28 \\
+\texttt{S3} & 0.450 & 0.8104 & -0.10 & 0.8090 & 0.6598 & +0.00 \\
+\texttt{S3+\allowbreak{}R2} & 0.450 & 0.8238 & -0.05 & 0.8223 & 0.6747 & +1.25 \\
+\texttt{S4} & 0.475 & 0.8101 & -0.13 & 0.8091 & 0.6639 & +0.41 \\
+\texttt{S4+\allowbreak{}R2} & 0.475 & 0.8232 & -0.10 & 0.8220 & 0.6788 & +1.66 \\
+\texttt{S5} & 0.475 & 0.8092 & -0.22 & 0.8081 & 0.6641 & +0.43 \\
+\texttt{S5+\allowbreak{}R2} & 0.475 & 0.8227 & -0.15 & 0.8214 & 0.6796 & +1.74 \\
+\texttt{S6} & 0.475 & 0.8087 & -0.27 & 0.8076 & 0.6642 & +0.44 \\
+\texttt{S6+\allowbreak{}R2} & 0.475 & 0.8226 & -0.17 & 0.8212 & 0.6800 & +1.78 \\
+\texttt{S7} & 0.475 & 0.8104 & -0.10 & 0.8094 & 0.6692 & +0.94 \\
+\texttt{S7+\allowbreak{}R2} & 0.450 & 0.8248 & +0.05 & 0.8234 & 0.6773 & +1.51 \\
+\texttt{S8} & 0.475 & 0.8107 & -0.07 & 0.8094 & 0.6700 & +1.03 \\
+\texttt{S8+\allowbreak{}R2} & 0.450 & 0.8246 & +0.03 & 0.8231 & 0.6772 & +1.50 \\
+\texttt{S9} & 0.500 & 0.8081 & -0.33 & 0.8067 & 0.6714 & +1.17 \\
+\texttt{S9+\allowbreak{}R2} & 0.475 & 0.8218 & -0.24 & 0.8206 & 0.6788 & +1.66 \\
+\texttt{S10} & 0.475 & 0.8068 & -0.46 & 0.8054 & 0.6641 & +0.43 \\
+\texttt{S10+\allowbreak{}R2} & 0.475 & 0.8216 & -0.27 & 0.8202 & 0.6811 & +1.90 \\
+\texttt{S11} & 0.475 & 0.8065 & -0.49 & 0.8051 & 0.6649 & +0.51 \\
+\texttt{S11+\allowbreak{}R2} & 0.475 & 0.8213 & -0.29 & 0.8198 & 0.6820 & +1.98 \\
+\end{longtable}}
+
+\paragraph{SG33: SG33 hierarchical residuals and coarse Markov reachability (Sec.~122).}
+Adapts FA-Seg (retain intermediate SA resolutions as residual support) and M2N2 (Markov first-arrival maps, IPF balancing, temperature 0.65) to the sequential 16$\rightarrow$32$\rightarrow$64 SA hierarchy seeded by A3 (matched SG25 modules, calls 10-20, 8 heads). Residual cells fuse normalized stage maps; Markov cells replace only the 16x16 start with a class-seeded reachability map. Twelve cells raw and after R2; no sweep; not a reproduction of either paper.
+
+\emph{Cell names.} S0 = same-generation FINE-P2. Per call, r16, r32, r64 = min-max normalized stages of the ordinary head-mean 16$\rightarrow$32$\rightarrow$64 hierarchy, upsampled to 64. H0 = ordinary hierarchy (replays SG31 S2). H1 = (r16+r32+r64)/3; H2 = 0.2 r16 + 0.3 r32 + 0.5 r64; H3 = r16/9 + 5 r32/9 + 3 r64/9; H4 = max(r64, 0.5 r32, 0.25 r16). Markov start on the 16x16 head-mean SA transition from the normalized CA seed: a node's arrival is the first step (step 0 included) at which its walk probability exceeds 0.3 x the maximum, unreached nodes get the cap 256, support = 1 - normalized arrival; the support then runs the ordinary 16$\rightarrow$32$\rightarrow$64 path. M1 = ordinary transition; M2 = IPF-balanced transition (tolerance 1e-5, at most 100 iterations); M3 = rows sharpened at T = 0.65 before IPF. C1 / C2 / C3 = M1 / M2 / M3 plus the equal three-stage residual. +R2 = fixed DenseCRF. Caution: these C1-C3 are unrelated to SG-combined-v1's C1-C3, and M2 is unrelated to an earlier backlog cell named M2; SG-combined C10a replays SG33 M2.
+
+\emph{Reference.} S0 / S0+R2 = same-generation FINE-P2, the working default.
+
+\emph{Decision.} The raw selector froze M2 with 4/5 votes (a raw-stage promotion; selected OOF 0.8159 vs 0.8098). M2: 0.8216 forced OOF (5/5 pairwise wins) / 0.8226 full VOC / 0.6463 COCO vs S0 0.8098 / 0.8114 / 0.6599; its threshold 0.675 sits near the grid top and the gain does not transfer. The final stage stayed at the reference: S0+R2 5/5 (0.8229 / 0.8243 / 0.6623); M2+R2 had 0.8313 forced OOF / 0.8313 / 0.6528 but only 3/5 pairwise wins and no votes. Residual H3+R2 reached 0.6976 COCO but 0.8106 / 0.8126 VOC (0/5). Caveat: A3's SA similarity uses a transposed affinity orientation relative to GoCA (protocol Sec. 107); on four images the correction changes per-call module weights by 0.9-2.0\% (Sec. 114), and a corrected replay has not been run. Owner-reported; not yet independently audited.
+
+{\scriptsize\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{5.2cm}rrrrrr@{}}
+\caption{\textbf{SG33: every cell} (24 cells). Screen references (\texttt{S0}, \texttt{S0+R2}) in bold; promoted cell marked $\star$. $\Delta$ in mIoU points against the reference of the screen that lists the cell.}\label{tab:record_sg33}\\
+\toprule
+Cell & $t^*$ & VOC & $\Delta$ & OOF & COCO & $\Delta$ \\
+\midrule
+\endfirsthead
+\toprule
+Cell & $t^*$ & VOC & $\Delta$ & OOF & COCO & $\Delta$ \\
+\midrule
+\endhead
+\midrule\multicolumn{7}{r}{\emph{continued}}\\
+\endfoot
+\bottomrule
+\endlastfoot
+\textbf{\texttt{S0}} & 0.450 & 0.8114 & +0.00 & 0.8098 & 0.6599 & +0.00 \\
+\textbf{\texttt{S0+\allowbreak{}R2}} & 0.425 & 0.8243 & +0.00 & 0.8229 & 0.6623 & +0.00 \\
+\texttt{H0} & 0.525 & 0.8077 & -0.37 & 0.8061 & 0.6782 & +1.83 \\
+\texttt{H0+\allowbreak{}R2} & 0.525 & 0.8196 & -0.48 & 0.8184 & 0.6924 & +3.01 \\
+\texttt{H1} & 0.550 & 0.7892 & -2.22 & 0.7879 & 0.6770 & +1.70 \\
+\texttt{H1+\allowbreak{}R2} & 0.525 & 0.8096 & -1.47 & 0.8083 & 0.6961 & +3.38 \\
+\texttt{H2} & 0.550 & 0.7983 & -1.31 & 0.7968 & 0.6840 & +2.40 \\
+\texttt{H2+\allowbreak{}R2} & 0.525 & 0.8153 & -0.90 & 0.8141 & 0.6973 & +3.50 \\
+\texttt{H3} & 0.550 & 0.7941 & -1.72 & 0.7926 & 0.6822 & +2.22 \\
+\texttt{H3+\allowbreak{}R2} & 0.525 & 0.8126 & -1.18 & 0.8106 & 0.6976 & +3.53 \\
+\texttt{H4} & 0.525 & 0.8072 & -0.42 & 0.8061 & 0.6774 & +1.75 \\
+\texttt{H4+\allowbreak{}R2} & 0.525 & 0.8191 & -0.52 & 0.8180 & 0.6916 & +2.93 \\
+\texttt{M1} & 0.700 & 0.7967 & -1.46 & 0.7961 & 0.5986 & -6.13 \\
+\texttt{M1+\allowbreak{}R2} & 0.675 & 0.8039 & -2.05 & 0.8039 & 0.5994 & -6.29 \\
+\texttt{M2}$^\star$ & 0.675 & 0.8226 & +1.13 & 0.8216 & 0.6463 & -1.36 \\
+\texttt{M2+\allowbreak{}R2} & 0.675 & 0.8313 & +0.70 & 0.8313 & 0.6528 & -0.95 \\
+\texttt{M3} & 0.700 & 0.8093 & -0.20 & 0.8093 & 0.6191 & -4.09 \\
+\texttt{M3+\allowbreak{}R2} & 0.700 & 0.8167 & -0.76 & 0.8167 & 0.6250 & -3.73 \\
+\texttt{C1} & 0.700 & 0.7567 & -5.46 & 0.7567 & 0.5581 & -10.18 \\
+\texttt{C1+\allowbreak{}R2} & 0.700 & 0.7761 & -4.82 & 0.7761 & 0.5725 & -8.98 \\
+\texttt{C2} & 0.700 & 0.7824 & -2.89 & 0.7824 & 0.6186 & -4.14 \\
+\texttt{C2+\allowbreak{}R2} & 0.700 & 0.8038 & -2.05 & 0.8038 & 0.6372 & -2.51 \\
+\texttt{C3} & 0.700 & 0.7642 & -4.72 & 0.7642 & 0.5890 & -7.10 \\
+\texttt{C3+\allowbreak{}R2} & 0.700 & 0.7840 & -4.04 & 0.7840 & 0.6056 & -5.67 \\
+\end{longtable}}
+
+\paragraph{SG-combined-v1: SG-combined-v1 constrained transport and budgeted completion (Sec.~123).}
+Our own unified mechanism, not a paper reproduction: coarse class evidence should be conserved through 16$\rightarrow$32$\rightarrow$64 refinement, and new evidence from a second fine SA pass admitted only under a background-aware budget. Each 2x2 child group is projected onto its coarse parent's mass with the closed-form KL solution (exact or 0.5-relaxed), then optional positive-residual completion. A3 seed, matched SA calls 10-20, 8 heads. Ten cells raw and after R2; no sweep.
+
+\emph{Cell names.} C0 = same-generation FINE-P2. C1 = ordinary 16$\rightarrow$32$\rightarrow$64 hierarchy, no conservation (replays SG31 S2; raw call maps averaged, then normalized). Transport cells work on per-call sum-normalized distributions; KL projection z\_child = q\_child x parent mass / sum of the group's q (uniform fallback when the group mass is near zero); min-max scoring only after transport. C2 = exact projection at 16$\rightarrow$32 only. C3 = exact at 32$\rightarrow$64 only. C4 = exact at both. C5 = 0.5-relaxed (half proposal, half exact) at both. Completion on a core: P1 = normalized core, P2 = normalized same-call head-mean fine SA applied to P1, residual [P2-P1]\_+. C6 = C4 then unconditional second fine pass (P2). C7 = C4 + (1-B) x residual, B = SG32 selected-row background support. C8 = C4 + odds P1/(P1+B) x residual. C9 = C5 with the C8 rule. +R2 = fixed DenseCRF. Caution: these C1-C3 differ from SG33's C1-C3.
+
+\emph{Reference.} C0 / C0+R2 = same-generation FINE-P2, the working default.
+
+\emph{Decision.} Every selector kept C0 (raw) and C0+R2 (final) in 5/5 VOC folds; nothing promoted. C0: 0.8097 forced OOF / 0.8114 full VOC / 0.6599 COCO; C0+R2: 0.8228 / 0.8242 / 0.6622. Exact both-scale C4 fell to 0.7592 / 0.7592 / 0.6499; relaxed C5 recovered to 0.7926, unconditional completion C6 to 0.8035; budgeted C8 was 0.7774. After R2, C6+R2 0.8201 / 0.8221 / 0.7063 and C8+R2 0.8031 / 0.8046 / 0.7061: large COCO gains, not selected on VOC. KL mass/ratio checks passed; preserving high-scoring wrong coarse parents plausibly drives C4's loss, and the fixed budget discards useful TP additions. Caveat: A3's SA similarity uses a transposed affinity orientation relative to GoCA (protocol Sec. 107); on four images the correction changes per-call module weights by 0.9-2.0\% (Sec. 114), and a corrected replay has not been run. Owner-reported; not yet independently audited.
+
+{\scriptsize\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{5.2cm}rrrrrr@{}}
+\caption{\textbf{SG-combined-v1: every cell} (20 cells). Screen references (\texttt{C0}, \texttt{C0+R2}) in bold; promoted cell marked $\star$. $\Delta$ in mIoU points against the reference of the screen that lists the cell.}\label{tab:record_sgcombinedv1}\\
+\toprule
+Cell & $t^*$ & VOC & $\Delta$ & OOF & COCO & $\Delta$ \\
+\midrule
+\endfirsthead
+\toprule
+Cell & $t^*$ & VOC & $\Delta$ & OOF & COCO & $\Delta$ \\
+\midrule
+\endhead
+\midrule\multicolumn{7}{r}{\emph{continued}}\\
+\endfoot
+\bottomrule
+\endlastfoot
+\textbf{\texttt{C0}} & 0.450 & 0.8114 & +0.00 & 0.8097 & 0.6599 & +0.00 \\
+\textbf{\texttt{C0+\allowbreak{}R2}} & 0.425 & 0.8242 & +0.00 & 0.8228 & 0.6622 & +0.00 \\
+\texttt{C1} & 0.525 & 0.8075 & -0.39 & 0.8059 & 0.6782 & +1.83 \\
+\texttt{C1+\allowbreak{}R2} & 0.525 & 0.8192 & -0.50 & 0.8181 & 0.6923 & +3.01 \\
+\texttt{C2} & 0.525 & 0.8049 & -0.64 & 0.8034 & 0.6921 & +3.22 \\
+\texttt{C2+\allowbreak{}R2} & 0.500 & 0.8208 & -0.35 & 0.8185 & 0.7038 & +4.16 \\
+\texttt{C3} & 0.525 & 0.7911 & -2.03 & 0.7894 & 0.6843 & +2.44 \\
+\texttt{C3+\allowbreak{}R2} & 0.500 & 0.8147 & -0.96 & 0.8135 & 0.7022 & +4.00 \\
+\texttt{C4} & 0.475 & 0.7592 & -5.22 & 0.7592 & 0.6499 & -1.00 \\
+\texttt{C4+\allowbreak{}R2} & 0.475 & 0.7917 & -3.25 & 0.7917 & 0.6851 & +2.29 \\
+\texttt{C5} & 0.525 & 0.7940 & -1.74 & 0.7926 & 0.6861 & +2.62 \\
+\texttt{C5+\allowbreak{}R2} & 0.500 & 0.8161 & -0.81 & 0.8149 & 0.7059 & +4.37 \\
+\texttt{C6} & 0.525 & 0.8044 & -0.70 & 0.8035 & 0.6933 & +3.34 \\
+\texttt{C6+\allowbreak{}R2} & 0.500 & 0.8221 & -0.21 & 0.8201 & 0.7063 & +4.41 \\
+\texttt{C7} & 0.550 & 0.7785 & -3.29 & 0.7785 & 0.6825 & +2.26 \\
+\texttt{C7+\allowbreak{}R2} & 0.525 & 0.8057 & -1.86 & 0.8047 & 0.7054 & +4.32 \\
+\texttt{C8} & 0.550 & 0.7774 & -3.40 & 0.7774 & 0.6823 & +2.24 \\
+\texttt{C8+\allowbreak{}R2} & 0.525 & 0.8046 & -1.96 & 0.8031 & 0.7061 & +4.39 \\
+\texttt{C9} & 0.550 & 0.7966 & -1.48 & 0.7951 & 0.6887 & +2.88 \\
+\texttt{C9+\allowbreak{}R2} & 0.525 & 0.8164 & -0.79 & 0.8140 & 0.7057 & +4.35 \\
+\end{longtable}}
+
+\paragraph{SG-combined C10: SG-combined-v1 C10 add-on: SG33 M2 coarse source (Sec.~124, 127).}
+Three cells added after SG33 completed, without changing SG-combined-v1's ten cells: they start the 16$\rightarrow$32$\rightarrow$64 hierarchy from SG33 M2's IPF-balanced 16x16 first-arrival source and test ordinary propagation, exact two-transition KL projection, and background-odds completion. Only C10a/b/c are candidates; a same-generation S0 is the reference. Raw and after R2; VOC-only selection, frozen COCO transfer; no new parameter.
+
+\emph{Cell names.} S0 = same-generation FINE-P2 (reference only, not a candidate). C10a = SG33 M2 source through ordinary same-call 16$\rightarrow$32$\rightarrow$64 SA (verified against same-generation SG33 M2). C10b = the same source with exact parentwise KL projection at 16$\rightarrow$32 and 32$\rightarrow$64 (SG-combined-v1 C4 operator). C10c = C10b plus the SG32 background-row / foreground-odds positive completion (SG-combined-v1 C8 rule). A second fine pass on C10b is a completion-efficiency diagnostic only. +R2 = fixed DenseCRF.
+
+\emph{Reference.} S0 / S0+R2 = same-generation FINE-P2, the working default.
+
+\emph{Decision.} The raw selector froze C10a with 4/5 votes (a raw-stage promotion; selected OOF gain +0.0061). C10a: 0.8216 forced OOF (5/5 pairwise wins) / 0.8226 full VOC / 0.6465 COCO vs S0 0.8098 / 0.8114 / 0.6599; its threshold 0.675 sits near the grid top and COCO is worse. The final stage stayed at the reference: S0+R2 5/5 (0.8231 / 0.8244 / 0.6623); C10a+R2 0.8313 / 0.8313 / 0.6529, 3/5 pairwise wins. C10b collapses (0.6444 / 0.6473 / 0.5150; 64x64 stage AUC 0.975 $\rightarrow$ 0.888); C10c recovers partly (0.7622). M2 stays excluded from v2. Caveat: A3's SA similarity uses a transposed affinity orientation relative to GoCA (protocol Sec. 107); on four images the correction changes per-call module weights by 0.9-2.0\% (Sec. 114), and a corrected replay has not been run. Owner-reported; not yet independently audited.
+
+{\scriptsize\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{5.2cm}rrrrrr@{}}
+\caption{\textbf{SG-combined C10: every cell} (8 cells). Screen references (\texttt{S0}, \texttt{S0+R2}) in bold; promoted cell marked $\star$. $\Delta$ in mIoU points against the reference of the screen that lists the cell.}\label{tab:record_sgcombinedc10}\\
+\toprule
+Cell & $t^*$ & VOC & $\Delta$ & OOF & COCO & $\Delta$ \\
+\midrule
+\endfirsthead
+\toprule
+Cell & $t^*$ & VOC & $\Delta$ & OOF & COCO & $\Delta$ \\
+\midrule
+\endhead
+\midrule\multicolumn{7}{r}{\emph{continued}}\\
+\endfoot
+\bottomrule
+\endlastfoot
+\textbf{\texttt{S0}} & 0.450 & 0.8114 & +0.00 & 0.8098 & 0.6599 & +0.00 \\
+\textbf{\texttt{S0+\allowbreak{}R2}} & 0.425 & 0.8244 & +0.00 & 0.8231 & 0.6623 & +0.00 \\
+\texttt{C10a}$^\star$ & 0.675 & 0.8226 & +1.12 & 0.8216 & 0.6465 & -1.34 \\
+\texttt{C10a+\allowbreak{}R2} & 0.675 & 0.8313 & +0.69 & 0.8313 & 0.6529 & -0.94 \\
+\texttt{C10b} & 0.425 & 0.6473 & -16.41 & 0.6444 & 0.5150 & -14.49 \\
+\texttt{C10b+\allowbreak{}R2} & 0.425 & 0.6665 & -15.79 & 0.6632 & 0.5343 & -12.80 \\
+\texttt{C10c} & 0.700 & 0.7622 & -4.92 & 0.7622 & 0.6177 & -4.22 \\
+\texttt{C10c+\allowbreak{}R2} & 0.700 & 0.7852 & -3.92 & 0.7852 & 0.6334 & -2.89 \\
+\end{longtable}}
+
+\paragraph{SG-combined-v2: SG-combined-v2 one-sided coarse caps and route diagnostic (Sec.~126, 127).}
+Following the calibration audit, replaces the exact two-sided KL projection with a one-sided cap: children may not exceed their coarse parent's mass, clipped mass is discarded, and raw call weights are kept, so the cap is isolated against the ordinary hierarchy. Tests the cap at 16$\rightarrow$32 and at both transitions, two completion variants, and a non-selectable per-image route diagnostic. A3 seed, matched SA calls 10-20, 8 heads. Seven cells raw and after R2.
+
+\emph{Cell names.} Cap on 2x2 groups: z\_j = q\_j x min(1, p\_g / (mean\_{k in g} q\_k + 1e-12)), the generalized-KL projection onto upper-mass constraints, applied to the raw (unrenormalized) hierarchy maps. V0 = same-generation FINE-P2 (reference). V1 = ordinary raw 16$\rightarrow$32$\rightarrow$64 hierarchy (SG31 S2, v1 C1). V2 = v1 C6 replay (exact KL at both transitions + unconditional completion). V3 = cap at 16$\rightarrow$32 only. V4 = cap at 16$\rightarrow$32 and 32$\rightarrow$64 (capped 32x32 map as parent). V5 = V3 core + unconditional completion (C6 convention). V6 = V3 core + whole positive residual admitted only where P1 $\geq$ B (B = SG32 background support). Route score R = sum B\_i [F\_i - H\_i]\_+ / (sum [F\_i - H\_i]\_+ + 1e-8), primary pair F = V0, H = V2; E = fine-exclusive mean (secondary). +R2 = fixed DenseCRF. Caution: SG-A3G reuses V0 and V3 with the same meaning.
+
+\emph{Reference.} V0 / V0+R2 = same-generation FINE-P2, the working default.
+
+\emph{Decision.} Every selector kept V0 (raw) and V0+R2 (final) in 5/5 VOC folds; nothing promoted. V0+R2: 0.8231 forced OOF / 0.8244 full VOC / 0.6622 COCO. V3+R2: 0.8304 forced OOF (+0.0073, 5/5 pairwise wins, paired interval [+0.0017, +0.0125]) / 0.8304 / 0.6966. V3 was ineligible: the worst class (sheep, -0.092 after R2) failed the -0.050 guard in every fold. The cap binds in 58\% of groups but removes only 7.6\% of mass, changing mask extent rather than ranking. V4 adds nothing; completion re-adds false positives (V5+R2 0.8209 / 0.8230 / 0.6647). Route AUC 0.554 VOC / 0.594 COCO: no-go. Caveat: A3's SA similarity uses a transposed affinity orientation relative to GoCA (protocol Sec. 107); on four images the correction changes per-call module weights by 0.9-2.0\% (Sec. 114), and a corrected replay has not been run. Owner-reported; not yet independently audited.
+
+{\scriptsize\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{5.2cm}rrrrrr@{}}
+\caption{\textbf{SG-combined-v2: every cell} (14 cells). Screen references (\texttt{V0}, \texttt{V0+R2}) in bold; promoted cell marked $\star$. $\Delta$ in mIoU points against the reference of the screen that lists the cell.}\label{tab:record_sgcombinedv2}\\
+\toprule
+Cell & $t^*$ & VOC & $\Delta$ & OOF & COCO & $\Delta$ \\
+\midrule
+\endfirsthead
+\toprule
+Cell & $t^*$ & VOC & $\Delta$ & OOF & COCO & $\Delta$ \\
+\midrule
+\endhead
+\midrule\multicolumn{7}{r}{\emph{continued}}\\
+\endfoot
+\bottomrule
+\endlastfoot
+\textbf{\texttt{V0}} & 0.450 & 0.8115 & +0.00 & 0.8098 & 0.6598 & +0.00 \\
+\textbf{\texttt{V0+\allowbreak{}R2}} & 0.425 & 0.8244 & +0.00 & 0.8231 & 0.6622 & +0.00 \\
+\texttt{V1} & 0.525 & 0.8077 & -0.38 & 0.8061 & 0.6783 & +1.85 \\
+\texttt{V1+\allowbreak{}R2} & 0.525 & 0.8195 & -0.49 & 0.8184 & 0.6925 & +3.03 \\
+\texttt{V2} & 0.525 & 0.8046 & -0.68 & 0.8037 & 0.6932 & +3.34 \\
+\texttt{V2+\allowbreak{}R2} & 0.500 & 0.8224 & -0.20 & 0.8204 & 0.7063 & +4.41 \\
+\texttt{V3} & 0.550 & 0.8175 & +0.60 & 0.8157 & 0.6821 & +2.23 \\
+\texttt{V3+\allowbreak{}R2} & 0.550 & 0.8304 & +0.60 & 0.8304 & 0.6966 & +3.44 \\
+\texttt{V4} & 0.650 & 0.8168 & +0.53 & 0.8151 & 0.6890 & +2.92 \\
+\texttt{V4+\allowbreak{}R2} & 0.625 & 0.8307 & +0.63 & 0.8290 & 0.6964 & +3.42 \\
+\texttt{V5} & 0.550 & 0.8145 & +0.30 & 0.8131 & 0.6652 & +0.54 \\
+\texttt{V5+\allowbreak{}R2} & 0.525 & 0.8230 & -0.14 & 0.8209 & 0.6647 & +0.25 \\
+\texttt{V6} & 0.575 & 0.8156 & +0.41 & 0.8143 & 0.6765 & +1.67 \\
+\texttt{V6+\allowbreak{}R2} & 0.550 & 0.8269 & +0.25 & 0.8256 & 0.6792 & +1.69 \\
 \end{longtable}}
 

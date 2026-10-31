@@ -7755,3 +7755,65 @@ are chained behind SG-A3G so that they start automatically:
 - **CPU merger 238581** has `afterok:238580`.
 
 These are submissions, not results.
+
+## 130. SG28 independent audit (Claude; 27 October 2026)
+
+**Accepted; no conclusion of Section 112 changes.** The audit covered the
+compact shards, `results.json`, `report.md`, the handoff, and the code
+(`src/segmentation/sg28_pearl.py`, `scripts/run_sg28.py`,
+`scripts/finalize_sg28.py`, `jobs/run_sg28.slurm`) against Section 110.
+
+- **Scores.** All 24 cells (raw and R2) were recomputed from the per-image
+  shards with independent code: forced VOC OOF, full VOC, threshold, frozen
+  COCO and pairwise fold wins match `report.md` exactly. The handoff's
+  precision/recall, fixed-0.45 pixel changes (net TP/FP equal the count
+  differences), trust-bin fractions and class deltas also reproduce.
+- **Baseline replay.** P0 and P0+R2 equal SG27 S0 and S0+R2 counts on all
+  490 VOC and 707 COCO images. *Procedural deviation:* `_verify_historical`
+  runs only with `--verify-controls`, which the slurm script passes only in
+  the smoke branch, so production enforced the replay on two images; the
+  offline replay above covers the rest.
+- **Code against registration.** Procrustes R = UVᵀ from SVD of KcᵀQc,
+  applied to uncentered K; 1/√d scale, softmax over keys, propagation by A
+  (not Aᵀ) as in P0; Laplacian (Dρ+L)F = ρf in float64, 4-neighbour edges,
+  exp(−5|ΔI|) boundary weights, ρ clamp only, τ=1; CG residual ≤ 1e-8
+  observed, at most 35 iterations (cap 2000). No GT enters inference; COCO
+  is never used for selection or thresholds. The Section 112 finalizer fix
+  (`("coco", coco, cdiag)`) is correct and touched diagnostics only.
+- **Environment.** All 40 metric shards ran on V100/V100S. They record two
+  commits (`726e32d`, `85a5467`) whose code is identical; only docs and paper
+  files differ.
+
+**Interpretation notes.**
+
+1. *The .005 floor.* Section 112 compares B2's forced OOF gain (+0.0043)
+   with the floor, but the selector applies it to each fold's training gain.
+   For B2 that is only +0.0017 to +0.0030, so B2 misses it by more than
+   stated. Part of the +0.0043 comes from P0's less stable fold thresholds
+   (P0 OOF 0.8097 vs full 0.8114); B2's full-VOC gain is +0.0026 and its
+   paired mean-image gain +0.0034 [+0.0013, +0.0054].
+2. *B2 on COCO.* Raw paired mean-image gain +0.0068 [+0.0050, +0.0086]; after
+   R2 +0.0027 [−0.0003, +0.0053]. "Small exploratory transfer signal" is fair
+   for raw maps only.
+3. *P2.* Centering K adds a per-row constant to the logits, which cancels in
+   the softmax, so P2 is effectively query centering only. Expected, not a bug.
+4. *P1 ≈ P3.* They differ on 490/490 VOC and 705/707 COCO images; the
+   query-norm weights are near uniform, so the two rotations barely differ.
+5. *Trust saturation.* c16, c32 and f all end with the same fine-scale SA pass
+   from the same seed, so they nearly agree everywhere. This is a property of
+   the registered definition, not a normalisation bug, and supports the
+   handoff's wording that only this trust map was tested.
+
+The supplementary record now carries these notes and no longer marks SG28 as
+unaudited. The paper's SG28 sentence (Sec. 8) is accurate as written.
+
+**Supplementary record update (31 October 2026).** The generated record
+(supplementary Sec. G) now covers SG29–SG33, SG-combined-v1, C10 and v2,
+the Section 125 calibration audit, and SG-A3G and SG-combined-v3 as
+registered/pending. All 174 cells recomputed from the shards match each
+package's `report.md`; the package descriptions in `record_glossary.json`
+are marked "owner-reported; not yet independently audited" for SG29 onward.
+Paper edit in Sec. 8: "SG29 is running" became "Later studies (SG29–SG33;
+supplementary Sec. G) also keep the reference after DenseCRF." The SG33
+related-work paragraph in Sec. 2 still says those experiments are not
+complete, and with it the main body runs about ten lines onto page 9.
