@@ -7817,3 +7817,123 @@ Paper edit in Sec. 8: "SG29 is running" became "Later studies (SG29–SG33;
 supplementary Sec. G) also keep the reference after DenseCRF." The SG33
 related-work paragraph in Sec. 2 still says those experiments are not
 complete, and with it the main body runs about ten lines onto page 9.
+
+## 131. SG-A3G results: A3 orientation is immaterial (Claude on Faiz's account; 31 October 2026)
+
+The GPU array **238557** (40 class shards, 490 VOC / 707 COCO images) and
+merger **238558** both completed. No registered rule, threshold or decision
+is changed. Outputs: `outputs/segmentation/controlled_attention_cv/sg_a3g/`.
+
+| Cell | VOC forced OOF (Δ vs V0, wins) | Full VOC (thr) | Frozen COCO | Worst VOC class |
+|---|---:|---:|---:|---|
+| V0 / V0+R2 | 0.8097 / 0.8228 | 0.8113 (0.450) / 0.8242 (0.425) | 0.6600 / 0.6623 | — |
+| V3 / V3+R2 | 0.8155 (+0.0059, 5/5) / 0.8292 (+0.0063, 5/5) | 0.8173 / 0.8302 (0.550) | 0.6821 / 0.6967 | sheep −0.069 / −0.092 |
+| G0 / G0+R2 | 0.8098 (+0.0001, 4/5) / 0.8228 (−0.0000, 3/5) | 0.8114 (0.450) / 0.8242 (0.425) | 0.6598 / 0.6617 | — |
+| G3 / G3+R2 | 0.8156 (+0.0060, 5/5) / 0.8304 (+0.0075, 5/5) | 0.8174 / 0.8304 (0.550) | 0.6815 / 0.6961 | sheep −0.069 / −0.091 |
+
+- **Control check.** G0+R2 − V0+R2 = −0.0000 VOC forced OOF (paired CI
+  [−0.0001, +0.0001]). This is inside the ±0.002 tie band; frozen COCO is
+  −0.0006.
+- **Why.** The two seeds are nearly identical on VOC: mean Pearson 0.99999
+  (min 0.9998), mean |Δseed| 0.0008 (max 0.0042), call-mean |Δw| 0.0010.
+  The orientation changes the layer scores but barely changes the softmaxed
+  weights.
+- **V3 on the GoCA seed.** G3+R2 − G0+R2 = +0.0075 (5/5,
+  [+0.0020, +0.0128]). G3+R2 − V3+R2 = +0.0012 (4/5, [+0.0002, +0.0021]),
+  well below the +0.005 conditional bar. Sheep is unchanged (−0.091).
+- **Selectors.** Raw selector V0 (4/5, one G3 vote); R2 selector V0+R2 5/5.
+- **Decision.** The A3 transpose (Section 128) is closed as immaterial for
+  results. The historical A3 seed stays the default. G-seeded cells are not
+  promoted.
+
+## 132. SG-combined-v3 results and sheep threshold diagnosis (Claude on Faiz's account; 31 October 2026)
+
+Live smoke **238579**, production array **238580** and merger **238581**
+all completed (40 class shards, 490 VOC / 707 COCO images). Same-generation
+references reproduce v2: R0 = 0.8098 and R1+R2 = 0.8293 VOC forced OOF.
+No registered rule, threshold or decision is changed. AP, best-threshold and
+GT cap-loss values are diagnostic only. Outputs:
+`outputs/segmentation/controlled_attention_cv/sg_combined_v3/`.
+
+### Selection table (reference R0)
+
+| Cell | VOC forced OOF (Δ vs R0, wins) | Full VOC (thr) | Frozen COCO |
+|---|---:|---:|---:|
+| R0 / R0+R2 | 0.8098 / 0.8230 | 0.8114 (0.450) / 0.8244 (0.425) | 0.6599 / 0.6623 |
+| R1 / R1+R2 | 0.8157 (+0.0059, 5/5) / 0.8293 (+0.0063, 5/5) | 0.8174 / 0.8303 (0.550) | 0.6820 / 0.6964 |
+| W1 / W1+R2 | 0.8161 (+0.0063, 5/5) / 0.8294 (+0.0064, 5/5) | 0.8176 / 0.8305 (0.550) | 0.6827 / 0.6972 |
+| W2 / W2+R2 | 0.8155 (+0.0057, 4/5) / 0.8281 (+0.0051, 4/5) | 0.8168 / 0.8296 (0.550) | 0.6833 / 0.6975 |
+| W3 / W3+R2 | 0.8116 (+0.0019, 3/5) / 0.8261 (+0.0031, 4/5) | 0.8134 (0.575) / 0.8261 (0.550) | 0.6792 / 0.6828 |
+
+Raw selector R0 (4/5, one W2 vote); R2 selector R0+R2 5/5. **No v3 cell
+is promoted.**
+
+### Mechanism table (reference R1 = v2 V3)
+
+| Contrast | VOC OOF Δ (wins) | Paired CI | COCO frozen Δ | COCO best-thr Δ | VOC sheep Δ |
+|---|---:|---|---:|---:|---:|
+| W1 − R1 | +0.0004 (4/5) | [−0.0007, +0.0011] | +0.0007 | +0.0000 | −0.000 |
+| W1+R2 − R1+R2 | +0.0001 (4/5) | [−0.0003, +0.0004] | +0.0007 | +0.0003 | +0.000 |
+| W2 − R1 | −0.0002 (3/5) | [−0.0017, +0.0009] | +0.0013 | +0.0025 | −0.003 |
+| W2+R2 − R1+R2 | −0.0012 (2/5) | [−0.0029, +0.0006] | +0.0011 | +0.0025 | −0.004 |
+| W3 − R1 | −0.0040 (0/5) | [−0.0075, −0.0009] | −0.0028 | −0.0082 | −0.012 |
+| W3+R2 − R1+R2 | −0.0032 (1/5) | [−0.0070, +0.0001] | −0.0137 | −0.0075 | +0.017 |
+
+- **Registered decision inputs.** None of W1, W2 or W3 beats R1 on 4/5
+  folds with an interval above zero.
+- **W1 (head-wise cap)** is a null result. It removes almost the same mass
+  as R1 (7.7% vs 7.6% at 16→32; binding groups 0.578 vs 0.581).
+- **W2 (native coarse seed)** is slightly below R1 on VOC and slightly above
+  on COCO (diagnostic only). c16* correlates 0.996 with the downsampled
+  seed (min 0.970; mean |Δ| 0.022), so it carries little new information.
+  It does not help sheep.
+- **W3 (temporal cap)** removes only 1.0% of mass but hurts, most of all in
+  the smallest GT-area bin (−0.016) and the largest (−0.010).
+
+### GT cap loss at 16→32 (VOC)
+
+| Cell | γ_GT all / sheep / non-sheep | L_GT all / sheep / non-sheep | L_background all |
+|---|---|---|---:|
+| R1 | 0.127 / 0.286 / 0.118 | 0.0052 / 0.0114 / 0.0048 | 0.132 |
+| W1 | 0.164 / 0.317 / 0.156 | 0.0066 / 0.0130 / 0.0063 | 0.130 |
+| W2 | 0.129 / 0.287 / 0.121 | 0.0056 / 0.0120 / 0.0052 | 0.140 |
+
+The cap removes about 13% of background proposal mass but only 0.5% of GT
+mass (sheep 1.1%). Cat (1.6%), potted-plant (1.4%), person (1.3%) and tv
+(1.2%) lose as much GT mass as sheep or more, without a sheep-sized IoU loss.
+**The cap is not what removes sheep pixels.**
+
+### Sheep threshold diagnosis (dense counts, CPU)
+
+Mean-image VOC IoU across the shared threshold grid, from the v3 count
+shards:
+- **Sheep (25 images).**
+  - At a matched threshold above 0.45, R1 beats R0: at 0.55, IoU 0.807 vs
+    0.778 and recall 0.858 vs 0.799.
+  - The selected thresholds differ: R0 at 0.45 gets 0.855; R1 at 0.55 gets
+    0.807.
+  - Best over the grid: R0 0.879 (at 0.35); R1 0.831 (at 0.475).
+  - Below 0.45, R1 has about twice R0's false positives: FP/GT 0.205 vs
+    0.104 at 0.30, and 0.125 vs 0.032 at 0.425.
+- **By GT-area bin (all 490 images).**
+
+  | GT fraction | n | R0 best (thr) | R1 best (thr) |
+  |---|---:|---|---|
+  | < 0.5 | 370 | 0.825 (0.525) | 0.829 (0.625) |
+  | 0.5–0.75 | 85 | 0.884 (0.325) | 0.890 (0.450) |
+  | ≥ 0.75 | 35 | 0.860 (0.300) | 0.878 (0.300) |
+
+  In the ≥ 0.75 bin, R1 beats R0 at every threshold on the grid.
+
+**Reading.** The sheep loss is not a general large-object failure and is not
+mass removed by the cap. R1 moves the optimal shared threshold upward
+(small objects now peak near 0.6). Sheep wants a low threshold, but R1 leaks
+background around sheep at low thresholds. Under one global threshold, sheep
+loses either recall (high threshold) or precision (low threshold).
+
+**Decision.**
+- V3+R2 (R1+R2) remains the best pipeline and the owner fallback (Section
+  127). It is still blocked only by the worst-class guard.
+- W1, W2 and W3 are closed.
+- A class-agnostic, per-image threshold or normalization is the candidate
+  follow-up. It is not registered here.
