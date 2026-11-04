@@ -60,19 +60,23 @@ def save(fig, name):
 
 def scale_profiles():
     fig, axes = plt.subplots(1, 3, figsize=(7.0, 2.05), gridspec_kw={"width_ratios": [1, 1, 1.35]})
-    cells = (("FINE-P2", "fine only (64 px)", BLUE, "-"), ("COARSE16-P2", "coarse only (16 px)", ORANGE, "-"),
-             ("16-to-64", "coarse $\\rightarrow$ fine", GREEN, "-"))
+    # (package, cell, label, color, linestyle); coarse-only comes from SG25 (same seed and SA calls),
+    # the other three from SG-combined-v2, the run behind Table 3.
+    cells = (("sg25", "COARSE16-P2", "coarse only (16 px)", ORANGE, ":"),
+             ("sg_combined_v2", "V0", "fine only (64 px)", BLUE, "-"),
+             ("sg_combined_v2", "V1", "coarse $\\rightarrow$ fine", GREY, "--"),
+             ("sg_combined_v2", "V3", "coarse $\\rightarrow$ fine + cap", GREEN, "-"))
     for ax, ds, title in ((axes[0], "voc", "VOC-Sim"), (axes[1], "coco", "COCO-Cap")):
-        counts, cfg, _, thr = load("sg25", ds)
-        for name, label, color, ls in cells:
-            s = counts[cfg.index(name)].sum(0).astype(float)
-            p, r = s[:, 0] / (s[:, 0] + s[:, 1]), s[:, 0] / (s[:, 0] + s[:, 2])
-            ax.plot(r, p, ls, color=color, lw=1.3, label=label)
-            ax.plot(r[[0, -1]], p[[0, -1]], "o", color=color, ms=2.4)
-        ax.set_xlabel("recall"); ax.set_title(title, fontsize=8)
-        ax.grid(alpha=.25, lw=.4)
-    axes[0].set_ylabel("precision")
-    axes[0].legend(loc="lower left", fontsize=6.4, handlelength=1.4)
+        for package, name, label, color, ls in cells:
+            counts, cfg, classes, thr = load(package, ds)
+            m = class_miou(counts[cfg.index(name)], classes)
+            ax.plot(thr, m, ls, color=color, lw=1.3, label=label)
+            ax.plot(thr[m.argmax()], m.max(), "o", color=color, ms=2.6)
+        ax.set_xlabel("global threshold $\\tau$"); ax.set_title(title, fontsize=8)
+        ax.set_xticks([.3, .4, .5, .6, .7]); ax.grid(alpha=.25, lw=.4)
+    axes[0].set_ylim(.66, .83); axes[1].set_ylim(.55, .71)
+    axes[0].set_ylabel("class mIoU (before CRF)")
+    h, l = axes[0].get_legend_handles_labels()
     # cap: removed object vs background mass by class
     res = json.loads((CV / "sg_combined_v3/results.json").read_text())
     by = res["diagnostics"]["voc"]["gt_cap_loss_16_to_32"]["R1"]["by_class"]
@@ -84,7 +88,9 @@ def scale_profiles():
     ax.set_xticks(x); ax.set_xticklabels([k.replace("-", " ") for k in names], rotation=90, fontsize=5.4)
     ax.set_ylabel("% of 32-px proposal mass"); ax.set_title("16$\\rightarrow$32 cap (VOC-Sim)", fontsize=8)
     ax.legend(fontsize=6, loc="upper left")
-    fig.tight_layout(w_pad=.8)
+    fig.tight_layout(w_pad=.8, rect=(0, 0, 1, .9))
+    fig.legend(h, l, loc="upper left", bbox_to_anchor=(.06, 1.0), ncol=4, fontsize=6.6, handlelength=2.0,
+               columnspacing=1.2)
     save(fig, "scale_profiles")
 
 
