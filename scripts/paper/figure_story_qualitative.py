@@ -11,6 +11,7 @@ Images are those of ``story_selection.json`` (fixed rules, no image inspected):
   crf_effect.pdf       V3 map, its thresholded mask and the DenseCRF mask (crf group)
   supp_ca_seeds.pdf    per-resolution CA, uniform and A3-weighted seeds (stages group)
   supp_sheep_case.pdf  FINE-P2+R2 vs V3+R2 on the median sheep image (sheep group)
+  supp_failures.pdf    the four weakest classes per dataset, median image each (failures group)
 
     MPLCONFIGDIR=/tmp ~/miniconda3/envs/lab1/bin/python scripts/paper/figure_story_qualitative.py \
         --cache /home/shafa/paper_cache/story_maps
@@ -225,6 +226,8 @@ def main():
     crf_effect(args.cache, groups["crf"])
     ca_seeds(args.cache, groups["stages"])
     sheep_case(args.cache, groups["sheep"][0])
+    teaser(args.cache, groups["failures"], ("seed_a3", "r16", "V3"),
+           ["Generated image", "CA seed $c$", "coarse SA (16 px)", "cap + fine SA", "+ DenseCRF"], "supp_failures")
 
 
 if __name__ == "__main__":

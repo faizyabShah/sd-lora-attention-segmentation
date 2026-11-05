@@ -14,6 +14,8 @@ Pipelines and full-VOC thresholds (frozen for COCO), from committed count shards
   crf    : the image at the 90th percentile of the V3+R2 - V3 change, on VOC and on COCO,
            and the VOC image at the 10th percentile
   sheep  : the VOC sheep image at the median V3+R2 - R0+R2 change among sheep images
+  failures: on each dataset, the four classes with the lowest V3+R2 class IoU, each shown by
+           its median-IoU image (lower median for an even count)
 
 Writes ``outputs/segmentation/paper_figures/story_selection.json``.
 """
@@ -95,6 +97,18 @@ def main():
     i = int(sheep[at_quantile((a - b)[sheep], .5)])
     out["groups"]["sheep"] = [pick(r, i, dataset="voc", quantile=.5, v3_r2_iou=round(float(a[i]), 4),
                                    r0_r2_iou=round(float(b[i]), 4))]
+    failures = []
+    for ds in ("voc", "coco"):
+        r = v3[ds]
+        c, iou = ious(r, "R1+R2", 0.55)
+        cls = np.asarray(r.classes)
+        class_iou = {k: float(c[cls == k, 0].sum() / c[cls == k, :3].sum()) for k in sorted(set(cls))}
+        for k in sorted(class_iou, key=class_iou.get)[:4]:
+            idx = np.where(cls == k)[0]
+            m = idx[np.argsort(iou[idx], kind="stable")][(len(idx) - 1) // 2]
+            failures.append(pick(r, m, dataset=ds, class_iou=round(class_iou[k], 4), image_quantile=.5,
+                                 image_iou=round(float(iou[m]), 4)))
+    out["groups"]["failures"] = failures
     OUT.write_text(json.dumps(out, indent=2) + "\n")
     print(json.dumps(out["groups"], indent=1))
 

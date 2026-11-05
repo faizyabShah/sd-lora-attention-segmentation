@@ -1,0 +1,44 @@
+% OLD supplementary (frozen copy of the version before the 5 Nov 2026 rewrite). Kept for reference; not submitted.
+
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+\usepackage[review]{cvpr}
+
+\input{preamble}
+\usepackage{longtable}
+\usepackage{float}
+
+\definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
+\usepackage[pagebackref,breaklinks,colorlinks,allcolors=cvprblue]{hyperref}
+
+\def\paperID{*****}
+\def\confName{CVPR}
+\def\confYear{2027}
+
+\title{BRACE: Bounded Refinement of Attention from Coarse Envelopes\\for Training-Free Segmentation}
+\author{Anonymous CVPR submission}
+
+\begin{document}
+\maketitlesupplementary
+{\small\setcounter{tocdepth}{2}\tableofcontents}
+
+\input{sec/supp/S1_method}
+\input{sec/supp/S2_baseline}
+\input{sec/supp/S3_stages}
+\input{sec/supp/S4_calibration}
+\input{sec/supp/S5_selection}
+\input{sec/supp/A_protocol}
+\input{sec/supp/B_controlled_packages}
+\input{sec/supp/C_negative_results}
+\input{sec/supp/D_exploratory}
+\input{sec/supp/E_reproducibility}
+\input{sec/supp/F_gallery}
+\input{sec/supp/G_record}
+
+{
+    \small
+    \bibliographystyle{ieeenat_fullname}
+    \bibliography{references}
+}
+
+\end{document}

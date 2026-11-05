@@ -127,6 +127,72 @@
         "v3_r2_iou": 0.9469,
         "r0_r2_iou": 0.9554
       }
+    ],
+    "failures": [
+      {
+        "image_id": "ovam-voc-sim-250",
+        "class": "dining-table",
+        "dataset": "voc",
+        "class_iou": 0.423,
+        "image_quantile": 0.5,
+        "image_iou": 0.3334
+      },
+      {
+        "image_id": "ovam-voc-sim-375",
+        "class": "potted-plant",
+        "dataset": "voc",
+        "class_iou": 0.7203,
+        "image_quantile": 0.5,
+        "image_iou": 0.7569
+      },
+      {
+        "image_id": "ovam-voc-sim-452",
+        "class": "train",
+        "dataset": "voc",
+        "class_iou": 0.7398,
+        "image_quantile": 0.5,
+        "image_iou": 0.8064
+      },
+      {
+        "image_id": "ovam-voc-sim-421",
+        "class": "sheep",
+        "dataset": "voc",
+        "class_iou": 0.7487,
+        "image_quantile": 0.5,
+        "image_iou": 0.9219
+      },
+      {
+        "image_id": "ovam-coco-449734-person-516411791",
+        "class": "person",
+        "dataset": "coco",
+        "class_iou": 0.2819,
+        "image_quantile": 0.5,
+        "image_iou": 0.2546
+      },
+      {
+        "image_id": "ovam-coco-224292-dining_table-2109244728",
+        "class": "dining table",
+        "dataset": "coco",
+        "class_iou": 0.4536,
+        "image_quantile": 0.5,
+        "image_iou": 0.4241
+      },
+      {
+        "image_id": "ovam-coco-386960-chair-2210794860",
+        "class": "chair",
+        "dataset": "coco",
+        "class_iou": 0.4713,
+        "image_quantile": 0.5,
+        "image_iou": 0.4552
+      },
+      {
+        "image_id": "ovam-coco-323242-bottle-3374637838",
+        "class": "bottle",
+        "dataset": "coco",
+        "class_iou": 0.5044,
+        "image_quantile": 0.5,
+        "image_iou": 0.5892
+      }
     ]
   }
 }

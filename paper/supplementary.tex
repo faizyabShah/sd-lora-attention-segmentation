@@ -1,11 +1,12 @@
 % Supplementary material, submitted as a separate PDF. Same kit and preamble.
+% Self-contained: every section, table and caption is in this file; figures are in figures/.
+% The previous, much longer version is kept as old_supplementary.tex.
 
 \documentclass[10pt,twocolumn,letterpaper]{article}
 
 \usepackage[review]{cvpr}
 
 \input{preamble}
-\usepackage{longtable}
 \usepackage{float}
 
 \definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
@@ -20,20 +21,453 @@
 
 \begin{document}
 \maketitlesupplementary
-{\small\setcounter{tocdepth}{2}\tableofcontents}
 
-\input{sec/supp/S1_method}
-\input{sec/supp/S2_baseline}
-\input{sec/supp/S3_stages}
-\input{sec/supp/S4_calibration}
-\input{sec/supp/S5_selection}
-\input{sec/supp/A_protocol}
-\input{sec/supp/B_controlled_packages}
-\input{sec/supp/C_negative_results}
-\input{sec/supp/D_exploratory}
-\input{sec/supp/E_reproducibility}
-\input{sec/supp/F_gallery}
-\input{sec/supp/G_record}
+\noindent This supplement gives the details referred to in the main paper. Section~\ref{sec:s_impl} lists implementation details, including the orientation of the layer-weighting score and the proof that the cap is a projection. Section~\ref{sec:s_baseline} describes how the fine-only reference and the SA call window were selected. Section~\ref{sec:s_ablation} gives the remaining ablations of each stage, and Sec.~\ref{sec:s_classes} the per-class results. Section~\ref{sec:s_calibration} covers per-image thresholds and the sheep failure, and Sec.~\ref{sec:s_qual} the qualitative results and failure cases. Section~\ref{sec:s_alternatives} summarizes the alternative operators we tested, Sec.~\ref{sec:s_protocol} the selection protocol and the status of each component, Sec.~\ref{sec:s_baselines} the released baseline masks under our evaluation, and Sec.~\ref{sec:s_repro} reproducibility.
+
+%=====================================================================
+\section{Implementation details}
+\label{sec:s_impl}
+
+\paragraph{Generation.}
+Stable Diffusion 1.5 generates every image from the benchmark's released prompt and seed, with 30 scheduler steps and classifier-free guidance 7.5, in float32; attention is stored in float16. The UNet is called 31 times per image (calls 0--30). Cross-attention (CA) uses the conditional branch for queries and keys, a softmax over all 77 positions of the padded attribution prompt ``a photograph of a [class]'', and the mean over the tokenizer pieces of the class word within each head. All maps are combined on a $64\times64$ grid.
+
+\paragraph{Layers.}
+The CA seed reads eleven of the sixteen CA layers at all 31 calls. In sorted order of the \texttt{attn2} modules, these are indices 0 and 1 (down blocks, 64\,px), 4 and 5 (down, 16\,px), 6 (middle, 8\,px), 7, 8 and 9 (up, 16\,px) and 13, 14 and 15 (up, 64\,px). The five 32-pixel layers (2, 3, 10, 11, 12) are excluded (Table~2 of the main paper). The hierarchy uses the self-attention (SA) of the last transformer block of the decoder at each resolution: \texttt{up\_blocks.1.attentions.2} (16\,px), \texttt{up\_blocks.2.attentions.2} (32\,px) and \texttt{up\_blocks.3.attentions.2} (64\,px), averaged over their eight heads, at calls 10--20 (Sec.~\ref{sec:s_baseline}).
+
+\paragraph{SA-guided layer weights.}
+At each call, $F$ is the conditional query of the CA layer in \texttt{up\_blocks.2.attentions.1}, with heads concatenated, and $P=\operatorname{softmax}(FF^\top/\sqrt d)$. For each CA layer, $S_\ell$ is the head-averaged SA of the same transformer block, resized to the $32\times32$ grid of $P$ (keys bilinearly, queries by nearest neighbour, as in GoCA). The weights of Eq.~3 of the main paper are computed per call. Figure~\ref{fig:s_weights} shows them. The 8-pixel layer receives a quarter of the weight and the five 16-pixel layers 60\%, while the six 64-pixel layers together receive 16\%. The 8-pixel layer dominates the first, noisiest calls, when the image is still coarse.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=.92\textwidth]{figures/a3_weights.pdf}
+\caption{\textbf{SA-guided CA layer weights} (VOC-Sim, all images). Left: mean weight per layer (m: index of the CA layer), against uniform weighting (dashed). Right: mean weight per denoising call. Weighting by agreement with SA moves 84\% of the weight to the 8- and 16-pixel layers.}
+\label{fig:s_weights}
+\end{figure*}
+
+\paragraph{Orientation of the agreement score.}
+Our resized SA affinity is indexed [key, query], so our score is $\langle S_\ell^\top,P\rangle$, whereas GoCA's is $\langle S_\ell,P\rangle$. A paired rerun accumulated both seeds in the same diffusion run (Table~\ref{tab:s_orient}). The two seeds have Pearson correlation 0.99999 (mean absolute difference 0.0008), the fine-only pipeline is unchanged, and the gain of the capped hierarchy holds on GoCA's orientation. All results in the paper use ours.
+
+\begin{table}[t]
+\centering
+\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Seed orientation $\rightarrow$ propagation & VOC OOF & folds & COCO \\
+\midrule
+ours $\rightarrow$ fine only & .8228 & -- & .6623 \\
+GoCA $\rightarrow$ fine only & .8228 & 3/5 & .6617 \\
+ours $\rightarrow$ coarse-to-fine + cap & .8292 & 5/5 & .6967 \\
+GoCA $\rightarrow$ coarse-to-fine + cap & .8304 & 5/5 & .6961 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Orientation of the agreement score} (paired rerun; all rows after DenseCRF; folds: held-out wins against the first row). GoCA $-$ ours, fine only: $-0.0000$ (CI $[-0.0001,+0.0001]$). Coarse-to-fine $-$ fine only on GoCA's seed: $+0.0075$ (5/5 folds, CI $[+0.0020,+0.0128]$).}
+\label{tab:s_orient}
+\end{table}
+
+\paragraph{The cap as a projection.}
+Let $q\ge0$ be the 32-pixel proposal and $r\ge0$ the 16-pixel envelope, and let $g$ index $2\times2$ groups of children $k$. Consider
+\begin{equation}
+\min_{z\ge0}\ \sum_k\Big(z_k\log\frac{z_k}{q_k}-z_k+q_k\Big)\quad\text{s.t.}\quad\bar z_g\le r_g\ \ \forall g,
+\label{eq:s_proj}
+\end{equation}
+where $\bar z_g$ is the mean of the four children of $g$. The objective and the constraints separate over groups. Within a group, stationarity gives $z_k=q_k e^{-\lambda_g}$ with a multiplier $\lambda_g\ge0$. If $\bar q_g\le r_g$, complementary slackness gives $\lambda_g=0$ and $z=q$. Otherwise the constraint is active and $e^{-\lambda_g}=r_g/\bar q_g$. Together, $z_k=q_k\min(1,r_g/\bar q_g)$, which is Eq.~5 of the main paper. Replacing $\le$ by $=$ gives exact conservation, $z_k=q_k\,r_g/\bar q_g$ for every group, which also scales up groups that are below their parent's budget.
+
+\paragraph{DenseCRF.}
+We use the SimpleCRF wrapper of OVAM. The unary term is the hard thresholded mask ($p(\text{fg}){=}1$ inside, 0 outside), and the parameters are $(w_1,\theta_\alpha,\theta_\beta,w_2,\theta_\gamma,\text{iterations})=(10,80,13,3,3,5)$ on the full-resolution RGB image. They are OVAM's and were not tuned.
+
+\paragraph{Cost.}
+All attention is captured during the 30-step generation, and nothing is optimized afterwards. The seed reads eleven CA layers at every call, and the hierarchy three SA layers at eleven calls. Its largest operation is multiplying one map by the $4096\times4096$ head-averaged 64-pixel SA matrix per call, which fine-only propagation also does. DenseCRF runs once per image on the CPU.
+
+%=====================================================================
+\section{The fine-only reference and the SA call window}
+\label{sec:s_baseline}
+Before the hierarchy, the pipeline was: CA seed $\rightarrow$ two passes through the 64-pixel SA $\rightarrow$ DenseCRF. This is the ``fine only'' reference of the main paper. Each of its choices was selected out of fold on VOC-Sim.
+
+\paragraph{One SA layer.}
+Propagating through all sixteen SA layers improves the seed, but the last 64-pixel layer alone is better: OOF mIoU rises from 0.756 to 0.789, all five folds select it, and the paired mean-image gain is $+0.042$ (CI $[+0.037,+0.047]$). A cross of six CA seeds with twelve SA settings found it the best SA layer for every seed.
+
+\paragraph{Two passes.}
+For each call--head observation $A_i$ the fine-only map is $\frac1{|\mathcal I|}\sum_iA_i^2c$: the square is taken within each observation before averaging. A second pass raises OOF mIoU from 0.788 to 0.800, especially for chair ($+0.078$) and person ($+0.030$). A third pass is not selected. Figure~\ref{fig:s_depth} shows why: pixels first accepted at the first pass are 86.5\% correct on VOC-Sim (70.8\% on COCO-Cap), but pixels first accepted at the third pass only 39.3\% (14.0\%).
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/propagation_depth.pdf}
+\caption{\textbf{How far fine SA should propagate.} Left: one, two and three passes on a completion example (VOC-Sim, 90th percentile of the two-pass gain) and a leakage example (COCO-Cap, 10th percentile of the three-pass gain), with the pass at which each pixel was first accepted. Right: fraction of newly accepted pixels that are correct, by pass, pooled over all images.}
+\label{fig:s_depth}
+\end{figure*}
+
+\paragraph{SA call window.}
+DenseCRF was selected in all five folds, and from then on every candidate was selected on the refined mask. On the refined mask, one more change was selected: SA calls 10--20 instead of all calls (Table~\ref{tab:s_window}, four of five folds). Late calls recover some object pixels but also add distant false positives (Fig.~\ref{fig:s_temporal}); early calls are noisy. The coarse-to-fine hierarchy keeps this window.
+
+\begin{table}[t]
+\centering
+\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Setting & 2 passes & CRF & calls 10--20 & VOC OOF & COCO \\
+\midrule
+one pass & -- & -- & -- & .7873 & .6172 \\
+two passes & $\checkmark$ & -- & -- & .7997 & .6246 \\
++ DenseCRF & $\checkmark$ & $\checkmark$ & -- & .8132 & .6372 \\
++ calls 10--20 & $\checkmark$ & $\checkmark$ & $\checkmark$ & .8168 & .6438 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Building the fine-only reference} (one run, uniform CA seed; VOC forced OOF, COCO-Cap frozen). The call window was selected in four of five folds.}
+\label{tab:s_window}
+\end{table}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/temporal_tradeoff.pdf}
+\caption{\textbf{A call window can remove leakage or object pixels.} Two VOC-Sim examples propagated with SA calls 0--30 or 10--20 (one pass, raw maps). Bird gains when a false region is suppressed; person loses when useful extent is suppressed. These are deliberately opposing examples.}
+\label{fig:s_temporal}
+\end{figure*}
+
+%=====================================================================
+\section{Additional ablations}
+\label{sec:s_ablation}
+
+\paragraph{CA by resolution.}
+Figure~\ref{fig:s_seeds} shows the CA maps of each resolution for the images of Fig.~2 of the main paper. 8-pixel CA is blob-like and 16-pixel CA follows object parts, while 64-pixel CA fires on texture and edges across the whole image. This is why 64-pixel CA alone scores only 0.17 mIoU (Table~2 of the main paper). The SA-guided weighting down-weights these layers, so its seed is smoother than the uniform one.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=.8\textwidth]{figures/supp_ca_seeds.pdf}
+\caption{\textbf{CA by resolution.} Mean CA of the selected layers at 8, 16 and 64 pixels, the uniformly weighted seed and the SA-guided seed, for the images of Fig.~2 of the main paper.}
+\label{fig:s_seeds}
+\end{figure*}
+
+\paragraph{Other layer weightings.}
+Table~\ref{tab:s_weighting} compares the SA-guided weights with three other training-free weightings in the same run. Weighting each pixel by the mass of the content tokens collapses on COCO-Cap, whose attribution prompt has a single content token. Weighting heads by the norm of their projected output loses on both datasets.
+
+\begin{table}[t]
+\centering
+\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+CA layer weighting & CA only & final & COCO final \\
+\midrule
+uniform & .7135 & .8169 & .6437 \\
+content-token mass & .6406 & .8005 & .0000 \\
+projected head output & .6897 & .8033 & .6366 \\
+SA-guided (ours) & .7049 & \textbf{.8230} & \textbf{.6620} \\
+all three combined & .6288 & .8004 & .0000 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{CA layer weightings} (one run; VOC forced OOF, COCO-Cap frozen; final: fine-only propagation + DenseCRF). SA-guided weighting beats uniform in 4/5 folds.}
+\label{tab:s_weighting}
+\end{table}
+
+\paragraph{SA scale and order.}
+Table~\ref{tab:s_scales} gives every scale configuration of the run behind Fig.~3 of the main paper. The 16-pixel SA alone is far below fine SA on VOC-Sim but is competitive on COCO-Cap after DenseCRF. Going from 16 to 64 pixels gains on COCO-Cap but not on VOC-Sim, the gap that the cap closes. The reverse order (64$\rightarrow$16) fails, so the order of the scales matters.
+
+\begin{table}[t]
+\centering
+\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Propagation (two passes) & VOC & VOC + CRF & COCO & COCO + CRF \\
+\midrule
+64 px only (fine) & .8097 & .8228 & .6599 & .6621 \\
+16 px only (coarse) & .7225 & .7538 & .6282 & .6652 \\
+32 px only & .7924 & .8138 & .6693 & .6948 \\
+16 $\rightarrow$ 64 & .8020 & .8170 & .6869 & .6975 \\
+32 $\rightarrow$ 64 & .8089 & .8217 & .6695 & .6717 \\
+64 $\rightarrow$ 16 & .7505 & .7825 & .6403 & .6705 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{SA scale and order} (one run, SA-guided seed, calls 10--20, no cap; VOC forced OOF, COCO-Cap frozen).}
+\label{tab:s_scales}
+\end{table}
+
+\paragraph{Further hierarchy variants.}
+Table~\ref{tab:s_hier} adds the variants not shown in Table~3 of the main paper: relaxed conservation, conservation with a completion budget, completion gated by confidence, and three single changes to the capped hierarchy. None improves on the one-sided cap. The cap binds in 58\% (VOC-Sim) and 65\% (COCO-Cap) of the $2\times2$ groups but removes only 7.6\% and 8.3\% of the proposal's mass; in groups where it binds, the mean scaling factor is 0.84.
+
+\begin{table*}[t]
+\centering
+\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Variant & VOC raw & VOC + CRF & COCO + CRF \\
+\midrule
+relaxed conservation: halfway between $q$ and its conserved projection, at both transitions & .7926 & .8149 & .7059 \\
+exact conservation (both transitions) + completion budget on background only & .7785 & .8047 & .7054 \\
+exact conservation (both transitions) + completion budget from class/background odds & .7774 & .8031 & .7061 \\
+relaxed conservation + completion budget from class/background odds & .7951 & .8140 & .7057 \\
+one-sided cap + completion only where the seed is confident & .8143 & .8256 & .6792 \\
+\midrule
+\textbf{one-sided cap at 16$\rightarrow$32 (ours)} & .8157 & \textbf{.8293} & .6964 \\
+cap applied to each head before averaging & .8161 & .8294 & .6972 \\
+native 16-pixel CA seed instead of the downsampled seed $c_{16}$ & .8155 & .8281 & .6975 \\
+additional cap of each call by the mean of earlier calls & .8116 & .8261 & .6828 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Further hierarchy variants} (VOC forced OOF, COCO-Cap frozen). The rows above the line and below it come from two runs, each with its own references, which agree with Table~3 of the main paper to 0.0003. Against our cap after DenseCRF: the per-head cap $+0.0001$ (CI spans 0) removes almost the same mass (7.7\% vs.\ 7.6\%); the native seed $-0.0012$ (2/5 folds) correlates 0.996 with $c_{16}$; the temporal cap $-0.0032$ (1/5) hurts small objects most ($-0.016$ in the smallest object-size bin).}
+\label{tab:s_hier}
+\end{table*}
+
+\paragraph{DenseCRF.}
+On VOC-Sim, DenseCRF changes the image IoU of the capped pipeline by more than 0.005 in 375 of 490 images and improves 278 of them. On COCO-Cap it improves 427 of 707 images and 18 of 20 classes. Figure~\ref{fig:s_crf} shows the change per class for fine-only and coarse-to-fine maps.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/supp_crf_classes.pdf}
+\caption{\textbf{Per-class effect of DenseCRF} on fine-only and capped coarse-to-fine maps (same run; thresholds chosen on VOC-Sim).}
+\label{fig:s_crf}
+\end{figure}
+
+%=====================================================================
+\section{Per-class results}
+\label{sec:s_classes}
+Table~\ref{tab:s_classes} gives the class IoU of the fine-only reference and of BRACE, before and after DenseCRF, on both datasets. On VOC-Sim the hierarchy gains most on train, tv, person, bicycle and bottle, and loses mainly on sheep (Sec.~\ref{sec:s_calibration}) and dining table. On COCO-Cap it improves 16 of 20 classes, most of all car ($+13.0$), aeroplane ($+8.2$), tv ($+7.4$) and train ($+6.6$), and no class loses more than 1.6 points. Person on COCO-Cap remains the weakest class, at 28.2; in its median image (Fig.~\ref{fig:s_failures}) the mask keeps the face, misses the arms and body, and leaks into the wall behind.
+
+\begin{table}[t]
+\centering
+\scriptsize\setlength{\tabcolsep}{2.6pt}
+\begin{tabular}{@{}lrrr|rrr@{}}
+\toprule
+& \multicolumn{3}{c|}{VOC-Sim} & \multicolumn{3}{c}{COCO-Cap} \\
+Class & fine+CRF & ours & ours+CRF & fine+CRF & ours & ours+CRF \\
+\midrule
+aeroplane & 88.4 & 85.3 & 88.4 & 71.7 & 73.1 & 79.9 \\
+bicycle & 76.2 & 78.2 & 79.5 & 57.0 & 61.6 & 62.6 \\
+bird & 91.3 & 87.5 & 92.4 & 78.0 & 75.6 & 77.9 \\
+boat & 83.9 & 85.4 & 85.6 & 56.3 & 57.3 & 58.5 \\
+bottle & 85.4 & 86.7 & 88.5 & 49.8 & 49.8 & 50.4 \\
+bus & 89.5 & 92.1 & 92.1 & 90.3 & 92.5 & 92.3 \\
+car & 84.6 & 85.3 & 84.9 & 63.3 & 75.6 & 76.3 \\
+cat & 83.9 & 84.2 & 84.9 & 85.5 & 85.6 & 87.0 \\
+chair & 78.0 & 72.2 & 79.3 & 44.6 & 45.9 & 47.1 \\
+cow & 92.2 & 88.6 & 90.2 & 85.5 & 84.7 & 87.4 \\
+dining table & 45.6 & 42.4 & 42.3 & 46.9 & 45.4 & 45.4 \\
+dog & 93.1 & 91.3 & 92.8 & 75.6 & 74.1 & 75.3 \\
+horse & 90.1 & 87.8 & 90.1 & 67.5 & 69.3 & 71.8 \\
+motorbike & 85.6 & 87.4 & 87.2 & 62.5 & 65.7 & 66.8 \\
+person & 77.5 & 80.2 & 81.0 & 26.6 & 28.2 & 28.2 \\
+potted plant & 73.9 & 72.0 & 72.0 & 69.8 & 72.3 & 74.5 \\
+sheep & 84.0 & 74.0 & 74.9 & 87.4 & 85.5 & 87.4 \\
+sofa & 96.4 & 95.2 & 95.8 & 66.2 & 69.4 & 69.9 \\
+train & 68.9 & 74.3 & 74.0 & 68.7 & 74.7 & 75.3 \\
+tv & 80.2 & 84.8 & 85.0 & 71.5 & 77.8 & 78.9 \\
+\midrule
+mean & 82.4 & 81.7 & \textbf{83.0} & 66.2 & 68.2 & \textbf{69.6} \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Class IoU ($\times100$).} \emph{fine+CRF}: fine-only reference with DenseCRF at its threshold 0.425; \emph{ours}: BRACE before and after DenseCRF at 0.55. All columns from one run; thresholds chosen on all of VOC-Sim, so the VOC means are in-sample (the forced out-of-fold values in the main paper are 0.823 and 0.829); COCO-Cap uses the same thresholds.}
+\label{tab:s_classes}
+\end{table}
+
+%=====================================================================
+\section{Calibration, thresholds and the sheep failure}
+\label{sec:s_calibration}
+
+\paragraph{Per-image thresholds.}
+Section~5.5 of the main paper attributes the remaining errors to the single global threshold. Could a threshold computed from each image's own map do better? We registered six label-free rules before running them: Otsu (T1), the crossing of a two-Gaussian fit (T2), $\mu_I+k\sigma_I$ (T3), the most stable threshold, \ie the one with the smallest change in area (T4), the capped map's ranking at the area of the fine-only mask (T5), and Otsu plus an offset (T6). One-parameter rules choose the parameter on the training folds. Each per-image threshold is snapped to the 17-point grid, so the stored per-image counts score it exactly, with and without DenseCRF. Table~\ref{tab:s_threshold} gives the outcome. No rule improves the capped pipeline. Matching the fine-only mask's area (T5) repairs sheep but gives back most of the gain. Otsu helps the fine-only map in four folds but loses 0.021 on COCO-Cap. With ground truth, the best threshold per image would give 0.896 (fine only) and 0.895 (ours): the two maps rank pixels equally well, and the hierarchy's gain is that one global threshold suits it better.
+
+\begin{table}[t]
+\centering
+\scriptsize\setlength{\tabcolsep}{2.2pt}
+\begin{tabular}{@{}llcccc@{}}
+\toprule
+Map & Threshold rule & VOC OOF & vs.\ global & sheep $\Delta$ & COCO \\
+\midrule
+fine only & T0 global & .8230 & -- & -- & .6623 \\
+fine only & T1 Otsu & .8283 & +.0054 (4/5) & $-$.041 & .6411 \\
+fine only & T4 stable & .8255 & +.0026 (2/5) & $-$.042 & .6809 \\
+fine only & T6 Otsu$+d$ & .8276 & +.0046 (3/5) & $-$.041 & .6411 \\
+\midrule
+ours & T0 global & \textbf{.8293} & -- & $-$.092 & \textbf{.6964} \\
+ours & T1 Otsu & .8238 & $-$.0055 (1/5) & $-$.079 & .6359 \\
+ours & T2 two-Gaussian & .8031 & $-$.0262 (0/5) & $-$.080 & .6258 \\
+ours & T3 $\mu{+}k\sigma$ & .7864 & $-$.0429 (0/5) & $-$.254 & .6498 \\
+ours & T4 stable & .8239 & $-$.0054 (1/5) & $-$.108 & .6722 \\
+ours & T5 fine-only area & .8246 & $-$.0047 (0/5) & $-$.007 & .6659 \\
+ours & T6 Otsu$+d$ & .8297 & +.0004 (2/5) & $-$.090 & .6586 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Per-image threshold rules} (all after DenseCRF; \emph{vs.\ global}: against T0 on the same map, with held-out fold wins; sheep $\Delta$: against the fine-only map with T0). Two-Gaussian and $\mu{+}k\sigma$ thresholds often fall outside the grid (20--87\% of images).}
+\label{tab:s_threshold}
+\end{table}
+
+\paragraph{Sheep.}
+The sheep loss is a loss of recall: 294{,}665 fewer correct pixels against only 12{,}173 more false positives. It is concentrated in close-ups in which the sheep covers 79--96\% of the frame. Figure~\ref{fig:s_sheep} shows that our map is better on sheep at every threshold above 0.45. Below that, its false positives are twice those of the fine-only map, so sheep cannot use the low threshold it prefers. Across all classes, objects that fill more than 75\% of the frame gain from the cap at every threshold; sheep is the exception because its surroundings (grass, other sheep) are grouped with it at low thresholds. Figure~\ref{fig:s_sheep_case} shows the median sheep image.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/supp_sheep_curves.pdf}
+\caption{\textbf{Sheep across thresholds} (25 VOC-Sim images, after DenseCRF). Vertical lines: the global thresholds of the two pipelines.}
+\label{fig:s_sheep}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/supp_sheep_case.pdf}
+\caption{\textbf{The median sheep image} (median change of our pipeline against fine only, both after DenseCRF at their global thresholds).}
+\label{fig:s_sheep_case}
+\end{figure}
+
+%=====================================================================
+\section{Qualitative results and failure cases}
+\label{sec:s_qual}
+All images in this section are chosen by fixed rules on the committed per-image scores, before any image is looked at. The maps are regenerated, and each regenerated mask reproduces the stored image IoU (largest difference 0.0054).
+
+\paragraph{Every stage.}
+Figure~\ref{fig:s_stages} repeats Fig.~2 of the main paper with every intermediate map, including the 32-pixel proposal and the capped map.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=.9\textwidth]{figures/supp_pipeline_c2f.pdf}
+\caption{\textbf{Every stage, for the images of Fig.~2 of the main paper.} Rows: generated image; CA seed $c$; coarse 16-pixel SA $r$; 32-pixel proposal $q$; capped map $z$; fine 64-pixel SA $y$; final mask after DenseCRF (blue) with the annotation outline (yellow).}
+\label{fig:s_stages}
+\end{figure*}
+
+\paragraph{Failure cases.}
+Figure~\ref{fig:s_failures} shows the four weakest classes on each dataset, each by its median image. Two failure modes dominate. \emph{Partial extent}: the mask covers the most class-specific part of the object and misses the rest. For the COCO-Cap person it keeps the face but misses the arms and sweater; for the COCO-Cap dining table it covers the plates and food but not the bare wood of the table, which the annotation includes; the bottle mask misses 40\% of the annotated bottle area. \emph{Grouped context}: SA groups an object with what it touches, so the envelope is too large and the mask follows it. The VOC-Sim dining table is segmented together with its chairs, the COCO-Cap chair mask also covers the floor and table edge between the chairs, and the person mask leaks into the wall above the head. The medians of the next-weakest VOC-Sim classes are already good (potted plant 0.76, train 0.81, sheep 0.92); their errors are thin parts, such as leaf tips and the edges of the train, narrower than one 64-pixel cell.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/supp_failures.pdf}
+\caption{\textbf{The weakest classes, one median image each.} Columns: the four classes with the lowest class IoU of BRACE on VOC-Sim, then on COCO-Cap, from the lowest; each shown by its median-IoU image. Rows as in Fig.~2 of the main paper.}
+\label{fig:s_failures}
+\end{figure*}
+
+%=====================================================================
+\section{Alternative operators}
+\label{sec:s_alternatives}
+Before arriving at the capped hierarchy, we registered and ran 45 comparisons of other operators, each against the reference of its own run (Table~\ref{tab:s_families}). Each family was screened with the protocol of Sec.~\ref{sec:s_protocol}. Two patterns emerge. First, operators that make propagation more reliable (consensus across call--head observations, robust aggregation, filtering unreliable observations) gain about one point over one SA pass, which is what a second pass gains, and their per-class gains correlate with those of the second pass (0.82--0.88). None of them improves on two passes plus DenseCRF. Second, operators that restrict the SA graph (absorbing walks, confidence locks, widest-path connectivity, region labelling) lose. Only the SA call window survived DenseCRF.
+
+\begin{table*}[t]
+\centering
+\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.6cm}>{\raggedright\arraybackslash}p{6.6cm}cc>{\raggedright\arraybackslash}p{2.3cm}@{}}
+\toprule
+Family & Operators & $\Delta$VOC & $\Delta$COCO & Outcome \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{Operators on the propagated map, mostly against one SA pass (before DenseCRF)}} \\
+Second pass, DenseCRF (2) & two observation-wise passes; DenseCRF & +1.2, +1.6 & +0.7, +1.8 & selected \\
+Observation reliability (4) & consensus graph, observation consensus, robust aggregation, keeping the 50\% most consistent observations & +0.8 to +1.0 & +0.4 to +1.0 & selected raw; lost after CRF \\
+Graph restriction (6) & absorbing walk, confidence lock, reciprocal links, widest-path connectivity, SA regions, region inference & $-$4.3 to +0.3 & $-$8.2 to +0.2 & rejected \\
+Further operators (14) & progressive expansion, background propagation, iteration to convergence, multi-resolution fusion, attention merging, region growing, single and multiple CA prototypes, CRF with SA edges, heat kernel, symmetric affinity, column-mass gate, entropy and agreement weighting of observations & $-$41.6 to +0.4 & $-$36.2 to +3.1 & rejected \\
+Contrastive seed (1) & CA seed contrasted against other class words & +0.6 & $-$2.7 & rejected \\
+Refinements (3) & combined consensus, consensus refinement, filtered second pass & $-$0.1 to +0.1 & $-$0.9 to 0.0 & rejected \\
+Call window (2) & SA calls 10--20; reliability operator on calls 10--20 & +0.7, +0.6 & +1.1, +0.1 & selected raw \\
+SA heads (1) & weighting heads by structural role & $-$0.2 & 0.0 & rejected \\
+PEARL-inspired (1) & alignment, boundary-aware Laplacians, cross-scale trust & +0.3 & +0.6 & rejected \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{Complete pipelines, against two passes with DenseCRF}} \\
+SA call window (1) & calls 10--20 instead of 0--30 & +0.5 & +0.7 & selected \\
+Reliability and window variants (4) & reliability operators or call window on one pass, + DenseCRF & $-$0.2 to +0.5 & $-$1.1 to +0.9 & rejected \\
+CA layer weighting (1) & SA-guided weights (Sec.~3.3 of the main paper) & +0.6 & +1.8 & adopted$^\ast$ \\
+32-pixel CA (1) & restoring the five 32-pixel CA layers & $-$0.9 & +0.8 & rejected \\
+Multi-scale SA (3) & coarser SA alone, as guidance, or by late fusion & $-$0.4 to +0.2 & +1.0 to +2.0 & led to the hierarchy \\
+PEARL-inspired + CRF (1) & as above, with DenseCRF & $-$0.1 & $-$0.8 & rejected \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Registered operator families before the hierarchy} (number of families in parentheses). Changes in mIoU points against the reference of the same run, at each method's threshold chosen on all of VOC-Sim (descriptive; the selection itself used the out-of-fold rule), COCO-Cap at the same threshold. $^\ast$Adopted after the registered selector kept uniform weights (Sec.~\ref{sec:s_protocol}).}
+\label{tab:s_families}
+\end{table*}
+
+\paragraph{Adaptations of related methods.}
+We also adapted components of recent training-free methods to our setting (Table~\ref{tab:s_related}), each in its own run against the fine-only pipeline with DenseCRF. Only the layer weighting adapted from GoCA improved the final mask. NERVE's entropy-based head weights are almost uniform on our data (7.998 effective heads of 8), and its stopped random walk loses on VOC-Sim. Several adaptations, notably SPARK-style sharpening and NERVE's walk, raise COCO-Cap transfer while losing on VOC-Sim; since only VOC-Sim selects, none of them was adopted. A coarse start from a class-seeded Markov chain (adapted from FA-Seg and M2N2) has the highest VOC-Sim score after DenseCRF but wins only three of five folds and loses on COCO-Cap.
+
+\begin{table*}[t]
+\centering
+\footnotesize\setlength{\tabcolsep}{6pt}
+\begin{tabular}{@{}llcc@{}}
+\toprule
+Source & Adapted component & $\Delta$VOC OOF & $\Delta$COCO \\
+\midrule
+GoCA~\cite{meng2026making} & SA-guided CA layer weights & \textbf{+.0061} (4/5) & \textbf{+.0183} \\
+PEARL~\cite{pei2026pearl} & boundary-aware Laplacian & +.0001 (1/5) & +.0040 \\
+PEARL & Procrustes alignment & $-$.0008 (2/5) & $-$.0078 \\
+NERVE~\cite{mahatha2025nerve} & entropy head weights & +.0001 (5/5) & +.0004 \\
+NERVE & stopped random walk & $-$.0094 & +.0073 \\
+SPARK~\cite{mahatha2026spark} & nonlinear affinity sharpening & $-$.0106 (1/5) & +.0232 \\
+SeeDiff~\cite{park2025seediff} & coarse-to-fine re-seeding & $-$.61 to $-$.45 & $-$.40 to $-$.23 \\
+SeeDiff & background propagation & $-$.0029 & +.0135 \\
+-- & second pass sharpened where scales disagree & +.0005 (2/5) & +.0151 \\
+FA-Seg, M2N2~\cite{che2025faseg,karmann2025m2n2} & class-seeded Markov coarse start & +.0084 (3/5) & $-$.0095 \\
+FA-Seg, M2N2 & hierarchical residuals & $-$.0123 (0/5) & +.0353 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Adaptations of related methods} (after DenseCRF; changes against the fine-only pipeline of the same run, VOC forced OOF with held-out fold wins, COCO-Cap frozen). None except the layer weighting was selected. The unnamed row is our own variant: a second SA pass sharpened only where the scales disagree.}
+\label{tab:s_related}
+\end{table*}
+
+%=====================================================================
+\section{Selection protocol and component status}
+\label{sec:s_protocol}
+
+\paragraph{Folds and selection.}
+Only VOC-Sim selects. Its 490 images are split into five class-stratified folds (about five images per class per fold), fixed before any experiment. In each outer fold, every choice, including the threshold on the grid 0.30, 0.325, \ldots, 0.70, is made on the other four folds and scored on the held-out fold; the reference is treated the same way. COCO-Cap is scored once per frozen pipeline, at the threshold chosen on VOC-Sim. Per-image true-positive, false-positive and false-negative counts at every threshold are stored, so folds, paired bootstrap intervals and later analyses need no regeneration.
+
+\paragraph{Decision rule.}
+Each experiment family, its candidates and its grid were registered before it was run. A candidate is promoted if it improves training-fold mIoU by at least 0.010, or by 0.005--0.010 with at least 12 of 20 classes improved and no class losing more than 0.05. It must also win at least four of five fold votes and give a positive pooled out-of-fold gain. Within 0.002, the simpler setting wins.
+
+\paragraph{Status of each component.}
+Table~\ref{tab:s_status} lists how each component of BRACE entered it. Two components were adopted after the registered selector kept a simpler reference. For the SA-guided weights, the multi-candidate selector chose them in only three of five folds. For the capped hierarchy, sheep lost more than the 0.05 class guard in the training folds, although the hierarchy won all five folds against both references. All numbers for these components in the main paper are forced out-of-fold estimates, and their COCO-Cap numbers are frozen transfer.
+
+\begin{table*}[t]
+\centering
+\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{5.4cm}l>{\raggedright\arraybackslash}p{9.2cm}@{}}
+\toprule
+Component & How it entered & Evidence \\
+\midrule
+CA without the 32-pixel layers & selected & 4/5 folds, OOF 0.665$\rightarrow$0.691, paired CI $[+0.015,+0.029]$ \\
+All CA heads and calls, mean of word pieces & selected / kept & head and call subsets within the 0.002 tie band once crossed with scale \\
+64-pixel SA layer for fine propagation & selected & 5/5 folds, 0.756$\rightarrow$0.789 \\
+Two observation-wise passes (fine only) & selected & 0.788$\rightarrow$0.800; with DenseCRF 5/5 folds (0.813) \\
+DenseCRF, OVAM's parameters & selected & 5/5 folds, all 20 classes improved \\
+SA calls 10--20 & selected & after DenseCRF, 4/5 folds \\
+SA-guided CA layer weights & adopted & 4/5 folds, +0.006 OOF, COCO +0.018; selector kept uniform weights (3/5 folds) \\
+Coarse-to-fine hierarchy with one-sided cap & adopted & 5/5 folds against fine only and the plain hierarchy, +0.006 OOF, COCO +0.034; selector kept fine only because sheep lost 0.057--0.104 in the training folds (guard 0.05) \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{How each component entered the pipeline.} \emph{Selected}: promoted by the registered rule. \emph{Adopted}: adopted after the registered selector kept a simpler reference; the evidence column gives the registered outcome.}
+\label{tab:s_status}
+\end{table*}
+
+%=====================================================================
+\section{Released baselines under our evaluation}
+\label{sec:s_baselines}
+Table~5 of the main paper quotes the class-word results reported by each method. Table~\ref{tab:s_released} scores the masks released by each method with OVAM's evaluation procedure, on each method's own released images and annotations. The released benchmarks differ slightly in size from ours (column ``images''). Grounded Diffusion and DatasetDM train a module or decoder; the others are training-free. ``Token'' columns use an optimized token instead of the class word, which we do not use.
+
+\begin{table*}[t]
+\centering
+\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+& \multicolumn{3}{c}{VOC-Sim} & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(l){5-7}
+Method & images & word & token & images & word & token \\
+\midrule
+OVAM & 490 & .704 & .825 & 707 & .582 & --- \\
+DAAM & 490 & .662 & .797 & 707 & .484 & .661 \\
+DAAM, threshold chosen in our folds & 490 & .674 & .797 & 707 & .527 & .642 \\
+Attn2Mask & 485 & .603 & .811 & 668 & .584 & .676 \\
+Grounded Diffusion (trains a module) & 496 & .621 & .866 & 588 & .502 & .732 \\
+DatasetDM (trains a decoder) & 500 & .803 & .806 & 728 & .593 & .605 \\
+\midrule
+BRACE (ours, class word, training-free) & 490 & \textbf{.829} & -- & 707 & \textbf{.696} & -- \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Released masks scored with OVAM's evaluation procedure.} mIoU over each method's released images; ours is forced out-of-fold on VOC-Sim and frozen on COCO-Cap.}
+\label{tab:s_released}
+\end{table*}
+
+%=====================================================================
+\section{Reproducibility}
+\label{sec:s_repro}
+
+\paragraph{Code and record.}
+The code, configurations, fold assignment and the per-image counts of every run will be released. The release also includes the complete experiment record: every registration, result and review in the order they happened, with each family's candidates, fold choices, paired intervals and per-class changes. Every table and figure in the paper and this supplement is generated from the stored per-image counts or from regenerated maps by scripts in the release; no figure script selects a method or changes a result.
+
+\paragraph{Environments.}
+Every run records its commit and software environment (PyTorch 2.4 or 2.6) and ran on V100 or A100 GPUs. Every comparison in the paper is within one run, \ie between methods scored on the same generated images. Regenerating images in another environment changes per-image counts slightly through floating-point differences in attention; the same fine-only pipeline, for example, scores 0.8132--0.8135 forced OOF across runs. We therefore never compare methods across runs.
+
+\paragraph{Independent checks.}
+Each result was re-derived from the stored per-image counts by a second analyst before it entered the record, and selected runs were regenerated independently. One dependence on an unregistered detail was found: in one early screen, the promotion of a reliability operator on raw maps depends on the order in which tied candidates are visited. That operator did not survive DenseCRF and is not part of BRACE.
 
 {
     \small
