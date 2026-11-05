@@ -8112,3 +8112,92 @@ class loses 0.057 to 0.104 (Section 127). On full VOC:
 - Later SG experiments use V3+R2 (R1+R2) as the reference for new
   candidates. Each also reports R0+R2, so results stay comparable with the
   registered history.
+
+## 136. SG-real-data: the frozen BRACE pipeline on real photos (Claude on Faiz's account; 5 November 2026)
+
+**Question.** Does the working default (Section 135: A3 → V3 → R2 at 0.55),
+selected entirely on generated VOC-Sim images, transfer to real photographs?
+This is a transfer study. Nothing in the pipeline is re-selected: the CA
+modules, layer weights, SA calls 10–20, the cap, DenseCRF and the 0.55
+threshold are all frozen. Real-image val sets are never used for selection.
+
+**Data** (both git-ignored under `datasets/`):
+- PASCAL VOC 2012 trainval (official tarball, md5
+  `6cd6e144f989b92b3379bac3b3de84fd`); segmentation train 1,464 / val 1,449.
+- COCO 2017 val (5,000 images) plus annotations; train2017 is downloading for
+  later use. Semantic labels for the chosen COCO images come from
+  `scripts/prep_sg_real_data_coco.py`: 0 = background, 1–80 = COCO category
+  order, 255 = crowd. Larger instances are drawn first, so small objects stay
+  on top.
+
+**How a real photo enters the frozen 31-call PNDM trajectory**
+(`scripts/run_sg_real_data.py`, `--modes`). The photo is resized to 512²
+and VAE-encoded to z0.
+- `renoise`: every UNet input is z0 noised to that call's timestep, with one
+  fixed noise draw per image. The attention grid is aligned with the photo by
+  construction, and no image is generated.
+- `free600` / `free400`: as `renoise` until the timestep drops below t0, then
+  the sampler denoises freely.
+
+The prompt is "a photograph of a {class}" for each class present in the
+image; it is also the attribution prompt. The recorder, A3 seed and
+`sg_combined_v2.aggregate` are unchanged.
+
+**Scoring.** One binary mask per (image, class present). Maps are resized to
+the original image size, label 255 is ignored, and DenseCRF runs on the real
+photo. The metric is class-macro mIoU with counts pooled per class, as on
+VOC-Sim. Variants: CA, C16 (coarse only), V0 (fine only), V1 (coarse-to-fine
+without cap), V3 (capped), V0+R2 and V3+R2. Size thirds use the GT share of
+valid pixels.
+
+### VOC 2012 train pilot (200 seeded images, 307 pairs; `voc_train_pilot_summary.md`)
+
+Frozen τ = 0.55:
+
+| Variant | renoise | free600 | free400 |
+|---|---:|---:|---:|
+| CA seed | 0.441 | 0.404 | 0.437 |
+| coarse only | 0.466 | 0.453 | 0.469 |
+| fine only | 0.468 | 0.456 | 0.470 |
+| fine only + CRF (R0+R2) | **0.475** | **0.470** | **0.478** |
+| BRACE raw (V3) | 0.412 | 0.424 | 0.413 |
+| BRACE + CRF (V3+R2) | 0.416 | 0.438 | 0.417 |
+
+Findings:
+1. **V3+R2 does not transfer.** It trails R0+R2 by 3–6 points in every mode,
+   reversing the VOC-Sim order (0.829 vs 0.823).
+2. **The cause is small objects.** On the smallest third (free400), V3+R2
+   scores 0.056 against 0.090 for R0+R2. On the largest third they are equal
+   (0.765 vs 0.771), and coarse-only scores 0.776. The 16-px envelope cannot
+   represent small objects, so the cap removes them.
+3. **The threshold shifts.** The best grid τ (diagnostic, in sample) is 0.70
+   for the hierarchy and 0.65 for fine only. At those thresholds V3+R2 is
+   within one point of R0+R2 (0.495 vs 0.505, free400).
+4. **Entry mode is immaterial.** The three modes are within one point for
+   R0+R2, so `renoise` (no extra parameter) is the default from here on.
+5. **The absolute level is far below VOC-Sim:** about 0.48 against 0.82 for
+   the same frozen R0+R2.
+
+### COCO val2017, 200-image set (619 pairs) — running
+
+The 200 images cover all 80 classes, with at least 2 images per class
+(median 5; person 108). Selection is seeded, rarest class first, and the rest
+is filled at random (`coco_val200_ids.txt`). The run uses `renoise` only.
+Results will be reported for all 80 classes and for the 20 VOC-equivalent
+classes, and will be appended to this section.
+
+### Open checks before any paper claim
+- **Methodology control.** Run VOC-Sim's own generated images through the
+  `renoise` path. A large drop from 0.823/0.829 would mean the entry method,
+  not the photos, causes the gap. One suspect: the A3 seed averages all
+  31 calls, including t ≈ 958, where z_t is about 99% noise.
+- **Visual check.** Decode the x0-prediction at SA calls 10–20 for a few
+  photos, to confirm that the attention is computed on the photo's content.
+- **Published baselines** (OVAM/DAAM-style class-word) on the same real-image
+  protocol, so the real-image numbers have a reference.
+- Only then: frozen VOC val, plus a variant with τ re-selected on VOC train.
+
+**Provenance.** The VOC pilot was run from a local copy of the runner that
+differs from `scripts/run_sg_real_data.py` only in paths and the dataset
+switch. The COCO prep script reproduces the local image list, class list and
+all 200 label PNGs byte for byte.
