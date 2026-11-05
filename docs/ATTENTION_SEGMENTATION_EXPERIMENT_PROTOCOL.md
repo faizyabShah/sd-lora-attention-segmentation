@@ -8201,3 +8201,159 @@ classes, and will be appended to this section.
 differs from `scripts/run_sg_real_data.py` only in paths and the dataset
 switch. The COCO prep script reproduces the local image list, class list and
 all 200 label PNGs byte for byte.
+
+## 137. SG-real-atlas registration: which attention is trustworthy on real photos (Claude on Faiz's account; 5 November 2026)
+
+**Goal.** Run one replay-complete capture on real and generated images, and
+use it to find out, without masks, which semantic attention and which spatial
+affinities can be trusted for a particular object in a particular image. The
+pipeline studied is the frozen working default (Section 135) and the fine-only
+reference. The study is diagnostic first. A method is designed only after the
+atlas supports one.
+
+**Inference rules may use only the image and the queried class names.**
+Ground truth (masks, sizes, GT-derived seeds and thresholds) is used for
+scoring and diagnostics only, never as input to an inference rule. Size
+strata are defined from GT for reporting only.
+
+### Image sets
+
+| Set | Images | Role |
+|---|---|---|
+| D: VOC 2012 train discovery | 200 (Section 136 pilot ids; 307 pairs, 20 classes) | Exploration and selection |
+| S: VOC 2012 train sealed | 300 more train images, seeded, disjoint from D | Confirmation of frozen candidates only. Captured now, not analysed until candidates are frozen |
+| C: COCO val2017 | 200 (Section 136 set; 619 pairs, 80 classes) | Transfer only, never used to keep or drop anything. Partial results were inspected in Section 136, so it is an **existing transfer diagnostic**, not untouched |
+| G: VOC-Sim generated | 100 (5 per class, seeded) | Generation-to-inversion control |
+| F: VOC 2012 val | 1,449 | One final frozen evaluation; not captured here |
+
+**Folds (D and S).** Five folds, **grouped by photograph**: all pairs of one
+photo share a fold. Classes are stratified greedily subject to that
+constraint. Comparisons are paired at image level, and the metric is
+class-pooled IoU; image-level bootstrap CIs resample photographs.
+
+### Conditions captured per image–class pair
+
+| Condition | Sets | Detail level |
+|---|---|---|
+| `renoise` noise 0: the exact Section 136 path, i.e. the replay reference | all | full |
+| `ddim`: DDIM inversion with the empty prompt at the 30 unique PNDM timesteps; attention read at the inverted latents, call-for-call at the same timesteps | all | full |
+| `generate`: the original SD1.5 generation from the released prompt and seed | G only | full |
+| `renoise` noise 1, noise 2 | all | lite |
+| Views: four overlapping quadrants (0.6 side) and one centre crop (0.6), each resized to 512; one attention-guided crop (0.5 side, centred on the argmax of the reference A3 seed, so label-free) | all | lite |
+| Prompts: "a photo of the {class}"; "a photograph of a {class} and background"; multi-class "a photograph of a {c1}, a {c2} and a {c3}" (queried class names only; skipped when only one class is queried) | all | lite |
+
+The full and lite levels differ only in what is stored. Every condition runs
+the unchanged recorder and A3 seed, and computes fine-only (V0), coarse-only
+(C16), uncapped (V1) and capped (V3) maps live.
+
+**Reconstruction diagnostics** (per image): PSNR, SSIM and LPIPS (alex) of
+the VAE-only reconstruction and of the DDIM invert-then-reconstruct image
+against the input; for G, also against the generated image.
+
+### Storage and replay matrix
+
+| Stored tensor (fp16 unless noted) | Where | Supports |
+|---|---|---|
+| SA Q/K of the 3 BRACE modules (16/32/64), calls 10–20, per head | full conditions; DDIM Q/K only for D and G | Exact replay of V0/V1/V3, same-observation propagation; every per-head or per-call graph method; label-free R/L; oracle-seed factorial; spectral and cut analyses |
+| SA Q/K of all 16 SA modules, calls 10–20 | renoise, first 50 images of D | Module-level graph atlas beyond the BRACE modules |
+| Live per (SA module, call 0–30, head): R(A,M) and L(A,M) for GT masks at native resolution (fractional occupancy), plus the eroded/dilated variants | full conditions | Graph-alignment atlas over all modules and timesteps (diagnostic) |
+| Live label-free R/L with the pair's own A3 seed in place of M, from a second identical pass once the seed is known | renoise full | Label-free reliability scores over all modules and calls |
+| CA class-token logits, per-pixel log-sum-exp, ‖q‖ per head; ‖k_class‖ and ‖v_class W_o^h‖ per head | renoise full, all 16 CA modules × 31 calls | Exact softmax probabilities, logits, query–key cosine and projected contribution magnitude for any module/head/call window |
+| CA head-mean probabilities for SOT, every content token, EOT and pads 1–4 | full; lite stores the class token plus the prompt's content tokens | Token contrast and competition |
+| Live maps: A3 seed, C16, V0, V1, V3 (64²), plus A3 per-call layer weights | every condition | CRF scoring (on CPU afterwards), view and prompt fusion, noise stability |
+| Crop boxes, timesteps, noise seeds, prompts and token positions | every condition | Unambiguous indexing |
+
+Definitions:
+- **R and L.** A is row-stochastic, with row i giving where pixel i draws
+  from, so propagation is y = A s. For a soft mask m:
+  R = Σᵢ mᵢ (A m)ᵢ / Σᵢ mᵢ and L = Σᵢ (1 − mᵢ)(A m)ᵢ / Σᵢ (1 − mᵢ).
+  For binary m these are the registered R(A,M) and L(A,M).
+- **Spectra and cuts** use the symmetrized affinity W = (A + Aᵀ)/2 and the
+  normalized Laplacian I − D^{-1/2} W D^{-1/2}. The directed R/L are always
+  reported alongside, and the directed transition matrix is never treated as
+  having an orthogonal eigenbasis.
+- **The ‖v W_o‖-weighted map** is a projected contribution magnitude, not a
+  causal effect.
+
+**Replay checks before the full run.**
+- On the smoke images, V0/V3 rebuilt from the stored Q/K must match the live
+  maps exactly on the same device. Against the Section 136 counts (V100) and
+  the VOC-Sim runs, maps and IoUs must agree within the usual cross-GPU
+  tolerance, which is reported.
+- DenseCRF uses the frozen OVAM parameters, at original resolution, on the
+  input photo.
+
+### Analyses (exploratory on D, unless marked confirmatory)
+1. **CA atlas.** For each module × head × call and each signal (probability,
+   logit, query cosine, contribution magnitude, other tokens):
+   - AP and best IoU;
+   - precision and recall at the F1-optimal threshold and at the
+     area-matched threshold;
+   - mass precision and coverage recall;
+   - where false positives fall: other annotated objects or background.
+
+   Everything is stratified by GT size and condition.
+2. **Graph-alignment atlas.** R and L by module, head, call, scale, size and
+   condition, and the partial-occupancy effect at each resolution.
+3. **Oracle-seed factorial** (diagnostic). Exact, eroded, dilated and
+   point-derived GT seeds through each SA resolution, fine-only, the
+   uncapped hierarchy and the capped hierarchy. It reports foreground
+   preservation, leakage and IoU, and attributes errors to seeding, graph
+   transport, resolution, threshold calibration or reconstruction mismatch.
+4. **Generation-to-inversion control (G).** `generate` vs `renoise` vs
+   `ddim` for every variant, together with the reconstruction metrics.
+5. **Label-free score validation.** Pre-registered scores:
+   - S1 conductance (W);
+   - S2 spectral energy;
+   - S3 image-edge agreement;
+   - S4 noise stability;
+   - S5 prompt stability;
+   - S6 view consistency;
+   - S7 CA–SA agreement;
+   - S8 token contrast;
+   - S9 label-free R/L.
+
+   Each is tested on whether it predicts: GT segmentation quality; which of
+   two candidate masks is better; which SA scale, head or window improves
+   propagation; and the realized held-out gain of choosing by it. Statistics:
+   Pearson, Spearman, pairwise selection AUC, and fold-held-out mIoU of the
+   selected rule. The null controls are mask area and mean confidence.
+
+**Pre-registered hypotheses.** M1–M8 of the design discussion:
+- M1 alternative CA signals and windows;
+- M2 per-image head weights;
+- M3 spectral seed cleaning;
+- M4 per-image score-based selection;
+- M5 multi-view fusion;
+- M6 token competition;
+- M7 noise and prompt ensembles;
+- M8 DDIM entry.
+
+The priority hypothesis is **H\*: class-conditioned propagation
+reliability.** Estimate per image, from the A3 seed, which SA heads, calls
+and scales retain the seeded object and leak little (S9). Then weight or
+gate transport by that estimate (reliability-aware semantic transport). The
+operator is not fixed until the atlas supports it. Any idea that arises
+after inspecting the atlas is labelled **post-hoc**.
+
+### Decision rules
+- **Discovery (D).** A candidate goes to confirmation only if it beats
+  R0+R2 by grouped 5-fold out-of-fold class-pooled mIoU, wins ≥4/5 folds,
+  and has a photo-bootstrap CI above 0. At most **5 frozen candidates**
+  advance, to limit selection bias.
+- **Confirmation (S).** Each frozen candidate is evaluated once. It passes if
+  its paired photo-bootstrap CI against R0+R2 is above 0. C is reported as
+  transfer, without veto.
+- **Final.** Passing candidates run once on F (VOC val, frozen).
+- **Reporting.** Every result reports precision, recall, size strata and
+  false-positive type, alongside R0+R2 and V3+R2.
+
+### Compute and storage
+- The capture runs on renyi (2× A100), resumable. Each pair is written to a
+  temporary directory and renamed atomically when complete, and existing
+  pairs are skipped.
+- A smoke test of 6 images (2 from D, 2 from C, 2 from G) measures UNet,
+  extraction and write time separately, peak memory and bytes per pair. The
+  full run is submitted only after the replay checks pass. The expected
+  total is about 300 GB.
+- CRF scoring and all analyses run on the CPU nodes.
