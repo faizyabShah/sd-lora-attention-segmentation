@@ -8357,3 +8357,39 @@ after inspecting the atlas is labelled **post-hoc**.
   full run is submitted only after the replay checks pass. The expected
   total is about 300 GB.
 - CRF scoring and all analyses run on the CPU nodes.
+
+### 137a. Smoke test, gate and launch (5 November 2026)
+
+**Smoke test.** A V100 run on 1 D pair (2007_001073, cow) and 1 G pair
+(ovam-voc-sim-2, aeroplane), checked with
+`scripts/check_sg_real_atlas_replay.py --gate`.
+- **Same-run replay.** Rebuilding V0/V1/V3 from the stored Q/K and A3 seed
+  matches the live maps to ≤ 7.7×10⁻⁷ (min-max scale) for `renoise/n0`,
+  `ddim` and `generate`.
+- **Against Section 136.** The real pair's IoU@0.55 is identical: V0 0.8118,
+  V3 0.7798 (same GPU type).
+- **Against SG-combined-v2.** `generate` gives V0 0.93487 against 0.93487,
+  and V3 0.9177 against 0.9187.
+- **Reconstruction.** The G image reaches 33.3 dB / SSIM 0.913 / LPIPS 0.032
+  through the VAE, and 30.0 / 0.877 / 0.053 through DDIM inversion. The VOC
+  photo reaches 19.5 dB through the VAE and 19.3 dB through DDIM, so inversion
+  adds almost no error on top of the VAE.
+- **One-image hint** (not evidence). On the G pair, V0/V3 score
+  0.935/0.918 under `generate`, 0.912/0.878 under `renoise` and 0.941/0.923
+  under `ddim`.
+- **Cost.** About 290 s per pair on a V100 (13 conditions at roughly 20 s
+  each), with peak GPU memory of 6.9 GB.
+- **Storage per pair, by component:** base 247 MB, all-module Q/K 508 MB,
+  DDIM Q/K 101 MB, generate 175 MB.
+
+**Gate.** Every correctness check passed. Storage failed: the projection is
+460 GB against a 400 GB limit. **The owner (Faiz) accepted 460 GB**, and the
+gate limit is now 500 GB. The full capture was submitted without changes to
+any design or decision rule: 4 shards, each a chain of three 12-hour jobs, on
+any GPU node except wald. Output goes to `/home/shafa/sg_real_atlas`
+(git-ignored).
+
+**Section 136 COCO set, stopped early.** On the owner's decision, the run
+stopped after 321/619 pairs (78 classes). At τ = 0.55, R0+R2 scores 0.171 and
+V3+R2 0.155. On the 20 VOC-equivalent classes (146 pairs) they score 0.267
+and 0.245.

@@ -1,0 +1,93 @@
+{
+ "D": [
+  {
+   "set": "D",
+   "image": "2007_001073",
+   "dataset": "voc",
+   "classes": [
+    10
+   ],
+   "fold": 3,
+   "all_qk": true,
+   "ddim_qk": true
+  },
+  {
+   "set": "D",
+   "image": "2007_000170",
+   "dataset": "voc",
+   "classes": [
+    5,
+    15
+   ],
+   "fold": 4,
+   "all_qk": true,
+   "ddim_qk": true
+  }
+ ],
+ "C": [
+  {
+   "set": "C",
+   "image": "000000003501",
+   "dataset": "coco",
+   "classes": [
+    46,
+    51
+   ],
+   "ddim_qk": false
+  },
+  {
+   "set": "C",
+   "image": "000000011760",
+   "dataset": "coco",
+   "classes": [
+    23
+   ],
+   "ddim_qk": false
+  }
+ ],
+ "G": [
+  {
+   "set": "G",
+   "image": "ovam-voc-sim-2",
+   "dataset": "vocsim",
+   "classes": [
+    1
+   ],
+   "row": {
+    "image_id": "ovam-voc-sim-2",
+    "classname": "aeroplane",
+    "prompt": "A photograph of a aeroplane",
+    "model": "runwayml/stable-diffusion-v1-5",
+    "seed": "1900203331",
+    "num_inferece_steps": "30",
+    "annotated": "True",
+    "image": "images/aeroplane_sd15_seed1900203331.png",
+    "annotation": "annotations/aeroplane_sd15_seed1900203331_annotation.png",
+    "attribution_prompt": "A photograph of a aeroplane"
+   },
+   "ddim_qk": true
+  },
+  {
+   "set": "G",
+   "image": "ovam-voc-sim-6",
+   "dataset": "vocsim",
+   "classes": [
+    1
+   ],
+   "row": {
+    "image_id": "ovam-voc-sim-6",
+    "classname": "aeroplane",
+    "prompt": "A photograph of a aeroplane",
+    "model": "runwayml/stable-diffusion-v1-5",
+    "seed": "2441484091",
+    "num_inferece_steps": "30",
+    "annotated": "True",
+    "image": "images/aeroplane_sd15_seed2441484091.png",
+    "annotation": "annotations/aeroplane_sd15_seed2441484091_annotation.png",
+    "attribution_prompt": "A photograph of a aeroplane"
+   },
+   "ddim_qk": true
+  }
+ ],
+ "S": []
+}
