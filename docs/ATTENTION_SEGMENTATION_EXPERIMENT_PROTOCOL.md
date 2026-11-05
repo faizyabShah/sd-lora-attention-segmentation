@@ -8393,3 +8393,21 @@ any GPU node except wald. Output goes to `/home/shafa/sg_real_atlas`
 stopped after 321/619 pairs (78 classes). At τ = 0.55, R0+R2 scores 0.171 and
 V3+R2 0.155. On the 20 VOC-equivalent classes (146 pairs) they score 0.267
 and 0.245.
+
+### 137b. Capture narrowed to D+G (6 November 2026)
+
+**Why.** Each pair runs 14 full 31-call trajectories with recording, about 17 s
+each on a V100, or ~240 s per pair. Writing to disk takes ~5 s per pair, so it
+is not the bottleneck. At ~73 pairs/h on 4 GPUs, the full 1,469-pair run would
+need ~28 more hours, and the slowest shard (neumann) would set the end time.
+
+**Change (owner decision).** Stopped the full chain after 253/307 D pairs
+(116 GB). Resubmitted as 12 small shards over D+G only, so whichever GPU frees
+up takes the next shard. Finished pairs are kept, and resume uses
+`done.json`.
+
+**S and C.** Not captured yet. They will be captured after the D/G analysis
+freezes at most 5 candidates (Section 137 decision rules), using only the
+conditions those candidates need. S stays sealed: no S image has been
+captured or looked at. This changes when, and with which conditions, S and C
+are captured. It does not change any decision rule.
