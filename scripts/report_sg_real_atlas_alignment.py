@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Report for SG-real-atlas analyses 2-4 + spectral (Section 137), exploratory on D.
-Usage: report_sg_real_atlas_alignment.py ALIGN_DIR SPECTRAL_DIR CAPTURE_DIR OUT_MD"""
+Usage: report_sg_real_atlas_alignment.py ALIGN_DIR SPECTRAL_DIR CAPTURE_DIR OUT_MD [vocsim]
+With "vocsim", ALIGN_DIR is the output of run_sg_vocsim_alignment.py (CAPTURE_DIR unused)."""
+import zlib
 import json, sys
 from collections import defaultdict
 from pathlib import Path
@@ -13,28 +15,32 @@ from PIL import Image
 
 AL, SP, CAP, OUT = (Path(x) for x in sys.argv[1:5])
 MANIFEST = Path(__file__).resolve().parents[1] / "outputs/segmentation/sg_real_atlas/manifest.json"
+SIM = len(sys.argv) > 5 and sys.argv[5] == "vocsim"
 fold_of = {e["image"]: e["fold"] for e in json.loads(MANIFEST.read_text())["D"]}
+TAGS = ("generate", "renoise_n0", "ddim") if SIM else ("renoise_n0", "ddim")
 VOCN = ["aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog",
         "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
 W = slice(10, 21)
 L = []; w = L.append
-files = sorted((AL / "D").glob("*.npz"))
+files = sorted(f for f in (AL if SIM else AL / "D").glob("*.npz") if not f.stem.endswith(".tmp"))
 R = [np.load(f, allow_pickle=False) for f in files]
-IMG = np.array([f.stem.split("__")[0] for f in files]); FOLD = np.array([fold_of[i] for i in IMG])
+IMG = np.array([f.stem.split("__")[0] for f in files]); FOLD = np.array([zlib.crc32(i.encode()) % 5 if SIM else fold_of[i] for i in IMG])
 AREA = np.array([float(r["area_full"]) for r in R]); KCL = np.array([int(r["k"]) for r in R])
 q1, q2 = np.quantile(AREA, [1 / 3, 2 / 3]); THIRDS = {"small": AREA < q1, "medium": (AREA >= q1) & (AREA <= q2),
                                                       "large": AREA > q2}
 mods = [str(m) for m in R[0]["mods"]]; sa_mods = [str(m) for m in R[0]["sa_mods"]]
 short = lambda m: m.replace(".transformer_blocks.0.attn2", "").replace(".transformer_blocks.0.attn1", "") \
     .replace("down_blocks.", "d").replace("up_blocks.", "u").replace("mid_block", "mid").replace(".attentions.", ".")
-w(f"# SG-real-atlas alignment diagnostics on D ({len(R)} pairs, {len(set(IMG))} photos)\n")
+w(f"# SG-real-atlas alignment diagnostics on {'VOC-Sim (generated, regenerated live)' if SIM else 'D'} ({len(R)} pairs, {len(set(IMG))} images)\n")
 w("Exploratory. The real mask is only used to measure the stored attention. AUROC: 0.5 = chance, 1 = the map "
   "ranks every object pixel above every non-object pixel; it ignores the threshold. The SA window is calls 10–20 "
   f"(t ≈ 661→331). Object-size thirds cut at {q1:.3f} / {q2:.3f} of the image.\n")
 
 # seed AUROC at 64 for reference
 seed_auc = {}
-for cond in ("renoise/n0", "ddim"):
+for cond in ([t.replace("_", "/") for t in TAGS] if SIM else ()):
+    seed_auc[cond] = np.array([float(r[f"{cond.replace('/', '_')}/seed_auc"][0]) for r in R])
+for cond in (() if SIM else ("renoise/n0", "ddim")):
     v = []
     for f, r in zip(files, R):
         iid, k = f.stem.split("__"); lab = np.asarray(Image.open(VOC / f"SegmentationClass/{iid}.png"))
@@ -46,7 +52,7 @@ for cond in ("renoise/n0", "ddim"):
 # ------------------------------------------------------------------ 1. CA atlas
 w("## 1. Cross-attention atlas (class token)\n")
 SIG = ("prob", "logit", "cos", "|q|")
-for cond in ("renoise_n0", "ddim"):
+for cond in TAGS:
     A = np.stack([r[f"{cond}/ca_auc"] for r in R])              # [P,4,M,31,8]
     w(f"### {cond}\n")
     w(f"A3 seed AUROC (the pipeline's CA seed, 64 px): {np.nanmean(seed_auc[cond.replace('_', '/')]):.3f}\n")
@@ -98,7 +104,7 @@ w("keep = share of a mask pixel's attention that lands inside the mask; leak = t
   "Chance for both is the mask area a. Reported: keep lift (keep − a)/(1 − a) (1 = perfect), leak ratio leak / a "
   "(0 = no leak, 1 = chance), for the exact, eroded (interior) and dilated (+2 px at 64) masks.\n")
 AR = np.stack([r["area"][3] for r in R])                          # [P,3] (scale-invariant)
-for cond in ("renoise_n0", "ddim"):
+for cond in TAGS:
     RL = np.stack([r[f"{cond}/rl"] for r in R])                   # [P,16,31,8,3,2]
     w(f"### {cond}\n")
     w("| module | side | keep lift exact | leak ratio exact | keep lift eroded | leak ratio dilated | head spread (keep lift) |")
@@ -123,7 +129,7 @@ for cond in ("renoise_n0", "ddim"):
 
 # ------------------------------------------------------------------ 3. diffusion
 w("## 3. How many propagation steps? (y_t = A^t seed, head-mean A, averaged over the 11 calls)\n")
-for cond in ("renoise_n0", "ddim"):
+for cond in TAGS:
     w(f"### {cond}\n")
     w("| side | metric | " + " | ".join(f"t={t}" for t in range(9)) + " |\n|---|---|" + "---:|" * 9)
     for s in (16, 32, 64):
@@ -143,8 +149,8 @@ for cond in ("renoise_n0", "ddim"):
     w("")
 
 # ------------------------------------------------------------------ 4. spectral
-w("## 4. Spectral structure of the SA graphs (first 50 photos, renoise/n0)\n")
-sf = sorted(SP.glob("*.npz"))
+w("## 4. Spectral structure of the SA graphs (" + ("VOC-Sim, " + ("generate" if SP.name.endswith("_gen") else "renoise/n0") if SIM else "first 50 photos, renoise/n0") + ")\n")
+sf = sorted(f for f in SP.glob("*.npz") if not f.stem.endswith(".tmp"))
 if sf:
     S = [np.load(f) for f in sf]; SA_ = np.array([float(s["area"]) for s in S])
     agg = defaultdict(list)
@@ -201,17 +207,47 @@ for v in E[0]:
 w("\nInstance coverage (share of each instance's pixels predicted), by instance size as a share of the image:\n")
 w("| variant | <1% | 1–5% | 5–20% | >20% | instances missed (<10% covered) |\n|---|---:|---:|---:|---:|---:|")
 for v in E[0]:
-    rows = [(n / max(int(np.asarray(Image.open(VOC / f"SegmentationClass/{f.stem.split('__')[0]}.png")).size), 1), c)
-            for f, e in zip(files, E) for n, c in e[v]["instances"]]
+    rows = [((float(r["area_full"]) if SIM else n / max(int(np.asarray(Image.open(VOC / f"SegmentationClass/{f.stem.split('__')[0]}.png")).size), 1)), c)
+            for f, e, r in zip(files, E, R) for n, c in e[v]["instances"]]
     sz = np.array([x[0] for x in rows]); cv = np.array([x[1] for x in rows])
     bins = [(0, .01), (.01, .05), (.05, .2), (.2, 1.1)]
     w(f"| {v} | " + " | ".join(f"{cv[(sz >= lo) & (sz < hi)].mean():.2f} (n={((sz >= lo) & (sz < hi)).sum()})" for lo, hi in bins)
       + f" | {(cv < .1).mean():.0%} of {len(cv)} |")
-w("\nMost FP pixels on another object (n0_V0R2), target → other class: ")
-conf = defaultdict(int)
-for e, k in zip(E, KCL):
+if SIM:
+    w("\nVOC-Sim masks have one object class, so 'other object' is always 0.\n")
+    w("## 6. Map scores on VOC-Sim (class-macro mIoU over 20 classes)\n")
+    THR = np.round(0.30 + 0.025 * np.arange(17), 3); TC = (0.50, 0.55, 0.60, 0.65, 0.70)
+    CLS = np.array([str(r["classname"]) for r in R])
+    def miou(key, sel=None):
+        C = np.stack([r[f"counts/{key}"] for r in R]); sel = np.ones(len(R), bool) if sel is None else sel
+        out = []
+        for c in np.unique(CLS):
+            x = C[sel & (CLS == c)].sum(0); out.append(x[:, 0] / np.maximum(x[:, 0] + x[:, 1] + x[:, 2], 1))
+        return np.mean(out, 0)
+    def oof(key):
+        g = THR if C_(key) == 17 else np.array(TC); tot = []
+        C = np.stack([r[f"counts/{key}"] for r in R])
+        cnt = defaultdict(lambda: np.zeros((len(g), 4)))
+        for fo in range(5):
+            j = int(np.argmax(miou(key, FOLD != fo)))
+            for c in np.unique(CLS):
+                cnt[c][0] += C[(FOLD == fo) & (CLS == c), j].sum(0)
+        return np.mean([x[0, 0] / max(x[0, 0] + x[0, 1] + x[0, 2], 1) for x in cnt.values()])
+    C_ = lambda key: R[0][f"counts/{key}"].shape[0]
+    w("| condition | map | best τ | mIoU at best τ | OOF mIoU | mIoU at τ 0.55 | mIoU at τ 0.65 |\n|---|---|---:|---:|---:|---:|---:|")
+    for t in TAGS:
+        cond = t.replace("_", "/")
+        for m in ("A3", "C16", "V0", "V1", "V3", "V0+R2", "V3+R2"):
+            key = f"{cond}/{m}"; g = THR if C_(key) == 17 else np.array(TC); mi = miou(key)
+            i55, i65 = int(np.argmin(abs(g - .55))), int(np.argmin(abs(g - .65)))
+            w(f"| {t} | {m} | {g[mi.argmax()]:.3f} | {mi.max():.3f} | {oof(key):.3f} | {mi[i55]:.3f} | {mi[i65]:.3f} |")
+    w("")
+for _ in (() if SIM else (0,)):
+  w("\nMost FP pixels on another object (n0_V0R2), target → other class: ")
+  conf = defaultdict(int)
+  for e, k in zip(E, KCL):
     for c, n in e["n0_V0R2"]["fp_other_by_class"].items():
         conf[(VOCN[k - 1], VOCN[int(c) - 1])] += n
-tot = sum(conf.values())
-w(", ".join(f"{a}→{b} {n / tot:.0%}" for (a, b), n in sorted(conf.items(), key=lambda x: -x[1])[:12]) + "\n")
+  tot = sum(conf.values())
+  w(", ".join(f"{a}→{b} {n / tot:.0%}" for (a, b), n in sorted(conf.items(), key=lambda x: -x[1])[:12]) + "\n")
 OUT.write_text("\n".join(L) + "\n"); print("\n".join(L))
