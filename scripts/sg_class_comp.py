@@ -50,11 +50,15 @@ def norm(x, how):
 def variants(seeds, raw, target, voc, joint):
     """seeds: word -> [64,64] min-max A3; raw: word -> un-normalised A3 sum (CA softmax probability scale).
     Returns name -> seed [64,64], each min-max normalised before propagation."""
-    out = {"base": seeds[target], "joint": joint}
-    others = [w for w in voc if w != target]
-    peak = {w: float(raw[w].max()) for w in others}
-    top3 = sorted(others, key=lambda w: -peak[w])[:3]          # label-free: strongest competitors in this image
-    sets = {"voc": others, "gen": GENERIC, "top3": top3}
+    out = {"base": seeds[target]}
+    if joint is not None:
+        out["joint"] = joint
+    sets = {"gen": GENERIC}
+    if voc:
+        others = [w for w in voc if w != target]
+        peak = {w: float(raw[w].max()) for w in others}
+        sets["voc"] = others
+        sets["top3"] = sorted(others, key=lambda w: -peak[w])[:3]   # label-free: strongest competitors here
     for how in ("mm", "raw"):
         src = seeds if how == "mm" else raw
         s = src[target]
@@ -154,6 +158,80 @@ def capture(a):
         print(f"[comp:{a.set}] {iid} {len(ks)} pairs {time.perf_counter() - t0:.0f}s", flush=True)
 
 
+# ------------------------------------------------------------------ capture on generated sets (GPU)
+def gen_rows(dataset):
+    import csv
+    d = st.VS if dataset == "voc" else st.VS.parent / "coco_captions"
+    f = d / ("ovam_voc_sim.csv" if dataset == "voc" else "ovam_coco_cap.csv")
+    with f.open(newline="", encoding="utf-8") as h:
+        rows = [r for r in csv.DictReader(h) if r["annotated"].lower() == "true"]
+    for r in rows:
+        r.setdefault("attribution_prompt", r["prompt"])
+    return rows
+
+
+def capture_gen(a):
+    """VOC-Sim: the target prompt generates the image; every generic word is then run on that exact latent
+    trajectory (recorded UNet inputs, replayed call by call). COCO-Cap: the UNet is conditioned on the caption
+    and the class word only enters attribution, so each word reruns the same caption and seed (identical
+    trajectory by construction). Only the generic competitor set is used (open vocabulary)."""
+    import run_sg_real_atlas as ra
+    from scripts import sg27_runtime
+    from diffusers import StableDiffusionPipeline
+    rows = gen_rows(a.dataset)[a.shard::a.num_shards]
+    if a.max_images:
+        rows = rows[: a.max_images]
+    runtime = sg27_runtime.make_runtime(a.model); pipe = runtime["pipe"]; rc = runtime["recorder_class"]
+    extra = rc.extra_sa
+    a.out.mkdir(parents=True, exist_ok=True)
+    for n_row, row in enumerate(rows):
+        iid, cls = row["image_id"], row["classname"]
+        out = a.out / f"{iid}.npz"
+        if out.exists():
+            continue
+        t0 = time.perf_counter()
+        seq = []
+        hook = pipe.unet.register_forward_pre_hook(lambda m, args: seq.append(args[0][:1].detach().clone()))
+        try:
+            with sg27_runtime.live_maps(runtime, dict(row), a.dataset) as (sample, sa, seed, base, _p):
+                seed_t = seed.float().clone(); raw_t = runtime["recorders"][-1].sums["selected/A3"].float().clone()
+                sa_t = {s_: [(q.clone(), k.clone()) for q, k in sa[s_]] for s_ in (16, 32, 64)}
+                img = np.asarray(sample.generated_image, np.uint8).copy(); truth = np.asarray(sample.target_mask, bool)
+                from src.segmentation import sg_combined_v2
+                v2, _ = sg_combined_v2.aggregate(sa, seed); ref_v3 = v2["V3"].float().cpu().numpy()
+        finally:
+            hook.remove()
+
+        def run_word(w):
+            r = dict(row)
+            if a.dataset == "voc":
+                r.update(prompt=f"A photograph of a {w}", attribution_prompt=f"A photograph of a {w}", classname=w)
+                it = iter(seq)
+                ctx = ra.trajectory(lambda p_, t_: next(it))
+            else:
+                r.update(attribution_prompt=w, classname=w)
+                import contextlib; ctx = contextlib.nullcontext()
+            with ctx, sg27_runtime.live_maps(runtime, r, a.dataset) as (_s, _sa, sd, _b, _p):
+                return sd.float().clone(), runtime["recorders"][-1].sums["selected/A3"].float().clone()
+
+        seeds, raws = {cls: seed_t}, {cls: raw_t}
+        for w in GENERIC:
+            seeds[w], raws[w] = run_word(w)
+        check = float("nan")
+        if n_row % 20 == 0:                                    # replay / rerun reproduces the target seed?
+            s_chk, _ = run_word(cls); check = float((st.mm(s_chk.cpu().numpy()) - st.mm(seed_t.cpu().numpy())).__abs__().max())
+        V = variants(seeds, raws, cls, [], None)
+        maps = {name: propagate(sa_t, s_) for name, s_ in V.items()}
+        v3chk = float(np.abs(st.mm(maps["base"][3]) - st.mm(ref_v3)).max())
+        tmp = out.with_name(out.stem + ".tmp.npz")
+        np.savez(tmp, **{f"map/{k}": v for k, v in maps.items()}, **{f"word/{w}": x.cpu().numpy() for w, x in raws.items()},
+                 cls=cls, check=check, v3check=v3chk, truth=truth, image=img, set=a.dataset)
+        os.replace(tmp, out)
+        del sa_t; torch.cuda.empty_cache()
+        print(f"[comp-gen:{a.dataset}] {iid} {cls} replay check {check:.1e} V3 check {v3chk:.1e} "
+              f"{time.perf_counter() - t0:.0f}s", flush=True)
+
+
 # ------------------------------------------------------------------ score (CPU)
 def auroc(pos, neg):
     if len(pos) == 0 or len(neg) == 0:
@@ -193,11 +271,16 @@ def score_one(job):
     torch.set_num_threads(1)
     from src.segmentation.ovam_full import _import_densecrf, apply_ovam_densecrf
     _import_densecrf(st.CRF_SITE)
-    z = np.load(f); iid, k = f.stem.split("__"); k = int(k)
-    img = np.asarray(Image.open(st.VOC / f"JPEGImages/{iid}.jpg").convert("RGB"))
-    lab = np.asarray(Image.open(st.VOC / f"SegmentationClass/{iid}.png"))
-    truth, valid = lab == k, lab != 255
-    other = valid & (lab != 0) & ~truth; bg = lab == 0
+    z = np.load(f)
+    if "truth" in z.files:                                   # generated set: one annotated object
+        img = z["image"]; truth = z["truth"].astype(bool); valid = np.ones_like(truth)
+        other = np.zeros_like(truth); bg = ~truth
+    else:
+        iid, k = f.stem.split("__"); k = int(k)
+        img = np.asarray(Image.open(st.VOC / f"JPEGImages/{iid}.jpg").convert("RGB"))
+        lab = np.asarray(Image.open(st.VOC / f"SegmentationClass/{iid}.png"))
+        truth, valid = lab == k, lab != 255
+        other = valid & (lab != 0) & ~truth; bg = lab == 0
     rng = np.random.default_rng(zlib.crc32(f.stem.encode()))
     sub = lambda m: np.flatnonzero(m.ravel()) if m.sum() <= 20000 else rng.choice(np.flatnonzero(m.ravel()), 20000, replace=False)
     it, io, ib = sub(truth & valid), sub(other), sub(bg)
@@ -360,17 +443,78 @@ def report(a):
     a.out_md.write_text("\n".join(L) + "\n"); print("\n".join(L))
 
 
+FROZEN = "marg.5/mm/gen"      # chosen on real D, passed the S holdout
+
+
+def load_gen(d):
+    fs = sorted(f for f in d.glob("*.npz") if not f.stem.endswith(".tmp")); Z = [np.load(f) for f in fs]
+    grp = np.array([f.stem for f in fs])
+    S = {"cls": np.array([str(z["cls"]) for z in Z]), "grp": grp,
+         "fold": np.array([zlib.crc32(g.encode()) % 5 for g in grp]), "area": np.array([float(z["area"]) for z in Z])}
+    for key in Z[0].files:
+        if "|" in key:
+            S[key] = np.stack([z[key] for z in Z])
+    return S
+
+
+def report_gen(a):
+    L = []; w = L.append
+    w("# Generic-word competition on generated sets (VOC-Sim, COCO-Cap)\n")
+    w(f"Frozen variant from the real-photo test: **{FROZEN}** = A3 − ½·max over the 8 generic-word A3 seeds "
+      f"({', '.join(GENERIC)}), per-word min-max, clipped at 0. VOC-Sim: each word runs on the target's own generation "
+      "trajectory (replayed UNet inputs); COCO-Cap: each word is the attribution word on the same caption and seed. "
+      "The other generic-set variants are shown for context only. Paper protocol = V3+R2 at fixed τ 0.55; "
+      "OOF = τ chosen on 4 folds (crc32(image_id) % 5). Δ vs base with image-bootstrap 95% CI.\n")
+    i55 = int(np.flatnonzero(np.isclose(THR, 0.55))[0]); j55 = int(np.flatnonzero(np.isclose(THR_CRF, 0.55))[0])
+    for name, d in (("VOC-Sim", a.voc), ("COCO-Cap", a.coco)):
+        if d is None or not Path(d).exists() or not any(Path(d).glob("*.npz")):
+            w(f"## {name}: no scores\n"); continue
+        S = load_gen(Path(d)); allp = np.ones(len(S["cls"]), bool)
+        names = sorted({k.split("|")[0] for k in S if "|" in k}, key=lambda n: (n != "base", n != FROZEN, n))
+        w(f"## {name} ({len(S['cls'])} images, {len(np.unique(S['cls']))} classes)\n")
+        w("| variant | V3+R2 @0.55 | V3+R2 OOF | C16 OOF | P1+R2 OOF | V0 OOF | seed AUROC tgt vs bg |\n|---|---:|---:|---:|---:|---:|---:|")
+        base = {}
+        for n in names:
+            cells = []
+            for m, fixed in (("V3+R2", True), ("V3+R2", False), ("C16", False), ("P1+R2", False), ("V0", False)):
+                X = S[f"{n}|{m}|raw"]
+                if fixed:
+                    Pp = X[:, j55 if "+R2" in m else i55]; mi = miou(Pp[:, None], S["cls"], allp)[0]
+                else:
+                    mi, Pp, _ = oof(S, X)
+                key = (m, fixed)
+                if n == "base":
+                    base[key] = Pp; cells.append(f"{mi:.3f}")
+                else:
+                    dm = mi - miou(base[key][:, None], S["cls"], allp)[0]
+                    lo, hi = boot(S, Pp, base[key], n=2000 if n == FROZEN else 300)
+                    cells.append(f"{mi:.3f} ({dm:+.3f}; {lo:+.3f}…{hi:+.3f})")
+            sep = np.nanmean(S[f"{n}|seed|sep"][:, 1])
+            w(f"| {'**' + n + '**' if n == FROZEN else n} | " + " | ".join(cells) + f" | {sep:.3f} |")
+        X = S[f"{FROZEN}|V3+R2|raw"]; B = S["base|V3+R2|raw"]
+        w("\nPer-class V3+R2 @0.55 (base → frozen): " + ", ".join(
+            f"{c} {miou(B[:, j55:j55+1], S['cls'], S['cls'] == c)[0]:.2f}→{miou(X[:, j55:j55+1], S['cls'], S['cls'] == c)[0]:.2f}"
+            for c in np.unique(S["cls"])) + "\n")
+    a.out_md.write_text("\n".join(L) + "\n"); print("\n".join(L))
+
+
 def main():
     ap_ = argparse.ArgumentParser(); sub = ap_.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("capture"); p.add_argument("--set", default="D"); p.add_argument("--shard", type=int, default=0)
     p.add_argument("--num-shards", type=int, default=1); p.add_argument("--max-images", type=int)
     p.add_argument("--out", type=Path, required=True); p.add_argument("--model", default="stable-diffusion-v1-5/stable-diffusion-v1-5")
+    p = sub.add_parser("capture-gen"); p.add_argument("--dataset", choices=("voc", "coco"), required=True)
+    p.add_argument("--shard", type=int, default=0); p.add_argument("--num-shards", type=int, default=1)
+    p.add_argument("--max-images", type=int); p.add_argument("--out", type=Path, required=True)
+    p.add_argument("--model", default="stable-diffusion-v1-5/stable-diffusion-v1-5")
+    p = sub.add_parser("report-gen"); p.add_argument("--voc", type=Path); p.add_argument("--coco", type=Path)
+    p.add_argument("out_md", type=Path)
     p = sub.add_parser("score"); p.add_argument("maps", type=Path); p.add_argument("out", type=Path)
     p.add_argument("--workers", type=int, default=16)
     p = sub.add_parser("report"); p.add_argument("--D", type=Path); p.add_argument("--S", type=Path)
     p.add_argument("out_md", type=Path)
     a = ap_.parse_args()
-    {"capture": capture, "score": score, "report": report}[a.cmd](a)
+    {"capture": capture, "capture-gen": capture_gen, "score": score, "report": report, "report-gen": report_gen}[a.cmd](a)
 
 
 if __name__ == "__main__":
