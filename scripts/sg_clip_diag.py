@@ -170,12 +170,83 @@ def report(a):
     a.report.write_text("\n".join(L) + "\n"); print("\n".join(L))
 
 
+# ------------------------------------------------------------------ confirmation on fresh set F (pre-registered)
+FROZEN_TAU = {("clip", "C16"): 0.575, ("comp", "C16"): 0.50, ("base", "V3+R2"): 0.70}   # fitted on all of D
+
+
+def merge_f(a):
+    """Keep only the pre-registered variants and add SCLIP's own prediction (binary, full size)."""
+    a.out.mkdir(parents=True, exist_ok=True); n = 0
+    for f in sorted(a.src.glob("*.npz")):
+        if f.stem.endswith(".tmp"):
+            continue
+        out = a.out / f.name
+        if out.exists():
+            continue
+        z = np.load(f); iid, k = f.stem.split("__"); k = int(k)
+        sc = (np.load(a.clip / f"{iid}__B16.npz")["pred21"] == k).astype(np.float32)
+        tmp = out.with_name(out.stem + ".tmp.npz")
+        np.savez(tmp, **{"map/base": z["map/base"], "map/comp": z["map/marg.5/mm/gen"], "map/clip": z["map/clip"],
+                         "map/sclip": np.repeat(sc[None], 5, 0)}, cls=z["cls"], k=k, check=z["check"], set="F")
+        os.replace(tmp, out); n += 1
+    print(n, "merged", flush=True)
+
+
+def confirm(a):
+    import sg_class_comp as cc
+    S = cc.load(a.scores, "F"); n = len(S["cls"]); ones = np.ones(n, bool); L = []; w = L.append
+    fixed = lambda v, m, t: S[f"{v}|{m}|raw"][:, int(np.argmin(np.abs((cc.THR_CRF if "+R2" in m else cc.THR) - t)))]
+    P = {("clip", "C16"): fixed("clip", "C16", .575), ("comp", "C16"): fixed("comp", "C16", .50),
+         ("base", "V3+R2"): fixed("base", "V3+R2", .70), ("sclip", "R2"): S["sclip|V3+R2|raw"][:, 0],
+         ("sclip", "standalone"): S["sclip|seed|raw"][:, 0]}
+    mi = lambda X, sel=ones: cc.miou(X[:, None], S["cls"], sel)[0]
+    w("# Confirmation on fresh real VOC photos (F): CLIP seed + SD propagation\n")
+    w(f"Pre-registered in `clip_confirm_prereg.md` (committed before the run). F: {n} pairs, "
+      f"{len(np.unique(S['grp']))} photos, never used before. All thresholds fixed on D; nothing fitted on F "
+      "except the secondary OOF column.\n")
+    w("| pipeline | τ (from D) | mIoU on F | prec / rec / FP-on-other |"); w("|---|---:|---:|---|")
+    for key, t in ((("clip", "C16"), "0.575"), (("sclip", "R2"), "—"), (("sclip", "standalone"), "—"),
+                   (("comp", "C16"), "0.50"), (("base", "V3+R2"), "0.70")):
+        pr, rc, fo = cc.prf(P[key])
+        w(f"| {key[0]} {key[1]} | {t} | {mi(P[key]):.3f} | {pr:.3f} / {rc:.3f} / {fo:.0%} |")
+    d = mi(P[("clip", "C16")]) - mi(P[("sclip", "R2")]); lo, hi = cc.boot(S, P[("clip", "C16")], P[("sclip", "R2")])
+    w(f"\n**Primary (registered):** clip C16 − SCLIP + R2 = {d:+.3f} (photo-bootstrap 95% CI {lo:+.3f}…{hi:+.3f}) → "
+      f"**{'CONFIRMED' if lo > 0 else 'NOT CONFIRMED'}**.\n")
+    w("## Secondary\n"); w("| comparison | Δ | 95% CI |"); w("|---|---:|---|")
+    for b in (("sclip", "standalone"), ("comp", "C16"), ("base", "V3+R2")):
+        d = mi(P[("clip", "C16")]) - mi(P[b]); lo, hi = cc.boot(S, P[("clip", "C16")], P[b])
+        w(f"| clip C16 − {b[0]} {b[1]} | {d:+.3f} | {lo:+.3f}…{hi:+.3f} |")
+    w("\nOOF within F (τ chosen on 4 F folds): " + ", ".join(
+        f"{v} {m} {cc.oof(S, S[f'{v}|{m}|raw'])[0]:.3f}" for v, m in
+        (("clip", "C16"), ("clip", "V3+R2"), ("clip", "P1+R2"), ("comp", "C16"), ("base", "V3+R2"), ("sclip", "V3+R2"))) + "\n")
+    ho = S["has_other"]
+    w("Seed-level AUROC (tgt vs other / tgt vs bg): " + ", ".join(
+        f"{v} {np.nanmean(S[f'{v}|seed|sep'][ho, 0]):.3f} / {np.nanmean(S[f'{v}|seed|sep'][:, 1]):.3f}"
+        for v in ("base", "comp", "clip")) + "\n")
+    w("## By object size (fixed-τ IoU, class-macro within bin)\n")
+    keys = [("clip", "C16"), ("sclip", "R2"), ("comp", "C16"), ("base", "V3+R2")]
+    w("| bin | n | " + " | ".join(f"{v} {m}" for v, m in keys) + " |"); w("|---|---:|" + "---:|" * len(keys))
+    for lo_, hi_, nm in ((0, .01, "<1%"), (.01, .05, "1–5%"), (.05, .2, "5–20%"), (.2, 1.01, ">20%")):
+        sel = (S["area"] >= lo_) & (S["area"] < hi_)
+        if sel.any():
+            w(f"| {nm} | {sel.sum()} | " + " | ".join(f"{mi(P[x], sel):.3f}" for x in keys) + " |")
+    w("\n## Per class (clip C16 / SCLIP + R2 / comp C16)\n")
+    w(", ".join(f"{c} {mi(P[('clip', 'C16')], S['cls'] == c):.2f} / {mi(P[('sclip', 'R2')], S['cls'] == c):.2f} / "
+                f"{mi(P[('comp', 'C16')], S['cls'] == c):.2f}" for c in np.unique(S["cls"])) + "\n")
+    a.report.write_text("\n".join(L) + "\n"); print("\n".join(L))
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); sub = ap.add_subparsers(dest="cmd", required=True)
+    p = sub.add_parser("merge-f"); p.add_argument("--src", type=Path, default=Path("/home/shafa/sg_comp/F_maps"))
+    p.add_argument("--clip", type=Path, default=Path("/home/shafa/sg_comp/clip_F"))
+    p.add_argument("--out", type=Path, default=Path("/home/shafa/sg_comp/clipconf_F_maps"))
+    p = sub.add_parser("confirm"); p.add_argument("--scores", type=Path, default=Path("/home/shafa/sg_comp/clipconf_F_scores"))
+    p.add_argument("--report", type=Path, default=ROOT / "outputs/segmentation/sg_real_atlas/analysis/clip_confirm_F.md")
     p = sub.add_parser("build"); p.add_argument("--src", type=Path, default=Path("/home/shafa/sg_comp/D_maps"))
     p.add_argument("--out", type=Path, default=Path("/home/shafa/sg_comp/clipdiag_D_maps"))
     p.add_argument("--workers", type=int, default=8); p.add_argument("--max-pairs", type=int)
     p = sub.add_parser("report"); p.add_argument("--scores", type=Path, default=Path("/home/shafa/sg_comp/clipdiag_D_scores"))
     p.add_argument("--report", type=Path, default=ROOT / "outputs/segmentation/sg_real_atlas/analysis/clip_diagnostic.md")
     a = ap.parse_args()
-    {"build": build, "report": report}[a.cmd](a)
+    {"build": build, "report": report, "merge-f": merge_f, "confirm": confirm}[a.cmd](a)
