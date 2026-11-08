@@ -133,13 +133,16 @@ def capture(a):
             return seed, raw, keep
 
         seeds, raws, sas = {}, {}, {}
-        for w in vocab:
+        for w in (vocab if a.vocab == "full" else list(dict.fromkeys(list(targets) + GENERIC))):
             seeds[w], raws[w], sas_w = run(f"a photograph of a {w}", w, w in targets)
             if sas_w is not None:
                 sas[w] = sas_w
         for cls, k in targets.items():
-            joint, _, _ = run(jp, cls, False)
-            V = variants(seeds, raws, cls, voc, joint)
+            joint = run(jp, cls, False)[0] if a.vocab == "full" else None
+            V = variants(seeds, raws, cls, voc if a.vocab == "full" else None, joint)
+            if a.clip:                                      # SCLIP VOC21 class probability (sg_clip_dense capture)
+                P21 = torch.from_numpy(np.load(a.clip / f"{iid}__B16.npz")["prob21_64"][k]).float().to(seeds[cls].device)
+                V["clip"] = norm(P21, "mm")
             maps = {name: propagate(sas[cls], s) for name, s in V.items()}
             check = float("nan")
             if (stored / iid / str(k) / "maps.npz").exists():
@@ -501,6 +504,8 @@ def report_gen(a):
 def main():
     ap_ = argparse.ArgumentParser(); sub = ap_.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("capture"); p.add_argument("--set", default="D"); p.add_argument("--shard", type=int, default=0)
+    p.add_argument("--vocab", choices=("full", "gen"), default="full")   # gen: targets + generic words only, no joint
+    p.add_argument("--clip", type=Path)                                   # also propagate the dense-CLIP seed
     p.add_argument("--num-shards", type=int, default=1); p.add_argument("--max-images", type=int)
     p.add_argument("--out", type=Path, required=True); p.add_argument("--model", default="stable-diffusion-v1-5/stable-diffusion-v1-5")
     p = sub.add_parser("capture-gen"); p.add_argument("--dataset", choices=("voc", "coco"), required=True)
