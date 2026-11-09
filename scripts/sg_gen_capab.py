@@ -172,13 +172,89 @@ def report(a):
     (ROOT / "outputs/segmentation/sg_real_atlas/analysis/gen_cap_ablation.md").write_text(txt)
 
 
+# ------------------------------------------------------------------ late fusion (gen_fusion_prereg.md)
+FUSE = ("geo", "mean", "min", "a", "c")
+
+
+def fused(z):
+    a = st.mm(z["maps/base"][VARS.index("V3")]); c = st.mm(z["maps/clip"][VARS.index("V3")])
+    return {"geo": st.mm(np.sqrt(a * c)), "mean": st.mm((a + c) / 2), "min": st.mm(np.minimum(a, c)), "a": a, "c": c}
+
+
+def fuse_one(job):
+    f, o = Path(job[0]), Path(job[1])
+    if o.exists():
+        return
+    torch.set_num_threads(1)
+    from src.segmentation.ovam_full import _import_densecrf, apply_ovam_densecrf
+    _import_densecrf(st.CRF_SITE)
+    z = np.load(f); img, truth = z["image"], z["truth"].astype(bool)
+    valid = np.ones_like(truth); other = np.zeros_like(truth); res = {"area": float(truth.mean()), "cls": str(z["cls"])}
+    for k, m in fused(z).items():
+        x = st.up(m, truth.shape)
+        res[f"{k}|raw"] = cc.counts(x[None] >= cc.THR[:, None, None], truth, valid, other)
+        res[f"{k}+R2|raw"] = cc.counts(np.stack([apply_ovam_densecrf(img, x >= t, st.CRF_SITE) for t in cc.THR_CRF]).astype(bool),
+                                       truth, valid, other)
+    tmp = o.with_name(o.stem + ".tmp.npz"); np.savez(tmp, **res); os.replace(tmp, o)
+
+
+def fuse_score(a):
+    for ds in a.sets:
+        sc = WORK / f"{ds}_fusion_scores"; sc.mkdir(parents=True, exist_ok=True)
+        jobs = [(str(f), str(sc / f.name)) for f in sorted((WORK / ds).glob("*.npz")) if not f.stem.endswith(".tmp")]
+        with Pool(a.workers) as pool:
+            for n, _ in enumerate(pool.imap_unordered(fuse_one, jobs, chunksize=2), 1):
+                if n % 200 == 0 or n == len(jobs):
+                    print(f"{ds} {n}/{len(jobs)}", flush=True)
+
+
+def fuse_report(a):
+    j55 = int(np.flatnonzero(np.isclose(cc.THR_CRF, TAU))[0])
+    lab = {"geo": "geo: sqrt(a·c)", "mean": "mean: (a+c)/2", "min": "min(a, c)", "a": "a = BRACE (cross-attention seed)",
+           "c": "c = CLIP-seeded BRACE"}
+    S = {ds: cc.load_gen(WORK / f"{ds}_fusion_scores") for ds in ("voc", "coco")}
+    one = lambda ds: np.ones(len(S[ds]["grp"]), bool)
+    fx = lambda ds, k: S[ds][f"{k}+R2|raw"][:, j55]
+    m55 = lambda ds, k: cc.miou(fx(ds, k)[:, None], S[ds]["cls"], one(ds))[0]
+    L = ["# Late fusion of cross-attention-seeded and CLIP-seeded BRACE (generated sets)\n",
+         "Pre-registered in `gen_fusion_prereg.md`, committed before scoring. a, c = the capped-hierarchy maps of the two "
+         "seeds from one capture per image; fused map min-max normalised, τ 0.55, then the frozen DenseCRF R2. Δ with "
+         "image-bootstrap 95% CI.\n"]
+    for ds in ("voc", "coco"):
+        L += [f"## {NAME[ds]} ({len(S[ds]['grp'])} images)\n",
+              "| map | mIoU @0.55 + R2 | prec / rec | Δ vs a (BRACE) | Δ vs c (CLIP-seeded) | OOF + R2 | raw @0.55 |",
+              "|---|---:|---|---|---|---:|---:|"]
+        i55 = int(np.flatnonzero(np.isclose(cc.THR, TAU))[0])
+        for k in FUSE:
+            cells = []
+            for r in ("a", "c"):
+                if k == r:
+                    cells.append("—")
+                else:
+                    lo, hi = cc.boot(S[ds], fx(ds, k), fx(ds, r)); cells.append(f"{m55(ds, k) - m55(ds, r):+.3f} ({lo:+.3f}…{hi:+.3f})")
+            pr = cc.prf(fx(ds, k)); oo = cc.oof(S[ds], S[ds][f"{k}+R2|raw"])[0]
+            raw = cc.miou(S[ds][f"{k}|raw"][:, i55][:, None], S[ds]["cls"], one(ds))[0]
+            L.append(f"| {lab[k]} | {m55(ds, k):.3f} | {pr[0]:.3f} / {pr[1]:.3f} | {cells[0]} | {cells[1]} | {oo:.3f} | {raw:.3f} |")
+        L.append("")
+        L.append("Per class @0.55 + R2 (a / c / geo / mean / min): " + ", ".join(
+            f"{c} " + " / ".join(f"{cc.miou(fx(ds, k)[:, None], S[ds]['cls'], S[ds]['cls'] == c)[0]:.2f}" for k in ("a", "c", "geo", "mean", "min"))
+            for c in np.unique(S[ds]["cls"])) + "\n")
+    ch = max(("geo", "mean", "min"), key=lambda k: m55("voc", k))
+    lo, hi = cc.boot(S["coco"], fx("coco", ch), fx("coco", "c")); d = m55("coco", ch) - m55("coco", "c")
+    L.append(f"## Registered test\n\nChosen on VOC-Sim: **{ch}** ({m55('voc', ch):.3f} vs c {m55('voc', 'c'):.3f}). COCO-Cap: "
+             f"{ch} {m55('coco', ch):.3f} vs CLIP-seeded BRACE {m55('coco', 'c'):.3f}, Δ {d:+.3f} (CI {lo:+.3f}…{hi:+.3f}) → "
+             f"**{'fusion helps' if lo > 0 else 'no gain over CLIP-seeded BRACE'}**.")
+    txt = "\n".join(L) + "\n"; print(txt)
+    (ROOT / "outputs/segmentation/sg_real_atlas/analysis/gen_fusion.md").write_text(txt)
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("capture"); p.add_argument("--dataset", choices=("voc", "coco"), required=True)
     p.add_argument("--shard", type=int, default=0); p.add_argument("--num-shards", type=int, default=1)
     p.add_argument("--model", default="stable-diffusion-v1-5/stable-diffusion-v1-5")
-    for nm in ("score", "report"):
+    for nm in ("score", "report", "fuse-score", "fuse-report"):
         p = sub.add_parser(nm); p.add_argument("--sets", nargs="+", default=["voc", "coco"])
         p.add_argument("--workers", type=int, default=32)
     a = ap.parse_args()
-    {"capture": capture, "score": score, "report": report}[a.cmd](a)
+    {"capture": capture, "score": score, "report": report, "fuse-score": fuse_score, "fuse-report": fuse_report}[a.cmd](a)
