@@ -58,6 +58,15 @@ def caption(a):
 
 
 def cap_prompt(capt, cls, tok):
+    # the frozen CA recorder's slow-tokenizer alignment rejects possessives ("person's" -> one BPE piece "'s"),
+    # so the CAPTURE prompt drops apostrophes; the inversion keeps the raw caption
+    import re
+    from src.segmentation import sg24_ca
+    capt = capt.replace("'", "").replace("\u2019", "")
+    try:
+        sg24_ca.content_positions(tok, capt, ())
+    except ValueError:
+        capt = re.sub(r"[^\w\s,.-]", "", capt)
     ids = tok(capt, add_special_tokens=False)["input_ids"]; cid = tok(cls, add_special_tokens=False)["input_ids"]
     has = any(ids[i:i + len(cid)] == cid for i in range(len(ids) - len(cid) + 1))
     return (capt if has else f"{capt.rstrip('.').rstrip()}, a {cls}"), has
