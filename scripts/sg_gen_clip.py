@@ -263,7 +263,7 @@ def rel_one(job):
         r["s_call_iou"] = float(np.mean([iou(pc[i], pc[j]) for i in range(11) for j in range(i + 1, 11)]))
     # pixel-level: which pixels of the BRACE mask are wrong?
     err = mask != truth
-    bd = np.minimum(distance_transform_edt(mask), distance_transform_edt(~mask))
+    bd = np.where(mask, distance_transform_edt(mask), distance_transform_edt(~mask))  # distance to the mask boundary
     U = {"u_boundary": -bd, "u_conf": -np.abs(v3 - TAU), "u_cf": np.abs(p1 - v3), "u_c16": np.abs(c16 - v3),
          "u_clip": np.abs(mask.astype(np.float32) - pk), "u_seed": np.abs(mask.astype(np.float32) - seed)}
     if sd is not None:
