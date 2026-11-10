@@ -248,13 +248,122 @@ def fuse_report(a):
     (ROOT / "outputs/segmentation/sg_real_atlas/analysis/gen_fusion.md").write_text(txt)
 
 
+# ------------------------------------------------------------------ early fusion (gen_early_fusion_prereg.md)
+EARLY = ("a", "c", "e_geo", "e_mean", "e_min", "e_prod")
+
+
+def early_capture(a):
+    from scripts import sg27_runtime
+    from src.segmentation import sg_combined_v2
+    rows = cc.gen_rows(a.dataset)[a.shard::a.num_shards]
+    runtime = sg27_runtime.make_runtime(a.model)
+    out = WORK / f"early_{a.dataset}"; out.mkdir(parents=True, exist_ok=True)
+    for row in rows:
+        iid, cls = row["image_id"], row["classname"]; o = out / f"{iid}.npz"
+        if o.exists():
+            continue
+        t0 = time.perf_counter(); stored = np.load(STORED[a.dataset] / f"{iid}.npz")
+        P = torch.from_numpy(np.load(CLIPW / f"sclip_{a.dataset}" / f"{iid}.npz")["prob21_64"]).float()
+        with sg27_runtime.live_maps(runtime, dict(row), a.dataset) as (sample, sa, seed, _b, _p):
+            img = np.asarray(sample.generated_image, np.uint8).copy(); truth = np.asarray(sample.target_mask, bool)
+            seed = seed.float().clone(); ma = cc.norm(seed, "mm"); mc = cc.norm(P.to(seed.device), "mm")
+            seeds = {"a": seed, "c": mc, "e_geo": cc.norm(torch.sqrt(ma * mc), "mm"), "e_mean": cc.norm((ma + mc) / 2, "mm"),
+                     "e_min": cc.norm(torch.minimum(ma, mc), "mm"), "e_prod": cc.norm(ma * mc, "mm")}
+            maps = np.stack([sg_combined_v2.aggregate(sa, seeds[k])[0]["V3"].float().cpu().numpy() for k in EARLY]).astype(np.float32)
+        img_diff = int(np.abs(img.astype(int) - stored["image"].astype(int)).max())
+        img_mean = float(np.abs(img.astype(int) - stored["image"].astype(int)).mean())
+        v3chk = float(np.abs(st.mm(maps[0]) - st.mm(stored["map/base"][3])).max())
+        tmp = o.with_name(o.stem + ".tmp.npz")
+        np.savez(tmp, maps=maps, cls=cls, check=v3chk, img_maxdiff=img_diff, img_meandiff=img_mean, truth=truth, image=img)
+        os.replace(tmp, o)
+        print(f"[early:{a.dataset}] {iid} {cls} img {img_diff} V3 check {v3chk:.1e} {time.perf_counter() - t0:.1f}s", flush=True)
+        torch.cuda.empty_cache()
+
+
+def early_one(job):
+    f, o = Path(job[0]), Path(job[1])
+    if o.exists():
+        return
+    torch.set_num_threads(1)
+    from src.segmentation.ovam_full import _import_densecrf, apply_ovam_densecrf
+    _import_densecrf(st.CRF_SITE)
+    z = np.load(f); img, truth = z["image"], z["truth"].astype(bool)
+    valid = np.ones_like(truth); other = np.zeros_like(truth)
+    res = {"area": float(truth.mean()), "cls": str(z["cls"]), "check": float(z["check"]), "img_maxdiff": int(z["img_maxdiff"]),
+           "img_meandiff": float(z["img_meandiff"])}
+    M = {k: st.mm(z["maps"][i]) for i, k in enumerate(EARLY)}
+    M["l_mean"] = st.mm((M["a"] + M["c"]) / 2)
+    for k, m in M.items():
+        x = st.up(m, truth.shape)
+        res[f"{k}|raw"] = cc.counts(x[None] >= cc.THR[:, None, None], truth, valid, other)
+        res[f"{k}+R2|raw"] = cc.counts(np.stack([apply_ovam_densecrf(img, x >= t, st.CRF_SITE) for t in cc.THR_CRF]).astype(bool),
+                                       truth, valid, other)
+    tmp = o.with_name(o.stem + ".tmp.npz"); np.savez(tmp, **res); os.replace(tmp, o)
+
+
+def early_score(a):
+    for ds in a.sets:
+        sc = WORK / f"early_{ds}_scores"; sc.mkdir(parents=True, exist_ok=True)
+        jobs = [(str(f), str(sc / f.name)) for f in sorted((WORK / f"early_{ds}").glob("*.npz")) if not f.stem.endswith(".tmp")]
+        with Pool(a.workers) as pool:
+            for n, _ in enumerate(pool.imap_unordered(early_one, jobs, chunksize=2), 1):
+                if n % 200 == 0 or n == len(jobs):
+                    print(f"{ds} {n}/{len(jobs)}", flush=True)
+
+
+def early_report(a):
+    j55 = int(np.flatnonzero(np.isclose(cc.THR_CRF, TAU))[0]); i55 = int(np.flatnonzero(np.isclose(cc.THR, TAU))[0])
+    keys = ("a", "c", "l_mean", "e_geo", "e_mean", "e_min", "e_prod")
+    lab = {"a": "BRACE (cross-attention seed)", "c": "CLIP-seeded BRACE", "l_mean": "late mean fusion of a and c maps",
+           "e_geo": "early: seed sqrt(a·c)", "e_mean": "early: seed (a+c)/2", "e_min": "early: seed min(a, c)",
+           "e_prod": "early: seed a·c (CLIP-gated)"}
+    S = {ds: cc.load_gen(WORK / f"early_{ds}_scores") for ds in ("voc", "coco")}
+    one = lambda ds: np.ones(len(S[ds]["grp"]), bool)
+    fx = lambda ds, k: S[ds][f"{k}+R2|raw"][:, j55]
+    m55 = lambda ds, k: cc.miou(fx(ds, k)[:, None], S[ds]["cls"], one(ds))[0]
+    L = ["# Early fusion of the cross-attention seed and the CLIP seed (generated sets)\n",
+         "Pre-registered in `gen_early_fusion_prereg.md`, committed before the capture. One regeneration per image; every "
+         "seed is propagated through that run's self-attention with the frozen BRACE capped hierarchy, then τ 0.55 and "
+         "the frozen DenseCRF R2. a = the cross-attention seed exactly as in BRACE; fused seeds use min-max a and c. "
+         "Δ with image-bootstrap 95% CI.\n"]
+    for ds in ("voc", "coco"):
+        sc = sorted((WORK / f"early_{ds}_scores").glob("*.npz"))
+        ex = np.array([int(np.load(f)["img_maxdiff"]) == 0 for f in sc])
+        L += [f"## {NAME[ds]} ({len(S[ds]['grp'])} images; {ex.sum()} regenerated bit-identically)\n",
+              "| seed / map | mIoU @0.55 + R2 | prec / rec | Δ vs BRACE | Δ vs CLIP-seeded | Δ vs late mean | OOF + R2 | raw @0.55 |",
+              "|---|---:|---|---|---|---|---:|---:|"]
+        for k in keys:
+            cells = []
+            for r in ("a", "c", "l_mean"):
+                if k == r:
+                    cells.append("—")
+                else:
+                    lo, hi = cc.boot(S[ds], fx(ds, k), fx(ds, r)); cells.append(f"{m55(ds, k) - m55(ds, r):+.3f} ({lo:+.3f}…{hi:+.3f})")
+            pr = cc.prf(fx(ds, k)); oo = cc.oof(S[ds], S[ds][f"{k}+R2|raw"])[0]
+            raw = cc.miou(S[ds][f"{k}|raw"][:, i55][:, None], S[ds]["cls"], one(ds))[0]
+            L.append(f"| {lab[k]} | {m55(ds, k):.3f} | {pr[0]:.3f} / {pr[1]:.3f} | " + " | ".join(cells) + f" | {oo:.3f} | {raw:.3f} |")
+        L.append("")
+        L.append("Per class @0.55 + R2 (" + " / ".join(keys) + "): " + ", ".join(
+            f"{c} " + " / ".join(f"{cc.miou(fx(ds, k)[:, None], S[ds]['cls'], S[ds]['cls'] == c)[0]:.2f}" for k in keys)
+            for c in np.unique(S[ds]["cls"])) + "\n")
+    ch = max(("e_geo", "e_mean", "e_min", "e_prod"), key=lambda k: m55("voc", k))
+    lo, hi = cc.boot(S["coco"], fx("coco", ch), fx("coco", "c")); d = m55("coco", ch) - m55("coco", "c")
+    L.append(f"## Registered test\n\nChosen on VOC-Sim: **{ch}** ({m55('voc', ch):.3f} vs CLIP-seeded {m55('voc', 'c'):.3f}). "
+             f"COCO-Cap: {ch} {m55('coco', ch):.3f} vs CLIP-seeded BRACE {m55('coco', 'c'):.3f}, Δ {d:+.3f} "
+             f"(CI {lo:+.3f}…{hi:+.3f}) → **{'early fusion helps' if lo > 0 else 'no gain over CLIP-seeded BRACE'}**.")
+    txt = "\n".join(L) + "\n"; print(txt)
+    (ROOT / "outputs/segmentation/sg_real_atlas/analysis/gen_early_fusion.md").write_text(txt)
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); sub = ap.add_subparsers(dest="cmd", required=True)
-    p = sub.add_parser("capture"); p.add_argument("--dataset", choices=("voc", "coco"), required=True)
-    p.add_argument("--shard", type=int, default=0); p.add_argument("--num-shards", type=int, default=1)
-    p.add_argument("--model", default="stable-diffusion-v1-5/stable-diffusion-v1-5")
-    for nm in ("score", "report", "fuse-score", "fuse-report"):
+    for nm in ("capture", "early-capture"):
+        p = sub.add_parser(nm); p.add_argument("--dataset", choices=("voc", "coco"), required=True)
+        p.add_argument("--shard", type=int, default=0); p.add_argument("--num-shards", type=int, default=1)
+        p.add_argument("--model", default="stable-diffusion-v1-5/stable-diffusion-v1-5")
+    for nm in ("score", "report", "fuse-score", "fuse-report", "early-score", "early-report"):
         p = sub.add_parser(nm); p.add_argument("--sets", nargs="+", default=["voc", "coco"])
         p.add_argument("--workers", type=int, default=32)
     a = ap.parse_args()
-    {"capture": capture, "score": score, "report": report, "fuse-score": fuse_score, "fuse-report": fuse_report}[a.cmd](a)
+    {"capture": capture, "score": score, "report": report, "fuse-score": fuse_score, "fuse-report": fuse_report,
+     "early-capture": early_capture, "early-score": early_score, "early-report": early_report}[a.cmd](a)
