@@ -1,5 +1,7 @@
 # Setting up this repo on a new machine (for Claude Code)
 
+> **Superseded on the A40 machine by `docs/NEW_MACHINE_SETUP.md` and `AGENTS.md`** (Codex's verified setup: `.venv` via `scripts/brace_env.sh`, cache in `BRACE_CACHE_DIR`). Use this file only for background: data sources, model ids and project state.
+
 This repo is the BRACE project: training-free class-word segmentation from Stable Diffusion 1.5 attention. Everything needed to rebuild it from scratch is listed below. Attention maps and per-image arrays are **not** copied; they are regenerated.
 
 Written 2026-11-14 from the original cluster setup (SLURM, V100/A100, CUDA 11.8).

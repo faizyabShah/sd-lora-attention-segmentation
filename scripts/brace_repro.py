@@ -8,7 +8,7 @@ check    environment, CRF, model weights, datasets (no GPU work)
 capture  regenerate each image with the frozen live pipeline and score BRACE (GPU; run shards in parallel)
 report   class-macro mIoU, comparison with the cluster reference (runs/00_setup_reproduce/reference_cluster.json)
 
-Cache (small per-image maps, not committed): $SG_CACHE (default ~/sg_cache)/brace_{voc,coco}/<id>.npz
+Cache (small per-image maps, not committed): $BRACE_CACHE_DIR (default outputs/sg_comp)/brace_{voc,coco}/<id>.npz
 """
 from __future__ import annotations
 
@@ -22,8 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / "scripts"))
 import sg_steps_test as st  # noqa: E402
 import sg_class_comp as cc  # noqa: E402
-
-CACHE = Path(os.environ.get("SG_CACHE", Path.home() / "sg_cache"))
+from brace_paths import CACHE  # noqa: E402
 RUN = ROOT / "runs/00_setup_reproduce"
 TAU = 0.55
 NAME = {"voc": "VOC-Sim", "coco": "COCO-Cap"}
