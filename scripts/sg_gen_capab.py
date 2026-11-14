@@ -12,7 +12,7 @@ cross-attention seed (A3) but SCLIP's target probability? Variants (frozen code,
 Seeds: base = A3 (BRACE), clip = SCLIP ViT-B/16 VOC21 target probability (mm), as in sg_gen_clip.py.
 Every image is regenerated with the frozen live pipeline (replay-checked against the stored image and stored V3).
 
-capture (GPU)  /home/shafa/sg_comp/gen_capab/<ds>/<id>.npz: maps/<seed> [len(VARS),64,64]
+capture (GPU)  <BRACE_CACHE_DIR>/gen_capab/<ds>/<id>.npz: maps/<seed> [len(VARS),64,64]
 score   (CPU)  counts per variant raw (τ 0.30..0.90) and +R2 (τ step 0.05)
 report  (CPU)  outputs/segmentation/sg_real_atlas/analysis/gen_cap_ablation.md
 """
@@ -29,10 +29,11 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / "scripts"))
 import sg_steps_test as st  # noqa: E402
 import sg_class_comp as cc  # noqa: E402
+from brace_paths import CACHE  # noqa: E402
 
-WORK = Path("/home/shafa/sg_comp/gen_capab")
-CLIPW = Path("/home/shafa/sg_comp/gen_clip")
-STORED = {"voc": Path("/home/shafa/sg_comp/vocsim_maps"), "coco": Path("/home/shafa/sg_comp/cococap_maps")}
+WORK = CACHE / "gen_capab"
+CLIPW = CACHE / "gen_clip"
+STORED = {"voc": CACHE / "vocsim_maps", "coco": CACHE / "cococap_maps"}
 NAME = {"voc": "VOC-Sim", "coco": "COCO-Cap"}
 VARS = ("V0", "V1", "V2core", "V2", "V3", "V4")
 LABEL = {"V0": "fine-only 64 graph (no hierarchy)", "V1": "hierarchy, no cap",

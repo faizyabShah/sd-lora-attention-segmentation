@@ -30,11 +30,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / "scripts"))
 import sg_steps_test as st  # noqa: E402
 import sg_class_comp as cc  # noqa: E402
+from brace_paths import CACHE  # noqa: E402
 
 AN = ROOT / "outputs/segmentation/sg_real_atlas/analysis"
-STORED = {"voc": Path("/home/shafa/sg_comp/vocsim_maps"), "coco": Path("/home/shafa/sg_comp/cococap_maps")}
-BASESC = {"voc": Path("/home/shafa/sg_comp/vocsim_scores"), "coco": Path("/home/shafa/sg_comp/cococap_scores")}
-WORK = Path("/home/shafa/sg_comp/gen_clip")
+STORED = {"voc": CACHE / "vocsim_maps", "coco": CACHE / "cococap_maps"}
+BASESC = {"voc": CACHE / "vocsim_scores", "coco": CACHE / "cococap_scores"}
+WORK = CACHE / "gen_clip"
 COCO_LINES = (ROOT / "scripts/sclip_cls_coco_object.txt").read_text().strip().split("\n")
 VOC_ORDER = ["aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "dining-table", "dog",
              "horse", "motorbike", "person", "potted-plant", "sheep", "sofa", "train", "tv"]

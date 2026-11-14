@@ -1,4 +1,15 @@
-# Cityscapes Stable Diffusion LoRA experiments
+# BRACE: attention segmentation with Stable Diffusion
+
+The active project is training-free class-word segmentation using SD 1.5
+attention. Start with [the current setup guide](docs/NEW_MACHINE_SETUP.md),
+[working rules](AGENTS.md), and the
+[experiment protocol](docs/ATTENTION_SEGMENTATION_EXPERIMENT_PROTOCOL.md).
+The [November machine handoff](docs/CLAUDE_MACHINE_HANDOFF_2026-11-14.md)
+preserves the context supplied by Claude, including recent CLIP-seed results.
+
+The Cityscapes/LoRA description below is retained as historical documentation.
+
+## Historical Cityscapes Stable Diffusion LoRA experiments
 
 This repository contains the Cityscapes crop and caption pipeline, Stable Diffusion 1.5 LoRA experiments, generation, and evaluation. GPU work is submitted through Slurm. Attention-map extraction and segmentation in `src/segmentation/` are future work.
 

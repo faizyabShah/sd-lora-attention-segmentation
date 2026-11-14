@@ -32,6 +32,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / "scripts"))
 import sg_steps_test as st  # noqa: E402
+from brace_paths import CACHE  # noqa: E402
 import sg_clip_dense as cd  # noqa: E402
 
 CRF_PARAMS = (10.0, 80, 13, 3.0, 3, 5.0)   # = ovam_full.OVAM_CRF_PARAMETERS (R2)
@@ -215,9 +216,9 @@ if __name__ == "__main__":
     p = sub.add_parser("capture"); p.add_argument("--split", default="val"); p.add_argument("--max-images", type=int)
     p.add_argument("--shard", type=int, default=0); p.add_argument("--num-shards", type=int, default=1)
     p.add_argument("--save-full", action="store_true", help="also store full-size SCLIP probabilities (dev sets only)")
-    p.add_argument("--model", default="stable-diffusion-v1-5/stable-diffusion-v1-5"); p.add_argument("--out", type=Path, default=Path("/home/shafa/sg_comp/voc21_val"))
+    p.add_argument("--model", default="stable-diffusion-v1-5/stable-diffusion-v1-5"); p.add_argument("--out", type=Path, default=CACHE / "voc21_val")
     p = sub.add_parser("score"); p.add_argument("--split", default="val")
-    p.add_argument("--maps", type=Path, default=Path("/home/shafa/sg_comp/voc21_val"))
+    p.add_argument("--maps", type=Path, default=CACHE / "voc21_val")
     p.add_argument("--out", type=Path, default=ROOT / "outputs/segmentation/sg_real_atlas/analysis/voc21_val.md")
     a = ap.parse_args()
     {"capture": capture, "score": score}[a.cmd](a)

@@ -31,6 +31,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / "scripts"))
 import sg_steps_test as st  # noqa: E402
+from brace_paths import CACHE  # noqa: E402
 
 BACKBONES = {"B16": "openai/clip-vit-base-patch16", "L14": "openai/clip-vit-large-patch14"}
 GENERIC = ["wall", "floor", "ground", "sky", "grass", "tree", "building", "road"]
@@ -230,6 +231,6 @@ if __name__ == "__main__":
     p.add_argument("--out", type=Path, default=ROOT / "outputs/segmentation/sg_real_atlas/analysis/sclip_faith.json")
     p = sub.add_parser("capture"); p.add_argument("--set", default="D"); p.add_argument("--max-images", type=int)
     p.add_argument("--backbones", nargs="+", default=["B16", "L14"])
-    p.add_argument("--out", type=Path, default=Path("/home/shafa/sg_comp/clip_D"))
+    p.add_argument("--out", type=Path, default=CACHE / "clip_D")
     a = ap.parse_args()
     {"faith": faith, "capture": capture}[a.cmd](a)
