@@ -79,8 +79,8 @@ support the required file locks; completed snapshots are copied to `HF_HOME`.
 Override staging with `BRACE_DOWNLOAD_CACHE` on another local filesystem.
 
 The full original requirements list installed and passed `pip check`, but its
-`bitsandbytes==0.43.3` extra caused `StableDiffusionPipeline` to fail on import:
-Triton raised `RuntimeError: 0 active drivers`. That package is only used by
+`bitsandbytes==0.43.3` extra caused `StableDiffusionPipeline` to fail on import
+inside the sandbox: Triton raised `RuntimeError: 0 active drivers`. That package is only used by
 old 8-bit LoRA training, not BRACE. Its installed package and metadata were
 preserved at `/home/fsh/.venvs/brace-legacy-extras/`, outside the active import
 path. All other handoff package pins are retained, including PEFT. The setup
@@ -94,10 +94,28 @@ load fully offline. Nine existing A3/cap tests and a synthetic DenseCRF smoke
 test pass. Both benchmark loaders return 490/707 annotated records. See the
 local `outputs/setup/` logs and `STATUS.md` for the final check results.
 
-This host has no `sbatch`, and `nvidia-smi` cannot communicate with the driver.
-Installing CUDA-enabled PyTorch does not fix the host NVIDIA driver. CPU
-imports/scoring and offline model loading can be checked here; live capture
-requires a working GPU host. No production experiments are part of this setup.
+The host has an NVIDIA A40 (44.42 GiB), driver 520.61.05, and CUDA 11.8.
+The sandbox hides the NVIDIA devices: `nvidia-smi` fails and PyTorch reports
+CUDA unavailable there, while both work outside it. The initial diagnosis of
+a broken host driver was incorrect. Use `exec_command` with
+`sandbox_permissions="require_escalated"` for GPU work and Screen management.
+No production experiments are part of setup. SLURM/`sbatch` is absent.
+
+GNU Screen supports detached work. A dedicated `brace_gpu_check_20261114`
+session was created, attached to, and detached from successfully. Interactive
+attachment needs a PTY and `TERM=xterm` in the agent's terminal environment:
+
+```bash
+TERM=xterm screen -r brace_gpu_check_20261114
+# Detach with Ctrl-A, then D.
+```
+
+CUDA matrix multiplication in that session passed a CPU-reference comparison.
+SD1.5 also completed two float32 denoising steps at 512×512 on `cuda:0`,
+producing finite latents and using 5.39 GiB peak allocated GPU memory (25.48 s
+including model loading). Smoke-test scripts, logs, and results are under
+`outputs/setup/`. This verifies GPU execution, not a full attention-capture
+experiment or score reproduction.
 
 ## Datasets
 

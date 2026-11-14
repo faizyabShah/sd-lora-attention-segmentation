@@ -40,3 +40,13 @@ Read `docs/NEW_MACHINE_SETUP.md` first. The opening Cityscapes material in
 
 Large datasets, model weights, attention maps, and local environments are ignored.
 Do not regenerate production captures merely to familiarize yourself with the repo.
+
+## Host GPU and persistent sessions
+
+The host has an NVIDIA A40 (~44.4 GiB), driver 520.61.05, CUDA 11.8, and GNU
+Screen. The sandbox hides `/dev/nvidia*`, so sandboxed `nvidia-smi` and CUDA
+checks falsely suggest that the host has no working driver. Run GPU work and
+Screen management with `exec_command(sandbox_permissions="require_escalated")`.
+Use the `.venv` environment via `source scripts/brace_env.sh`. For interactive
+Screen attachment, allocate a PTY and set `TERM=xterm`; detach with Ctrl-A, D.
+Do not disturb existing Screen sessions belonging to other work.
