@@ -103,3 +103,15 @@ On the A40, ideas 1, 3, 4, 6 and 7 (knockout, chrono, Jacobian, OT, CFG contrast
    - The remaining question is a paper one: why the cap works. `runs/06_cap_mechanism` asks it.
    - Any clutter-adaptive method would still need a label-free signal and an unused multi-object confirmation set.
 4. **Per-image τ and boundary placement look like missing information**, not unused information. More selectors of the same kind are unlikely to work.
+
+## Update (2026-11-15, later)
+
+- **Cap mechanism** (`runs/06_cap_mechanism`): **not supported** under the pre-registered rule.
+  - SCLIP competitor coverage does not predict V3's gain over V0 (β ≈ 0, CI within ±0.01 on both sets).
+  - On COCO-Cap, V3 removes false positives at the same rate on and off competitor regions (−10% each). Most of its gain comes from fewer false positives (only-FP hybrid 0.691 of 0.696).
+  - On VOC-Sim the gain is recall (+0.009 TP / GT).
+  - The cap reduces over-expansion in general, not leakage onto competing objects specifically.
+- **VAE-decoder ownership** (`runs/07_vae_owner`): **closed**.
+  - Gate A passed: the decoder response beats its own footprint, +0.105.
+  - Gates B and C failed: +0.004 AUROC beyond RGB + footprint; the fixed rule wins on 2/22 images, −0.109 IoU.
+  - Within cells crossed by the boundary, decoder ownership (0.720) equals RGB colour (0.721). The decoder's boundary information is the RGB image's.
