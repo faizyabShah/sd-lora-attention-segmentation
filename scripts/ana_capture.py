@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Map analysis, rich capture (GPU, exploratory diagnostics) on a fixed development subset of the generated sets.
 
-Subset: the 150 VOC-Sim and 150 COCO-Cap annotated rows with the smallest crc32(image_id) (fixed, label-free).
+Subset: the class-stratified 150 VOC-Sim and 150 COCO-Cap screening images of the grouped run (ideas_grouped.screen_ids).
 Per image:
   live   frozen live capture -> A3 seed, V3 (BRACE map), image, truth; oracle seed (truth area-pooled to 64) -> V3
   base   own regeneration (manual PNDM loop == pipe(), checked against the live image) with recording processors:
@@ -41,8 +41,10 @@ N_EIG = 64
 
 
 def subset(ds, n):
-    rows = cc.gen_rows(ds)
-    return sorted(rows, key=lambda r: zlib.crc32(r["image_id"].encode()))[:n]
+    """The class-stratified 150-image screening subset of the grouped run (ideas_grouped.screen_ids)."""
+    from ideas_grouped import screen_ids
+    ids = screen_ids(ds, n)
+    return sorted((r for r in cc.gen_rows(ds) if r["image_id"] in ids), key=lambda r: zlib.crc32(r["image_id"].encode()))
 
 
 def block_of(i):
