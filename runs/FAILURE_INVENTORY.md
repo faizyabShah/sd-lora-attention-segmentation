@@ -61,6 +61,12 @@ Unless marked otherwise, numbers are VOC-Sim / COCO-Cap mIoU. Most diagnostics b
 
 VOC-only selection rejects these every time, by design. This means that **the development set cannot select mechanisms that target clutter.** That is a property of the protocol, not evidence that the mechanisms are useless.
 
+**Correction (2026-11-15).** These deltas are measured against the old S0/V0 baseline (COCO-Cap 0.662), not against BRACE.
+- BRACE's one-sided cap is itself a tighter propagation. V3 + R2 reaches 0.829 / 0.697: it takes most of the COCO-Cap gain (+0.028 paired, CI excluding 0) without a VOC-Sim cost.
+- None of the variants above clearly beats V3 + R2 on COCO-Cap: S2 0.686, S1 0.698.
+- Further tightening on top of V3 was tested once, in SG-combined-v3: W1 (per-head cap) was null, and W3 (temporal cap) was worse.
+- So the trade-off is largely resolved by the cap, not an unexploited pattern. `runs/06_cap_mechanism` tests whether competing objects explain the cap's gain.
+
 ## 3. Inaccurate boundaries
 
 - **R2 (DenseCRF)** is the only boundary step that has ever helped.
@@ -92,9 +98,8 @@ On the A40, ideas 1, 3, 4, 6 and 7 (knockout, chrono, Jacobian, OT, CFG contrast
 
 1. **The seed is where the headroom is.** Its missing piece is label-free selection, not new map construction. Every label-free selector tried has failed, so the next idea should bring new evidence, not another selector over the same evidence.
 2. **Bleed is attention support, not a propagation bug.** Propagation operators can't remove what the attention itself says, and the pilot shows SD's support really is wider than the object.
-3. **The VOC↔COCO trade-off (§2) is the most consistent unexploited pattern.** Several independent mechanisms help clutter and hurt simple scenes. Exploiting it needs either:
-   - a label-free scene-complexity signal (for example, the number of content words in the prompt); or
-   - a development set with clutter.
-
-   Both touch the protocol rule that COCO-Cap is untuned transfer, so this is an owner decision before any experiment.
+3. **The VOC↔COCO trade-off (§2) is mostly resolved by BRACE's cap** (corrected 2026-11-15; first written as "the most consistent unexploited pattern").
+   - The trade-off was measured against the pre-cap baseline.
+   - The remaining question is a paper one: why the cap works. `runs/06_cap_mechanism` asks it.
+   - Any clutter-adaptive method would still need a label-free signal and an unused multi-object confirmation set.
 4. **Per-image τ and boundary placement look like missing information**, not unused information. More selectors of the same kind are unlikely to work.
