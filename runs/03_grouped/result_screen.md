@@ -1,0 +1,114 @@
+# Grouped run: ideas 1, 3, 4, 6, 7, Stage 1 screening (exploratory; 150 class-stratified images per set)
+
+Pre-registered in `PREREG.md` (amendment 1: two stages). One shared generation per image. BRACE = frozen V3 + R2 from the same process. Class-macro mIoU; OOF = τ chosen on 4 folds (crc32 % 5); Δ vs BRACE OOF + R2 with image-bootstrap 95% CI.
+
+## VOC-Sim (150 of 150 images; base-loop vs live mean |Δpixel| 0.41/255, 7 images > 2/255, max 6.39; 379.2 s/image)
+
+| group | map | OOF + R2 | Δ vs BRACE (95% CI) | prec / rec | OOF raw | @0.55 + R2 |
+|---|---|---:|---|---|---:|---:|
+| — | BRACE (frozen) | 0.819 | — | 0.885 / 0.898 | 0.806 | 0.819 |
+| knockout (idea 1) | attn_fin_k5 | 0.492 | -0.327 (-0.360…-0.293) | 0.680 / 0.611 | 0.463 | 0.207 |
+| knockout (idea 1) | attn_fin_k10 | 0.469 | -0.350 (-0.380…-0.318) | 0.748 / 0.530 | 0.449 | 0.148 |
+| knockout (idea 1) | attn_ins_k5 | 0.628 | -0.191 (-0.216…-0.164) | 0.779 / 0.713 | 0.591 | 0.316 |
+| knockout (idea 1) | attn_ins_k10 | 0.610 | -0.209 (-0.235…-0.181) | 0.784 / 0.684 | 0.576 | 0.293 |
+| knockout (idea 1) | swap_fin_k5 | 0.527 | -0.292 (-0.321…-0.261) | 0.610 / 0.783 | 0.496 | 0.297 |
+| knockout (idea 1) | swap_fin_k10 | 0.516 | -0.303 (-0.336…-0.270) | 0.674 / 0.658 | 0.481 | 0.227 |
+| knockout (idea 1) | swap_ins_k5 | 0.634 | -0.186 (-0.212…-0.158) | 0.743 / 0.772 | 0.595 | 0.351 |
+| knockout (idea 1) | swap_ins_k10 | 0.619 | -0.200 (-0.226…-0.172) | 0.757 / 0.735 | 0.583 | 0.307 |
+| chrono (idea 3) | chrono_K4 | 0.600 | -0.219 (-0.251…-0.184) | 0.728 / 0.771 | 0.576 | 0.533 |
+| chrono (idea 3) | chrono_K8 | 0.665 | -0.154 (-0.179…-0.124) | 0.747 / 0.854 | 0.638 | 0.598 |
+| chrono (idea 3) | chrono_K16 | 0.716 | -0.104 (-0.132…-0.073) | 0.765 / 0.900 | 0.680 | 0.637 |
+| jacobian (idea 4) | jac_s10 | 0.717 | -0.103 (-0.128…-0.083) | 0.798 / 0.875 | 0.689 | 0.648 |
+| jacobian (idea 4) | jac_s20 | 0.710 | -0.109 (-0.134…-0.089) | 0.796 / 0.869 | 0.683 | 0.636 |
+| optimal transport (idea 6) | ot | 0.642 | -0.178 (-0.204…-0.149) | 0.799 / 0.745 | 0.584 | 0.577 |
+| optimal transport (idea 6) | ot_v3 | 0.739 | -0.080 (-0.105…-0.053) | 0.789 / 0.891 | 0.717 | 0.728 |
+| denoising contrast (idea 7) | cfg_k0 | 0.631 | -0.188 (-0.214…-0.161) | 0.728 / 0.781 | 0.594 | 0.383 |
+| denoising contrast (idea 7) | cfg_k10 | 0.615 | -0.204 (-0.232…-0.174) | 0.742 / 0.739 | 0.576 | 0.325 |
+
+Per class, OOF + R2 (BRACE / best of each group on this set):
+
+| class | BRACE | swap_ins_k5 | chrono_K16 | jac_s10 | ot_v3 | cfg_k0 |
+|---|---:|---:|---:|---:|---:|---:|
+| aeroplane | 0.91 | 0.90 | 0.89 | 0.60 | 0.80 | 0.89 |
+| bicycle | 0.80 | 0.73 | 0.55 | 0.61 | 0.68 | 0.70 |
+| bird | 0.90 | 0.75 | 0.75 | 0.73 | 0.77 | 0.75 |
+| boat | 0.91 | 0.51 | 0.74 | 0.83 | 0.80 | 0.53 |
+| bottle | 0.81 | 0.72 | 0.61 | 0.71 | 0.85 | 0.77 |
+| bus | 0.90 | 0.76 | 0.69 | 0.89 | 0.82 | 0.76 |
+| car | 0.80 | 0.72 | 0.56 | 0.75 | 0.72 | 0.69 |
+| cat | 0.82 | 0.66 | 0.80 | 0.70 | 0.81 | 0.57 |
+| chair | 0.77 | 0.53 | 0.46 | 0.42 | 0.39 | 0.49 |
+| cow | 0.92 | 0.68 | 0.93 | 0.86 | 0.96 | 0.67 |
+| dining-table | 0.33 | 0.20 | 0.28 | 0.38 | 0.29 | 0.21 |
+| dog | 0.89 | 0.82 | 0.87 | 0.80 | 0.90 | 0.77 |
+| horse | 0.86 | 0.62 | 0.82 | 0.79 | 0.89 | 0.61 |
+| motorbike | 0.87 | 0.78 | 0.66 | 0.78 | 0.82 | 0.78 |
+| person | 0.79 | 0.63 | 0.81 | 0.66 | 0.73 | 0.63 |
+| potted-plant | 0.73 | 0.70 | 0.76 | 0.62 | 0.72 | 0.68 |
+| sheep | 0.70 | 0.50 | 0.92 | 0.79 | 0.68 | 0.53 |
+| sofa | 0.96 | 0.54 | 0.92 | 0.87 | 0.90 | 0.53 |
+| train | 0.78 | 0.48 | 0.52 | 0.66 | 0.69 | 0.46 |
+| tv | 0.92 | 0.46 | 0.79 | 0.88 | 0.56 | 0.60 |
+
+## COCO-Cap (150 of 150 images; base-loop vs live mean |Δpixel| 0.41/255, 5 images > 2/255, max 8.51; 383.7 s/image)
+
+| group | map | OOF + R2 | Δ vs BRACE (95% CI) | prec / rec | OOF raw | @0.55 + R2 |
+|---|---|---:|---|---|---:|---:|
+| — | BRACE (frozen) | 0.688 | — | 0.767 / 0.799 | 0.681 | 0.685 |
+| knockout (idea 1) | attn_fin_k5 | 0.331 | -0.358 (-0.404…-0.311) | 0.467 / 0.507 | 0.310 | 0.179 |
+| knockout (idea 1) | attn_fin_k10 | 0.354 | -0.334 (-0.380…-0.283) | 0.584 / 0.439 | 0.330 | 0.141 |
+| knockout (idea 1) | attn_ins_k5 | 0.484 | -0.204 (-0.239…-0.161) | 0.576 / 0.682 | 0.453 | 0.313 |
+| knockout (idea 1) | attn_ins_k10 | 0.478 | -0.210 (-0.246…-0.167) | 0.582 / 0.656 | 0.446 | 0.283 |
+| knockout (idea 1) | swap_fin_k5 | 0.318 | -0.370 (-0.418…-0.323) | 0.412 / 0.584 | 0.303 | 0.244 |
+| knockout (idea 1) | swap_fin_k10 | 0.327 | -0.361 (-0.407…-0.316) | 0.473 / 0.495 | 0.306 | 0.173 |
+| knockout (idea 1) | swap_ins_k5 | 0.473 | -0.215 (-0.257…-0.168) | 0.557 / 0.668 | 0.438 | 0.341 |
+| knockout (idea 1) | swap_ins_k10 | 0.465 | -0.223 (-0.261…-0.180) | 0.540 / 0.680 | 0.430 | 0.298 |
+| chrono (idea 3) | chrono_K4 | 0.401 | -0.288 (-0.331…-0.240) | 0.512 / 0.680 | 0.381 | 0.414 |
+| chrono (idea 3) | chrono_K8 | 0.469 | -0.219 (-0.259…-0.184) | 0.583 / 0.670 | 0.451 | 0.470 |
+| chrono (idea 3) | chrono_K16 | 0.544 | -0.144 (-0.179…-0.112) | 0.649 / 0.712 | 0.520 | 0.547 |
+| jacobian (idea 4) | jac_s10 | 0.582 | -0.106 (-0.133…-0.077) | 0.711 / 0.734 | 0.544 | 0.549 |
+| jacobian (idea 4) | jac_s20 | 0.572 | -0.116 (-0.145…-0.086) | 0.698 / 0.751 | 0.537 | 0.537 |
+| optimal transport (idea 6) | ot | 0.498 | -0.190 (-0.235…-0.141) | 0.724 / 0.597 | 0.453 | 0.433 |
+| optimal transport (idea 6) | ot_v3 | 0.583 | -0.105 (-0.150…-0.051) | 0.673 / 0.737 | 0.571 | 0.583 |
+| denoising contrast (idea 7) | cfg_k0 | 0.402 | -0.286 (-0.332…-0.242) | 0.474 / 0.667 | 0.375 | 0.306 |
+| denoising contrast (idea 7) | cfg_k10 | 0.396 | -0.292 (-0.336…-0.249) | 0.465 / 0.646 | 0.367 | 0.267 |
+
+- token rule **class_word**: 95 images (63%); OOF + R2 on this subset: brace 0.720, attn_fin_k5 0.358, attn_fin_k10 0.386, attn_ins_k5 0.529, attn_ins_k10 0.519, swap_fin_k5 0.354, swap_fin_k10 0.359, swap_ins_k5 0.501, swap_ins_k10 0.488, chrono_K4 0.402, chrono_K8 0.488, chrono_K16 0.567, jac_s10 0.623, jac_s20 0.613, ot 0.531, ot_v3 0.615, cfg_k0 0.423, cfg_k10 0.408
+- token rule **fallback**: 55 images (37%); OOF + R2 on this subset: brace 0.646, attn_fin_k5 0.316, attn_fin_k10 0.357, attn_ins_k5 0.471, attn_ins_k10 0.461, swap_fin_k5 0.322, swap_fin_k10 0.334, swap_ins_k5 0.480, swap_ins_k10 0.473, chrono_K4 0.363, chrono_K8 0.440, chrono_K16 0.529, jac_s10 0.557, jac_s20 0.548, ot 0.500, ot_v3 0.578, cfg_k0 0.426, cfg_k10 0.414
+
+Per class, OOF + R2 (BRACE / best of each group on this set):
+
+| class | BRACE | attn_ins_k5 | chrono_K16 | jac_s10 | ot_v3 | cfg_k0 |
+|---|---:|---:|---:|---:|---:|---:|
+| aeroplane | 0.71 | 0.55 | 0.77 | 0.58 | 0.91 | 0.52 |
+| bicycle | 0.63 | 0.54 | 0.29 | 0.44 | 0.61 | 0.34 |
+| bird | 0.89 | 0.70 | 0.78 | 0.74 | 0.88 | 0.68 |
+| boat | 0.56 | 0.38 | 0.41 | 0.54 | 0.41 | 0.32 |
+| bottle | 0.32 | 0.30 | 0.21 | 0.30 | 0.24 | 0.15 |
+| bus | 0.94 | 0.71 | 0.73 | 0.91 | 0.87 | 0.61 |
+| car | 0.72 | 0.54 | 0.59 | 0.54 | 0.42 | 0.30 |
+| cat | 0.73 | 0.54 | 0.58 | 0.51 | 0.53 | 0.49 |
+| chair | 0.72 | 0.43 | 0.57 | 0.57 | 0.38 | 0.33 |
+| cow | 0.86 | 0.61 | 0.70 | 0.78 | 0.85 | 0.53 |
+| dining table | 0.33 | 0.47 | 0.39 | 0.47 | 0.56 | 0.54 |
+| dog | 0.82 | 0.56 | 0.63 | 0.70 | 0.63 | 0.50 |
+| horse | 0.76 | 0.52 | 0.62 | 0.70 | 0.68 | 0.50 |
+| motorbike | 0.81 | 0.61 | 0.57 | 0.74 | 0.67 | 0.38 |
+| person | 0.24 | 0.27 | 0.18 | 0.24 | 0.32 | 0.29 |
+| potted plant | 0.67 | 0.24 | 0.39 | 0.34 | 0.48 | 0.36 |
+| sheep | 0.84 | 0.59 | 0.64 | 0.73 | 0.84 | 0.49 |
+| sofa | 0.73 | 0.22 | 0.58 | 0.55 | 0.27 | 0.05 |
+| train | 0.77 | 0.48 | 0.61 | 0.69 | 0.68 | 0.47 |
+| tv | 0.73 | 0.42 | 0.63 | 0.58 | 0.43 | 0.20 |
+
+## Screening decision (pass: VOC-chosen candidate's Δ vs BRACE on the COCO-Cap screen > 0)
+
+| group | chosen on VOC-Sim screen (OOF + R2 vs BRACE) | COCO-Cap screen OOF + R2 vs BRACE | Δ | 95% CI | decision |
+|---|---|---|---:|---|---|
+| knockout (idea 1) | swap_ins_k5 (0.634 vs 0.819) | 0.473 vs 0.688 | -0.215 | -0.257…-0.168 | **stop** |
+| chrono (idea 3) | chrono_K16 (0.716 vs 0.819) | 0.544 vs 0.688 | -0.144 | -0.179…-0.112 | **stop** |
+| jacobian (idea 4) | jac_s10 (0.717 vs 0.819) | 0.582 vs 0.688 | -0.106 | -0.133…-0.077 | **stop** |
+| optimal transport (idea 6) | ot_v3 (0.739 vs 0.819) | 0.583 vs 0.688 | -0.105 | -0.150…-0.051 | **stop** |
+| denoising contrast (idea 7) | cfg_k0 (0.631 vs 0.819) | 0.402 vs 0.688 | -0.286 | -0.332…-0.242 | **stop** |
+
+Groups for stage 2: **none (stage 2 is not run)**.

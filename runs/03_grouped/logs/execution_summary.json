@@ -1,0 +1,195 @@
+{
+  "provenance": {
+    "commit": "79f36c4d4750ad81cf57f0cfded896f079adc59e",
+    "protected_sha256": {
+      "scripts/ideas_grouped.py": "8c689a467b25ff5fe666489eb785b46de8fbf31c8efda52a5d7a0015f4dd0310",
+      "runs/03_grouped/PREREG.md": "ba73f974c514391d879fccd85cb109a122ba1447743424a9e7e9ee54c3c19a36"
+    },
+    "manifest_sha256": "071ad019bd83e6f46ed6e64b31be93741b33859a587667813c810b39d12bfeff",
+    "cancelled_idea1_cached": {
+      "voc": 490,
+      "coco": 402
+    }
+  },
+  "selftest": "\nLoading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]\nLoading pipeline components...:  14%|\u2588\u258d        | 1/7 [00:00<00:05,  1.10it/s]\nLoading pipeline components...:  29%|\u2588\u2588\u258a       | 2/7 [00:01<00:02,  2.07it/s]/home/fsh/.venvs/brace/lib/python3.10/site-packages/transformers/tokenization_utils_base.py:1601: FutureWarning: `clean_up_tokenization_spaces` was not set. It will be set to `True` by default. This behavior will be depracted in transformers v4.45, and will be then set to `False` by default. For more details check this issue: https://github.com/huggingface/transformers/issues/31884\n  warnings.warn(\n\nLoading pipeline components...:  43%|\u2588\u2588\u2588\u2588\u258e     | 3/7 [00:01<00:01,  2.70it/s]\nLoading pipeline components...:  57%|\u2588\u2588\u2588\u2588\u2588\u258b    | 4/7 [00:02<00:01,  1.83it/s]\nLoading pipeline components...:  71%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f  | 5/7 [00:03<00:01,  1.36it/s]\nLoading pipeline components...: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 7/7 [00:03<00:00,  2.14it/s]\nbase loop (with recording) vs pipe(): max |\u0394latent| 0 (expect < 1e-4)\ntoken-attention calls recorded: 16x16 155, 32x32 155 (expect > 0 and divisible by 31)\nJacobian maps finite: True; peak GPU memory during VJP 6.8 GiB\nSELFTEST PASS\n",
+  "nproc": 6,
+  "P": 3,
+  "W": 1,
+  "smoke": {
+    "voc": {
+      "pid": 3743769,
+      "crf_workers": 4,
+      "peak_nvidia_smi_mib": 10090,
+      "images": [
+        {
+          "image_id": "ovam-voc-sim-3",
+          "img_meandiff": 0.08701578776041667,
+          "sec_base": 13.956483263522387,
+          "sec_live": 17.0241872780025,
+          "sec_signals": 60.09373649954796,
+          "sec_total": 180.13486114144325,
+          "token_rule": "class_word"
+        },
+        {
+          "image_id": "ovam-voc-sim-7",
+          "img_meandiff": 0.18210983276367188,
+          "sec_base": 5.908560272306204,
+          "sec_live": 16.300109738484025,
+          "sec_signals": 65.3753401171416,
+          "sec_total": 165.91245817765594,
+          "token_rule": "class_word"
+        }
+      ],
+      "exit_code": 0
+    },
+    "coco": {
+      "pid": 3744641,
+      "crf_workers": 4,
+      "peak_nvidia_smi_mib": 10092,
+      "images": [
+        {
+          "image_id": "ovam-coco-196984-aeroplane-3878063291",
+          "img_meandiff": 0.8342882792154948,
+          "sec_base": 13.346712613478303,
+          "sec_live": 16.90474963001907,
+          "sec_signals": 63.121407782658935,
+          "sec_total": 181.84518507868052,
+          "token_rule": "fallback"
+        },
+        {
+          "image_id": "ovam-coco-239260-aeroplane-516409323",
+          "img_meandiff": 0.20371246337890625,
+          "sec_base": 6.140072105452418,
+          "sec_live": 16.971982004120946,
+          "sec_signals": 62.92331757582724,
+          "sec_total": 165.28130557201803,
+          "token_rule": "class_word"
+        }
+      ],
+      "exit_code": 0
+    }
+  },
+  "datasets": {
+    "voc": {
+      "expected": 150,
+      "finished": 150,
+      "workers": [
+        {
+          "pid": 3745406,
+          "shard": 0,
+          "log": "grouped_screen_voc_0.log",
+          "peak_nvidia_smi_mib": 10092,
+          "exit_code": 0
+        },
+        {
+          "pid": 3745407,
+          "shard": 1,
+          "log": "grouped_screen_voc_1.log",
+          "peak_nvidia_smi_mib": 10092,
+          "exit_code": 0
+        },
+        {
+          "pid": 3745408,
+          "shard": 2,
+          "log": "grouped_screen_voc_2.log",
+          "peak_nvidia_smi_mib": 10092,
+          "exit_code": 0
+        }
+      ]
+    },
+    "coco": {
+      "expected": 150,
+      "finished": 150,
+      "workers": [
+        {
+          "pid": 3755002,
+          "shard": 0,
+          "log": "grouped_screen_coco_0.log",
+          "peak_nvidia_smi_mib": 10092,
+          "exit_code": 0
+        },
+        {
+          "pid": 3755003,
+          "shard": 1,
+          "log": "grouped_screen_coco_1.log",
+          "peak_nvidia_smi_mib": 10092,
+          "exit_code": 0
+        },
+        {
+          "pid": 3755004,
+          "shard": 2,
+          "log": "grouped_screen_coco_2.log",
+          "peak_nvidia_smi_mib": 10092,
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "screen_outliers_above_2": {
+    "voc": [
+      {
+        "image_id": "ovam-voc-sim-132",
+        "class": "bus",
+        "img_meandiff": 2.5755411783854165
+      },
+      {
+        "image_id": "ovam-voc-sim-146",
+        "class": "bus",
+        "img_meandiff": 2.0410372416178384
+      },
+      {
+        "image_id": "ovam-voc-sim-267",
+        "class": "dining-table",
+        "img_meandiff": 3.6239916483561196
+      },
+      {
+        "image_id": "ovam-voc-sim-337",
+        "class": "motorbike",
+        "img_meandiff": 2.0690027872721353
+      },
+      {
+        "image_id": "ovam-voc-sim-473",
+        "class": "train",
+        "img_meandiff": 5.522112528483073
+      },
+      {
+        "image_id": "ovam-voc-sim-48",
+        "class": "bicycle",
+        "img_meandiff": 4.360165913899739
+      },
+      {
+        "image_id": "ovam-voc-sim-83",
+        "class": "boat",
+        "img_meandiff": 6.39450200398763
+      }
+    ],
+    "coco": [
+      {
+        "image_id": "ovam-coco-166787-train-1839819348",
+        "class": "train",
+        "img_meandiff": 8.512744903564453
+      },
+      {
+        "image_id": "ovam-coco-472976-person-4017470167",
+        "class": "person",
+        "img_meandiff": 2.3515141805013022
+      },
+      {
+        "image_id": "ovam-coco-591374-person-1032945820",
+        "class": "person",
+        "img_meandiff": 4.427122751871745
+      },
+      {
+        "image_id": "ovam-coco-715892-cat-2645664967",
+        "class": "cat",
+        "img_meandiff": 2.345550537109375
+      },
+      {
+        "image_id": "ovam-coco-727691-bottle-388038328",
+        "class": "bottle",
+        "img_meandiff": 2.8202184041341147
+      }
+    ]
+  },
+  "stage2_authorized": false
+}
