@@ -1,0 +1,7 @@
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  14%|█▍        | 1/7 [00:00<00:05,  1.10it/s]Loading pipeline components...:  29%|██▊       | 2/7 [00:01<00:02,  2.07it/s]/home/fsh/.venvs/brace/lib/python3.10/site-packages/transformers/tokenization_utils_base.py:1601: FutureWarning: `clean_up_tokenization_spaces` was not set. It will be set to `True` by default. This behavior will be depracted in transformers v4.45, and will be then set to `False` by default. For more details check this issue: https://github.com/huggingface/transformers/issues/31884
+  warnings.warn(
+Loading pipeline components...:  43%|████▎     | 3/7 [00:01<00:01,  2.70it/s]Loading pipeline components...:  57%|█████▋    | 4/7 [00:02<00:01,  1.83it/s]Loading pipeline components...:  71%|███████▏  | 5/7 [00:03<00:01,  1.36it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:03<00:00,  2.14it/s]
+base loop (with recording) vs pipe(): max |Δlatent| 0 (expect < 1e-4)
+token-attention calls recorded: 16x16 155, 32x32 155 (expect > 0 and divisible by 31)
+Jacobian maps finite: True; peak GPU memory during VJP 6.8 GiB
+SELFTEST PASS
