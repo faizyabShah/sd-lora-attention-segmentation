@@ -2,7 +2,7 @@
 # Map analysis rich capture (GPU). Usage: sbatch jobs/ana_gpu.slurm scripts/ana_capture.py run --dataset voc|coco
 #SBATCH --job-name=ana-cap
 #SBATCH --partition=gpu
-#SBATCH --exclude=wald
+
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
