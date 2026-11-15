@@ -105,3 +105,29 @@ BRACE (frozen V3 + R2) from the frozen live capture of the same image in the sam
 ## If a group fails
 
 It is reported as an exploratory signal. Nothing is promoted.
+
+## Amendment 1 (2026-11-15, before any grouped image has been scored): two-stage design
+
+The full run is replaced by a cheap screening stage. A confirmatory stage on held-out images follows only for the groups that pass. Everything above (signals, candidates, comparator, claim threshold) is unchanged, except where this section says otherwise.
+
+### Screening subsets (class-stratified, fixed, label-free selection)
+
+- **Size.** 150 VOC-Sim and 150 COCO-Cap images.
+- **Selection.** Each of the 20 classes gets 7 images. The 10 remaining slots go to the classes with the 10 smallest crc32(class name), one each. Within a class, take the images with the smallest crc32(image_id).
+- **Implementation.** `ideas_grouped.screen_ids`.
+
+### Stage 1: screening (exploratory)
+
+1. Run all five groups on both screening subsets.
+2. In each group, choose the candidate with the highest OOF + R2 on the VOC-Sim screening subset.
+3. **Pass rule.** A group passes if its chosen candidate's point estimate Δ vs BRACE OOF + R2 on the COCO-Cap screening subset is **> 0**. This is deliberately lenient: the screen only decides what is worth running further.
+4. Screening numbers are exploratory and are never reported as a test result.
+
+### Stage 2: confirmation (registered test, only for passing groups)
+
+1. Run the passing groups on all remaining images: VOC-Sim 340, COCO-Cap 557.
+2. Choose each passing group's candidate again, on all 490 VOC-Sim images (OOF + R2).
+3. **Registered test.** Compare it with BRACE OOF + R2 on the **557 held-out COCO-Cap images**, which exclude every screening image. The image bootstrap uses 1000 resamples, and the τ folds are crc32(image_id) % 5 within the held-out set.
+4. **Claim threshold.** Bonferroni over the 5 groups, unchanged and conservative: the 99% CI must be > 0. The 95% CI is also reported.
+5. **Idea-1 rule.** If the knockout group passes the screen, its original rule (95% CI > 0) is also reported, now on the held-out set.
+6. **If no group passes,** stage 2 is not run. All five groups are reported as exploratory, with screening numbers only.

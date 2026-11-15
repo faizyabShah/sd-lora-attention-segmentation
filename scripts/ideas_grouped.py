@@ -10,13 +10,15 @@ Per image, one shared generation:
   4. chrono k-means, CFG contrast maps
   5. every map -> counts on the tau grid, raw and + R2 (CRF in a CPU process pool)
 
+Two stages (PREREG.md, amendment 1): screen = 150 class-stratified images per set; rest = all other images.
 selftest (GPU)  python scripts/ideas_grouped.py selftest
-run      (GPU)  python scripts/ideas_grouped.py run --dataset voc|coco [--shard i --num-shards n] [--max-images k] [--crf-workers w]
-report   (CPU)  python scripts/ideas_grouped.py report
+run      (GPU)  python scripts/ideas_grouped.py run --dataset voc|coco --subset screen|rest [--groups knockout,chrono,jacobian,ot,contrast]
+                [--shard i --num-shards n] [--max-images k] [--crf-workers w]
+report   (CPU)  python scripts/ideas_grouped.py report --stage screen|confirm
 """
 from __future__ import annotations
 
-import argparse, copy, json, os, sys, time
+import argparse, copy, json, os, sys, time, zlib
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
@@ -46,6 +48,26 @@ GROUPS = {
     "denoising contrast (idea 7)": ("cfg_k0", "cfg_k10"),
 }
 CANDS = tuple(c for g in GROUPS.values() for c in g)
+GKEY = dict(zip(("knockout", "chrono", "jacobian", "ot", "contrast"), GROUPS))
+N_SCREEN = 150
+
+
+def crc(x):
+    return zlib.crc32(x.encode())
+
+
+def screen_ids(ds, n=N_SCREEN):
+    """Class-stratified screening subset (PREREG amendment 1): n // C per class, the remainder to the classes with
+    the smallest crc32(class name); within a class the images with the smallest crc32(image_id)."""
+    by = {}
+    for r in cc.gen_rows(ds):
+        by.setdefault(r["classname"], []).append(r["image_id"])
+    cls = sorted(by, key=crc); q = {c: n // len(cls) for c in cls}
+    for c in cls[: n - sum(q.values())]:
+        q[c] += 1
+    ids = [i for c in cls for i in sorted(by[c], key=crc)[: q[c]]]
+    assert len(ids) == n and len(set(ids)) == n
+    return set(ids)
 TAU = 0.55
 NAME = {"voc": "VOC-Sim", "coco": "COCO-Cap"}
 
@@ -239,9 +261,12 @@ def run(a):
     pool = ProcessPoolExecutor(a.crf_workers, mp_context=mp.get_context("forkserver"), initializer=_crf_init)
     from scripts import sg27_runtime
     from src.segmentation import sg_combined_v2, sg24_ca
-    rows = cc.gen_rows(a.dataset)[a.shard::a.num_shards]
+    sc = screen_ids(a.dataset)
+    rows = [r for r in cc.gen_rows(a.dataset) if (r["image_id"] in sc) == (a.subset == "screen")][a.shard::a.num_shards]
     if a.max_images:
         rows = rows[: a.max_images]
+    groups = [GKEY[g] for g in a.groups.split(",")]; cands = tuple(c for g in groups for c in GROUPS[g])
+    print(f"[grouped:{a.dataset}] subset {a.subset}: {len(rows)} images in this shard; groups {', '.join(groups)}", flush=True)
     runtime = sg27_runtime.make_runtime(MODEL); pipe = runtime["pipe"]; pipe.unet.requires_grad_(False)
     out = CACHE / f"grouped_{a.dataset}"; out.mkdir(parents=True, exist_ok=True)
     for row in rows:
@@ -266,37 +291,45 @@ def run(a):
                 content = sg24_ca.content_positions(pipe.tokenizer, row["prompt"], tuple(tokens))
             except ValueError:
                 content = tuple(tokens)
-            ot32, a_hat = ot_map(B["tok"][1024], content, tokens, seed64.cpu().numpy())
-            ot64 = torch.from_numpy(st.up(ot32, (64, 64))).to(seed64.device)
-            v3_ot = sg_combined_v2.aggregate(sa, ot64)[0]["V3"].float().cpu().numpy()
+            a_hat = float(np.clip(st.a_hat(seed64.cpu().numpy()), 0.02, 0.98))
+            if GKEY["ot"] in groups:
+                ot32, a_hat = ot_map(B["tok"][1024], content, tokens, seed64.cpu().numpy())
+                ot64 = torch.from_numpy(st.up(ot32, (64, 64))).to(seed64.device)
+                v3_ot = sg_combined_v2.aggregate(sa, ot64)[0]["V3"].float().cpu().numpy()
         s64 = seed64.cpu().numpy()
         t2 = time.perf_counter()
         # 3. knockout, Jacobian
         ctl = Control(); saved = install(pipe, ctl)
         try:
-            ps = k1.swap_embeds(pipe, row, tokens)
-            maps64.update(knockout_maps(pipe, ctl, B, tokens, ps))
-            maps64.update(jac_maps(pipe, ctl, B, s64))
+            if GKEY["knockout"] in groups:
+                ps = k1.swap_embeds(pipe, row, tokens)
+                maps64.update(knockout_maps(pipe, ctl, B, tokens, ps))
+            if GKEY["jacobian"] in groups:
+                maps64.update(jac_maps(pipe, ctl, B, s64))
         finally:
             pipe.unet.set_attn_processor(saved)
         # 4. CFG contrast, chrono
-        for k in (0, 10):
-            maps64[f"cfg_k{k}"] = B["gdiff"][k:].sum(0).cpu().numpy()
+        if GKEY["contrast"] in groups:
+            for k in (0, 10):
+                maps64[f"cfg_k{k}"] = B["gdiff"][k:].sum(0).cpu().numpy()
         hw = truth.shape
         maps = {c: k1.post(maps64[c], hw) for c in maps64}
-        maps.update({c: st.up(v, hw) for c, v in chrono_maps(B["x0"], s64).items()})
-        maps["ot"] = st.mm(st.up(ot32, hw)); maps["ot_v3"] = st.up(st.mm(v3_ot), hw)
+        if GKEY["chrono"] in groups:
+            maps.update({c: st.up(v, hw) for c, v in chrono_maps(B["x0"], s64).items()})
+        if GKEY["ot"] in groups:
+            maps["ot"] = st.mm(st.up(ot32, hw)); maps["ot_v3"] = st.up(st.mm(v3_ot), hw)
+        assert set(maps) == set(cands), (sorted(maps), cands)
         img_diff = float(np.abs(base_img.astype(int) - img.astype(int)).mean())
         t3 = time.perf_counter()
         # 5. counts
         valid = np.ones_like(truth); other = np.zeros_like(truth)
         res = {"cls": cls, "area": float(truth.mean())}
         xb = st.up(st.mm(v3), hw)
-        jobs = [(img, xb)] + [(base_img, maps[c]) for c in CANDS]
+        jobs = [(img, xb)] + [(base_img, maps[c]) for c in cands]
         masks = list(pool.map(_crf_job, jobs))
         res["brace|raw"] = cc.counts(xb[None] >= cc.THR[:, None, None], truth, valid, other)
         res["brace+R2|raw"] = cc.counts(masks[0], truth, valid, other)
-        for c, m in zip(CANDS, masks[1:]):
+        for c, m in zip(cands, masks[1:]):
             res[f"{c}|raw"] = cc.counts(maps[c][None] >= cc.THR[:, None, None], truth, valid, other)
             res[f"{c}+R2|raw"] = cc.counts(m, truth, valid, other)
         res.update(tokens=np.array(tokens), token_rule=how, img_meandiff=img_diff, a_hat=a_hat,
@@ -317,18 +350,33 @@ def boot2(S, Pa, Pb, n=1000):
     return np.percentile(d, [2.5, 97.5]), np.percentile(d, [0.5, 99.5])
 
 
+def load(ds, ids):
+    """Score counts of the cached images in `ids` (keys present in every file only)."""
+    d = CACHE / f"grouped_{ds}"
+    fs = sorted(f for f in d.glob("*.npz") if not f.stem.endswith(".tmp") and f.stem in ids) if d.exists() else []
+    if not fs:
+        return None
+    Z = [np.load(f) for f in fs]; grp = np.array([f.stem for f in fs])
+    keys = set.intersection(*[{k for k in z.files if "|" in k} for z in Z])
+    S = {"cls": np.array([str(z["cls"]) for z in Z]), "grp": grp, "fold": np.array([crc(g) % 5 for g in grp]),
+         "rule": np.array([str(z["token_rule"]) for z in Z]), "sec": np.array([float(z["sec_total"]) for z in Z]),
+         "imgdiff": np.array([float(z["img_meandiff"]) for z in Z])}
+    S.update({k: np.stack([z[k] for z in Z]) for k in keys})
+    return S
+
+
 def report(a):
     j55 = int(np.flatnonzero(np.isclose(cc.THR_CRF, TAU))[0])
-    S = {}
-    for ds in ("voc", "coco"):
-        d = CACHE / f"grouped_{ds}"
-        if d.exists() and any(d.glob("*.npz")):
-            S[ds] = cc.load_gen(d)
-            Z = [np.load(f) for f in sorted(f for f in d.glob("*.npz") if not f.stem.endswith(".tmp"))]
-            for key, name in (("rule", "token_rule"),):
-                S[ds][key] = np.array([str(z[name]) for z in Z])
-            S[ds]["sec"] = np.array([float(z["sec_total"]) for z in Z])
-            S[ds]["imgdiff"] = np.array([float(z["img_meandiff"]) for z in Z])
+    allids = {ds: {r["image_id"] for r in cc.gen_rows(ds)} for ds in ("voc", "coco")}
+    scr = {ds: screen_ids(ds) for ds in ("voc", "coco")}
+    if a.stage == "screen":
+        want = scr; full = {"voc": N_SCREEN, "coco": N_SCREEN}
+    else:
+        want = {"voc": allids["voc"], "coco": allids["coco"] - scr["coco"]}
+        full = {"voc": len(allids["voc"]), "coco": len(want["coco"])}
+    S = {ds: x for ds in ("voc", "coco") if (x := load(ds, want[ds])) is not None}
+    have = lambda ds: {k.split("+R2|raw")[0] for k in S[ds] if k.endswith("+R2|raw")}
+    groups = {g: ks for g, ks in GROUPS.items() if all(set(ks) <= have(ds) for ds in S)}
     one = lambda ds: np.ones(len(S[ds]["grp"]), bool)
     memo = {}
 
@@ -336,16 +384,19 @@ def report(a):
         if (ds, k) not in memo:
             memo[ds, k] = cc.oof(S[ds], S[ds][f"{k}+R2|raw"])
         return memo[ds, k]
-    L = ["# Grouped run: ideas 1, 3, 4, 6, 7 (pre-registered in `PREREG.md`)\n",
-         "One shared generation per image. BRACE = frozen V3 + R2 from the same process. Class-macro mIoU; "
-         "OOF = τ chosen on 4 folds (crc32 % 5); Δ vs BRACE OOF + R2 with image-bootstrap 95% CI.\n"]
+    title = {"screen": "Stage 1 screening (exploratory; 150 class-stratified images per set)",
+             "confirm": "Stage 2 confirmation (VOC-Sim all 490; COCO-Cap the 557 held-out images)"}[a.stage]
+    L = [f"# Grouped run: ideas 1, 3, 4, 6, 7, {title}\n",
+         "Pre-registered in `PREREG.md` (amendment 1: two stages). One shared generation per image. BRACE = frozen V3 + R2 "
+         "from the same process. Class-macro mIoU; OOF = τ chosen on 4 folds (crc32 % 5); Δ vs BRACE OOF + R2 with "
+         "image-bootstrap 95% CI.\n"]
     for ds in S:
         n = len(S[ds]["grp"]); ref = oof(ds, "brace"); dd = S[ds]["imgdiff"]
-        L += [f"## {NAME[ds]} ({n} images; base-loop vs live mean |Δpixel| {dd.mean():.2f}/255, "
+        L += [f"## {NAME[ds]} ({n} of {full[ds]} images; base-loop vs live mean |Δpixel| {dd.mean():.2f}/255, "
               f"{(dd > 2).sum()} images > 2/255, max {dd.max():.2f}; {S[ds]['sec'].mean():.1f} s/image)\n",
               "| group | map | OOF + R2 | Δ vs BRACE (95% CI) | prec / rec | OOF raw | @0.55 + R2 |",
               "|---|---|---:|---|---|---:|---:|"]
-        for g, ks in [("—", ("brace",))] + list(GROUPS.items()):
+        for g, ks in [("—", ("brace",))] + list(groups.items()):
             for k in ks:
                 m, P, _ = oof(ds, k)
                 if k == "brace":
@@ -355,42 +406,72 @@ def report(a):
                 pr = cc.prf(P); raw = cc.oof(S[ds], S[ds][f"{k}|raw"])[0]
                 f55 = cc.miou(S[ds][f"{k}+R2|raw"][:, j55][:, None], S[ds]["cls"], one(ds))[0]
                 L.append(f"| {g} | {'BRACE (frozen)' if k == 'brace' else k} | {m:.3f} | {d} | {pr[0]:.3f} / {pr[1]:.3f} | {raw:.3f} | {f55:.3f} |")
+        cands = tuple(c for ks in groups.values() for c in ks)
         if ds == "coco":
             L.append("")
             for r in ("class_word", "fallback"):
                 sel = S[ds]["rule"] == r
-                L.append(f"- token rule **{r}**: {sel.sum()} images ({sel.mean() * 100:.0f}%); OOF + R2 on this subset: " + ", ".join(
-                    f"{k} {cc.miou(oof(ds, k)[1][:, None], S[ds]['cls'], sel)[0]:.3f}" for k in ("brace",) + CANDS))
-        L.append("\nPer class, OOF + R2 (BRACE / best of each group on this set):\n")
-        best = [max(ks, key=lambda k: oof(ds, k)[0]) for ks in GROUPS.values()]
-        L += ["| class | BRACE | " + " | ".join(best) + " |", "|---|" + "---:|" * (len(best) + 1)]
-        for c in np.unique(S[ds]["cls"]):
-            L.append(f"| {c} | " + " | ".join(f"{cc.miou(oof(ds, k)[1][:, None], S[ds]['cls'], S[ds]['cls'] == c)[0]:.2f}"
-                                             for k in ("brace",) + tuple(best)) + " |")
+                if sel.any():
+                    L.append(f"- token rule **{r}**: {sel.sum()} images ({sel.mean() * 100:.0f}%); OOF + R2 on this subset: " + ", ".join(
+                        f"{k} {cc.miou(oof(ds, k)[1][:, None], S[ds]['cls'], sel)[0]:.3f}" for k in ("brace",) + cands))
+        if groups:
+            L.append("\nPer class, OOF + R2 (BRACE / best of each group on this set):\n")
+            best = [max(ks, key=lambda k: oof(ds, k)[0]) for ks in groups.values()]
+            L += ["| class | BRACE | " + " | ".join(best) + " |", "|---|" + "---:|" * (len(best) + 1)]
+            for c in np.unique(S[ds]["cls"]):
+                L.append(f"| {c} | " + " | ".join(f"{cc.miou(oof(ds, k)[1][:, None], S[ds]['cls'], S[ds]['cls'] == c)[0]:.2f}"
+                                                 for k in ("brace",) + tuple(best)) + " |")
         L.append("")
-    res = {}
-    L.append("## Registered tests (one per group)\n")
-    if "voc" in S and "coco" in S and len(S["voc"]["grp"]) == 490 and len(S["coco"]["grp"]) == 707:
-        rb = oof("coco", "brace")
-        L += ["| group | chosen on VOC-Sim (OOF + R2) | COCO-Cap OOF + R2 vs BRACE | Δ | 95% CI | 99% CI (Bonferroni, 5 groups) | verdict |",
-              "|---|---|---|---:|---|---|---|"]
-        for g, ks in GROUPS.items():
-            ch = max(ks, key=lambda k: oof("voc", k)[0]); m, P, _ = oof("coco", ch)
-            (lo, hi), (lo99, hi99) = boot2(S["coco"], P, rb[1])
-            verdict = "beats BRACE" if lo99 > 0 else ("95% CI > 0 only (not claimable family-wise)" if lo > 0 else "no gain over BRACE")
-            L.append(f"| {g} | {ch} ({oof('voc', ch)[0]:.3f} vs BRACE {oof('voc', 'brace')[0]:.3f}) | {m:.3f} vs {rb[0]:.3f} | "
-                     f"{m - rb[0]:+.3f} | {lo:+.3f}…{hi:+.3f} | {lo99:+.3f}…{hi99:+.3f} | **{verdict}** |")
-            res[g] = {"chosen": ch, "coco_delta": m - rb[0], "ci95": [lo, hi], "ci99": [lo99, hi99], "verdict": verdict}
-        g1 = res["knockout (idea 1)"]
-        L.append(f"\nIdea-1 rule as originally registered (`runs/01_knockout/PREREG.md`, 95% CI > 0): "
-                 f"**{'knockout beats BRACE' if g1['ci95'][0] > 0 else 'no gain over BRACE'}**.")
+    res = {"stage": a.stage}
+    complete = "voc" in S and "coco" in S and all(len(S[ds]["grp"]) == full[ds] for ds in ("voc", "coco"))
+    if a.stage == "screen":
+        L.append("## Screening decision (pass: VOC-chosen candidate's Δ vs BRACE on the COCO-Cap screen > 0)\n")
+        if complete:
+            rb = oof("coco", "brace")
+            L += ["| group | chosen on VOC-Sim screen (OOF + R2 vs BRACE) | COCO-Cap screen OOF + R2 vs BRACE | Δ | 95% CI | decision |",
+                  "|---|---|---|---:|---|---|"]
+            for g, ks in groups.items():
+                ch = max(ks, key=lambda k: oof("voc", k)[0]); m, P, _ = oof("coco", ch); (lo, hi), _ = boot2(S["coco"], P, rb[1])
+                ok = m - rb[0] > 0
+                L.append(f"| {g} | {ch} ({oof('voc', ch)[0]:.3f} vs {oof('voc', 'brace')[0]:.3f}) | {m:.3f} vs {rb[0]:.3f} | "
+                         f"{m - rb[0]:+.3f} | {lo:+.3f}…{hi:+.3f} | **{'PASS → stage 2' if ok else 'stop'}** |")
+                res[g] = {"chosen": ch, "coco_delta": m - rb[0], "ci95": [lo, hi], "pass": bool(ok)}
+            passed = [k for k, g in GKEY.items() if res.get(g, {}).get("pass")]
+            res["passed_groups"] = passed
+            L.append(f"\nGroups for stage 2: **{', '.join(passed) if passed else 'none (stage 2 is not run)'}**"
+                     + (f" → `--groups {','.join(passed)}`" if passed else "") + ".")
+        else:
+            L.append("Not evaluated: both complete screening subsets (150 / 150) are required.")
+        out_md, out_js = RUN / "result_screen.md", RUN / "result_screen.json"
     else:
-        L.append("Not evaluated: both full sets (490 / 707) are required.")
+        L.append("## Registered tests (stage 2; COCO-Cap held-out images only)\n")
+        scr_res = json.loads((RUN / "result_screen.json").read_text()) if (RUN / "result_screen.json").exists() else {}
+        passed = [GKEY[k] for k in scr_res.get("passed_groups", [])]
+        if complete and passed:
+            rb = oof("coco", "brace")
+            L += ["| group | chosen on VOC-Sim 490 (OOF + R2) | COCO-Cap held-out OOF + R2 vs BRACE | Δ | 95% CI | 99% CI (Bonferroni, 5 groups) | verdict |",
+                  "|---|---|---|---:|---|---|---|"]
+            for g in passed:
+                ks = groups[g]; ch = max(ks, key=lambda k: oof("voc", k)[0]); m, P, _ = oof("coco", ch)
+                (lo, hi), (lo99, hi99) = boot2(S["coco"], P, rb[1])
+                verdict = "beats BRACE" if lo99 > 0 else ("95% CI > 0 only (not claimable family-wise)" if lo > 0 else "no gain over BRACE")
+                L.append(f"| {g} | {ch} ({oof('voc', ch)[0]:.3f} vs BRACE {oof('voc', 'brace')[0]:.3f}) | {m:.3f} vs {rb[0]:.3f} | "
+                         f"{m - rb[0]:+.3f} | {lo:+.3f}…{hi:+.3f} | {lo99:+.3f}…{hi99:+.3f} | **{verdict}** |")
+                res[g] = {"chosen": ch, "coco_delta": m - rb[0], "ci95": [lo, hi], "ci99": [lo99, hi99], "verdict": verdict}
+            if "knockout (idea 1)" in res:
+                g1 = res["knockout (idea 1)"]
+                L.append(f"\nIdea-1 rule as originally registered (95% CI > 0), on the held-out set: "
+                         f"**{'knockout beats BRACE' if g1['ci95'][0] > 0 else 'no gain over BRACE'}**.")
+        elif not passed:
+            L.append("No group passed the screen (`result_screen.json`); stage 2 is not run.")
+        else:
+            L.append(f"Not evaluated: VOC-Sim {full['voc']} and COCO-Cap {full['coco']} held-out images are required for the passing groups.")
+        out_md, out_js = RUN / "result.md", RUN / "result.json"
     for ds in S:
-        res[ds] = {k: oof(ds, k)[0] for k in ("brace",) + CANDS} | {"n": len(S[ds]["grp"])}
+        res[ds] = {k: oof(ds, k)[0] for k in ("brace",) + tuple(c for ks in groups.values() for c in ks)} | {"n": len(S[ds]["grp"])}
     txt = "\n".join(L) + "\n"; print(txt)
     RUN.mkdir(parents=True, exist_ok=True)
-    (RUN / "result.md").write_text(txt); (RUN / "result.json").write_text(json.dumps(res, indent=1, default=float))
+    out_md.write_text(txt); out_js.write_text(json.dumps(res, indent=1, default=float))
 
 
 if __name__ == "__main__":
@@ -398,6 +479,9 @@ if __name__ == "__main__":
     p = sub.add_parser("run"); p.add_argument("--dataset", choices=("voc", "coco"), required=True)
     p.add_argument("--shard", type=int, default=0); p.add_argument("--num-shards", type=int, default=1)
     p.add_argument("--max-images", type=int); p.add_argument("--crf-workers", type=int, default=4)
-    sub.add_parser("report"); sub.add_parser("selftest")
+    p.add_argument("--subset", choices=("screen", "rest"), default="screen")
+    p.add_argument("--groups", default=",".join(GKEY))
+    q = sub.add_parser("report"); q.add_argument("--stage", choices=("screen", "confirm"), default="screen")
+    sub.add_parser("selftest")
     a = ap.parse_args()
     {"run": run, "report": report, "selftest": selftest}[a.cmd](a)
