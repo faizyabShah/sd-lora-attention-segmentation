@@ -115,3 +115,22 @@ On the A40, ideas 1, 3, 4, 6 and 7 (knockout, chrono, Jacobian, OT, CFG contrast
   - Gate A passed: the decoder response beats its own footprint, +0.105.
   - Gates B and C failed: +0.004 AUROC beyond RGB + footprint; the fixed rule wins on 2/22 images, −0.109 IoU.
   - Within cells crossed by the boundary, decoder ownership (0.720) equals RGB colour (0.721). The decoder's boundary information is the RGB image's.
+
+## Update: A40 grouped screen (`runs/03_grouped/result_screen.md`, 2026-11-15)
+
+All five generation-side groups **stop** at stage 1. Each candidate was chosen on the VOC-Sim screen; Δ is against BRACE on the COCO-Cap screen, OOF + R2:
+- knockout/swap −0.215;
+- chrono −0.144;
+- Jacobian −0.106;
+- OT seed into V3 −0.105;
+- CFG contrast −0.286.
+
+Stage 2 is not run.
+- **Causal token effects are worse segmentation evidence than attention.**
+  - The instantaneous noise-prediction effect reaches about 0.63 on VOC-Sim, against BRACE 0.82.
+  - Letting the knocked-out trajectory run to the end (`fin`) is worse still, about 0.50: the scene itself changes.
+  - This removes the premise for pairwise token interactions and time-resolved influence.
+- **Descriptive, post hoc, about 7 images per class:**
+  - chrono K16 beats BRACE on VOC-Sim sheep (0.92 vs 0.70), the class that broke the worst-class guard;
+  - every group beats BRACE on COCO-Cap dining table (0.38–0.56 vs 0.33).
+  - Not a basis for selection.
