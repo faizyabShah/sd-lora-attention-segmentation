@@ -1,3 +1,47 @@
 % Comment 3: comparison methods (GoCA, NERVE, DiffSegmenter, SPARK, published block)
 % Owner: N. Only this side edits this file.
 % Add frames below; one message per frame. See docs/JC_REVIEW_WORKPLAN.md, Section 6.
+
+\begin{frame}{Three of four requested methods run with the class word}
+\status{done}
+\begin{slidetable}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+Method & Venue & Public code & Backbone used & Verdict \\
+\midrule
+GoCA & CVPR 2026 & yes & SD 1.5, SDXL & \textbf{go} \\
+NERVE & WACV 2026 & yes & SD 1.5 + CLIP ViT-L/14 & \textbf{go} \\
+DiffSegmenter & TIP 2025 & yes & SD 1.5 & \textbf{go} \\
+SPARK & 2026 & no & --- & no-go \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item Each method runs from its own repository and settings; the query is the class word.
+\item SPARK: no released code and no class query, so published block only.
+\end{itemize}
+\src{Workplan Entry 2; \texttt{comparisons/README.md}}
+\end{frame}
+
+\begin{frame}{Sanity check: every method finds the object}
+\status{running}
+\begin{slidetable}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Method (fixed threshold 0.5, no DenseCRF) & VOC-Sim & COCO-Cap & s / image \\
+\midrule
+GoCA, SD 1.5 & 0.671 & 0.452 & 0.14 \\
+GoCA, SDXL & 0.788 & 0.607 & 0.66 \\
+DiffSegmenter, SD 1.5 & 0.713 & 0.653 & 0.15 \\
+NERVE, SD 1.5 + CLIP, class word only & 0.830 & 0.729 & 0.30 \\
+NERVE, SD 1.5 + CLIP, 20-class vocabulary & 0.824 & 0.743 & 0.30 \\
+Centre prior (no model) & 0.318 & 0.225 & --- \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item Sanity numbers on all 490 + 707 images, not yet paired with BRACE.
+\item Possible action: report NERVE in a separate ``with CLIP'' block.
+\end{itemize}
+\src{Workplan Entry 4; \texttt{outputs/segmentation/comparisons/n\_side/}}
+\end{frame}

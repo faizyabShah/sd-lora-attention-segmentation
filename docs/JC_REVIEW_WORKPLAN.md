@@ -290,22 +290,22 @@ Edited in place by the owner. States: `not started`, `in progress`,
 | Contract and manifests | F | not started | — |
 | #1 gain breakdown | F | not started | — |
 | #1 reframing text | N | not started | — |
-| #2 mapping table | N | not started | — |
+| #2 mapping table | N | done, awaiting review | Entry 7 |
 | #3 OVAM class word | F | not started | — |
 | #3 OVAM optimized tokens | F | not started | — |
 | #3 DAAM | F | not started | — |
 | #3 SeeDiff | F | not started | — |
 | #3 SCLIP + DenseCRF | F | not started | — |
-| #3 GoCA | N | not started | — |
-| #3 NERVE | N | not started | — |
-| #3 DiffSegmenter | N | not started | — |
-| #3 SPARK | N | not started | — |
+| #3 GoCA | N | done, awaiting review (sanity only; official scoring waits for Entry 1) | Entries 2–4 |
+| #3 NERVE | N | done, awaiting review (sanity only; official row undecided: A or V) | Entries 2–4 |
+| #3 DiffSegmenter | N | done, awaiting review (sanity only; class-word row) | Entries 2–4 |
+| #3 SPARK | N | no-go | Entry 2 |
 | #3 published block | N | not started | — |
 | #4 BRACE with optimized tokens | F | not started | — |
-| #4 token provenance | N | not started | — |
+| #4 token provenance | N | done, awaiting review | Entry 5 |
 | #5 fine-only and BRACE, SD 1.5 / 2.1 / XL | F | not started | — |
-| #5 GoCA, SD 1.5 / 2.1 / XL | N | not started | — |
-| #6 consistency | N | not started | — |
+| #5 GoCA, SD 1.5 / 2.1 / XL | N | in progress: SD 1.5 and SDXL done; SD 2.1 blocked (official weights removed) | Entries 3–4 |
+| #6 consistency | N | done, awaiting review | Entry 6 |
 | #7 Table 1 | F | not started | — |
 | #8 cost and hardware | F | not started | — |
 | #8 restructuring | N | not started | — |
@@ -338,3 +338,93 @@ read, or traced to a file) and what was not. An objection is answered in a new
 entry, not by editing the reviewed one.
 
 <!-- Entries start here. -->
+
+*Entry 1 is reserved for F's day-one contract (Section 3). N's entries start at Entry 2.*
+
+### Entry 2 — N (Narmeen), 2026-11-16
+**Item:** #3 GoCA, NERVE, DiffSegmenter, SPARK (go / no-go)
+**Kind:** go/no-go
+**What was done:** Cloned each method's public repository and ran a 12-item smoke test (8 VOC-Sim classes, 4 COCO-Cap images) on SD 1.5 with the class word as the only query, using each repository's own settings. Repositories and commits are in `comparisons/README.md`.
+**Where:** `comparisons/`; this commit.
+**Result:**
+- **GoCA (CVPR 2026): go.** Code unchanged, SD 1.5 config as shipped (t=100). Prompt "<class>, background", which is what GoCA's own captioner builds for one entity; the class word alone makes its sum-1 rescaling 0/0. The output is GoCA's per-class soft map after aggregation, rescaling and affinity, before its multi-class argmax.
+- **NERVE (WACV 2026): go.** NERVE's own `Pipeline` with its VOC21 ViT-L/14 config, driven without mmseg. With a one-class vocabulary its entropy head weighting divides by log2(1) = 0, so a one-line guard is needed (deviation D1). SD 1.5 instead of the paper's SD 2.1.
+- **DiffSegmenter (TIP 2025): go.** Code unchanged. Prompt "a photograph of {class}++". The published method appends a BLIP-large caption; that variant is not run (image-derived text breaks the class-word rule, and the download is pending a decision).
+- **SPARK (2026): no-go.** No public code (project page 404, no repository in the paper), and the method is unsupervised: it takes no class query. It moves to the published block.
+**Slides:** `slides/jc_meeting/sections/c3_N.tex`
+**Open points:** Smoke numbers are not results and are not repeated here.
+
+**Review — F, <date>:** pending
+
+### Entry 3 — N (Narmeen), 2026-11-16
+**Item:** #3 NERVE; #5 GoCA, SD 1.5 / 2.1 / XL
+**Kind:** pre-registration
+**What was done:** Fixed the settings of the full runs before running them. Both notes were written before any full-run output existed and have no amendments.
+**Where:** `comparisons/goca/PREREG_backbones.md`, `comparisons/nerve/PREREG_sd15.md`; this commit.
+**Result:**
+- **GoCA SDXL:** GoCA's `config_model_xl.py` unchanged; 512→1024 bicubic upscale; fp16 VAE with `force_upcast` (no NaN occurred, so no fallback). **SD 2.1: blocked**, because `stabilityai/stable-diffusion-2-1-base` is no longer available on Hugging Face; the planned config and the "!"-padding fix are written down. Using a community mirror needs agreement between F and N, since F's #5 needs the same weights.
+- **NERVE:** three variants, all run. A = {class word} + NERVE's background words, head size 40, with the K=1 guard (D1). V = the 20 benchmark class words, head size 40. W = NERVE's released `cls_voc21` names, head size 64 (as released). Timestep index 45 (t=101), seed 0. Deviations D1 (K=1 guard), D2 (head size 64 → 40 on SD 1.5, A and V), D3 (offline model id).
+- **All methods:** noise seed 0; thresholds and DenseCRF follow Entry 1's shared scorer once it exists.
+**Slides:** `slides/jc_meeting/sections/c3_N.tex`, `c5_N.tex`
+**Open points:** Which NERVE variant is the official row (A: class word only, as for every other method; V: native vocabulary) is undecided.
+
+**Review — F, <date>:** pending
+
+### Entry 4 — N (Narmeen), 2026-11-16
+**Item:** #3 GoCA, NERVE, DiffSegmenter; #5 GoCA SD 1.5 and SDXL
+**Kind:** result
+**What was done:** Full runs on the 490 VOC-Sim and 707 COCO-Cap items of `comparisons/manifests/` (stored OVAM benchmark images), on one A100-40GB (node renyi). SLURM jobs 253155 (GoCA SD 1.5), 253160 (GoCA SDXL), 253159 (DiffSegmenter), 253163 (NERVE A, V, W). Every map was rescored independently by `comparisons/verify_runs.py`.
+**Where:** `outputs/segmentation/comparisons/n_side/<run>/{sanity_summary.json, per_item_counts.csv}`; this commit.
+**Result:** fixed threshold 0.5 on the min-max map, no DenseCRF, class-macro IoU. **Sanity, fixed-threshold; not the official comparison.**
+
+| Run | VOC-Sim | COCO-Cap | s / image (A100) | Peak GPU memory |
+|---|---:|---:|---:|---:|
+| GoCA, SD 1.5 | 0.671 | 0.452 | 0.14 | 4.4 GB |
+| GoCA, SDXL | 0.788 | 0.607 | 0.66 | 13.3 GB |
+| DiffSegmenter, SD 1.5 | 0.713 | 0.653 | 0.15 | 8.2 GB |
+| NERVE A, SD 1.5 | 0.830 | 0.729 | 0.30 | 11.7 GB |
+| NERVE V, SD 1.5 | 0.824 | 0.743 | 0.30 | 11.7 GB |
+| NERVE W, SD 1.5 | 0.810 | 0.729 | 0.30 | 11.7 GB |
+| Centre-prior control (no model) | 0.318 | 0.225 | — | — |
+
+- All 1197 items per run: no missing, NaN, constant or duplicate maps; no image above 0.995 IoU (no sign of label leakage); median per-image AUROC 0.993–0.998.
+- NERVE also uses CLIP ViT-L/14, a second model; it belongs in a separately labelled block next to the SD-only methods.
+- NERVE's own binarisation and DiffSegmenter's own threshold rule are in the summaries. GoCA's per-class maps and background channel are saved for its own rule.
+- Not the same setting as BRACE's numbers (generation-time attention, tuned threshold, DenseCRF): no paired claim is made.
+**Slides:** `slides/jc_meeting/sections/c3_N.tex`, `c5_N.tex`
+**Open points:** Official scoring with Entry 1's scorer, thresholds chosen on VOC-Sim, and with/without DenseCRF. The soft maps are local to N (0.7–2.4 GB per run) and can be shared for rescoring. Possible annotation gaps found while checking NERVE overlays (`ovam-voc-sim-50` bird tail, `ovam-coco-687317-cow-478200312` second cow) are listed in `comparisons/nerve/` and were not changed.
+
+**Review — F, <date>:** pending
+
+### Entry 5 — N (Narmeen), 2026-11-16
+**Item:** #4 token provenance
+**Kind:** result
+**What was done:** Matched OVAM's 57 released per-image tokens with the VOC-Sim and COCO-Cap evaluation images by class and generation seed, plus a pixel comparison of the locally held images.
+**Where:** `comparisons/notes/entry_4_token_provenance.md`; this commit.
+**Result:** The tokens were optimized on 57 separate annotated generated images (2–3 per class) in `voc_sim_train`. **No overlap with any VOC-Sim (500) or COCO-Cap (707) evaluation image.** The #4 block is therefore few-shot (not training-free) but has no evaluation leakage; no clean-subset rerun is needed.
+**Slides:** `slides/jc_meeting/sections/c4_N.tex`
+**Open points:** none.
+
+**Review — F, <date>:** pending
+
+### Entry 6 — N (Narmeen), 2026-11-16
+**Item:** #6 consistency
+**Kind:** text
+**What was done:** Traced every numeric claim in the main paper and the current supplementary to a committed source, and checked each of JC's #6 items.
+**Where:** `comparisons/notes/entry_6_consistency.md`; this commit.
+**Result:** 162 claims: 137 traced and matching, 22 differing, 3 not traced. Main fixes: use the v3 run (0.829 / 0.696) throughout; separate raw and DenseCRF values in every comparison; label 0.829 as forced OOF; correct the "objects that fill the frame" failure statement (the record says sheep is the exception); replace ten "(supplementary material)" pointers; rebuild both PDFs (the committed main PDF predates commit 2a954a2). "Eq. ??" could not be reproduced from any committed source.
+**Slides:** `slides/jc_meeting/sections/c6_N.tex`
+**Open points:** Which PDF JC read. The three proposed citations must be checked against DOI/arXiv before entering `references.bib`.
+
+**Review — F, <date>:** pending
+
+### Entry 7 — N (Narmeen), 2026-11-16
+**Item:** #2 mapping table
+**Kind:** text
+**What was done:** Mapped each of the four contributions in `paper/sec/1_intro.tex` to its sections, tables, figures, key numbers and sources.
+**Where:** `comparisons/notes/entry_2_mapping.md`; this commit.
+**Result:** Contributions 1–3 are supported in the main paper. Contribution 4 (fold-safe protocol) has no main-paper table or figure, and the registered selector's own outcome (fine-only kept) is not printed. Thirteen results support no contribution and are candidates to shorten or move.
+**Slides:** `slides/jc_meeting/sections/c2_N.tex`
+**Open points:** none.
+
+**Review — F, <date>:** pending

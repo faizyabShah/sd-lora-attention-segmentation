@@ -1,3 +1,14 @@
 % Comment 4: token provenance and overlap
 % Owner: N. Only this side edits this file.
 % Add frames below; one message per frame. See docs/JC_REVIEW_WORKPLAN.md, Section 6.
+
+\begin{frame}{The optimized tokens never saw an evaluation image}
+\status{done}
+\begin{itemize}
+\item OVAM's released token for each class is the mean of 2--3 tokens, each optimized on one annotated generated image: 57 images in total.
+\item None of these 57 images is in VOC-Sim (500 images) or COCO-Cap (707 images): no shared class and seed, no identical pixels.
+\item The optimized-token block is therefore few-shot, not training-free, but it has no evaluation leakage.
+\item Recommended action: report the block next to the class-word results with the label ``few-shot, 57 annotated images''.
+\end{itemize}
+\src{Workplan Entry 5; \texttt{comparisons/notes/entry\_4\_token\_provenance.md}}
+\end{frame}
