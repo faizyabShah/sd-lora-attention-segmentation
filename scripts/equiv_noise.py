@@ -192,7 +192,7 @@ def one(job):
            "noise_avg": iou(mask(np.mean([c[f"v3/{k}"] for k in ids_], 0)))}
     caq = sbd.auc((gt >= 0.5).ravel(), feats["mean_ca"].ravel())
     inside = {k: (float(np.nanmean(feats[k][Mc])), float(np.nanmean(feats[k][~Mc]))) for k in ("e_ca", "v_ca", "e_v3", "v_v3")}
-    return {"id": iid, "ok": True, "Q": Q, "y": y, "X": {k: np.asarray(f, np.float64).ravel()[Q] for k, f in feats.items()},
+    return {"id": iid, "ok": True, "Q": Q, "F": F, "B": B, "y": y, "X": {k: np.asarray(f, np.float64).ravel()[Q] for k, f in feats.items()},
             "aug": aug, "ca_auc": caq, "inside": inside, "sec": float(c["sec"])}
 
 
