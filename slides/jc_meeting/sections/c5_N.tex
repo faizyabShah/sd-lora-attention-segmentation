@@ -1,3 +1,23 @@
 % Comment 5: backbones (GoCA)
 % Owner: N. Only this side edits this file.
 % Add frames below; one message per frame. See docs/JC_REVIEW_WORKPLAN.md, Section 6.
+
+\begin{frame}{GoCA gains strongly from SDXL; SD 2.1 weights are no longer public}
+\status{running}
+\begin{slidetable}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+GoCA backbone & VOC-Sim & COCO-Cap & s / image & GPU mem. \\
+\midrule
+SD 1.5 & 0.671 & 0.452 & 0.14 & 4.4 GB \\
+SDXL & \textbf{0.788} & \textbf{0.607} & 0.66 & 13.3 GB \\
+SD 2.1 & \multicolumn{4}{c}{blocked (weights removed)} \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item Fixed threshold 0.5, no DenseCRF. Same images, noise seed and prompt; SDXL uses GoCA's own configuration, pre-registered before the run.
+\item Possible actions for SD 2.1: use an agreed community copy for every method, or report SD 1.5 and SDXL only.
+\end{itemize}
+\src{Workplan Entries 3--4; \texttt{comparisons/goca/PREREG\_backbones.md}}
+\end{frame}

@@ -1,0 +1,49 @@
+diff --git a/diffusion_model/stable_diffusion.py b/diffusion_model/stable_diffusion.py
+index 0e79a5e..83744a8 100644
+--- a/diffusion_model/stable_diffusion.py
++++ b/diffusion_model/stable_diffusion.py
+@@ -1,6 +1,7 @@
+ # make sure you're logged in with `huggingface-cli login`
+ import os
+-os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
++# [n_side patch] HF mirror endpoint disabled; we run offline from the local HF cache
++# os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
+ 
+ import torch
+ from diffusers.utils.torch_utils import randn_tensor
+@@ -24,7 +25,8 @@ class diffusion(nn.Module):
+         if model == "v2.1":
+             model = "stabilityai/stable-diffusion-2-1-base"
+         elif model == "v1.5":
+-            model = "runwayml/stable-diffusion-v1-5"
++            # [n_side patch] runwayml repo id -> locally cached mirror of the same weights
++            model = "stable-diffusion-v1-5/stable-diffusion-v1-5"
+         elif model == "v1.4":
+             model = "CompVis/stable-diffusion-v1-4"
+         else:
+diff --git a/ovs/pipeline_clean_mean_final_run_correct.py b/ovs/pipeline_clean_mean_final_run_correct.py
+index 8e45344..5039c04 100644
+--- a/ovs/pipeline_clean_mean_final_run_correct.py
++++ b/ovs/pipeline_clean_mean_final_run_correct.py
+@@ -35,7 +35,9 @@ def weighted_attention_fusion_by_entropy_joint(
+     eps: float = EPS
+ ) -> (torch.Tensor, torch.Tensor):
+     K = A_cross.shape[-1]
+-    logK = math.log2(K)
++    # [n_side patch] K=1 (single-class vocabulary): log2(1)=0 and every row entropy is 0 -> 0/0 = NaN.
++    # Treat normalised entropy as 0, i.e. uniform head weights. K>1 unchanged.
++    logK = math.log2(K) if K > 1 else float("inf")
+ 
+     entropies = []
+     A_cross = A_cross.to(A_self_list[0].dtype)
+@@ -210,7 +212,9 @@ class Pipeline(nn.Module):
+                 self.attn_refine.qk_store,
+                 self.cfg.attention_layers_to_use,
+                 cross_att,
+-                d=64
++                # [n_side patch] NERVE hard-codes d=64 (= SD 2.1 head dim); cfg.sfsa_head_dim lets SD 1.5 use its
++                # true head dim (40). Unset -> 64, i.e. unchanged behaviour.
++                d=getattr(self.cfg, "sfsa_head_dim", 64)
+             )
+ 
+         fused = fused.to(fused.dtype)
