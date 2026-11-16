@@ -106,10 +106,11 @@ def batched_v3(sa,seeds):
 
 @torch.inference_mode()
 def capture(a):
-    torch.set_num_threads(2)
+    torch.set_num_threads(1)
     from scripts import sg_clip_dense as cd
     rows=json.loads((DATA/'manifest.json').read_text())
     if a.max_images:rows=rows[:a.max_images]
+    rows=rows[a.shard::a.num_shards]
     out=OUT/'maps';out.mkdir(parents=True,exist_ok=True)
     todo=[r for r in rows if not (out/(r['image_id']+'.npz')).exists()]
     if not todo:print('All requested captures already complete',flush=True);return
@@ -128,11 +129,11 @@ def capture(a):
     MultiA3Recorder.attribution_prompt=prompts[0]
     from src.segmentation.sg24_ca import content_positions
     MultiA3Recorder.content=content_positions(pipe.tokenizer,prompts[0],tuple(positions[0]))
-    checked=False
+    checked=(OUT/'selftest.json').exists()
     for row in todo:
         t0=time.perf_counter();iid=row['image_id'];gen=row['generation']
         torch.cuda.reset_peak_memory_stats()
-        img=np.asarray(Image.open(DATA/row['image_file']).convert('RGB'))
+        img=np.asarray(Image.open(DATA/row['image_file']).convert('RGB')).copy()
         png_hash=hashlib.sha256((DATA/row['image_file']).read_bytes()).hexdigest()
         assert png_hash==gen['png_sha256']
         pipe.set_adapters('cityscapes',adapter_weights=gen['lora_scale'])
@@ -226,7 +227,9 @@ def render_one(iid):
         for mi,method in enumerate(METHODS):
             for ti,t in enumerate(THRESHOLDS):
                 raw=full[mi]>=t
-                refined=apply_ovam_densecrf(img,raw,st.CRF_SITE)
+                # A spatially constant hard binary unary stays constant under R2.
+                # Verified against its original output in the smoke render.
+                refined=apply_ovam_densecrf(img,raw,st.CRF_SITE) if raw.any() and not raw.all() else raw.copy()
                 masks[mi,ti]=refined
                 for mode,mask in [('raw',raw),('crf',refined)]:
                     p=OUT/'masks'/iid/cls/f'{method}_t{t:.2f}_{mode}.png';p.parent.mkdir(parents=True,exist_ok=True)
@@ -278,11 +281,12 @@ def report(a):
         writer=csv.DictWriter(f,fieldnames=list(stats[0]));writer.writeheader();writer.writerows(stats)
     options=''.join(f'<option>{c}</option>' for c in CLASSES)
     image_options=''.join(f'<option>{r["image_id"]}</option>' for r in rows)
+    witnesses=json.loads((DATA/'coverage.json').read_text())['class_witnesses']
     html='''<!doctype html><meta charset="utf-8"><title>Cityscapes 50 — BRACE comparison</title>
 <style>body{font:16px system-ui;max-width:1200px;margin:24px auto;background:#eee;color:#222}select,button{font:inherit;padding:8px}img{width:100%;height:auto}header{position:sticky;top:0;background:#eee;padding:10px}p{line-height:1.5}a{color:#1454a1}</style>
-<h1>Cityscapes LoRA 50: class-wise threshold comparison</h1><p>Same fixed image and captured attention for BRACE, SCLIP-seeded BRACE and early geometric fusion. Columns compare methods; rows compare thresholds 0.40 / 0.55 / 0.70. Top row contains the original and normalized scores. Binary masks can overlap across classes. No masks or accuracy labels are available: area is not quality. Absent classes can still produce masks after min-max normalization. This is image-anchored LoRA inference, not original-trajectory replay.</p>
-<header><label>Image <select id="image">IMAGE_OPTIONS</select></label> <label>Class <select id="cls">CLASS_OPTIONS</select></label> <button onclick="move(-1)">Previous image</button> <button onclick="move(1)">Next image</button> <a id="full" target="_blank">Open sheet</a></header><img id="sheet"><p><a href="README.md">Protocol and run details</a> · <a href="summary.json">Summary JSON</a> · <a href="mask_statistics.csv">Mask statistics CSV</a></p>
-<script>const im=document.getElementById('image'),cl=document.getElementById('cls');function update(){let p=`comparisons/${cl.value}/${im.value}.jpg`;document.getElementById('sheet').src=p;document.getElementById('full').href=p;location.hash=im.value+'/'+cl.value}function move(d){im.selectedIndex=(im.selectedIndex+d+im.length)%im.length;update()}im.onchange=cl.onchange=update;let parts=location.hash.slice(1).split('/');if(parts.length===2){im.value=parts[0];cl.value=parts[1]}else{cl.value='person'}update();</script>'''.replace('IMAGE_OPTIONS',image_options).replace('CLASS_OPTIONS',options)
+<h1>Cityscapes LoRA 50: class-wise threshold comparison</h1><p>Same fixed image and captured attention for BRACE, SCLIP-seeded BRACE and early geometric fusion. Columns compare methods; rows compare thresholds 0.40 / 0.55 / 0.70. Top row contains the original and normalized scores. Binary masks can overlap across classes. No ground-truth masks or accuracy labels are available: area is not quality. Absent classes can still produce masks after min-max normalization. This is image-anchored LoRA inference, not original-trajectory replay.</p>
+<header><label>Image <select id="image">IMAGE_OPTIONS</select></label> <label>Class <select id="cls">CLASS_OPTIONS</select></label> <button onclick="example()">Class example</button> <button onclick="move(-1)">Previous image</button> <button onclick="move(1)">Next image</button> <a id="full" target="_blank">Open sheet</a></header><img id="sheet"><p><a href="README.md">Protocol and run details</a> · <a href="summary.json">Summary JSON</a> · <a href="mask_statistics.csv">Mask statistics CSV</a></p>
+<script>const witnesses=WITNESS_JSON;const im=document.getElementById('image'),cl=document.getElementById('cls');function update(){let p=`comparisons/${cl.value}/${im.value}.jpg`;document.getElementById('sheet').src=p;document.getElementById('full').href=p;location.hash=im.value+'/'+cl.value}function example(){im.value=witnesses[cl.value];update()}function move(d){im.selectedIndex=(im.selectedIndex+d+im.length)%im.length;update()}im.onchange=cl.onchange=update;let parts=location.hash.slice(1).split('/');if(parts.length===2){im.value=parts[0];cl.value=parts[1]}else{cl.value='person'}update();</script>'''.replace('IMAGE_OPTIONS',image_options).replace('CLASS_OPTIONS',options).replace('WITNESS_JSON',json.dumps(witnesses))
     (OUT/'index.html').write_text(html)
     metas=[json.loads((OUT/'maps'/f'{iid}.json').read_text()) for iid in ids]
     text=f'''# Cityscapes LoRA 50 — exploratory segmentation comparison\n\nComplete: 50 images × 14 classes × 3 methods × 3 thresholds = **6300 post-CRF masks**, with 6300 pre-CRF masks, 700 comparison sheets, seeds and propagated maps.\n\nOpen `index.html` to browse every image/class. Columns: BRACE, SCLIP-seeded BRACE, early geometric fusion. Rows: thresholds **0.40 / 0.55 / 0.70**. All methods use the same captured attention for each image.\n\nNo ground-truth masks exist. This run provides visual comparison and mask area statistics, not mIoU, precision, recall, threshold selection or a scientific winner. Class masks are independent and may overlap; absent-class maps can yield false foreground because each nonconstant class map is min-max normalized.\n\n## Capture and variants\n\nThe original PNGs are fixed. Capture uses the repository's image-anchored renoise procedure: 512-square bicubic input, VAE posterior mean, fixed crc32(image_id) noise, original generation prompt and negative prompt, 30-step PNDM with 31 UNet calls, and the supplied Cityscapes LoRA at the recorded image scale. Outputs are resized back to native dimensions. This is a Cityscapes/LoRA input adaptation, not exact replay of original batched generation.\n\nThe selected A3 seed and V3 one-sided-capped hierarchy plus R2 remain unchanged. Independent 77-token `a photograph of a <class>` attribution queries allow unprompted classes. Seeds and all methods share the image's own attention. SCLIP is ViT-B/16 with the committed Cityscapes vocabulary, logit scale 65 and probability/area threshold .1. VOC21 grouped the stuff classes into background and cannot be reused unchanged for this task.\n\nThe prior VOC-selected SCLIP-seeded variant is V3. Early sqrt(a*c) is the requested exploratory fusion; the earlier registered fusion gain test failed for its selected arithmetic candidate. No variant is promoted here.\n\nSelftest: `selftest.json` checks batched A3 and V3 against unchanged source. Mean capture+propagation time {np.mean([m['seconds'] for m in metas]):.1f} s/image, peak allocated GPU memory {max(m['peak_gpu_allocated_gib'] for m in metas):.2f} GiB. Timings exclude CPU CRF/rendering.\n\n## Files\n\n- `comparisons/<class>/<image>.jpg`: original, heatmaps and 9 post-CRF overlays.\n- `masks/<image>/<class>/<method>_t<threshold>_raw.png` and `_crf.png`: native-size binary PNGs, 0/255.\n- `maps/<image>.npz`: [method,class,64,64] propagated maps, A3 and SCLIP seeds; JSON sidecars record settings and source hashes.\n- `summary.json`, `mask_statistics.csv`: foreground area and empty/full-mask counts (not quality metrics).\n- `PREREG.md`: committed before inference.\n- `VISUAL_REVIEW.md`: observations from representative completed sheets.\n'''
@@ -293,7 +297,8 @@ def report(a):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('command',choices=['capture','render','report']);p.add_argument('--max-images',type=int);p.add_argument('--workers',type=int,default=4)
-    a=p.parse_args();OUT.mkdir(parents=True,exist_ok=True)
+    p.add_argument('--shard',type=int,default=0);p.add_argument('--num-shards',type=int,default=1)
+    a=p.parse_args();assert 0<=a.shard<a.num_shards;OUT.mkdir(parents=True,exist_ok=True)
     {'capture':capture,'render':render,'report':report}[a.command](a)
 
 if __name__=='__main__':main()
