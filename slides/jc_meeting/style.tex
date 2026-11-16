@@ -1,0 +1,37 @@
+% Deck style. Do not change per slide; propose changes in docs/JC_REVIEW_WORKPLAN.md.
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[sc]{mathpazo}          % Palatino text and maths
+\linespread{1.05}
+\usefonttheme{serif}
+\usepackage{booktabs,graphicx,array,amsmath}
+\graphicspath{{figures/}}
+
+% White background, black text, no decoration.
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{normal text}{fg=black,bg=white}
+\setbeamercolor{structure}{fg=black}
+\setbeamercolor{frametitle}{fg=black,bg=white}
+\setbeamercolor{title}{fg=black}
+\setbeamercolor{alerted text}{fg=black}
+\setbeamercolor{caption name}{fg=black}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize items}{\textbullet}
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{footline}{\hfill\footnotesize\insertframenumber\hspace{1em}\vspace{0.6em}}
+
+% Fixed sizes: frame title \Large bold, body \normalsize, tables \small,
+% captions and source notes \footnotesize. Nothing smaller.
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{title}{size=\LARGE,series=\bfseries}
+\setbeamerfont{caption}{size=\footnotesize}
+\setbeamersize{text margin left=1.2em,text margin right=1.2em}
+
+% Helpers so every slide looks the same.
+%   \src{path or entry}      source line under a table or figure
+%   \status{done|running|planned}   state of the result shown
+%   \fig[width]{file}        centred figure from figures/
+\newcommand{\src}[1]{\par\vspace{0.4em}{\footnotesize Source: #1}}
+\newcommand{\status}[1]{\hfill{\footnotesize [#1]}}
+\newcommand{\fig}[2][0.85\linewidth]{\begin{center}\includegraphics[width=#1,height=0.68\textheight,keepaspectratio]{#2}\end{center}}
+\newenvironment{slidetable}{\begin{center}\small\renewcommand{\arraystretch}{1.15}}{\end{center}}

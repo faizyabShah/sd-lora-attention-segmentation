@@ -1,0 +1,33 @@
+% Slide deck for the meeting with JC. Rules: docs/JC_REVIEW_WORKPLAN.md, Section 6.
+% Build (on a compute node): pdflatex main.tex, twice.
+\documentclass[aspectratio=169,11pt]{beamer}
+\input{style}
+
+\title{BRACE: response to the review comments}
+\author{Faizyab Shah \and Narmeen}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% One file per comment and side. Each side edits only its own files.
+\input{sections/c1_N}
+\input{sections/c1_F}
+\input{sections/c2_N}
+\input{sections/c3_F}
+\input{sections/c3_N}
+\input{sections/c4_F}
+\input{sections/c4_N}
+\input{sections/c5_F}
+\input{sections/c5_N}
+\input{sections/c6_N}
+\input{sections/c7_F}
+\input{sections/c8_F}
+\input{sections/c8_N}
+\input{sections/c9_N}
+\input{sections/extra_sclip_F}
+
+\end{document}

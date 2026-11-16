@@ -11,9 +11,9 @@ other's work here.
   machine, counted as one side).
 - **N** = Narmeen's agent (Claude under Narmeen's account).
 
-**Status of this file.** Sections 1–5 are the agreed plan and change only by an
-explicit amendment entry in Section 7. Section 6 is the status board, edited in
-place by the owner of each line. Section 7 is the append-only log.
+**Status of this file.** Sections 1–6 are the agreed plan and change only by an
+explicit amendment entry in Section 8. Section 7 is the status board, edited in
+place by the owner of each line. Section 8 is the append-only log.
 
 This file replaces `docs/ATTENTION_FUSION_AND_TOKEN_IDEAS.md` (last edited
 29 October 2026) as the place where work is split. The scientific protocol in
@@ -179,7 +179,7 @@ N reviews it; it changes afterwards only by an amendment entry.
 ## 4. Working rules
 
 1. **Append, don't rewrite.** New work goes in a new numbered entry in
-   Section 7. Earlier entries are corrected by a later entry, not edited.
+   Section 8. Earlier entries are corrected by a later entry, not edited.
 2. **Review does not gate work.** The other side's check is required before a
    result goes on a slide or into the paper, not before the next run starts.
 3. **Pre-register before scoring.** #4 and #5 and any comparison that involves a
@@ -198,6 +198,9 @@ N reviews it; it changes afterwards only by an amendment entry.
    the owner asks.
 9. **Manuscript text** avoids internal names (A3, V3, C16, SGxx). This file may
    use them.
+10. **Every result also goes into the slide deck.** An entry that reports a
+    result, a table, a figure or a decision is not complete until its slide is
+    added (Section 6). The entry names the slide file it touched.
 
 ---
 
@@ -218,7 +221,66 @@ is already known.
 
 ---
 
-## 6. Status board
+## 6. Slide deck for the meeting
+
+JC asked for a short slide deck with, for each comment, the possible actions.
+The agents build it as the work proceeds: **whatever is done for this workplan
+is added to the deck in the same commit as its log entry.**
+
+### 6.1 Where it lives
+
+| Path | Content |
+|---|---|
+| `slides/jc_meeting/main.tex` | Deck skeleton: title slide and the list of section files. Changed only to add a new section file. |
+| `slides/jc_meeting/style.tex` | The one style definition. Not changed per slide. |
+| `slides/jc_meeting/sections/c<k>_<side>.tex` | Slides for comment `k` by side `F` or `N`. Each side edits only its own files, so there are no merge conflicts. |
+| `slides/jc_meeting/sections/extra_sclip_F.tex` | The SCLIP-seeded result. |
+| `slides/jc_meeting/figures/` | Images used in the deck, committed (keep each under about 1 MB). |
+| `slides/jc_meeting/main.pdf` | Compiled deck, committed after each change so the other side can read it without building. |
+
+Build with `pdflatex main.tex` (twice) inside `slides/jc_meeting/`, on a compute
+node, not the login node. The deck is LaTeX Beamer, 16:9. Only packages in
+`style.tex` are used (`multirow` is not installed on the cluster).
+
+### 6.2 Appearance rules
+
+- **White background, black text.** No coloured themes, no coloured text, no
+  logos, no decoration. Colour appears only inside figures where it carries
+  meaning (masks, overlays, plot series).
+- **Serif font.** Palatino for text and maths, set once in `style.tex`.
+- **Fixed sizes.** Frame title `\Large` bold; body `\normalsize`; tables
+  `\small`; captions and source lines `\footnotesize`. Nothing smaller, and no
+  per-slide size changes. If content does not fit, split the slide.
+- **Tables.** `booktabs` rules (`\toprule`, `\midrule`, `\bottomrule`), no
+  vertical lines, inside the `slidetable` environment. Numbers right-aligned
+  with the same number of decimals in a column (three for mIoU). At most about
+  8 rows and 6 columns per slide. The row or number the slide is about is in
+  bold. Units and the benchmark are in the header.
+- **Images.** Inserted with `\fig{file}` so they are centred, keep their aspect
+  ratio and never overflow the slide. Vector (PDF) for plots; PNG or JPG for
+  photos and masks. Every figure has axis labels or a one-line caption that
+  says what is shown. Side-by-side images use equal widths.
+- **Layout.** One message per slide, stated in the frame title as a full
+  sentence where possible. At most five bullets, no nested bullets beyond one
+  level, no full paragraphs.
+
+### 6.3 Content rules
+
+- **Structure per comment:** (1) the comment in one line, (2) what we did or
+  found, (3) the possible actions and the one we recommend.
+- **Every number has a source line** (`\src{...}`) naming the committed file or
+  the log entry it comes from, and a status tag (`\status{done}`,
+  `\status{running}` or `\status{planned}`).
+- **Label the kind of result** where it matters: exploratory, in-sample, OOF,
+  fixed-threshold or confirmatory. Paired and unpaired rows are never mixed
+  without a label. Failures and negative results get a slide like any other.
+- **No internal names** on slides (A3, V3, C16, SGxx): JC reads the deck.
+- **Review:** a slide counts as final once the entry behind it has its review
+  line. Until then its status tag stays `running` or carries `unreviewed`.
+
+---
+
+## 7. Status board
 
 Edited in place by the owner. States: `not started`, `in progress`,
 `done, awaiting review`, `reviewed`, `no-go`, `blocked (reason)`.
@@ -248,11 +310,12 @@ Edited in place by the owner. States: `not started`, `in progress`,
 | #8 cost and hardware | F | not started | — |
 | #8 restructuring | N | not started | — |
 | #9 venue | N | not started | — |
-| Slides | F and N | not started | — |
+| Slide deck: blank skeleton | F | done | `slides/jc_meeting/` |
+| Slides: own sections | F and N | not started | — |
 
 ---
 
-## 7. Log
+## 8. Log
 
 Append entries below, numbered in order. Use this template.
 
@@ -264,6 +327,7 @@ Append entries below, numbered in order. Use this template.
 **Where:** <committed paths; commit hash>
 **Result:** <numbers with their label: exploratory / in-sample / OOF /
 fixed-threshold / confirmatory; failures included>
+**Slides:** <slide file changed, or "none" with the reason>
 **Open points:** <what is not done or not verified>
 
 **Review — <other side>, <date>:** <checked / objections / requested changes>
