@@ -1,0 +1,1119 @@
+{
+  "images": 50,
+  "classes": [
+    "road",
+    "sidewalk",
+    "building",
+    "vegetation",
+    "terrain",
+    "sky",
+    "person",
+    "rider",
+    "car",
+    "truck",
+    "bus",
+    "train",
+    "motorcycle",
+    "bicycle"
+  ],
+  "methods": [
+    "brace",
+    "sclip_brace",
+    "early_geo"
+  ],
+  "thresholds": [
+    0.4,
+    0.55,
+    0.7
+  ],
+  "post_crf_masks": 6300,
+  "comparisons": 700,
+  "summaries": [
+    {
+      "class": "road",
+      "method": "brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.5895331319173177,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "road",
+      "method": "brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.5036449686686197,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "road",
+      "method": "brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.39351796468098954,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "road",
+      "method": "sclip_brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.3976237233479818,
+      "empty_masks": 19,
+      "full_masks": 0
+    },
+    {
+      "class": "road",
+      "method": "sclip_brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.3326185353597005,
+      "empty_masks": 19,
+      "full_masks": 0
+    },
+    {
+      "class": "road",
+      "method": "sclip_brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.2557612101236979,
+      "empty_masks": 19,
+      "full_masks": 0
+    },
+    {
+      "class": "road",
+      "method": "early_geo",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.45600730895996094,
+      "empty_masks": 19,
+      "full_masks": 0
+    },
+    {
+      "class": "road",
+      "method": "early_geo",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.3785065205891927,
+      "empty_masks": 19,
+      "full_masks": 0
+    },
+    {
+      "class": "road",
+      "method": "early_geo",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.28087961832682296,
+      "empty_masks": 19,
+      "full_masks": 0
+    },
+    {
+      "class": "sidewalk",
+      "method": "brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.6173262278238932,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "sidewalk",
+      "method": "brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.5265263875325521,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "sidewalk",
+      "method": "brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.419234364827474,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "sidewalk",
+      "method": "sclip_brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.3060453287760417,
+      "empty_masks": 12,
+      "full_masks": 0
+    },
+    {
+      "class": "sidewalk",
+      "method": "sclip_brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.2614376831054688,
+      "empty_masks": 12,
+      "full_masks": 0
+    },
+    {
+      "class": "sidewalk",
+      "method": "sclip_brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.2104217020670573,
+      "empty_masks": 12,
+      "full_masks": 0
+    },
+    {
+      "class": "sidewalk",
+      "method": "early_geo",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.3726516469319661,
+      "empty_masks": 12,
+      "full_masks": 0
+    },
+    {
+      "class": "sidewalk",
+      "method": "early_geo",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.2866967519124349,
+      "empty_masks": 12,
+      "full_masks": 0
+    },
+    {
+      "class": "sidewalk",
+      "method": "early_geo",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.23884262084960942,
+      "empty_masks": 12,
+      "full_masks": 0
+    },
+    {
+      "class": "building",
+      "method": "brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.6643064880371093,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "building",
+      "method": "brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.562967274983724,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "building",
+      "method": "brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.4245701599121094,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "building",
+      "method": "sclip_brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.2101906077067057,
+      "empty_masks": 28,
+      "full_masks": 0
+    },
+    {
+      "class": "building",
+      "method": "sclip_brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.19297762552897132,
+      "empty_masks": 28,
+      "full_masks": 0
+    },
+    {
+      "class": "building",
+      "method": "sclip_brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.1688934326171875,
+      "empty_masks": 28,
+      "full_masks": 0
+    },
+    {
+      "class": "building",
+      "method": "early_geo",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.215784428914388,
+      "empty_masks": 28,
+      "full_masks": 0
+    },
+    {
+      "class": "building",
+      "method": "early_geo",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.19750882466634112,
+      "empty_masks": 28,
+      "full_masks": 0
+    },
+    {
+      "class": "building",
+      "method": "early_geo",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.17772315979003905,
+      "empty_masks": 28,
+      "full_masks": 0
+    },
+    {
+      "class": "vegetation",
+      "method": "brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.5911150614420573,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "vegetation",
+      "method": "brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.41773867289225264,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "vegetation",
+      "method": "brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.22222015380859372,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "vegetation",
+      "method": "sclip_brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.18213600158691406,
+      "empty_masks": 32,
+      "full_masks": 0
+    },
+    {
+      "class": "vegetation",
+      "method": "sclip_brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.15001836140950522,
+      "empty_masks": 32,
+      "full_masks": 0
+    },
+    {
+      "class": "vegetation",
+      "method": "sclip_brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.12093294779459635,
+      "empty_masks": 32,
+      "full_masks": 0
+    },
+    {
+      "class": "vegetation",
+      "method": "early_geo",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.21340471903483071,
+      "empty_masks": 32,
+      "full_masks": 0
+    },
+    {
+      "class": "vegetation",
+      "method": "early_geo",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.17698104858398436,
+      "empty_masks": 32,
+      "full_masks": 0
+    },
+    {
+      "class": "vegetation",
+      "method": "early_geo",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.1414208730061849,
+      "empty_masks": 32,
+      "full_masks": 0
+    },
+    {
+      "class": "terrain",
+      "method": "brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.6579176839192707,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "terrain",
+      "method": "brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.49776407877604173,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "terrain",
+      "method": "brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.32201978047688795,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "terrain",
+      "method": "sclip_brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.044131011962890626,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "terrain",
+      "method": "sclip_brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.030591506958007813,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "terrain",
+      "method": "sclip_brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.01799611409505208,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "terrain",
+      "method": "early_geo",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.050536422729492186,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "terrain",
+      "method": "early_geo",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.03659830729166667,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "terrain",
+      "method": "early_geo",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.02119313557942708,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "sky",
+      "method": "brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.6239541371663411,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "sky",
+      "method": "brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.5467544809977214,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "sky",
+      "method": "brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.4569999186197917,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "sky",
+      "method": "sclip_brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.007146987915039062,
+      "empty_masks": 49,
+      "full_masks": 0
+    },
+    {
+      "class": "sky",
+      "method": "sclip_brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.0032942962646484377,
+      "empty_masks": 49,
+      "full_masks": 0
+    },
+    {
+      "class": "sky",
+      "method": "sclip_brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.0029401397705078125,
+      "empty_masks": 49,
+      "full_masks": 0
+    },
+    {
+      "class": "sky",
+      "method": "early_geo",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.009864578247070313,
+      "empty_masks": 49,
+      "full_masks": 0
+    },
+    {
+      "class": "sky",
+      "method": "early_geo",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.007042770385742188,
+      "empty_masks": 49,
+      "full_masks": 0
+    },
+    {
+      "class": "sky",
+      "method": "early_geo",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.00321380615234375,
+      "empty_masks": 49,
+      "full_masks": 0
+    },
+    {
+      "class": "person",
+      "method": "brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.47979423522949216,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "person",
+      "method": "brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.3469060516357421,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "person",
+      "method": "brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.22197939554850263,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "person",
+      "method": "sclip_brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.020272979736328123,
+      "empty_masks": 44,
+      "full_masks": 0
+    },
+    {
+      "class": "person",
+      "method": "sclip_brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.016218109130859373,
+      "empty_masks": 44,
+      "full_masks": 0
+    },
+    {
+      "class": "person",
+      "method": "sclip_brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.013904495239257813,
+      "empty_masks": 44,
+      "full_masks": 0
+    },
+    {
+      "class": "person",
+      "method": "early_geo",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.01742431640625,
+      "empty_masks": 44,
+      "full_masks": 0
+    },
+    {
+      "class": "person",
+      "method": "early_geo",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.016043319702148437,
+      "empty_masks": 44,
+      "full_masks": 0
+    },
+    {
+      "class": "person",
+      "method": "early_geo",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.014017257690429687,
+      "empty_masks": 44,
+      "full_masks": 0
+    },
+    {
+      "class": "rider",
+      "method": "brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.37282936096191405,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "rider",
+      "method": "brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.25616193135579424,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "rider",
+      "method": "brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.178717041015625,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "rider",
+      "method": "sclip_brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.028497390747070313,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "rider",
+      "method": "sclip_brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.020413055419921874,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "rider",
+      "method": "sclip_brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.011435012817382812,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "rider",
+      "method": "early_geo",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.027530136108398436,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "rider",
+      "method": "early_geo",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.018669204711914064,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "rider",
+      "method": "early_geo",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.011394271850585938,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "car",
+      "method": "brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.4311146799723307,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "car",
+      "method": "brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.3245624542236329,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "car",
+      "method": "brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.20653600056966145,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "car",
+      "method": "sclip_brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.022725448608398438,
+      "empty_masks": 44,
+      "full_masks": 0
+    },
+    {
+      "class": "car",
+      "method": "sclip_brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.021123733520507813,
+      "empty_masks": 44,
+      "full_masks": 0
+    },
+    {
+      "class": "car",
+      "method": "sclip_brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.019288558959960938,
+      "empty_masks": 44,
+      "full_masks": 0
+    },
+    {
+      "class": "car",
+      "method": "early_geo",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.022616119384765626,
+      "empty_masks": 44,
+      "full_masks": 0
+    },
+    {
+      "class": "car",
+      "method": "early_geo",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.0209613037109375,
+      "empty_masks": 44,
+      "full_masks": 0
+    },
+    {
+      "class": "car",
+      "method": "early_geo",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.018991546630859377,
+      "empty_masks": 44,
+      "full_masks": 0
+    },
+    {
+      "class": "truck",
+      "method": "brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.38343612670898447,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "truck",
+      "method": "brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.2592854817708333,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "truck",
+      "method": "brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.17770746866861978,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "truck",
+      "method": "sclip_brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.03176752726236979,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "truck",
+      "method": "sclip_brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.03015716552734375,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "truck",
+      "method": "sclip_brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.025924886067708333,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "truck",
+      "method": "early_geo",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.03186350504557292,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "truck",
+      "method": "early_geo",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.030132904052734374,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "truck",
+      "method": "early_geo",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.02519220987955729,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "bus",
+      "method": "brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.5443235524495443,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "bus",
+      "method": "brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.4258235677083333,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "bus",
+      "method": "brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.3045638529459635,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "bus",
+      "method": "sclip_brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.0254833984375,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "bus",
+      "method": "sclip_brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.02324091593424479,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "bus",
+      "method": "sclip_brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.020841267903645832,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "bus",
+      "method": "early_geo",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.024673411051432295,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "bus",
+      "method": "early_geo",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.02319244384765625,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "bus",
+      "method": "early_geo",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.021439158121744795,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "train",
+      "method": "brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.582607676188151,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "train",
+      "method": "brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.45559356689453134,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "train",
+      "method": "brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.3262618509928385,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "train",
+      "method": "sclip_brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.032270863850911456,
+      "empty_masks": 44,
+      "full_masks": 0
+    },
+    {
+      "class": "train",
+      "method": "sclip_brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.028042399088541666,
+      "empty_masks": 44,
+      "full_masks": 0
+    },
+    {
+      "class": "train",
+      "method": "sclip_brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.02432708740234375,
+      "empty_masks": 44,
+      "full_masks": 0
+    },
+    {
+      "class": "train",
+      "method": "early_geo",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.03165445963541667,
+      "empty_masks": 44,
+      "full_masks": 0
+    },
+    {
+      "class": "train",
+      "method": "early_geo",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.028452301025390626,
+      "empty_masks": 44,
+      "full_masks": 0
+    },
+    {
+      "class": "train",
+      "method": "early_geo",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.024824320475260418,
+      "empty_masks": 44,
+      "full_masks": 0
+    },
+    {
+      "class": "motorcycle",
+      "method": "brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.41353477478027345,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "motorcycle",
+      "method": "brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.27713160196940106,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "motorcycle",
+      "method": "brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.19793673197428385,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "motorcycle",
+      "method": "sclip_brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.017644271850585938,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "motorcycle",
+      "method": "sclip_brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.016178359985351564,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "motorcycle",
+      "method": "sclip_brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.014484481811523437,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "motorcycle",
+      "method": "early_geo",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.017723388671875,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "motorcycle",
+      "method": "early_geo",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.016173171997070312,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "motorcycle",
+      "method": "early_geo",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.014387664794921875,
+      "empty_masks": 46,
+      "full_masks": 0
+    },
+    {
+      "class": "bicycle",
+      "method": "brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.46748715718587236,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "bicycle",
+      "method": "brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.3408460744222005,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "bicycle",
+      "method": "brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.2072560373942057,
+      "empty_masks": 0,
+      "full_masks": 0
+    },
+    {
+      "class": "bicycle",
+      "method": "sclip_brace",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.07312143961588542,
+      "empty_masks": 39,
+      "full_masks": 0
+    },
+    {
+      "class": "bicycle",
+      "method": "sclip_brace",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.05270642598470052,
+      "empty_masks": 39,
+      "full_masks": 0
+    },
+    {
+      "class": "bicycle",
+      "method": "sclip_brace",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.03496360778808594,
+      "empty_masks": 39,
+      "full_masks": 0
+    },
+    {
+      "class": "bicycle",
+      "method": "early_geo",
+      "threshold": 0.4,
+      "mean_foreground_fraction": 0.07500353495279949,
+      "empty_masks": 39,
+      "full_masks": 0
+    },
+    {
+      "class": "bicycle",
+      "method": "early_geo",
+      "threshold": 0.55,
+      "mean_foreground_fraction": 0.05429056803385417,
+      "empty_masks": 39,
+      "full_masks": 0
+    },
+    {
+      "class": "bicycle",
+      "method": "early_geo",
+      "threshold": 0.7,
+      "mean_foreground_fraction": 0.03486666361490885,
+      "empty_masks": 39,
+      "full_masks": 0
+    }
+  ],
+  "capture_mean_seconds": 34.61073970679194,
+  "peak_gpu_allocated_gib": 7.07553243637085,
+  "maximum_A3_seed_check_error": 1.3113021850585938e-06,
+  "classification": "exploratory qualitative comparison; no ground-truth masks or pixel scores",
+  "local_outputs": "outputs/segmentation/cityscapes_50",
+  "primary_class_seed_diagnostics": [
+    {
+      "class": "person",
+      "visually_verified_primary_presence_images": 12,
+      "empty_clip_seed_images": [
+        "cs_0064",
+        "cs_0216",
+        "cs_0226",
+        "cs_0283",
+        "cs_0292",
+        "cs_0153"
+      ],
+      "empty_count": 6
+    },
+    {
+      "class": "bicycle",
+      "visually_verified_primary_presence_images": 14,
+      "empty_clip_seed_images": [
+        "cs_0380",
+        "cs_0480",
+        "cs_0488"
+      ],
+      "empty_count": 3
+    },
+    {
+      "class": "rider",
+      "visually_verified_primary_presence_images": 6,
+      "empty_clip_seed_images": [
+        "cs_0332",
+        "cs_0495"
+      ],
+      "empty_count": 2
+    },
+    {
+      "class": "car",
+      "visually_verified_primary_presence_images": 6,
+      "empty_clip_seed_images": [],
+      "empty_count": 0
+    },
+    {
+      "class": "bus",
+      "visually_verified_primary_presence_images": 4,
+      "empty_clip_seed_images": [],
+      "empty_count": 0
+    },
+    {
+      "class": "truck",
+      "visually_verified_primary_presence_images": 4,
+      "empty_clip_seed_images": [],
+      "empty_count": 0
+    },
+    {
+      "class": "train",
+      "visually_verified_primary_presence_images": 4,
+      "empty_clip_seed_images": [],
+      "empty_count": 0
+    },
+    {
+      "class": "motorcycle",
+      "visually_verified_primary_presence_images": 4,
+      "empty_clip_seed_images": [],
+      "empty_count": 0
+    }
+  ],
+  "validation": {
+    "binary_masks_checked": 12600,
+    "dimensions_match_original_PNGs": true,
+    "values_only_0_or_255": true,
+    "class_comparison_sheets": 700,
+    "source_images": 50
+  },
+  "bundle_sha256": "9210cdf2c128e1c997c10d9f2c039e7b21a624e6279b02c2cdfc65d290c84bda",
+  "bundle_bytes": 235427333
+}

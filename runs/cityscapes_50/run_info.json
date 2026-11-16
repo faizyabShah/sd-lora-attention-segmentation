@@ -1,0 +1,22 @@
+{
+  "runner_commit": "1073913e310ad62f4d08a4a2696e40c250745fb7",
+  "capture_screen": "cityscapes_brace",
+  "gpu_workers": 3,
+  "cpu_render_workers_requested": 6,
+  "gpu": "NVIDIA A40",
+  "torch": "2.6.0+cu118",
+  "diffusers": "0.36.0",
+  "peft": "0.19.1",
+  "transformers": "4.44.2",
+  "input_manifest_sha256": "bb30eeecdbb130d9a5bb591b81e01de0a09cda3ef8d89fb5427ccb188a6b10aa",
+  "actual_lora_sha256": "deec4bf94e3ed9e08c7dc7bfae08c0ab05f07d0e62e0d07887567a2c15f9f4d8",
+  "notes": "The initial smoke capture was reused. All other captures use 3 disjoint shards. The GPU capture path of this commit matches the running workers. No changes to src/.",
+  "cpu_main_render_workers_actual": 4,
+  "cpu_example_render_workers": 2,
+  "base_model": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+  "base_revision": "451f4fe16113bff5a5d2269ed5ad43b0592e9a14",
+  "capture_dtype": "float32",
+  "attention_qk_storage": "float16",
+  "propagation_dtype": "float32",
+  "cpu_workers_total_peak": 6
+}
