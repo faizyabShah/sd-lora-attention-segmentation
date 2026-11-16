@@ -111,3 +111,11 @@ Nothing is tuned after the run: not the prompts, the key thresholds, the filter,
 **Run order.**
 - (B) and (C) do not depend on the tokens. They are scored from a token-free replay (tag `bc`) submitted now; that replay is their registered result.
 - (A) is scored from a second replay, run after the tokens exist, with its own `base` arm from the same replay.
+
+## Second smoke test (2026-11-16, 3 classes, new key; before the full token run)
+
+- **The token stage runs end to end.**
+- **Kept exemplars:** aeroplane 10 of 18, bicycle 8 of 40, bird 10 of 20.
+- **Training loss** falls from about 0.9–1.0 to 0.3–0.4; ‖θ‖ is 0.7–0.9.
+- No design change was made.
+- No token was evaluated on VOC-Sim or COCO-Cap.
