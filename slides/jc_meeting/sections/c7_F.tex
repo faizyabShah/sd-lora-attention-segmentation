@@ -1,3 +1,35 @@
 % Comment 7: Table 1
 % Owner: F. Only this side edits this file.
-% Add frames below; one message per frame. See docs/JC_REVIEW_WORKPLAN.md, Section 6.
+% Source of every number: runs/15_token_ladder/result.md, class-word column (workplan Entry 8).
+
+\begin{frame}{Comment 7: Table 1 rerun with COCO-Cap values and consecutive differences}
+\begin{slidetable}
+\begin{tabular}{lrrcrr}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & \multicolumn{2}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-6}
+Step & mIoU & $\Delta$ & folds & mIoU & $\Delta$ \\
+\midrule
+Cross-attention seed, uniform layers & 0.588 & ---      & --- & 0.444 & --- \\
++ guided layer weights               & 0.611 & $+0.023$ & 0/5 & 0.501 & $+0.056$ \\
++ fine-only propagation              & 0.791 & $+0.180$ & 5/5 & 0.677 & $+0.176$ \\
++ hierarchy, no cap                  & 0.807 & $+0.016$ & 3/5 & 0.687 & $+0.010$ \\
++ one-sided cap                      & 0.817 & $+0.010$ & 4/5 & 0.682 & $-0.005$ \\
+\textbf{+ DenseCRF (full pipeline)}  & \textbf{0.830} & $+0.013$ & 5/5 & \textbf{0.696} & $+0.014$ \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+Every $\Delta$ is the row minus the row above, from one capture, fixed threshold 0.55. Folds: held-out folds won with the threshold chosen on the other four.
+\src{runs/15\_token\_ladder/result.md, class-word column}\status{done, unreviewed}
+\end{frame}
+
+\begin{frame}{Comment 7: what the rerun changes for the claim}
+\begin{itemize}
+  \item \textbf{Reproduction.} The full pipeline reproduces the paper's numbers (0.830 and 0.696). The largest step, fine-only propagation ($+0.18$ on both benchmarks), is now a visible row.
+  \item \textbf{Hierarchy on COCO-Cap.} With the same DenseCRF, capped hierarchy vs fine-only is $+0.012$ [$-0.002$, $+0.026$] at threshold 0.55, and $+0.022$ with the VOC-Sim-selected threshold. The draft's $+0.034$ is not reproduced here and must be traced.
+  \item \textbf{Guided layer weights.} $+0.024$ [$+0.013$, $+0.036$] on COCO-Cap at the full pipeline; $+0.004$ on VOC-Sim.
+  \item \textbf{Cap.} Helps on VOC-Sim ($+0.010$), slightly negative on COCO-Cap ($-0.005$).
+  \item \textbf{Action.} Rebuild Table 1 in this format; decide the claim after tracing the $+0.034$.
+\end{itemize}
+\src{runs/15\_token\_ladder/result.md}\status{done, unreviewed}
+\end{frame}

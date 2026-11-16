@@ -288,7 +288,7 @@ Edited in place by the owner. States: `not started`, `in progress`,
 | Item | Owner | State | Latest entry |
 |---|---|---|---|
 | Contract and manifests | F | not started | — |
-| #1 gain breakdown | F | not started | — |
+| #1 gain breakdown | F | in progress: step-by-step numbers in Entry 8; configuration vs new-component split not yet written | Entry 8 |
 | #1 reframing text | N | not started | — |
 | #2 mapping table | N | done, awaiting review | Entry 7 |
 | #3 OVAM class word | F | not started | — |
@@ -301,17 +301,17 @@ Edited in place by the owner. States: `not started`, `in progress`,
 | #3 DiffSegmenter | N | done, awaiting review (sanity only; class-word row) | Entries 2–4 |
 | #3 SPARK | N | no-go | Entry 2 |
 | #3 published block | N | not started | — |
-| #4 BRACE with optimized tokens | F | not started | — |
+| #4 BRACE with optimized tokens | F | done, awaiting review | Entry 8 |
 | #4 token provenance | N | done, awaiting review | Entry 5 |
 | #5 fine-only and BRACE, SD 1.5 / 2.1 / XL | F | not started | — |
 | #5 GoCA, SD 1.5 / 2.1 / XL | N | in progress: SD 1.5 and SDXL done; SD 2.1 blocked (official weights removed) | Entries 3–4 |
 | #6 consistency | N | done, awaiting review | Entry 6 |
-| #7 Table 1 | F | not started | — |
+| #7 Table 1 | F | in progress: numbers done (Entry 8); paper table and caption not yet rewritten | Entry 8 |
 | #8 cost and hardware | F | not started | — |
 | #8 restructuring | N | not started | — |
 | #9 venue | N | not started | — |
 | Slide deck: blank skeleton | F | done | `slides/jc_meeting/` |
-| Slides: own sections | F and N | not started | — |
+| Slides: own sections | F and N | in progress | Entries 2–8 |
 
 ---
 
@@ -428,3 +428,25 @@ entry, not by editing the reviewed one.
 **Open points:** none.
 
 **Review — F, <date>:** pending
+
+### Entry 8 — F (Faizyab's Claude), 2026-11-16
+**Item:** #4 BRACE with optimized tokens; #7 Table 1 numbers; #1 gain breakdown (numbers only)
+**Kind:** pre-registration and result
+**What was done:** One live generation per image with the frozen runtime on this cluster (V100 nodes), 490 VOC-Sim and 707 COCO-Cap images. Each generation gives two query columns, class word (frozen attribution) and OVAM's released VOC-Sim token (`configs/ovam/tokens_VOC.npy`; keys `[<SoT>, token]`, conditional query, the form fixed in protocol Section 50), and every pipeline step for both. The layer weights are text-independent, so both columns share them. Jobs 253146–253153. Rules were committed before scoring (95288dc09); one later code change guards empty folds in the report and does not touch scoring (95381a493).
+**Where:** `runs/15_token_ladder/PREREG.md`, `runs/15_token_ladder/result.md`, `scripts/jc_ladder.py`; result commit 812405e1c. Per-image maps are in the ignored cache (`jc_ladder/`), not in git.
+**Result (fixed threshold 0.55, paired, class-macro mIoU, 95% image-bootstrap intervals):**
+- Reproduction: class-word full pipeline 0.830 VOC-Sim / 0.696 COCO-Cap. In-sample for the method design.
+- Optimized token, full pipeline: 0.861 / 0.681. Token minus word: +0.031 [+0.022, +0.039] on VOC-Sim, −0.015 [−0.030, +0.000] on COCO-Cap. Few-shot, not training-free.
+- Registered comparisons with the token, all three **do not hold**: capped hierarchy vs fine-only (both DenseCRF) +0.010 / −0.017 [−0.028, −0.007]; guided vs uniform layer weights +0.003 / +0.004 [−0.002, +0.011]; cap vs no cap +0.012 / −0.002 [−0.006, +0.003].
+- Same comparisons with the class word (rerun, reference): hierarchy +0.034 / +0.012 [−0.002, +0.026]; layer weights +0.004 / +0.024 [+0.013, +0.036]; cap +0.010 / −0.005 [−0.011, −0.001].
+- Best token cell on COCO-Cap is fine-only + DenseCRF, 0.698.
+- Seed alone: the token raises it by about +0.18 on both benchmarks (0.588 → 0.766, 0.444 → 0.625, uniform layers).
+- Regeneration: 238/490 and 243/707 images bit-identical to the stored capture; the rest differ by GPU nondeterminism (class-word maps: median max |Δ| 8e-4 / 3e-3).
+**Slides:** `slides/jc_meeting/sections/c4_F.tex` (4 slides), `slides/jc_meeting/sections/c7_F.tex` (2 slides).
+**Open points:**
+- The draft's COCO-Cap hierarchy gain of +0.034 is not reproduced by this rerun (+0.012 at 0.55, +0.022 with the VOC-Sim-selected threshold). Where the +0.034 comes from has not been traced.
+- The COCO-Cap loss with the token is concentrated in a few classes (sofa 0.70 → 0.34, car 0.76 → 0.66; person rises 0.28 → 0.62). Not investigated.
+- Paper Table 1 and its caption are not rewritten yet. The configuration vs new-component split for #1 is not written yet.
+- Entry 1 (contract) was dropped as a separate task: both sides have the same benchmark data. The scoring rules of Section 3 stand.
+
+**Review — N, <date>:** pending
