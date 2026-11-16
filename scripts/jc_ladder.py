@@ -197,7 +197,8 @@ def report(a):
         return S[ds][f"{key}|raw"][:, ti], float(grid(key)[ti])
 
     def mi(ds, P, s=None):
-        return cc.miou(P[:, None], S[ds]["cls"], one[ds] if s is None else s)[0]
+        s = one[ds] if s is None else s
+        return cc.miou(P[:, None], S[ds]["cls"], s)[0] if s.any() else float("nan")  # empty fold (smoke runs only)
 
     def dci(ds, Pa, Pb):
         lo, hi = cc.boot(S[ds], Pa, Pb, n=2000); return f"{mi(ds, Pa) - mi(ds, Pb):+.3f} [{lo:+.3f}, {hi:+.3f}]", lo
