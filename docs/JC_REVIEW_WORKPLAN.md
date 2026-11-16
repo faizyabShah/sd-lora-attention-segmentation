@@ -450,3 +450,22 @@ entry, not by editing the reviewed one.
 - Entry 1 (contract) was dropped as a separate task: both sides have the same benchmark data. The scoring rules of Section 3 stand.
 
 **Review — N, <date>:** pending
+
+### Entry 9 — F (Faizyab's Claude), 2026-11-16
+**Item:** #7 Table 1; #1 claim (source of the draft's COCO-Cap hierarchy gain, +0.034)
+**Kind:** result (diagnostic, post hoc; nothing selected)
+**What was done:** Traced the +0.034 to its source and recomputed it from the Entry 8 capture with DenseCRF on the original 17-threshold grid (0.30–0.70, step 0.025). Jobs 253170–253171.
+**Where:** `runs/16_trace_034/result.md`, `scripts/jc_trace_034.py`; this commit. Source of the original number: `outputs/segmentation/controlled_attention_cv/sg_combined_v3/report.md` and `results.json`, protocol Section 135, `configs/owner_default_v3.json`.
+**Result:**
+- **Source.** +0.0341 = capped hierarchy + DenseCRF at threshold 0.55 (0.6964) minus fine-only + DenseCRF at threshold 0.425 (0.6623). Each map is scored at its own full-VOC-Sim-best threshold, frozen for COCO-Cap. The paper's hierarchy table caption says "COCO-Cap: VOC-frozen threshold" but does not say the two thresholds differ.
+- **Reproduced.** Same convention on the new capture: +0.0341 [+0.0227, +0.0450] (0.6962 vs 0.6621). The full-VOC-Sim-best thresholds are again 0.55 and 0.425.
+- **Other conventions, COCO-Cap, with DenseCRF.** Same threshold 0.55: +0.0121 [−0.0018, +0.0264]. Same threshold 0.425: −0.0387 [−0.0502, −0.0265]. Each map at its COCO-Cap-best threshold (0.600 / 0.525; uses COCO-Cap labels, diagnostic only): +0.0176 [+0.0063, +0.0294]. The original run's own report already listed "COCO best-thr Δ +0.0175" next to the +0.0341.
+- **Raw (no DenseCRF), COCO-Cap.** VOC-Sim thresholds 0.55 / 0.45: +0.0219 [+0.0117, +0.0321]; same threshold 0.55: +0.0049 [−0.0077, +0.0186]; each at its COCO-Cap best: +0.0172 [+0.0074, +0.0275].
+- **VOC-Sim.** Each map at its own threshold: +0.0057 [−0.0009, +0.0122]; 5-fold out-of-fold threshold per map: +0.0074 [+0.0009, +0.0142].
+- **Why the conventions differ.** The fine-only map's best threshold moves from 0.425 on VOC-Sim to 0.525 on COCO-Cap; the hierarchy's moves from 0.55 to 0.60. Fine-only at its VOC-Sim threshold is over-inclusive on COCO-Cap (precision 0.703). So the +0.034 is part localisation (+0.018 at each map's best threshold) and part threshold transfer.
+- **Per class (COCO-Cap).** Under the draft's convention the largest gains are car +0.132, aeroplane +0.082, tv +0.074. At the same threshold the hierarchy loses on 8 of 20 classes (chair −0.076, boat −0.056) and gains most on dining table +0.139 and tv +0.114.
+**Slides:** `slides/jc_meeting/sections/c7_F.tex` (one bullet rewritten, one slide added).
+**Open points:** The paper text is not changed. Proposed wording for the claim: the hierarchy's map transfers to cluttered scenes at its VOC-Sim threshold, where the fine-only map does not; about half of the +0.034 remains when each map is given its best threshold. This agrees with protocol Section 134 ("cross-image calibration, not better localisation").
+
+**Review — N, <date>:** pending
+

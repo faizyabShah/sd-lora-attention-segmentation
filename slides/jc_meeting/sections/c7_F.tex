@@ -26,10 +26,31 @@ Every $\Delta$ is the row minus the row above, from one capture, fixed threshold
 \begin{frame}{Comment 7: what the rerun changes for the claim}
 \begin{itemize}
   \item \textbf{Reproduction.} The full pipeline reproduces the paper's numbers (0.830 and 0.696). The largest step, fine-only propagation ($+0.18$ on both benchmarks), is now a visible row.
-  \item \textbf{Hierarchy on COCO-Cap.} With the same DenseCRF, capped hierarchy vs fine-only is $+0.012$ [$-0.002$, $+0.026$] at threshold 0.55, and $+0.022$ with the VOC-Sim-selected threshold. The draft's $+0.034$ is not reproduced here and must be traced.
+  \item \textbf{Hierarchy on COCO-Cap.} The draft's $+0.034$ is reproduced exactly ($+0.034$ [$+0.023$, $+0.045$]), but it compares the two maps at different thresholds (hierarchy 0.55, fine-only 0.425, each best on VOC-Sim). At the same threshold 0.55 the gain is $+0.012$ [$-0.002$, $+0.026$]; at each map's best COCO-Cap threshold it is $+0.018$ [$+0.006$, $+0.029$].
   \item \textbf{Guided layer weights.} $+0.024$ [$+0.013$, $+0.036$] on COCO-Cap at the full pipeline; $+0.004$ on VOC-Sim.
   \item \textbf{Cap.} Helps on VOC-Sim ($+0.010$), slightly negative on COCO-Cap ($-0.005$).
-  \item \textbf{Action.} Rebuild Table 1 in this format; decide the claim after tracing the $+0.034$.
+  \item \textbf{Action.} Rebuild Table 1 in this format and state the threshold convention next to the $+0.034$.
 \end{itemize}
-\src{runs/15\_token\_ladder/result.md}\status{done, unreviewed}
+\src{runs/15\_token\_ladder/result.md; runs/16\_trace\_034/result.md}\status{done, unreviewed}
+\end{frame}
+
+\begin{frame}{Comment 7: the hierarchy's COCO-Cap gain depends on the threshold convention}
+\begin{slidetable}
+\begin{tabular}{lrrr}
+\toprule
+Convention (with DenseCRF) & hierarchy & fine-only & $\Delta$ on COCO-Cap \\
+\midrule
+Each at its VOC-Sim threshold (0.55 / 0.425) & 0.696 & 0.662 & $\mathbf{+0.034}$ \\
+Both at 0.55                                 & 0.696 & 0.684 & $+0.012$ \\
+Both at 0.425                                & 0.623 & 0.662 & $\mathbf{-0.039}$ \\
+Each at its COCO-Cap best (0.60 / 0.525)     & 0.707 & 0.689 & $\mathbf{+0.018}$ \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+  \item Bold: 95\% interval excludes zero. The last row uses COCO-Cap labels and is diagnostic only.
+  \item The fine-only map's best threshold moves by 0.10 from VOC-Sim to COCO-Cap; the hierarchy's moves by 0.05.
+  \item About half of the $+0.034$ is better localisation ($+0.018$); the rest is that the hierarchy's threshold transfers better.
+\end{itemize}
+\src{runs/16\_trace\_034/result.md}\status{done, unreviewed}
 \end{frame}
