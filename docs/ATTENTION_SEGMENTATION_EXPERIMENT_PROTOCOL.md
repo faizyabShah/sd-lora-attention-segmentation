@@ -8421,3 +8421,14 @@ existing image-anchored renoise capture with the supplied LoRA and an explicit
 Cityscapes SCLIP vocabulary. It has no pixel annotations and cannot establish
 accuracy, an optimal threshold or promotion. All methods share each image's
 capture. Frozen BRACE and its owner-override provenance remain unchanged.
+
+### 139. Owner-selected Cityscapes joint multiclass run (16 November 2026)
+
+The owner replaces Section 138's 50 images with 65 explicitly named candidates
+and merges the taxonomy into ten groups. All classes must compete jointly,
+with winner-takes-all assignment and subthreshold background at .40/.55/.70.
+`runs/cityscapes_joint_owner/PREREG.md` specifies shared CA queries, grouped
+SCLIP queries, common rather than per-class scaling, and exclusive raw/refined
+label maps. This is exploratory, has no pixel GT, and does not change frozen
+BRACE or promote geometric fusion. Keep the earlier selection/results. Run
+unattended with automatic rendering/reporting, then leave it running.
