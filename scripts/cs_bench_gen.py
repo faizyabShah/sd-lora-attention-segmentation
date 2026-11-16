@@ -70,7 +70,7 @@ def run(a):
     import idea1_knockout as k1
     rows = json.loads((RUN / "prompts.json").read_text())[: a.limit or None]
     pipe = sg27_runtime.make_runtime(k1.MODEL)["pipe"]
-    pipe.load_lora_weights(str(LORA)); OUT.mkdir(parents=True, exist_ok=True)
+    pipe.load_lora_weights(str(LORA), weight_name="pytorch_lora_weights.safetensors"); OUT.mkdir(parents=True, exist_ok=True)
     meta = {"lora": str(LORA.relative_to(ROOT)), "gpu": torch.cuda.get_device_name(0), "dtype": str(pipe.unet.dtype),
             "steps": 30, "guidance": 7.5, "scheduler": type(pipe.scheduler).__name__, "size": 512}
     for r in rows:
