@@ -153,6 +153,8 @@ def report(a):
         """terms: list of (sign, counts array). Returns text and (point, lo, hi)."""
         fs = [(sg, stat(ds, P)) for sg, P in terms]
         idx = np.arange(n[ds]) if sub is None else np.flatnonzero(sub)
+        if len(idx) == 0:                      # empty subset (smoke runs only)
+            return "—", (float("nan"),) * 3
         pt = sum(sg * f(idx) for sg, f in fs)
         lo, hi = boot(ds, lambda s: sum(sg * f(s) for sg, f in fs), sub=sub)
         return f"{pt:+.3f} [{lo:+.3f}, {hi:+.3f}]", (pt, lo, hi)

@@ -111,7 +111,7 @@ def seed(a):
 def walk(a):
     pipe, cfg, _ = build(refine=True)
     dev = pipe.device
-    out = SWAP / ("walk" + a.tag) / a.dataset; out.mkdir(parents=True, exist_ok=True)
+    out = SWAP / ("walk" + a.tag + a.walk_tag) / a.dataset; out.mkdir(parents=True, exist_ok=True)
     capdir = SWAP / ("cap" + a.tag) / a.dataset
     rows = rows_for(a.dataset, a.shard, a.num_shards, 0)
     if a.max_images:                      # smoke runs: only the images the capture smoke produced
@@ -145,4 +145,5 @@ if __name__ == "__main__":
         p = sub.add_parser(nm); p.add_argument("--dataset", choices=("voc", "coco"), required=True)
         p.add_argument("--shard", type=int, default=0); p.add_argument("--num-shards", type=int, default=1)
         p.add_argument("--max-images", type=int, default=0); p.add_argument("--tag", default="")
+        p.add_argument("--walk-tag", default="", help="extra suffix for the walk output folder (device checks)")
     a = ap.parse_args(); {"seed": seed, "walk": walk}[a.cmd](a)
