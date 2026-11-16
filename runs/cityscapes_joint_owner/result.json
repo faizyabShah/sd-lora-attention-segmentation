@@ -1,0 +1,605 @@
+{
+  "completion": {
+    "status": "complete",
+    "images": 65,
+    "groups": [
+      "road",
+      "sidewalk",
+      "building/wall",
+      "vegetation/terrain",
+      "sky",
+      "person/rider",
+      "car",
+      "bus",
+      "train/tram",
+      "motorcycle/bicycle"
+    ],
+    "methods": [
+      "brace",
+      "sclip_brace",
+      "early_geo"
+    ],
+    "thresholds": [
+      0.4,
+      0.55,
+      0.7
+    ],
+    "raw_label_maps": 585,
+    "refined_label_maps": 585,
+    "comparison_sheets": 130,
+    "config_sha256": "eb0df54154b91c93aaca299bc1adfffdc1e4e44a36bcdeb97c2b3ae3d69cf730",
+    "validation": "All label maps decode, have native dimensions and values 0..10; winner/threshold rules checked during rendering."
+  },
+  "archive_sha256_verified": "7d6768ee07f3b18ed675225a82d2b98f5b736a0717184ea42d3da09197d356e6",
+  "archive_mib": 55.60384273529053,
+  "descriptive_statistics": [
+    {
+      "method": "brace",
+      "threshold": 0.4,
+      "mode": "raw",
+      "mean_image_area_fraction": {
+        "background": 0.0,
+        "road": 0.0,
+        "sidewalk": 0.7528190025916467,
+        "building/wall": 0.0,
+        "vegetation/terrain": 0.0,
+        "sky": 0.0,
+        "person/rider": 0.0,
+        "car": 0.0,
+        "bus": 0.0731827369103065,
+        "train/tram": 0.17399826049804684,
+        "motorcycle/bicycle": 0.0
+      },
+      "images_with_any_pixels_per_class": {
+        "background": 0,
+        "road": 0,
+        "sidewalk": 62,
+        "building/wall": 0,
+        "vegetation/terrain": 0,
+        "sky": 0,
+        "person/rider": 0,
+        "car": 0,
+        "bus": 11,
+        "train/tram": 24,
+        "motorcycle/bicycle": 0
+      }
+    },
+    {
+      "method": "brace",
+      "threshold": 0.4,
+      "mode": "crf",
+      "mean_image_area_fraction": {
+        "background": 0.00400232168344351,
+        "road": 0.0,
+        "sidewalk": 0.7511914962377305,
+        "building/wall": 0.0,
+        "vegetation/terrain": 0.0,
+        "sky": 0.0,
+        "person/rider": 0.0,
+        "car": 0.0,
+        "bus": 0.07287820669320913,
+        "train/tram": 0.17192797538561702,
+        "motorcycle/bicycle": 0.0
+      },
+      "images_with_any_pixels_per_class": {
+        "background": 31,
+        "road": 0,
+        "sidewalk": 61,
+        "building/wall": 0,
+        "vegetation/terrain": 0,
+        "sky": 0,
+        "person/rider": 0,
+        "car": 0,
+        "bus": 11,
+        "train/tram": 24,
+        "motorcycle/bicycle": 0
+      }
+    },
+    {
+      "method": "brace",
+      "threshold": 0.55,
+      "mode": "raw",
+      "mean_image_area_fraction": {
+        "background": 0.024228218274238784,
+        "road": 0.0,
+        "sidewalk": 0.7408699818146535,
+        "building/wall": 0.0,
+        "vegetation/terrain": 0.0,
+        "sky": 0.0,
+        "person/rider": 0.0,
+        "car": 0.0,
+        "bus": 0.0731827369103065,
+        "train/tram": 0.16171906300080127,
+        "motorcycle/bicycle": 0.0
+      },
+      "images_with_any_pixels_per_class": {
+        "background": 9,
+        "road": 0,
+        "sidewalk": 61,
+        "building/wall": 0,
+        "vegetation/terrain": 0,
+        "sky": 0,
+        "person/rider": 0,
+        "car": 0,
+        "bus": 11,
+        "train/tram": 24,
+        "motorcycle/bicycle": 0
+      }
+    },
+    {
+      "method": "brace",
+      "threshold": 0.55,
+      "mode": "crf",
+      "mean_image_area_fraction": {
+        "background": 0.028483288104717546,
+        "road": 0.0,
+        "sidewalk": 0.7392420255220853,
+        "building/wall": 0.0,
+        "vegetation/terrain": 0.0,
+        "sky": 0.0,
+        "person/rider": 0.0,
+        "car": 0.0,
+        "bus": 0.07287820669320913,
+        "train/tram": 0.15939647967998802,
+        "motorcycle/bicycle": 0.0
+      },
+      "images_with_any_pixels_per_class": {
+        "background": 32,
+        "road": 0,
+        "sidewalk": 60,
+        "building/wall": 0,
+        "vegetation/terrain": 0,
+        "sky": 0,
+        "person/rider": 0,
+        "car": 0,
+        "bus": 11,
+        "train/tram": 24,
+        "motorcycle/bicycle": 0
+      }
+    },
+    {
+      "method": "brace",
+      "threshold": 0.7,
+      "mode": "raw",
+      "mean_image_area_fraction": {
+        "background": 0.12799191597180487,
+        "road": 0.0,
+        "sidewalk": 0.6885079408303286,
+        "building/wall": 0.0,
+        "vegetation/terrain": 0.0,
+        "sky": 0.0,
+        "person/rider": 0.0,
+        "car": 0.0,
+        "bus": 0.0731827369103065,
+        "train/tram": 0.1103174062875601,
+        "motorcycle/bicycle": 0.0
+      },
+      "images_with_any_pixels_per_class": {
+        "background": 18,
+        "road": 0,
+        "sidewalk": 54,
+        "building/wall": 0,
+        "vegetation/terrain": 0,
+        "sky": 0,
+        "person/rider": 0,
+        "car": 0,
+        "bus": 11,
+        "train/tram": 24,
+        "motorcycle/bicycle": 0
+      }
+    },
+    {
+      "method": "brace",
+      "threshold": 0.7,
+      "mode": "crf",
+      "mean_image_area_fraction": {
+        "background": 0.13295507186498395,
+        "road": 0.0,
+        "sidewalk": 0.6868057446602064,
+        "building/wall": 0.0,
+        "vegetation/terrain": 0.0,
+        "sky": 0.0,
+        "person/rider": 0.0,
+        "car": 0.0,
+        "bus": 0.07287850013146034,
+        "train/tram": 0.10736068334334936,
+        "motorcycle/bicycle": 0.0
+      },
+      "images_with_any_pixels_per_class": {
+        "background": 35,
+        "road": 0,
+        "sidewalk": 53,
+        "building/wall": 0,
+        "vegetation/terrain": 0,
+        "sky": 0,
+        "person/rider": 0,
+        "car": 0,
+        "bus": 11,
+        "train/tram": 24,
+        "motorcycle/bicycle": 0
+      }
+    },
+    {
+      "method": "sclip_brace",
+      "threshold": 0.4,
+      "mode": "raw",
+      "mean_image_area_fraction": {
+        "background": 0.04697793813852163,
+        "road": 0.3006497896634615,
+        "sidewalk": 0.24921830006134818,
+        "building/wall": 0.07445841080103166,
+        "vegetation/terrain": 0.17960977798853164,
+        "sky": 0.0,
+        "person/rider": 0.005265162541316106,
+        "car": 0.042955251840444714,
+        "bus": 0.025404710036057692,
+        "train/tram": 0.06495022896008615,
+        "motorcycle/bicycle": 0.010510429969200721
+      },
+      "images_with_any_pixels_per_class": {
+        "background": 16,
+        "road": 42,
+        "sidewalk": 49,
+        "building/wall": 12,
+        "vegetation/terrain": 24,
+        "sky": 0,
+        "person/rider": 5,
+        "car": 6,
+        "bus": 6,
+        "train/tram": 8,
+        "motorcycle/bicycle": 6
+      }
+    },
+    {
+      "method": "sclip_brace",
+      "threshold": 0.4,
+      "mode": "crf",
+      "mean_image_area_fraction": {
+        "background": 0.06025873819986978,
+        "road": 0.2971932631272536,
+        "sidewalk": 0.2467677581004607,
+        "building/wall": 0.073800776554988,
+        "vegetation/terrain": 0.17784822904146635,
+        "sky": 0.0,
+        "person/rider": 0.004180008325821314,
+        "car": 0.042297774094801684,
+        "bus": 0.024292461688701927,
+        "train/tram": 0.06409667577498998,
+        "motorcycle/bicycle": 0.009264315091646635
+      },
+      "images_with_any_pixels_per_class": {
+        "background": 62,
+        "road": 41,
+        "sidewalk": 45,
+        "building/wall": 12,
+        "vegetation/terrain": 23,
+        "sky": 0,
+        "person/rider": 5,
+        "car": 6,
+        "bus": 6,
+        "train/tram": 8,
+        "motorcycle/bicycle": 6
+      }
+    },
+    {
+      "method": "sclip_brace",
+      "threshold": 0.55,
+      "mode": "raw",
+      "mean_image_area_fraction": {
+        "background": 0.17179806049053487,
+        "road": 0.27747319539388016,
+        "sidewalk": 0.23206896659655446,
+        "building/wall": 0.050487968249198725,
+        "vegetation/terrain": 0.16127489530123199,
+        "sky": 0.0,
+        "person/rider": 0.004943671593299279,
+        "car": 0.027078599196213943,
+        "bus": 0.020985921223958336,
+        "train/tram": 0.04740702311197917,
+        "motorcycle/bicycle": 0.006481698843149039
+      },
+      "images_with_any_pixels_per_class": {
+        "background": 46,
+        "road": 38,
+        "sidewalk": 44,
+        "building/wall": 8,
+        "vegetation/terrain": 24,
+        "sky": 0,
+        "person/rider": 4,
+        "car": 6,
+        "bus": 6,
+        "train/tram": 7,
+        "motorcycle/bicycle": 4
+      }
+    },
+    {
+      "method": "sclip_brace",
+      "threshold": 0.55,
+      "mode": "crf",
+      "mean_image_area_fraction": {
+        "background": 0.18286831195537862,
+        "road": 0.27463723207131413,
+        "sidewalk": 0.23008501101762818,
+        "building/wall": 0.049975507687299685,
+        "vegetation/terrain": 0.15982916416266027,
+        "sky": 0.0,
+        "person/rider": 0.0039300576234475165,
+        "car": 0.026189892108623797,
+        "bus": 0.0203887939453125,
+        "train/tram": 0.046247159517728356,
+        "motorcycle/bicycle": 0.005848869910606971
+      },
+      "images_with_any_pixels_per_class": {
+        "background": 64,
+        "road": 38,
+        "sidewalk": 44,
+        "building/wall": 7,
+        "vegetation/terrain": 23,
+        "sky": 0,
+        "person/rider": 4,
+        "car": 6,
+        "bus": 5,
+        "train/tram": 7,
+        "motorcycle/bicycle": 4
+      }
+    },
+    {
+      "method": "sclip_brace",
+      "threshold": 0.7,
+      "mode": "raw",
+      "mean_image_area_fraction": {
+        "background": 0.39209948808718953,
+        "road": 0.19536661001352162,
+        "sidewalk": 0.16569360586313106,
+        "building/wall": 0.03467064881936097,
+        "vegetation/terrain": 0.13131668873322316,
+        "sky": 0.0,
+        "person/rider": 0.0027486165364583332,
+        "car": 0.02330316396859976,
+        "bus": 0.018297518216646633,
+        "train/tram": 0.03611690814678486,
+        "motorcycle/bicycle": 0.0003867516150841346
+      },
+      "images_with_any_pixels_per_class": {
+        "background": 62,
+        "road": 32,
+        "sidewalk": 35,
+        "building/wall": 5,
+        "vegetation/terrain": 23,
+        "sky": 0,
+        "person/rider": 3,
+        "car": 5,
+        "bus": 5,
+        "train/tram": 7,
+        "motorcycle/bicycle": 2
+      }
+    },
+    {
+      "method": "sclip_brace",
+      "threshold": 0.7,
+      "mode": "crf",
+      "mean_image_area_fraction": {
+        "background": 0.3993382184933393,
+        "road": 0.1926958719889323,
+        "sidewalk": 0.1639322721041166,
+        "building/wall": 0.03432910625751202,
+        "vegetation/terrain": 0.13062102488982374,
+        "sky": 0.0,
+        "person/rider": 0.0024003835824819714,
+        "car": 0.022876563439002403,
+        "bus": 0.01811499962439904,
+        "train/tram": 0.03569155962039263,
+        "motorcycle/bicycle": 0.0
+      },
+      "images_with_any_pixels_per_class": {
+        "background": 64,
+        "road": 31,
+        "sidewalk": 34,
+        "building/wall": 5,
+        "vegetation/terrain": 23,
+        "sky": 0,
+        "person/rider": 3,
+        "car": 5,
+        "bus": 5,
+        "train/tram": 7,
+        "motorcycle/bicycle": 0
+      }
+    },
+    {
+      "method": "early_geo",
+      "threshold": 0.4,
+      "mode": "raw",
+      "mean_image_area_fraction": {
+        "background": 0.004103362254607371,
+        "road": 0.08672549907977764,
+        "sidewalk": 0.6193824768066407,
+        "building/wall": 0.023541964017427884,
+        "vegetation/terrain": 0.10935631776467349,
+        "sky": 0.0,
+        "person/rider": 1.6373854417067307e-05,
+        "car": 0.022869638296274038,
+        "bus": 0.018787227532802486,
+        "train/tram": 0.10121819911858974,
+        "motorcycle/bicycle": 0.013998941274789664
+      },
+      "images_with_any_pixels_per_class": {
+        "background": 2,
+        "road": 19,
+        "sidewalk": 58,
+        "building/wall": 5,
+        "vegetation/terrain": 19,
+        "sky": 0,
+        "person/rider": 1,
+        "car": 5,
+        "bus": 5,
+        "train/tram": 9,
+        "motorcycle/bicycle": 7
+      }
+    },
+    {
+      "method": "early_geo",
+      "threshold": 0.4,
+      "mode": "crf",
+      "mean_image_area_fraction": {
+        "background": 0.013234945443960339,
+        "road": 0.08561659592848558,
+        "sidewalk": 0.616256087865585,
+        "building/wall": 0.023140657865084135,
+        "vegetation/terrain": 0.10854232005583934,
+        "sky": 0.0,
+        "person/rider": 0.0,
+        "car": 0.022328009972205527,
+        "bus": 0.01790834084535256,
+        "train/tram": 0.10040232340494791,
+        "motorcycle/bicycle": 0.012570718618539664
+      },
+      "images_with_any_pixels_per_class": {
+        "background": 50,
+        "road": 18,
+        "sidewalk": 58,
+        "building/wall": 5,
+        "vegetation/terrain": 18,
+        "sky": 0,
+        "person/rider": 0,
+        "car": 5,
+        "bus": 5,
+        "train/tram": 9,
+        "motorcycle/bicycle": 6
+      }
+    },
+    {
+      "method": "early_geo",
+      "threshold": 0.55,
+      "mode": "raw",
+      "mean_image_area_fraction": {
+        "background": 0.06683130508814103,
+        "road": 0.08507708035982572,
+        "sidewalk": 0.5840393848908252,
+        "building/wall": 0.022226597712590144,
+        "vegetation/terrain": 0.10925531631860978,
+        "sky": 0.0,
+        "person/rider": 0.0,
+        "car": 0.022869638296274038,
+        "bus": 0.017183059301131814,
+        "train/tram": 0.07860283484825721,
+        "motorcycle/bicycle": 0.013914783184344953
+      },
+      "images_with_any_pixels_per_class": {
+        "background": 23,
+        "road": 18,
+        "sidewalk": 58,
+        "building/wall": 4,
+        "vegetation/terrain": 19,
+        "sky": 0,
+        "person/rider": 0,
+        "car": 5,
+        "bus": 5,
+        "train/tram": 9,
+        "motorcycle/bicycle": 7
+      }
+    },
+    {
+      "method": "early_geo",
+      "threshold": 0.55,
+      "mode": "crf",
+      "mean_image_area_fraction": {
+        "background": 0.07642231476612579,
+        "road": 0.08399640596829928,
+        "sidewalk": 0.580350572634966,
+        "building/wall": 0.021950765756460336,
+        "vegetation/terrain": 0.10846849099183695,
+        "sky": 0.0,
+        "person/rider": 0.0,
+        "car": 0.022328009972205527,
+        "bus": 0.016568032289162662,
+        "train/tram": 0.07739797738882212,
+        "motorcycle/bicycle": 0.012517430232121395
+      },
+      "images_with_any_pixels_per_class": {
+        "background": 56,
+        "road": 17,
+        "sidewalk": 58,
+        "building/wall": 4,
+        "vegetation/terrain": 18,
+        "sky": 0,
+        "person/rider": 0,
+        "car": 5,
+        "bus": 5,
+        "train/tram": 9,
+        "motorcycle/bicycle": 6
+      }
+    },
+    {
+      "method": "early_geo",
+      "threshold": 0.7,
+      "mode": "raw",
+      "mean_image_area_fraction": {
+        "background": 0.35486720158503604,
+        "road": 0.051140770545372596,
+        "sidewalk": 0.3947540283203126,
+        "building/wall": 0.018179614727313703,
+        "vegetation/terrain": 0.08854692899263822,
+        "sky": 0.0,
+        "person/rider": 0.0,
+        "car": 0.019618518535907452,
+        "bus": 0.014027932974008414,
+        "train/tram": 0.05074615478515625,
+        "motorcycle/bicycle": 0.008118849534254808
+      },
+      "images_with_any_pixels_per_class": {
+        "background": 64,
+        "road": 13,
+        "sidewalk": 55,
+        "building/wall": 3,
+        "vegetation/terrain": 13,
+        "sky": 0,
+        "person/rider": 0,
+        "car": 4,
+        "bus": 5,
+        "train/tram": 9,
+        "motorcycle/bicycle": 6
+      }
+    },
+    {
+      "method": "early_geo",
+      "threshold": 0.7,
+      "mode": "crf",
+      "mean_image_area_fraction": {
+        "background": 0.36353319608248197,
+        "road": 0.050340310121193915,
+        "sidewalk": 0.3896986154409556,
+        "building/wall": 0.01817040076622596,
+        "vegetation/terrain": 0.08832141191531451,
+        "sky": 0.0,
+        "person/rider": 0.0,
+        "car": 0.019370387150691105,
+        "bus": 0.01385955810546875,
+        "train/tram": 0.04977704561673678,
+        "motorcycle/bicycle": 0.006929074800931491
+      },
+      "images_with_any_pixels_per_class": {
+        "background": 65,
+        "road": 12,
+        "sidewalk": 55,
+        "building/wall": 3,
+        "vegetation/terrain": 13,
+        "sky": 0,
+        "person/rider": 0,
+        "car": 4,
+        "bus": 4,
+        "train/tram": 9,
+        "motorcycle/bicycle": 6
+      }
+    }
+  ],
+  "visually_reviewed_images": [
+    "cs_0000",
+    "cs_0089",
+    "cs_0499",
+    "cs_0447",
+    "cs_0402",
+    "cs_0394",
+    "cs_0331"
+  ],
+  "interpretation": "Execution succeeded; the joint BRACE decoder exhibits severe class collapse. No pixel GT or accuracy metrics are available."
+}
