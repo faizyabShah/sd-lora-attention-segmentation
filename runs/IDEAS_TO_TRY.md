@@ -42,6 +42,73 @@ Sorted by outcome, the experiments so far follow one rule.
 | 7 | Generate-to-agree | we control the generator | moderate, hard to evaluate | high | yes |
 | 8 | Confirm what already nearly works | — | good | low–medium | mixed |
 
+## Second pass (same day): three deeper ideas
+
+These came from a harder look at why bleed happens. Candidates that turned out to be already tested are listed under "Closed" at the end.
+
+**The diagnosis they share.** Cross-attention to a class word measures *dependence*, not *identity*. A plate attends to "dining table" because its appearance depends on the table being there, not because it is the table. Every failed fix tried to clean the map; these three change what is asked.
+
+| # | idea | my odds | cost | training-free? |
+|---|---|---|---|---|
+| A | Green-screen tokens: OVAM's token optimisation with zero annotations | good | medium | no (learns one token per class, no labels) |
+| B | Depth–time signature of the class word's attention | low–moderate | low | yes |
+| C | Caption-competitive attribution on COCO-Cap | moderate | very low | yes |
+
+### A. Green-screen tokens
+
+**The gap.** OVAM's learned tokens are the largest single gain we have measured (+0.051 on VOC-Sim on the older pipeline, 0.865 against BRACE's 0.830). Their only cost is one annotated image per class.
+
+**The idea.**
+- Let the generator make its own annotated examples: "a photo of a {class}, isolated on a plain white background".
+- On a uniform backdrop the mask comes from colour keying alone, with no attention and no annotator. It is a label by construction.
+- Optimise one token per class on these images, as OVAM does, with other classes' objects as negatives so the token learns to exclude other things, not only the backdrop.
+- At test time, BRACE runs unchanged with the learned token in place of the class word.
+
+**Why it might work.**
+- It uses the one lever we have never used: we control the generator, so we can ask it for cases where the answer is free.
+- The colour key is a view independent of attention, which is the pattern behind every win so far.
+- OVAM's own tokens were learned on a single image per class and still transferred to COCO-Cap.
+- It answers JC's "BRACE with optimised tokens" request while staying annotation-free.
+
+**Risks.**
+- Some classes do not render cleanly on a plain backdrop (boat, train, dining table). A label-free filter is needed: keep an exemplar only if its border is uniformly backdrop.
+- A token trained without context has never been penalised for attending to context. The cross-class negatives are meant to cover this; plates only get excluded if something plate-like is among the negatives.
+- Shadows and reflections blur the colour key.
+
+**Prior work.** [OVAM](https://arxiv.org/abs/2403.14291) learns tokens from annotated masks. OVDiff generates support images per class and builds feature prototypes from them. The search found no token optimisation supervised by backdrop keying, but OVDiff is close in spirit and must be compared.
+
+**First test.** 20 exemplars for each of the 20 VOC classes, the filter, token learning in the replay harness, then BRACE with the tokens against BRACE and against OVAM's released tokens in one capture. Tokens are learned from VOC-style prompts only, so COCO-Cap stays untuned transfer.
+
+### B. Depth–time signature of the class word's attention
+
+**The gap.** The seed averages the class word's attention over 11 layers and 31 steps into one number per pixel. The profile behind that number, 341 values per pixel, has never been looked at.
+
+**The hypothesis.**
+- An object pixel reads its class word throughout: at coarse layers when layout is decided, and at fine layers late, when detail is rendered.
+- A context pixel reads it only where it needs to stay consistent with the object, mostly coarse layers and early steps.
+- So two pixels with the same averaged attention can have different profile shapes, and the shape separates identity from dependence.
+
+**The test.** Normalise each pixel's profile to remove its magnitude. Compare it with the mean profile of BRACE's core and of clear background. Add that score to the same bleed-detection baseline as runs 08–10 and 13 (+0.05 AUROC bar).
+
+**Why it might work.** The earlier time-based attempt clustered image-latent trajectories, not attention profiles, and still beat BRACE on single classes post hoc (sheep 0.92 against 0.70 on VOC-Sim).
+
+**Risk.** It is one more per-image signal from the same model, and every one of those has failed so far. I would only run it because it is cheap: one replay, about 15 minutes of GPU.
+
+**Prior work.** Layer and timestep choice is well studied ([EmerDiff](https://arxiv.org/pdf/2401.11739), [Dataset Diffusion](https://arxiv.org/pdf/2309.14303), [GoCA](https://arxiv.org/pdf/2603.06178v1) with per-pixel head weights). The search found no use of the per-pixel profile shape as a feature.
+
+### C. Caption-competitive attribution on COCO-Cap
+
+**The gap.** On COCO-Cap the class word is scored through a prompt containing only that word, following OVAM. The softmax then has no competing noun: any object-like pixel prefers the lone class word over the start token and padding. On VOC-Sim the class word sits inside the caption and competes with its other words.
+
+**The idea.** Score the class word inside the caption: the caption itself when it contains the word, otherwise the caption with the class word appended. Plates then have their own word to attend to.
+
+**Why it might work.** It is class competition at the seed, inside the softmax, and it costs nothing: the image queries are fixed, so only the keys change in a replay.
+
+**Risks.**
+- Subtracting separately computed generic-word maps did not help in practice; this differs by competing inside one softmax with the caption's own nouns.
+- The optimal-transport variant over caption tokens lost (−0.08), though it changed the resolution and the assignment rule at the same time.
+- It is a protocol change more than a method, so on its own it is not a paper.
+
 ## 1. Class competition inside the capped hierarchy
 
 **The gap.** BRACE spreads each class alone, normalises each map to its own 0–1 range and thresholds it. Nothing says a pixel belongs to only one class.
@@ -179,4 +246,7 @@ Sorted by outcome, the experiments so far follow one rule.
 - **Per-image bleed detection:** UNet features, VAE decoder ownership, SA value vectors, SA row divergence, noise variability at any noise level, flip and shift equivariance.
 - **Self-refinement:** SA head weighting (seed agreement or entropy), nuisance purification of the class embedding, synonym ensembles, contrast seeds, one-step key refinement.
 - **Generation interventions:** token knockout, dose–response, CFG differences, Jacobians, timestep regrouping.
+- **Propagation operators:** reciprocal attention (geometric mean, minimum or soft gate of A and Aᵀ; SG9), the transposed operator Aᵀx, seed-connected bottleneck paths (SG10), spectral and graph-cut partitions, two-sided caps (V2, V4), optimal-transport assignment over caption tokens.
+- **Trajectory clustering:** k-means on image-latent trajectories (chrono).
+- **Not new elsewhere:** class prototypes from generated support images (OVDiff).
 - **Map-level fixes:** clutter-adaptive cap, generic-word subtraction, reliability scores from CLIP agreement, re-noising ensembles, flip and noise averaging.
