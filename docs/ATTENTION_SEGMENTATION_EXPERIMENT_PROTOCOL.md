@@ -8411,3 +8411,13 @@ freezes at most 5 candidates (Section 137 decision rules), using only the
 conditions those candidates need. S stays sealed: no S image has been
 captured or looked at. This changes when, and with which conditions, S and C
 are captured. It does not change any decision rule.
+
+### 138. Cityscapes LoRA 50 visual comparison (16 November 2026)
+
+Owner requests exploratory class-wise segmentation of the curated 50 LoRA
+images with BRACE, SCLIP-seeded V3 and early geometric fusion, at 0.40/0.55/0.70.
+The committed specification is `runs/cityscapes_50/PREREG.md`. This uses the
+existing image-anchored renoise capture with the supplied LoRA and an explicit
+Cityscapes SCLIP vocabulary. It has no pixel annotations and cannot establish
+accuracy, an optimal threshold or promotion. All methods share each image's
+capture. Frozen BRACE and its owner-override provenance remain unchanged.
