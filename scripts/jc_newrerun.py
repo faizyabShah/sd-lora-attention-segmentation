@@ -50,8 +50,10 @@ FAMILIES = {"PW": [f"PW{g:g}" for g in PW], "FL": [f"FL{p}" for p in FL], "TK": 
 THR = np.round(0.30 + 0.025 * np.arange(17), 3)
 
 
-def rows(ds, shard=0, num_shards=1, max_images=0):
+def rows(ds, shard=0, num_shards=1, max_images=0, ids=""):
     R = cc.gen_rows(ds)
+    if ids:
+        R = [r for r in R if r["image_id"] in set(ids.split(","))]
     for r in R:
         r["label"] = r["classname"]; fix = PROMPTS[ds].get(r["image_id"])
         r["changed"] = fix is not None
@@ -82,7 +84,7 @@ def gen(a):
                                                    safety_checker=None, requires_safety_checker=False).to("cuda")
     pipe.set_progress_bar_config(disable=True)
     out = WORK / f"img{a.tag}" / a.dataset; out.mkdir(parents=True, exist_ok=True)
-    for r in rows(a.dataset, a.shard, a.num_shards, a.max_images):
+    for r in rows(a.dataset, a.shard, a.num_shards, a.max_images, a.ids):
         o = out / f"{r['image_id']}.png"
         if o.exists():
             continue
@@ -153,7 +155,7 @@ def capture(a):
     M = cd.DenseCLIP("B16", dev); n21, i21 = cd.split([cd.VOC21_BG] + cd.VOC20_NAMES); T21 = M.text(n21)
     B = np.load(WORK / f"bank{a.btag}.npz"); bvals = torch.from_numpy(B["vals"]).to(dev)
     out = WORK / (a.dataset + a.tag); out.mkdir(parents=True, exist_ok=True)
-    for r in rows(a.dataset, a.shard, a.num_shards, a.max_images):
+    for r in rows(a.dataset, a.shard, a.num_shards, a.max_images, a.ids):
         iid = r["image_id"]; o = out / f"{iid}.npz"
         if o.exists():
             continue
@@ -412,6 +414,7 @@ if __name__ == "__main__":
         p.add_argument("--model", default="stable-diffusion-v1-5/stable-diffusion-v1-5")
         p.add_argument("--itag", default="", help="capture: tag of the gen images"); p.add_argument("--btag", default="")
         p.add_argument("--ntag", default="", help="capture: suffix of the NERVE seed folder (smoke)")
+        p.add_argument("--ids", default="", help="comma-separated image ids (smoke on chosen images)")
     p = sub.add_parser("bank"); p.add_argument("--tag", default=""); p.add_argument("--ntag", default="")
     for nm in ("score", "report"):
         p = sub.add_parser(nm); p.add_argument("--sets", nargs="+", default=["voc", "coco"])
