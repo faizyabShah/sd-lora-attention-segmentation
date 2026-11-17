@@ -124,10 +124,19 @@ def capture(a):
         t0 = time.perf_counter(); stored = np.load(STORED[a.dataset] / f"{iid}.npz"); zs = np.load(sdir / f"{iid}.npz")
         if str(zs["cls"]).replace("-", " ") != cls.replace("-", " "):
             raise ValueError(f"class mismatch for {iid}")
-        hook = QKHook(pipe.unet, NERVE_LAYERS + (sa_mods[64],), keep_calls=set(range(10, 21)))
+        hook = QKHook(pipe.unet, NERVE_LAYERS + (sa_mods[64],))    # every forward of to_q/to_k; aligned to steps below
         try:
             with sg27_runtime.live_maps(runtime, dict(row), a.dataset) as (sample, sa, seed, _b, _p):
                 hook.remove()
+                rec = runtime["recorders"][-1]
+                # The recording processor computes Q/K itself and then calls the original processor, which computes
+                # them again, so a module's to_q/to_k can fire more than once per denoising step. Align by the
+                # recorder's own per-module call count; the first firing of each step is kept.
+                for name in hook.store:
+                    steps = rec.call_counts[name]; f = hook.count[name] // steps
+                    if steps < 21 or f < 1 or hook.count[name] != f * steps:
+                        raise ValueError(f"hook/call mismatch for {name}: {hook.count[name]} firings, {steps} steps")
+                    hook.store[name] = [hook.store[name][i * f] for i in range(10, 21)]
                 img = np.asarray(sample.generated_image, np.uint8).copy(); truth = np.asarray(sample.target_mask, bool)
                 # hook check: the hooked BRACE 64-px Q/K must equal the runtime's own record, call by call
                 hk = hook.store[sa_mods[64]]
