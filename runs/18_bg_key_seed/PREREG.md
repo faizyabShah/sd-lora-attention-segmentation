@@ -97,6 +97,25 @@ does not change BRACE.
 - COCO-Cap numbers of the non-selected candidates are diagnostic only and are
   labelled so.
 
+## Amendment 1 (17 November 2026, before any image was scored)
+
+Requested by the owner. The smoke jobs of the first version were cancelled
+during capture; no scoring had run.
+
+Every seed above is also computed with **uniform layer weights** (the plain
+mean over the 11 cross-attention layers, no self-attention-guided weighting):
+W0 (frozen class-word attribution, uniform) and S1u, B8u, R8u, BNu, RNu. They
+come from the same generation and go through the same cells. This shows what
+the hierarchy adds on the most basic seed, with and without background words.
+
+- These six seeds are **descriptive**. They do not enter the selection or the
+  test, which stay as registered above.
+- Added readouts for every seed, on both benchmarks, at VOC-selected
+  thresholds: capped hierarchy minus seed alone (raw); capped hierarchy minus
+  fine-only (both with DenseCRF); self-attention-guided minus uniform layer
+  weights at the full pipeline.
+- Scoring may be sharded over images; this does not change any number.
+
 ## Fidelity
 
 W must reproduce the frozen pipeline (0.830 / 0.696 at 0.55 with DenseCRF);

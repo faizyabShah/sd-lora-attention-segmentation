@@ -7,7 +7,7 @@ One live generation per image with the frozen runtime. Seeds differ only in the 
 Class map = sum of the softmax columns of the class word's pieces; conditional query, head mean, frozen layers,
 calls and SA-guided layer weights. Each seed goes through the frozen propagation (sg_combined_v2.aggregate).
 
-capture (GPU)  <BRACE_CACHE_DIR>/jc_bgkey/<ds>/<id>.npz: maps [6 seeds, 3 maps, 64, 64]
+capture (GPU)  <BRACE_CACHE_DIR>/jc_bgkey/<ds>/<id>.npz: maps [12 seeds, 3 maps, 64, 64]
 score   (CPU)  counts per cell at 17 thresholds, raw and + DenseCRF
 report  (CPU)  runs/18_bg_key_seed/result.md
 """
@@ -36,13 +36,16 @@ GEN8 = ["wall", "floor", "ground", "sky", "grass", "tree", "building", "road"]
 NERVE25 = ("ground, land, grass, tree, building, wall, sky, lake, water, river, sea, railway, railroad, keyboard, "
            "helmet, cloud, house, mountain, ocean, road, rock, street, valley, bridge, sign").split(", ")
 CAND = ("S1", "B8", "R8", "BN", "RN")
-SEEDS = ("W",) + CAND
+UNI = tuple(c + "u" for c in CAND)          # the same key sets with uniform layer weights
+SEEDS = ("W",) + CAND + ("W0",) + UNI
 FORMS = {"S1": (True, ()), "B8": (True, GEN8), "R8": (False, GEN8), "BN": (True, NERVE25), "RN": (False, NERVE25)}
 MAPS = ("seed", "V0", "V3")
 THR = np.round(0.30 + 0.025 * np.arange(17), 3)
 TAU = 0.55
 DESC = {"W": "frozen class-word attribution (BRACE)", "S1": "⟨SoT⟩ + class word", "B8": "⟨SoT⟩ + class + 8 generic words",
-        "R8": "class + 8 generic words", "BN": "⟨SoT⟩ + class + NERVE's 25 words", "RN": "class + NERVE's 25 words"}
+        "R8": "class + 8 generic words", "BN": "⟨SoT⟩ + class + NERVE's 25 words", "RN": "class + NERVE's 25 words",
+        "W0": "frozen class-word attribution, uniform layer weights"}
+DESC.update({c + "u": DESC[c] + ", uniform layer weights" for c in CAND})
 
 
 class BgKeyRecorder(sg25_sa.SG25Recorder):
@@ -53,7 +56,7 @@ class BgKeyRecorder(sg25_sa.SG25Recorder):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.pending_bg = {}
-        self.bg_sums = {k: torch.zeros((64, 64), device=self.pipe.device) for k in CAND}
+        self.bg_sums = {k: torch.zeros((64, 64), device=self.pipe.device) for k in CAND + UNI}
 
     def record(self, module_name, kind, query, key, value, attention_mask, scale, attribution_key=None):
         super().record(module_name, kind, query, key, value, attention_mask, scale, attribution_key)
@@ -81,6 +84,7 @@ class BgKeyRecorder(sg25_sa.SG25Recorder):
             for name in CAND:
                 up = F.interpolate(pend[m][name], size=(64, 64), mode="bilinear", align_corners=False)[0, 0]
                 self.bg_sums[name] += up * w[i] / 31
+                self.bg_sums[name + "u"] += up / len(self.selected_modules) / 31
 
     def bg_seeds(self):
         out = {}
@@ -128,7 +132,7 @@ def capture(a):
         with sg27_runtime.live_maps(runtime, dict(row), a.dataset) as (sample, sa, seed, _b, _p):
             rec = runtime["recorders"][-1]
             img = np.asarray(sample.generated_image, np.uint8).copy(); truth = np.asarray(sample.target_mask, bool)
-            word = rec.seeds(); sd = dict(rec.bg_seeds()); sd["W"] = word["selected/A3"]
+            word = rec.seeds(); sd = dict(rec.bg_seeds()); sd["W"] = word["selected/A3"]; sd["W0"] = word["selected/A0"]
             if float((sd["W"].float() - seed.float()).abs().max()) > 0:
                 raise ValueError("bgkey: A3 seed differs from the frozen runtime's seed")
             maps = []
@@ -176,7 +180,7 @@ def score(a):
     for ds in a.sets:
         sc = WORK / f"{ds}{a.tag}_scores"; sc.mkdir(parents=True, exist_ok=True)
         jobs = [(str(f), str(sc / f.name)) for f in sorted((WORK / (ds + a.tag)).glob("*.npz"))
-                if not f.stem.endswith(".tmp")]
+                if not f.stem.endswith(".tmp")][a.shard::a.num_shards]
         print(ds, len(jobs), flush=True)
         with Pool(a.workers) as pool:
             for n, _ in enumerate(pool.imap_unordered(score_one, jobs, chunksize=2), 1):
@@ -231,12 +235,15 @@ def report(a):
                 L.append(f"| {lab} | " + " | ".join(f"{mi(ds, f(ds, f'{s}|{m}')):.3f}" for s in SEEDS) + " |")
             L.append("")
         L.append("**Δ vs W, full pipeline (capped hierarchy + DenseCRF)**\n")
-        L.append("| Seed | VOC-sel. | fixed 0.55 | hierarchy − fine-only on this seed (both + DenseCRF, VOC-sel.) |"); L.append("|---|---|---|---|")
+        L.append("| Seed | VOC-sel. | fixed 0.55 | hierarchy − fine-only on this seed (both + DenseCRF, VOC-sel.) | hierarchy − seed alone (raw, VOC-sel.) | SA-guided − uniform layer weights (full pipeline, VOC-sel.) |"); L.append("|---|---|---|---|---|---|")
         for s in SEEDS:
             h = dci(ds, sel(ds, f"{s}|V3+R2"), sel(ds, f"{s}|V0+R2"))[0]
+            g = dci(ds, sel(ds, f"{s}|V3"), sel(ds, f"{s}|seed"))[0]
+            u = "W0" if s == "W" else s + "u"
+            lw = dci(ds, sel(ds, f"{s}|V3+R2"), sel(ds, f"{u}|V3+R2"))[0] if u in SEEDS else "—"
             if s == "W":
-                L.append(f"| W | — | — | {h} |"); continue
-            L.append(f"| {s} | {dci(ds, sel(ds, f'{s}|V3+R2'), sel(ds, 'W|V3+R2'))[0]} | {dci(ds, fx(ds, f'{s}|V3+R2'), fx(ds, 'W|V3+R2'))[0]} | {h} |")
+                L.append(f"| W | — | — | {h} | {g} | {lw} |"); continue
+            L.append(f"| {s} | {dci(ds, sel(ds, f'{s}|V3+R2'), sel(ds, 'W|V3+R2'))[0]} | {dci(ds, fx(ds, f'{s}|V3+R2'), fx(ds, 'W|V3+R2'))[0]} | {h} | {g} | {lw} |")
         L.append("")
     oofm = {s: mi("voc", sel("voc", f"{s}|V3+R2")) for s in SEEDS}
     win = max(CAND, key=lambda s: oofm[s])
@@ -275,5 +282,6 @@ if __name__ == "__main__":
     for nm in ("score", "report"):
         p = sub.add_parser(nm); p.add_argument("--sets", nargs="+", default=["voc", "coco"])
         p.add_argument("--workers", type=int, default=16); p.add_argument("--tag", default="")
+        p.add_argument("--shard", type=int, default=0); p.add_argument("--num-shards", type=int, default=1)
     a = ap.parse_args()
     {"capture": capture, "score": score, "report": report}[a.cmd](a)
