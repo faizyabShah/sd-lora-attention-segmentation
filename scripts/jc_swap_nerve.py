@@ -90,7 +90,10 @@ def seed(a):
         o = out / (r["key"] + ".npz")
         if o.exists():
             continue
-        pil = Image.open(r["image_local"]).convert("RGB")
+        src = Path(a.image_dir) / a.dataset / (r["key"] + ".png") if a.image_dir else r["image_local"]
+        if a.image_dir and not Path(src).exists():
+            continue                                            # --image-dir: only images generated so far
+        pil = Image.open(src).convert("RGB")
         if r["text"] not in fg_cache:
             fg_cache[r["text"]] = pipe.nerve.classifier([r["text"]], cfg.semantic_templates)
         img = pipe.nerve.preprocess(pil)[None].to(dev)
@@ -146,4 +149,6 @@ if __name__ == "__main__":
         p.add_argument("--shard", type=int, default=0); p.add_argument("--num-shards", type=int, default=1)
         p.add_argument("--max-images", type=int, default=0); p.add_argument("--tag", default="")
         p.add_argument("--walk-tag", default="", help="extra suffix for the walk output folder (device checks)")
+        p.add_argument("--image-dir", default="", help="seed only: read <image-dir>/<dataset>/<key>.png instead of the "
+                       "manifest image (runs/20 new reruns: our corrected-prompt generations)")
     a = ap.parse_args(); {"seed": seed, "walk": walk}[a.cmd](a)
