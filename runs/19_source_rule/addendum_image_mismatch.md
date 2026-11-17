@@ -49,3 +49,35 @@ comes from images on which BRACE is scored against the annotation of a different
 V (hA − CA): hierarchy +0.018 [+0.007, +0.033], walk +0.034 [+0.013, +0.054]: survives.
 K (CLIP − hA): hierarchy −0.035 [−0.054, −0.007]: on matched images CLIP's ranking is worse than ours under the hierarchy.
 VOC-Sim matched: hA hierarchy 0.874 vs CA 0.856 (V +0.017 [+0.008, +0.026]).
+
+## Why our generations differ from the official images (2026-11-17, diagnostic)
+
+Scripts in `diag/`: `regen_variants.py`, `regen_ovam_stack.py`, `regen_prompt_test.py`, `regen_coco_prompt.py`,
+`regen_prompt_fix.py`, `regen_couch.py`. Per-image results: `diag/prompt_fix_coco.csv`, `diag/prompt_fix_voc.csv`.
+All comparisons are generated pixels vs the official PNG; no annotation is read.
+
+**Not the cause.** fp16 weights, fp16 vs fp32 noise, classic vs SDPA attention, V100 vs A100, and OVAM's own stack
+(torch 2.1.0, diffusers 0.20.0, OVAM's exact `set_seed(seed); pipe(prompt, num_inference_steps=30)` call) all reproduce
+*our* stored images (fp32 on A100: median 0.00 grey levels from the stored capture) and none reproduces the official
+image on the diverging set (at most 7 of 156 within 5 grey levels).
+
+**The cause is the prompt text in the manifests.** OVAM generated from text that differs from the shipped CSVs:
+
+- **VOC-Sim:** OVAM's script uses `"A photograph of a {classname}"` with `"dining table"` and `"potted plant"` (spaces;
+  hyphens only in file names). Our manifest prompt is `"A photograph of a dining-table"` / `"potted-plant"`. All 25 + 25
+  images of these two classes diverge; with the space, 44 of the 50 come back within 1 grey level and 47 within 2.
+- **COCO-Cap:** the official images were generated from captions that still ended with a period; the shipped CSV has it
+  stripped (OVAM's notebook strips "." during cleaning). Appending "." reproduces 86 of the 101 diverging images within
+  2 grey levels (84 within 1). This is why divergence sits almost entirely on `word_included = True` rows (98/465 vs
+  3/242) and on bottle, cat, dog, motorbike, person.
+- **Two black COCO images** (224079 chair, 556255 dog) are our runtime's safety checker (on by default). With it off,
+  generation matches the official image (0.9 and 0.4); BRACE's attention for them was from the right generation, but
+  DenseCRF (and the runs/19 NERVE pass) saw a black image.
+- **Unresolved:** 13 COCO-Cap (3 of them dog-on-sofa captions; "couch" did not fix them) and 8 VOC-Sim images (5 of them
+  in classes with no prompt issue: bicycle, bus, car ×2, horse; residual 5–12 grey levels).
+
+**Consequence.** BRACE's published VOC-Sim/COCO-Cap numbers come from generations that, on 50/490 VOC-Sim and ~88/707
+COCO-Cap images, are not the annotated image. All BRACE ablations share these generations, so internal comparisons stay
+paired; comparisons with methods run on the official images (NERVE, SCLIP-seeded variants computed on official PNGs) are
+not like for like. A corrected generation prompt per image is available from `diag/prompt_fix_*.csv`. No BRACE score
+with corrected prompts has been computed.
