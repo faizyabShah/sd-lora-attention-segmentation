@@ -1,3 +1,47 @@
 % Comment 3: comparison methods (OVAM, optimized tokens, DAAM, SeeDiff, SCLIP, BRACE rows)
 % Owner: F. Only this side edits this file.
 % Add frames below; one message per frame. See docs/JC_REVIEW_WORKPLAN.md, Section 6.
+% Source of every number below: runs/17_seed_walk_swap/result.md (workplan Entry 10).
+
+\begin{frame}{Comment 3: where NERVE's lead comes from (seed and propagation swapped)}
+\begin{slidetable}
+\begin{tabular}{lrrcrr}
+\toprule
+ & \multicolumn{2}{c}{VOC-Sim} & & \multicolumn{2}{c}{COCO-Cap} \\
+\cmidrule(lr){2-3}\cmidrule(lr){5-6}
+Propagation & our seed & CLIP seed & & our seed & CLIP seed \\
+\midrule
+None (seed alone)            & 0.735 & 0.759 & & 0.619 & 0.693 \\
+Our fine-only propagation    & 0.823 & 0.830 & & 0.662 & 0.704 \\
+Our capped hierarchy         & \textbf{0.830} & 0.836 & & \textbf{0.696} & 0.704 \\
+NERVE's random walk          & 0.828 & \textbf{0.842} & & 0.678 & \textbf{0.737} \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+  \item Our seed: cross-attention (Stable Diffusion only). CLIP seed: NERVE's CLIP ViT-L/14 map. Bold: the two published pipelines.
+  \item mIoU with DenseCRF, threshold selected on VOC-Sim per cell.
+\end{itemize}
+\src{runs/17\_seed\_walk\_swap/result.md}\status{done, unreviewed}
+\end{frame}
+
+\begin{frame}{Comment 3: NERVE's lead on COCO-Cap is the combination, not either part}
+\begin{slidetable}
+\begin{tabular}{lrr}
+\toprule
+Contrast (with DenseCRF) & VOC-Sim & COCO-Cap \\
+\midrule
+CLIP seed $-$ our seed, under our hierarchy       & $+0.006$ & $+0.008$ \\
+CLIP seed $-$ our seed, under NERVE's walk        & $\mathbf{+0.014}$ & $\mathbf{+0.060}$ \\
+NERVE's walk $-$ our hierarchy, on the CLIP seed  & $+0.006$ & $\mathbf{+0.033}$ \\
+NERVE's walk $-$ our hierarchy, on our seed       & $-0.002$ & $\mathbf{-0.019}$ \\
+Interaction                                       & $+0.008$ & $\mathbf{+0.052}$ \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+  \item Bold: 95\% interval excludes zero. Registered reading: \textbf{mixed}; neither part alone explains NERVE's $+0.041$.
+  \item NERVE's walk helps only on the CLIP seed and hurts on ours: its higher COCO-Cap score needs CLIP.
+\end{itemize}
+\src{runs/17\_seed\_walk\_swap/result.md}\status{done, unreviewed}
+\end{frame}

@@ -298,6 +298,7 @@ Edited in place by the owner. States: `not started`, `in progress`,
 | #3 SCLIP + DenseCRF | F | not started | — |
 | #3 GoCA | N | done, awaiting review (sanity only; official scoring waits for Entry 1) | Entries 2–4 |
 | #3 NERVE | N | done, awaiting review (sanity only; official row undecided: A or V) | Entries 2–4 |
+| #3 seed × propagation swap, BRACE and NERVE (cross-side diagnostic; does not replace N's NERVE row) | F | done, awaiting review | Entry 10 |
 | #3 DiffSegmenter | N | done, awaiting review (sanity only; class-word row) | Entries 2–4 |
 | #3 SPARK | N | no-go | Entry 2 |
 | #3 published block | N | not started | — |
@@ -469,3 +470,28 @@ entry, not by editing the reviewed one.
 
 **Review — N, <date>:** pending
 
+### Entry 10 — F (Faizyab's Claude), 2026-11-17
+**Item:** #3 comparison methods (cross-side diagnostic: where NERVE's lead over BRACE comes from)
+**Kind:** result (pre-registered: `runs/17_seed_walk_swap/PREREG.md`, commit 6a445fc0e, before scoring)
+**What was done:** Swapped seed and propagation between the two methods on all 490 VOC-Sim and 707 COCO-Cap images. Seeds: BRACE's cross-attention seed (live generation) and NERVE's CLIP ViT-L/14 seed (stored image; {class word} + NERVE's VOC background words, N's variant A). Propagations: none, BRACE fine-only, BRACE capped hierarchy (frozen code), NERVE's released refinement (N's patched copy, unchanged). Jobs 253191–253203. This uses N's NERVE setup as is and does not replace N's official NERVE row.
+**Where:** `runs/17_seed_walk_swap/result.md`, `scripts/jc_swap.py`, `scripts/jc_swap_nerve.py`, `jobs/nerve_gpu.slurm`; this commit.
+**Result (primary: threshold selected on VOC-Sim per cell, with DenseCRF; class-macro mIoU):**
+
+| Propagation | VOC-Sim, CA seed | VOC-Sim, CLIP seed | COCO-Cap, CA seed | COCO-Cap, CLIP seed |
+|---|---:|---:|---:|---:|
+| none | 0.735 | 0.759 | 0.619 | 0.693 |
+| BRACE fine-only | 0.823 | 0.830 | 0.662 | 0.704 |
+| BRACE capped hierarchy | 0.830 | 0.836 | 0.696 | 0.704 |
+| NERVE walk | 0.828 | 0.842 | 0.678 | 0.737 |
+
+- **Registered contrasts, COCO-Cap.** Walk − hierarchy on the CLIP seed: +0.033 [+0.019, +0.049]. Walk − hierarchy on the CA seed: −0.019 [−0.031, −0.005]. CLIP − CA seed under the hierarchy: +0.008 [−0.012, +0.029]. CLIP − CA seed under the walk: +0.060 [+0.035, +0.083]. Interaction: +0.052 [+0.034, +0.070].
+- **Registered contrasts, VOC-Sim.** +0.006 [−0.002, +0.015]; −0.002 [−0.013, +0.008]; +0.006 [−0.007, +0.018]; +0.014 [+0.001, +0.029]; interaction +0.008 [−0.004, +0.021].
+- **Reading rule: mixed.** Neither "the seed explains it" nor "the walk explains it" holds. NERVE's COCO-Cap lead (0.737 vs 0.696) appears only when its walk is applied to its CLIP seed. The hierarchy removes the seed gap (+0.074 for seeds alone, +0.008 after the hierarchy); the walk is worse than the hierarchy on the CA seed.
+- **Per class, COCO-Cap.** CLIP seed: person 0.28 → 0.64 (hierarchy) / 0.71 (walk), chair 0.47 → 0.59 / 0.68; tv 0.79 → 0.26 / 0.25, aeroplane 0.80 → 0.67 / 0.64.
+- **Fidelity.** BRACE cell at 0.55 with DenseCRF: 0.830 / 0.696 (paper: same). NERVE cell at N's convention (0.5, raw): 0.8302 / 0.7295, equal to N's committed counts to four decimals; per-image counts identical on 40/490 and 94/707 images, max |ΔIoU| 0.0016 / 0.0021. The residual is not explained (NERVE runs CLIP in half precision and zeroes seed values below 20% of the maximum; both NERVE stages ran on the A100 node as N's did).
+- **Sensitivity.** COCO-Cap, bit-identical regenerated images only (243): same signs; walk − hierarchy on the CA seed becomes −0.013 [−0.035, +0.008]. Raw (no DenseCRF): same signs and conclusions.
+**Caveats:** (1) The CLIP seed and NERVE's walk read the stored image; BRACE's attention comes from the regeneration, which is bit-identical to the stored image on 238/490 and 243/707 images. (2) Both benchmarks were used to develop BRACE, not NERVE. (3) The CA seed is min–max normalised; NERVE's walk was designed for CLIP probabilities and none of its constants were retuned for the CA seed. (4) CLIP-seed cells use a second model and are not SD-only. (5) Two code changes after the pre-registration, neither in scoring: an empty-subset guard in the report and an output-folder suffix for the hardware check (commit 150586fa3).
+**Slides:** `slides/jc_meeting/sections/c3_F.tex` (two slides).
+**Open points:** N to confirm that the NERVE cell here matches the intended variant A. Whether the paper states this result (e.g. one sentence: with the same CLIP seed, our hierarchy and NERVE's walk differ by +0.033 on COCO-Cap in NERVE's favour; with the SD-only seed, by 0.019 in ours) is for the owners.
+
+**Review — N, <date>:** pending
