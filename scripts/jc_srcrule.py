@@ -35,7 +35,7 @@ SWAP = CACHE / "jc_swap"
 STORED = {"voc": CACHE / "vocsim_maps", "coco": CACHE / "cococap_maps"}
 NAME = {"voc": "VOC-Sim", "coco": "COCO-Cap"}
 OUT = ROOT / "runs/19_source_rule"
-SEEDS = ("ca", "clip")
+SEEDS = ("ca", "clip", "hA", "hB")   # hA = CA ranking with CLIP values; hB = CLIP ranking with CA values (amendment 1)
 CELLS = ("seed", "G|V0", "G|V3", "G|W", "N|V0", "N|V3", "N|W")
 NERVE_LAYERS = ("up_blocks.3.attentions.1.transformer_blocks.0.attn1",    # NERVE index -4
                 "up_blocks.3.attentions.0.transformer_blocks.0.attn1")    # NERVE index -6
@@ -70,6 +70,23 @@ class QKHook:
     def remove(self):
         for h in self.handles:
             h.remove()
+
+
+def rank_swap(rank_src: torch.Tensor, value_src: torch.Tensor) -> torch.Tensor:
+    """Pixels ordered by rank_src receive value_src's sorted values. Ties in rank_src (e.g. the zeros NERVE's 20%
+    cut leaves in the CLIP seed) receive the mean of the donor values over their rank range, so no arbitrary order
+    is imposed inside a tie. Both inputs [64, 64]; values are used as given (no rescaling)."""
+    r = rank_src.flatten().double(); v = torch.sort(value_src.flatten().double()).values
+    order = torch.argsort(r, stable=True); rs = r[order]
+    out_sorted = v.clone()
+    _, counts = torch.unique_consecutive(rs, return_counts=True)
+    start = 0
+    for c in counts.tolist():
+        if c > 1:
+            out_sorted[start:start + c] = v[start:start + c].mean()
+        start += c
+    out = torch.empty_like(out_sorted); out[order] = out_sorted
+    return out.reshape(rank_src.shape).to(rank_src.dtype)
 
 
 def nerve_fused(stores, d):
@@ -111,7 +128,7 @@ def capture(a):
     from src.segmentation import sg_combined_v2
     import json
     sa_mods = {int(k): v for k, v in json.loads((ROOT / "configs/sg25.json").read_text())["sa_modules"].items()}
-    rows = cc.gen_rows(a.dataset)
+    rows = cc.gen_rows(a.dataset)[a.shard::a.num_shards]
     if a.max_images:
         rows = rows[:: max(1, len(rows) // a.max_images)][: a.max_images]
     runtime = sg27_runtime.make_runtime(a.model); pipe = runtime["pipe"]
@@ -144,9 +161,13 @@ def capture(a):
                                         for h, s in zip(hk, sa[64])):
                     raise ValueError(f"hooked Q/K differ from the runtime's SA record for {iid}")
                 d = int(hk[0]["query"].shape[-1])
-                sd = {"ca": seed.float().clone(),
-                      "clip": cc.norm(torch.from_numpy(zs["seed64"][0]).float().to(seed.device), "mm")}
-                walk_in = {"ca": seed.float()[None], "clip": torch.from_numpy(zs["seg"]).float().to(seed.device)}
+                ca64 = seed.float().clone()
+                clip64 = torch.from_numpy(zs["seed64"][0]).float().to(seed.device)   # NERVE's own 64-px resize of seg
+                hyb = {"hA": rank_swap(ca64, clip64), "hB": rank_swap(clip64, ca64)}
+                # hierarchy inputs min-max scaled (affine, as runs/17); walk inputs as given (NERVE resizes to 64)
+                sd = {"ca": ca64, "clip": cc.norm(clip64, "mm"), "hA": cc.norm(hyb["hA"], "mm"), "hB": cc.norm(hyb["hB"], "mm")}
+                walk_in = {"ca": ca64[None], "clip": torch.from_numpy(zs["seg"]).float().to(seed.device),
+                           "hA": hyb["hA"][None], "hB": hyb["hB"][None]}
                 res = {s: {"seed": sd[s]} for s in SEEDS}
                 for s in SEEDS:                                         # G, BRACE rule
                     v, _ = sg_combined_v2.aggregate(sa, sd[s]); res[s]["G|V0"], res[s]["G|V3"] = v["V0"], v["V3"]; del v
@@ -273,24 +294,25 @@ def report(a):
                  f"{np.nanmedian(wc[exact[ds]]) if exact[ds].any() else float('nan'):.1e} on bit-identical images.\n")
         for conv, f in (("VOC-sel. threshold, with DenseCRF (primary)", lambda k: sel(ds, k)),
                         ("fixed threshold 0.55, with DenseCRF", lambda k: S[ds][f"{k}|raw"][:, t55])):
-            L.append(f"**{conv}**\n"); L.append("| Cell | CA seed | CLIP seed | CLIP − CA |"); L.append("|---|---:|---:|---|")
+            L.append(f"**{conv}**\n"); L.append("| Cell | CA seed | CLIP seed | CLIP − CA | CA rank + CLIP values (hA) | CLIP rank + CA values (hB) |")
+            L.append("|---|---:|---:|---|---:|---:|")
             for c in CELLS:
                 pa, pb = f(key("clip", c)), f(key("ca", c))
-                L.append(f"| {LAB[c]} | {mi(ds, pb):.3f} | {mi(ds, pa):.3f} | {dci(ds, pa, pb)[0]} |")
+                L.append(f"| {LAB[c]} | {mi(ds, pb):.3f} | {mi(ds, pa):.3f} | {dci(ds, pa, pb)[0]} | {mi(ds, f(key('hA', c))):.3f} | {mi(ds, f(key('hB', c))):.3f} |")
             L.append("")
-        L.append("**Raw (no DenseCRF), VOC-sel. threshold**\n"); L.append("| Cell | CA seed | CLIP seed |"); L.append("|---|---:|---:|")
+        L.append("**Raw (no DenseCRF), VOC-sel. threshold**\n"); L.append("| Cell | CA | CLIP | hA | hB |"); L.append("|---|---:|---:|---:|---:|")
         for c in CELLS:
-            L.append(f"| {LAB[c]} | {mi(ds, sel(ds, f'ca|{c}')):.3f} | {mi(ds, sel(ds, f'clip|{c}')):.3f} |")
+            L.append(f"| {LAB[c]} | " + " | ".join(f"{mi(ds, sel(ds, f'{s}|{c}')):.3f}" for s in SEEDS) + " |")
         L.append("")
     L.append("## Thresholds selected on full VOC-Sim (with DenseCRF)\n")
-    L.append("| Cell | CA | CLIP |"); L.append("|---|---:|---:|")
+    L.append("| Cell | CA | CLIP | hA | hB |"); L.append("|---|---:|---:|---:|---:|")
     for c in CELLS:
-        L.append(f"| {LAB[c]} | {THR[tbest(key('ca', c))]:.3f} | {THR[tbest(key('clip', c))]:.3f} |")
+        L.append(f"| {LAB[c]} | " + " | ".join(f"{THR[tbest(key(s, c))]:.3f}" for s in SEEDS) + " |")
     L.append("\n## Registered contrasts (VOC-sel. threshold, with DenseCRF)\n")
     L.append("| ID | Contrast | Seed | VOC-Sim | COCO-Cap | COCO-Cap, bit-identical images |"); L.append("|---|---|---|---|---|---|")
     res = {}
     for cid, lab, _, ca_, cb_ in CONTRASTS:
-        for s in SEEDS:
+        for s in ("ca", "clip"):
             v = dci("voc", sel("voc", key(s, ca_)), sel("voc", key(s, cb_)))[0]
             c, pt = dci("coco", sel("coco", key(s, ca_)), sel("coco", key(s, cb_)))
             e = dci("coco", sel("coco", key(s, ca_)), sel("coco", key(s, cb_)), exact["coco"])[0]
@@ -313,14 +335,44 @@ def report(a):
              f"**{'yes' if source else 'no'}**. Result: **{verdict}**.\n")
     L.append(f"Reference (runs/17, CLIP seed): NERVE walk on NERVE pass − BRACE hierarchy on generation = "
              f"{dci('coco', sel('coco', key('clip', 'N|W')), sel('coco', key('clip', 'G|V3')))[0]} here (runs/17: +0.033).\n")
+    L.append("## Amendment 1: rank–distribution swap (VOC-sel. threshold, with DenseCRF)\n")
+    L.append("| ID | Contrast | Cell | VOC-Sim | COCO-Cap | COCO-Cap, bit-identical images |"); L.append("|---|---|---|---|---|---|")
+    rd = {}
+    for c in CELLS:
+        for cid, lab, sa_, sb_ in (("V", "values: CA rank + CLIP values − CA", "hA", "ca"),
+                                   ("K", "ranking: CLIP − CA rank + CLIP values", "clip", "hA"),
+                                   ("V'", "values: CLIP rank + CA values − CLIP", "hB", "clip")):
+            v = dci("voc", sel("voc", key(sa_, c)), sel("voc", key(sb_, c)))[0]
+            t, pt = dci("coco", sel("coco", key(sa_, c)), sel("coco", key(sb_, c)))
+            e = dci("coco", sel("coco", key(sa_, c)), sel("coco", key(sb_, c)), exact["coco"])[0]
+            rd[(cid, c)] = pt
+            L.append(f"| {cid} | {lab} | {LAB[c]} | {v} | {t} | {e} |")
+    calib = rd[("V", "G|V3")][1] > 0 or rd[("V", "N|W")][1] > 0
+    rank = rd[("K", "G|V3")][1] > 0 and rd[("K", "N|W")][1] > 0
+    L.append(f"\n**Registered reading (COCO-Cap; cells: generation × hierarchy and NERVE pass × walk).** Calibration has "
+             f"headroom (V above zero in either cell): **{'yes' if calib else 'no'}**. CLIP's spatial ranking is essential "
+             f"(K above zero in both cells): **{'yes' if rank else 'no'}**.\n")
+    L.append("**COCO-Cap failure modes, VOC-sel. threshold with DenseCRF (descriptive)**\n")
+    area = S["coco"]["area"]; tb = np.digitize(area, np.quantile(area, [1 / 3, 2 / 3])); clsc = S["coco"]["cls"]
+    L.append("| Seed | Cell | mIoU | small third | middle | large | images below 0.3 IoU | false-positive area / image | macro precision | macro recall |")
+    L.append("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|")
+    for c in ("seed", "G|V3", "G|W", "N|V3", "N|W"):
+        for s in SEEDS:
+            P = sel("coco", key(s, c)); x = P[:, 0] / np.maximum(P[:, :3].sum(1), 1); fp = P[:, 1] / P[:, :4].sum(1)
+            pr, rc = [], []
+            for cl in np.unique(clsc):
+                q = P[clsc == cl].sum(0); pr.append(q[0] / max(q[0] + q[1], 1)); rc.append(q[0] / max(q[0] + q[2], 1))
+            L.append(f"| {s} | {LAB[c]} | {mi('coco', P):.3f} | " + " | ".join(f"{x[tb == k].mean():.3f}" for k in range(3))
+                     + f" | {np.mean(x < 0.3):.3f} | {fp.mean():.4f} | {np.mean(pr):.3f} | {np.mean(rc):.3f} |")
+    L.append("")
     L.append("## N's sanity convention for the NERVE cell (CLIP × NERVE pass × walk, raw, threshold 0.5)\n")
     for ds in ("voc", "coco"):
         L.append(f"- {NAME[ds]}: {mi(ds, S[ds]['clip|N|W|raw'][:, t50]):.4f} (runs/17 used bilinear-then-min–max; "
                  f"here min–max-then-bilinear, the project's scoring)")
     L.append("")
     for ds in ("voc", "coco"):
-        L.append(f"Per class, {NAME[ds]}, VOC-sel. + DenseCRF (" + " / ".join(f"{s.upper()} {c}" for s in SEEDS for c in ("G|V3", "G|W", "N|V3", "N|W")) + "): "
-                 + ", ".join(f"{cl} " + " / ".join(f"{mi(ds, sel(ds, key(s, c)), S[ds]['cls'] == cl):.2f}" for s in SEEDS for c in ("G|V3", "G|W", "N|V3", "N|W"))
+        L.append(f"Per class, {NAME[ds]}, VOC-sel. + DenseCRF (" + " / ".join(f"{s.upper()} {c}" for s in ("ca", "clip") for c in ("G|V3", "G|W", "N|V3", "N|W")) + "): "
+                 + ", ".join(f"{cl} " + " / ".join(f"{mi(ds, sel(ds, key(s, c)), S[ds]['cls'] == cl):.2f}" for s in ("ca", "clip") for c in ("G|V3", "G|W", "N|V3", "N|W"))
                              for cl in np.unique(S[ds]["cls"])) + "\n")
     txt = "\n".join(L) + "\n"; print(txt)
     OUT.mkdir(parents=True, exist_ok=True); (OUT / f"result{a.tag}.md").write_text(txt)
@@ -330,6 +382,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(); sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("capture"); p.add_argument("--dataset", choices=("voc", "coco"), required=True)
     p.add_argument("--max-images", type=int, default=0); p.add_argument("--tag", default="")
+    p.add_argument("--shard", type=int, default=0); p.add_argument("--num-shards", type=int, default=1)
     p.add_argument("--model", default="stable-diffusion-v1-5/stable-diffusion-v1-5")
     for nm in ("score", "report"):
         p = sub.add_parser(nm); p.add_argument("--sets", nargs="+", default=["voc", "coco"])

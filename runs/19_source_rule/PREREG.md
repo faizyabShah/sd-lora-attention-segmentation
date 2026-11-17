@@ -115,3 +115,61 @@ They are descriptive, as is the comparison with runs/17's +0.033.
 - `scripts/jc_srcrule_portcheck.py`: port check (NERVE environment).
 - Maps: `<BRACE_CACHE_DIR>/jc_srcrule/<set>/<image id>.npz`.
 - Report: `runs/19_source_rule/result.md`.
+
+## Amendment 1 (17 November 2026, before any image was scored)
+
+Requested by the owner after a second external review. The first full
+capture was cancelled after 39 VOC-Sim images; none were scored. Those maps
+are left in `<BRACE_CACHE_DIR>/jc_srcrule/voc/` and are not used. The
+amended run writes to `jc_srcrule/<set>_a1/`.
+
+**Question added.** Is the CLIP seed's advantage a matter of its spatial
+ranking (which pixels score higher) or of its score distribution (how the
+values are spread: background floor, sparsity, peakiness)?
+
+**Two hybrid seeds are added, built per image at 64 px:**
+
+| Seed | Ranking from | Values from |
+|---|---|---|
+| hA | CA seed | CLIP seed (NERVE's own 64-px resize of its map) |
+| hB | CLIP seed | CA seed |
+
+**Construction.**
+- The pixels, ordered by the ranking seed, receive the other seed's sorted
+  values.
+- Ties in the ranking seed (for example the zeros left by NERVE's 20% cut)
+  receive the mean of the donor values over their rank range, so no arbitrary
+  order is imposed inside a tie.
+- Values are used as given. Both propagations are linear in the seed, and
+  NERVE's walk matrix is row-normalised, so a global scale or offset does not
+  change the min–max-scaled output; only the shape of the value distribution
+  can matter.
+- Inputs are treated as for the original seeds: min–max scaled for BRACE's
+  rules, as given for the walk. Every cell runs on both attention sources and
+  under all three rule outputs.
+
+**Registered contrasts (primary convention, every cell).**
+- V = hA − CA (values, with CA's ranking held);
+- K = CLIP − hA (ranking, with CLIP's values held);
+- V′ = hB − CLIP (descriptive).
+
+**Registered reading (COCO-Cap), in two cells:** BRACE's own (generation ×
+hierarchy) and NERVE's own (NERVE pass × walk).
+- **Calibration has headroom** if V is above zero (95% interval) in either
+  cell.
+- **CLIP's spatial ranking is essential** if K is above zero in both cells.
+- Per the reviewer's plan, an SD-only calibration mechanism is worth building
+  only if calibration has headroom.
+
+**Added readouts.**
+- COCO-Cap per-image IoU by object-size third, share of images below 0.3 IoU,
+  false-positive area, macro precision and recall, for every seed in the
+  seed-alone, hierarchy and walk cells.
+
+**Seed-alone CPU part.** The same four seeds are also scored with no
+propagation and no DenseCRF from the runs/17 caches
+(`scripts/jc_rankswap_seed.py` → `runs/19_source_rule/seed_alone_rankswap.md`).
+It is descriptive and needs no GPU.
+
+**Capture.** Sharded over up to four GPUs. Every image's cells come from one
+GPU and one generation, so all comparisons stay within one capture.
