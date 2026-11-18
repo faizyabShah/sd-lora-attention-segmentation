@@ -388,7 +388,7 @@ def report(a):
         Z = [np.load(f) for f in sorted((WORK / f"{ds}{a.tag}_scores").glob("*.npz")) if not f.stem.endswith(".tmp")]
         fs = max(float(z["fid_seed"]) for z in Z); fv = max(float(z["fid_v3"]) for z in Z)
         L.append(f"- {NAME[ds]}: {n[ds]} images. Zero-adapter shadow vs frozen BRACE: max |Δ| seed {fs:.1e}, BRACE map {fv:.1e}.")
-    L.append("- Validation (40 images, raw shadow BRACE map @0.55): " + ", ".join(f"{k} {v:.3f}" for k, v in V["miou"].items())
+    L.append(f"- Validation ({V['n']} images, raw shadow BRACE map @0.55): " + ", ".join(f"{k} {v:.3f}" for k, v in V["miou"].items())
              + f"; selected B step {V['selected']['B']}, C step {V['selected']['C']}.")
     for arm in ("B", "C"):
         f = OUT / f"train_{arm}{a.tag}.json"
