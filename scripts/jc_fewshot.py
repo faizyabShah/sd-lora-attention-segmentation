@@ -35,8 +35,8 @@ ARMS = ("A", "B", "C", "D")
 MAPS = ("seed", "V3")
 THR, T55 = J.THR, J.T55
 LR, STEPS, PER_CLASS = 1e-3, 60, 3
-SET_DS = {"train": "voc", "test": "coco"}
-NAME = {"train": "VOC-Sim training images (in-sample)", "test": "COCO-Cap test"}
+SET_DS = {"train": "voc", "test": "coco", "all": "coco"}      # "all" = every COCO-Cap image (amendment 1)
+NAME = {"train": "VOC-Sim training images (in-sample)", "test": "COCO-Cap 60 (3/class)", "all": "COCO-Cap all"}
 
 
 def shadow(rt, arm):
@@ -62,9 +62,9 @@ def split(a):
     print({k: (len(v) if isinstance(v, list) else v) for k, v in o.items()}, flush=True)
 
 
-def rows_for(nm, n=0):
-    ids = json.loads((OUT / "split.json").read_text())[nm]
-    R = J.rows_for(SET_DS[nm], ids)
+def rows_for(nm, n=0, shard=0, num_shards=1):
+    R = nr.rows("coco") if nm == "all" else J.rows_for(SET_DS[nm], json.loads((OUT / "split.json").read_text())[nm])
+    R = R[shard::num_shards]
     return R[:n] if n else R
 
 
@@ -101,7 +101,7 @@ def train(a):
 @torch.no_grad()
 def capture(a):
     from src.segmentation import sg_combined_v2
-    R = rows_for(a.set, a.max_images); ds = SET_DS[a.set]; rt = J.make_runtime(a.model)
+    R = rows_for(a.set, a.max_images, a.shard, a.num_shards); ds = SET_DS[a.set]; rt = J.make_runtime(a.model)
     sh = {}
     for arm in ARMS[1:]:
         m = shadow(rt, arm); m.load_state_dict(torch.load(WORK / f"ckpt{a.tag}" / f"{arm}.pt", map_location=rt["pipe"].device))
@@ -150,7 +150,8 @@ def score_one(job):
 def score(a):
     for s in a.sets:
         sc = WORK / f"{s}{a.tag}_scores"; sc.mkdir(parents=True, exist_ok=True)
-        jobs = [(str(f), str(sc / f.name)) for f in sorted((WORK / (s + a.tag)).glob("*.npz")) if not f.stem.endswith(".tmp")]
+        jobs = [(str(f), str(sc / f.name)) for f in sorted((WORK / (s + a.tag)).glob("*.npz"))
+                if not f.stem.endswith(".tmp")][a.shard::a.num_shards]
         print(s, len(jobs), flush=True)
         with Pool(a.workers) as pool:
             for n, _ in enumerate(pool.imap_unordered(score_one, jobs, chunksize=1), 1):
@@ -158,8 +159,14 @@ def score(a):
                     print(f"{s} {n}/{len(jobs)}", flush=True)
 
 
+def _sub(S, keep):
+    return {k: (v[keep] if isinstance(v, np.ndarray) and len(v) == len(keep) else v) for k, v in S.items()}
+
+
 def report(a):
-    S = {s: cc.load_gen(WORK / f"{s}{a.tag}_scores") for s in ("train", "test")}
+    S = {s: cc.load_gen(WORK / f"{s}{a.tag}_scores") for s in ("train", "all")}
+    t60 = set(json.loads((OUT / "split.json").read_text())["test"])
+    S["test"] = _sub(S["all"], np.array([g in t60 for g in S["all"]["grp"]]))
     one = {s: np.ones(len(S[s]["grp"]), bool) for s in S}
     mi = lambda s, P: cc.miou(P[:, None], S[s]["cls"], one[s])[0]
     key = lambda arm, m, crf: f"{arm}|{m}{'+R2' if crf else ''}|raw"
@@ -168,17 +175,18 @@ def report(a):
     def at(s, k, mode):
         return S[s][k][:, T55] if mode == "0.55" else S[s][k][:, tsel(k)]
 
-    def dci(Pa, Pb):
-        lo, hi = cc.boot(S["test"], Pa, Pb, n=a.boot); d = mi("test", Pa) - mi("test", Pb)
+    def dci(Pa, Pb, s="all"):
+        lo, hi = cc.boot(S[s], Pa, Pb, n=a.boot); d = mi(s, Pa) - mi(s, Pb)
         return f"{d:+.3f} [{lo:+.3f}, {hi:+.3f}]", d, lo
 
-    L = ["# Few-shot supervised shadow attention (`PREREG.md`)\n",
+    L = ["# Few-shot supervised shadow attention (`PREREG.md`, amendment 1)\n",
          "`scripts/jc_fewshot.py`. **Exploratory, supervised, few-shot** (masks of 3 VOC-Sim images per class). Shadow "
          f"low-rank copies (rank {J.RANK}, {STEPS} steps, lr {LR:g}); the generator is untouched. All arms from one live "
          "generation per image (paired). *train-sel.* = each arm's best threshold on the 60 training images, applied "
-         f"unchanged to COCO-Cap test. Class-macro mIoU; Δ with paired image-bootstrap 95% interval ({a.boot}).\n",
+         "unchanged to COCO-Cap. Primary test set: all COCO-Cap images (amendment 1); the registered 60-image subset is "
+         f"also reported. Class-macro mIoU; Δ with paired image-bootstrap 95% interval ({a.boot}).\n",
          "## Data and checks\n"]
-    for s in S:
+    for s in ("train", "all"):
         Z = [np.load(f) for f in sorted((WORK / f"{s}{a.tag}_scores").glob("*.npz")) if not f.stem.endswith(".tmp")]
         fs = max(float(z["fid_seed"]) for z in Z); fv = max(float(z["fid_v3"]) for z in Z)
         L.append(f"- {NAME[s]}: {len(Z)} images, {len(np.unique(S[s]['cls']))} classes. Zero-adapter shadow vs frozen "
@@ -194,27 +202,29 @@ def report(a):
            "D": "D CA + SA, hierarchy supervision"}
     for crf in (True, False):
         L.append(f"\n## {'With DenseCRF (primary)' if crf else 'Raw (secondary)'}\n")
-        L.append("| Arm | Map | Train (in-sample), own best | train-sel. threshold | COCO-Cap test, train-sel. | COCO-Cap test, 0.55 |")
-        L.append("|---|---|---:|---:|---:|---:|")
+        L.append("| Arm | Map | Train (in-sample), own best | train-sel. thr. | COCO-Cap all, train-sel. | COCO-Cap all, 0.55 "
+                 "| COCO-Cap 60, train-sel. | COCO-Cap 60, 0.55 |")
+        L.append("|---|---|---:|---:|---:|---:|---:|---:|")
         for arm in ARMS:
             for m, ml in (("seed", "seed"), ("V3", "BRACE hierarchy")):
                 k = key(arm, m, crf)
                 L.append(f"| {lab[arm]} | {ml} | {mi('train', at('train', k, 'sel')):.3f} | {THR[tsel(k)]:.3f} | "
-                         f"{mi('test', at('test', k, 'sel')):.3f} | {mi('test', at('test', k, '0.55')):.3f} |")
-    L.append("\n## Registered comparisons (COCO-Cap test, BRACE hierarchy + DenseCRF)\n")
-    L.append("| ID | Comparison | train-sel. | 0.55 | Positive (0.55)? |")
-    L.append("|---|---|---|---|---|")
+                         + " | ".join(f"{mi(s, at(s, k, md)):.3f}" for s in ("all", "test") for md in ("sel", "0.55")) + " |")
+    L.append("\n## Comparisons (BRACE hierarchy + DenseCRF)\n")
+    L.append("| ID | Comparison | COCO-Cap all, train-sel. | COCO-Cap all, 0.55 | Positive (all, 0.55)? | COCO-Cap 60, 0.55 |")
+    L.append("|---|---|---|---|---|---|")
     for tid, lb, x, y in (("F1", "D − C (SA copies add to hierarchy-supervised CA?)", "D", "C"),
                           ("F2", "C − B (hierarchy vs direct supervision of CA)", "C", "B"),
                           ("F3", "B − A", "B", "A"), ("F4", "C − A", "C", "A"), ("F5", "D − A", "D", "A")):
-        c = {mode: dci(at("test", key(x, "V3", True), mode), at("test", key(y, "V3", True), mode)) for mode in ("sel", "0.55")}
-        L.append(f"| {tid} | {lb} | {c['sel'][0]} | {c['0.55'][0]} | {'yes' if c['0.55'][2] > 0 else 'no'} |")
-    L.append("\n\"Positive\" = 95% interval above zero at 0.55. 60 test images: intervals are wide; descriptive, exploratory.\n")
-    L.append("Seed + DenseCRF @0.55, COCO-Cap test, vs A: " + "; ".join(
-        f"{x} {dci(at('test', key(x, 'seed', True), '0.55'), at('test', key('A', 'seed', True), '0.55'))[0]}" for x in ARMS[1:]) + "\n")
-    cl = S["test"]["cls"]
-    L.append("Per class, COCO-Cap test, BRACE hierarchy + DenseCRF @0.55 (A / B / C / D): " + ", ".join(
-        f"{c} " + " / ".join(f"{cc.miou(at('test', key(arm, 'V3', True), '0.55')[:, None], cl, cl == c)[0]:.2f}" for arm in ARMS)
+        c = {mode: dci(at("all", key(x, "V3", True), mode), at("all", key(y, "V3", True), mode)) for mode in ("sel", "0.55")}
+        c60 = dci(at("test", key(x, "V3", True), "0.55"), at("test", key(y, "V3", True), "0.55"), "test")
+        L.append(f"| {tid} | {lb} | {c['sel'][0]} | {c['0.55'][0]} | {'yes' if round(c['0.55'][2], 3) > 0 else 'no'} | {c60[0]} |")
+    L.append("\n\"Positive\" = 95% interval above zero on all COCO-Cap at 0.55. Exploratory.\n")
+    L.append("Seed + DenseCRF @0.55, COCO-Cap all, vs A: " + "; ".join(
+        f"{x} {dci(at('all', key(x, 'seed', True), '0.55'), at('all', key('A', 'seed', True), '0.55'))[0]}" for x in ARMS[1:]) + "\n")
+    cl = S["all"]["cls"]
+    L.append("Per class, COCO-Cap all, BRACE hierarchy + DenseCRF @0.55 (A / B / C / D): " + ", ".join(
+        f"{c} " + " / ".join(f"{cc.miou(at('all', key(arm, 'V3', True), '0.55')[:, None], cl, cl == c)[0]:.2f}" for arm in ARMS)
         for c in np.unique(cl)) + "\n")
     txt = "\n".join(L) + "\n"; print(txt)
     (OUT / f"result{a.tag}.md").write_text(txt)
@@ -227,10 +237,12 @@ if __name__ == "__main__":
     p = sub.add_parser("train"); p.add_argument("--arm", choices=ARMS[1:], required=True)
     p.add_argument("--steps", type=int, default=0); p.add_argument("--n-train", type=int, default=0)
     p.add_argument("--tag", default=""); p.add_argument("--model", default=M)
-    p = sub.add_parser("capture"); p.add_argument("--set", choices=("train", "test"), required=True)
+    p = sub.add_parser("capture"); p.add_argument("--set", choices=("train", "test", "all"), required=True)
     p.add_argument("--max-images", type=int, default=0); p.add_argument("--tag", default=""); p.add_argument("--model", default=M)
+    p.add_argument("--shard", type=int, default=0); p.add_argument("--num-shards", type=int, default=1)
     for nm in ("score", "report"):
-        p = sub.add_parser(nm); p.add_argument("--sets", nargs="+", default=["train", "test"]); p.add_argument("--tag", default="")
+        p = sub.add_parser(nm); p.add_argument("--sets", nargs="+", default=["train", "all"]); p.add_argument("--tag", default="")
         p.add_argument("--workers", type=int, default=16); p.add_argument("--boot", type=int, default=2000)
+        p.add_argument("--shard", type=int, default=0); p.add_argument("--num-shards", type=int, default=1)
     a = ap.parse_args()
     {"split": split, "train": train, "capture": capture, "score": score, "report": report}[a.cmd](a)

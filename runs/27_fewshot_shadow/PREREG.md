@@ -49,6 +49,13 @@ Training-image numbers are in-sample and reported as such. Class-macro mIoU; pai
 With 60 test images, intervals will be wide. A comparison is called **positive** only if its 95% interval at 0.55 is
 above zero; everything else is reported as not shown. Results do not change the frozen method.
 
+## Amendment 1 (2026-11-18, during training, before any capture or scoring)
+
+Owner: evaluate on all COCO-Cap images instead of only 60. **Primary test set = all 707 COCO-Cap images** (none is
+used for training or any choice); the comparisons above are judged there ("positive" = interval above zero at 0.55).
+The registered 60-image subset (3/class) is still reported, as a secondary column. Nothing else changes. Reason:
+60 images give intervals too wide to resolve differences of a few points.
+
 ## Files
 
 `scripts/jc_fewshot.py` (`split` → `train` per arm, GPU → `capture --set train|test`, GPU → `score`, CPU →
