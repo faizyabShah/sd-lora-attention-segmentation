@@ -1,0 +1,32 @@
+% JC #7 draft of Table 1 (side N). Not in paper/; for the owners to adopt or edit.
+% Source of every number: comparisons/drafts/table1_ladder/result.json (result.md), one live generation per image,
+% frozen runtime, runs/20 corrected prompts, 490 VOC-Sim + 707 COCO-Cap; script t1_ladder.py; PREREG.md in that folder.
+% Paper's current values for comparison (paper/tables/tab_progression.tex): .665 .691 (.756) .789 .800 .813 .817 .823 .829 / COCO .625 .637 .644 .662 .696.
+% Cross-check with side F's committed runs/25 (a64aff6, V100, same runtime): fine-only + DenseCRF @0.55 0.796 / 0.698 and
+% BRACE @0.55 0.832 / 0.708; here (A100 capture) 0.796 / 0.698 and 0.833 / 0.708. VOC-sel. BRACE: F 0.831 / 0.708, here 0.832 / 0.708.
+% Reproduction of the paper's VOC-Sim screens at their fixed threshold 0.45 (result.md, fixed-threshold table):
+% rows 1, 2, (3a), 3, 4, 5, 6 = .667 .696 (.757) .790 .803 .816 .821 vs paper .665 .691 (.756) .789 .800 .813 .817.
+% Bold = 95% paired image-bootstrap interval excludes zero (2000 resamples); all intervals in result.md.
+\begin{table}[t]
+\centering
+\caption{\textbf{The pipeline, one decision at a time, on both benchmarks.} Every row comes from one generation per image and adds one decision to the row named in the \emph{vs} column; $\Delta$ is the paired difference to that row (bold: 95\% image-bootstrap interval excludes zero). Threshold convention: chosen on VOC-Sim (5-fold out-of-fold), the full-VOC-Sim threshold applied unchanged to COCO-Cap, so consecutive rows may use different thresholds (row~8 uses 0.55, row~7 0.425). Folds: VOC-Sim held-out folds won (of 5). Row~7 is the fine-only reference kept by the registered rule. The last three columns use one shared threshold, 0.55, for every row; there row~8 gains $+0.010$ on COCO-Cap over row~7, against $+0.036$ with each row at its own VOC-Sim threshold. The indented row is the alternative to row~3 (one pass through all 16 SA modules); row~3 builds on row~2. VOC-Sim values are in-sample for the method design.}
+\label{tab:progression}
+\footnotesize\setlength{\tabcolsep}{2pt}
+\begin{tabular}{@{}rlr rrr rr rrr@{}}
+\toprule
+ & & & \multicolumn{3}{c}{VOC-Sim} & \multicolumn{2}{c}{COCO-Cap} & \multicolumn{3}{c}{shared threshold 0.55} \\
+\cmidrule(lr){4-6}\cmidrule(lr){7-8}\cmidrule(lr){9-11}
+ & Step & vs & mIoU & $\Delta$ & folds & mIoU & $\Delta$ & VOC & COCO & $\Delta$ COCO \\
+\midrule
+1 & CA seed, all 16 CA modules & --- & .707 & --- & --- & .574 & --- & .545 & .449 & --- \\
+2 & $-$ five 32-px CA modules & 1 & .714 & $\mathbf{+.008}$ & 5/5 & .572 & $-.002$ & .590 & .456 & $+.007$ \\
+ & \quad(1 SA pass, 16 modules) & 2 & .759 & $\mathbf{+.044}$ & 5/5 & .632 & $\mathbf{+.060}$ & .748 & .638 & $\mathbf{+.182}$ \\
+3 & + 1 SA pass, 64-px module & 2 & .790 & $\mathbf{+.076}$ & 5/5 & .629 & $\mathbf{+.057}$ & .754 & .642 & $\mathbf{+.187}$ \\
+4 & + 2nd SA pass & 3 & .803 & $\mathbf{+.012}$ & 5/5 & .636 & $\mathbf{+.008}$ & .778 & .658 & $\mathbf{+.016}$ \\
+5 & + DenseCRF & 4 & .816 & $\mathbf{+.013}$ & 5/5 & .651 & $\mathbf{+.014}$ & .783 & .664 & $\mathbf{+.006}$ \\
+6 & + SA calls 10--20 & 5 & .820 & $\mathbf{+.004}$ & 4/5 & .657 & $\mathbf{+.007}$ & .785 & .669 & $\mathbf{+.004}$ \\
+7 & + SA-guided CA weights & 6 & .825 & $+.005$ & 4/5 & .673 & $\mathbf{+.015}$ & .796 & .698 & $\mathbf{+.030}$ \\
+8 & + hierarchy, cap (BRACE) & 7 & .832 & $\mathbf{+.007}$ & 4/5 & .708 & $\mathbf{+.036}$ & .833 & .708 & $+.010$ \\
+\bottomrule
+\end{tabular}
+\end{table}

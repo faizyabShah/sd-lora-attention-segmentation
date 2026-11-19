@@ -1,0 +1,184 @@
+{
+ "a100": {
+  "meta": {
+   "gpu": "NVIDIA A100-PCIE-40GB",
+   "node": "renyi.cl.itk.ppke.hu",
+   "cpu": "x86_64",
+   "torch": "2.4.1+cu121",
+   "cuda": "12.1",
+   "cudnn": 90100,
+   "diffusers": "0.36.0",
+   "transformers": "5.6.2",
+   "python": "3.11.15",
+   "driver": "580.95.05",
+   "unet_dtype": "torch.float32",
+   "n_per_set": 50,
+   "warmup_discarded": 1
+  },
+  "n": 100,
+  "median": {
+   "gen_plain": 2.6635971926152706,
+   "gen_capture": 6.938609490171075,
+   "runtime_extras": 0.04883946478366852,
+   "fine_map": 0.034461092203855515,
+   "hier_map": 0.037640511989593506,
+   "aggregate": 0.11903715319931507,
+   "crf_fine": 5.920363124459982,
+   "crf_brace": 5.919278426095843,
+   "gen_plain_peak_mib": 5064.96142578125,
+   "gen_capture_total_peak_mib": 5267.5263671875,
+   "fine_map_peak_mib": 5233.474609375,
+   "hier_map_peak_mib": 5267.5
+  },
+  "p10_p90": {
+   "gen_plain": [
+    2.588875389844179,
+    2.6755859930068255
+   ],
+   "gen_capture": [
+    6.911088263615966,
+    6.9774978894740345
+   ],
+   "runtime_extras": [
+    0.048708783090114595,
+    0.04896360635757446
+   ],
+   "fine_map": [
+    0.034378188848495486,
+    0.0345754723995924
+   ],
+   "hier_map": [
+    0.03757377006113529,
+    0.03777327984571457
+   ],
+   "aggregate": [
+    0.11563538201153278,
+    0.12131045795977116
+   ],
+   "crf_fine": [
+    5.893849760666489,
+    5.960375783592463
+   ],
+   "crf_brace": [
+    5.890263391658664,
+    5.970221111550927
+   ],
+   "gen_plain_peak_mib": [
+    5064.96142578125,
+    5064.96142578125
+   ],
+   "gen_capture_total_peak_mib": [
+    5267.5263671875,
+    5267.5263671875
+   ],
+   "fine_map_peak_mib": [
+    5233.474609375,
+    5233.474609375
+   ],
+   "hier_map_peak_mib": [
+    5267.5,
+    5267.5
+   ]
+  },
+  "capture_overhead_median": 4.273702634498477,
+  "brace_total_median": 12.895300175994635,
+  "fine_only_total_median": 12.894771793857217,
+  "brace_gpu_median": 6.97630119509995,
+  "fine_gpu_median": 6.973142856732011,
+  "peak_mib_max": 5267.5263671875,
+  "images_equal_plain": 100,
+  "v0_maxdiff_max": 0.0,
+  "v3_maxdiff_max": 0.0
+ },
+ "v100": {
+  "meta": {
+   "gpu": "Tesla V100-PCIE-16GB",
+   "node": "erdos.cl.itk.ppke.hu",
+   "cpu": "x86_64",
+   "torch": "2.4.1+cu121",
+   "cuda": "12.1",
+   "cudnn": 90100,
+   "diffusers": "0.36.0",
+   "transformers": "5.6.2",
+   "python": "3.11.15",
+   "driver": "560.35.05",
+   "unet_dtype": "torch.float32",
+   "n_per_set": 50,
+   "warmup_discarded": 1
+  },
+  "n": 100,
+  "median": {
+   "gen_plain": 12.111661829054356,
+   "gen_capture": 12.016925796866417,
+   "runtime_extras": 0.0920381098985672,
+   "fine_map": 0.07952471077442169,
+   "hier_map": 0.0983738973736763,
+   "aggregate": 0.4022345095872879,
+   "crf_fine": 5.078221432864666,
+   "crf_brace": 5.069216176867485,
+   "gen_plain_peak_mib": 4870.7109375,
+   "gen_capture_total_peak_mib": 5268.5263671875,
+   "fine_map_peak_mib": 5234.474609375,
+   "hier_map_peak_mib": 5268.5
+  },
+  "p10_p90": {
+   "gen_plain": [
+    11.657341587543488,
+    12.638111072778702
+   ],
+   "gen_capture": [
+    11.26255980581045,
+    12.745252288877964
+   ],
+   "runtime_extras": [
+    0.07871212065219879,
+    0.173940320312977
+   ],
+   "fine_map": [
+    0.057890786230564116,
+    0.2135628804564485
+   ],
+   "hier_map": [
+    0.0624061718583107,
+    0.31880334019660955
+   ],
+   "aggregate": [
+    0.1777149647474289,
+    0.6569046586751938
+   ],
+   "crf_fine": [
+    5.052075719833374,
+    5.138799811899662
+   ],
+   "crf_brace": [
+    5.044398249685765,
+    5.118928129971027
+   ],
+   "gen_plain_peak_mib": [
+    4870.7109375,
+    4870.7109375
+   ],
+   "gen_capture_total_peak_mib": [
+    5267.5263671875,
+    5268.5263671875
+   ],
+   "fine_map_peak_mib": [
+    5233.474609375,
+    5234.474609375
+   ],
+   "hier_map_peak_mib": [
+    5267.5,
+    5268.5
+   ]
+  },
+  "capture_overhead_median": -0.17510084807872772,
+  "brace_total_median": 17.197129137814045,
+  "fine_only_total_median": 17.195399776101112,
+  "brace_gpu_median": 12.140020161867142,
+  "fine_gpu_median": 12.126034453511238,
+  "peak_mib_max": 5268.5263671875,
+  "images_equal_plain": 100,
+  "v0_maxdiff_max": 0.0,
+  "v3_maxdiff_max": 0.0
+ }
+}
