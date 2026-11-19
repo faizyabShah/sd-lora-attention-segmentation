@@ -126,9 +126,6 @@ and for the paper edits.
   copy of the paper (\texttt{sd-lora-attention-segmentation/paper/}),
   where the edit will be made. The repo copy matches JC's PDF except for
   the equation numbering in Sec. 3.3 (see \#6).
-\item
-  \textbf{{[}pending{]}} = a run is still on the cluster; the cell is
-  filled in when it finishes (same day).
 \end{itemize}
 
 \textbf{Words used throughout.}
@@ -562,16 +559,17 @@ hierarchy: cluttered scenes benefit most from a coarse envelope.
 Table 5 compares BRACE with competing methods on the same images (paired
 block) and lists the numbers published for these benchmarks (unpaired
 block). Among methods that use only the diffusion model, BRACE is the
-strongest on both benchmarks: GoCA trails it by 0.08 / 0.11 with SD 1.5
-and by 0.03 / 0.10 with SDXL, and DiffSegmenter by 0.04 / 0.02. NERVE,
-which adds a CLIP seed, is on par on VOC-Sim and stronger on COCO-Cap
-(+0.032 {[}+0.007, +0.060{]}); with its own released thresholding rule
-it falls below BRACE (0.812 / 0.663). The published numbers come from
-OVAM's reruns of each method and use other images and post-processing,
-so they are indicative only.
+strongest on both benchmarks: our run of OVAM with the class word trails
+it by 0.13 / 0.14 on the same images, DAAM by 0.10 / 0.07, SeeDiff by
+0.11 / 0.05, GoCA by 0.08 / 0.11 with SD 1.5 and by 0.03 / 0.10 with
+SDXL, and DiffSegmenter by 0.04 / 0.02. OVAM with its optimized token,
+which is few-shot, ties BRACE on VOC-Sim (\ensuremath{-}0.003 {[}\ensuremath{-}0.016, +0.010{]})
+and trails it on COCO-Cap (\ensuremath{-}0.044). NERVE, which adds a CLIP seed, is on
+par on VOC-Sim and stronger on COCO-Cap (+0.032 {[}+0.007, +0.060{]});
+with its own released thresholding rule it falls below BRACE (0.812 /
+0.663). The published numbers come from OVAM's reruns of each method and
+use other images and post-processing, so they are indicative only.
 \end{quote}
-
-(OVAM, DAAM and SCLIP rows {[}pending{]}, see \#3.)
 
 \textbf{(g) Sec. 7, ``Failure modes and scope'', last sentence} ---
 p.~8; \texttt{sec/7\_discussion.tex:7}.
@@ -765,8 +763,9 @@ Images & the same 490 VOC-Sim + 707 COCO-Cap images and annotations for
 every method (ground truth checked identical on 1,197/1,197) \\
 Query & the class word only, for every method \\
 Code & each method from its own public repository and settings (GoCA
-github.com/Darkbblue/goca; NERVE; DiffSegmenter); OVAM and DAAM from
-their released code {[}pending{]} \\
+github.com/Darkbblue/goca; NERVE; DiffSegmenter); OVAM, DAAM and SeeDiff
+(github.com/BAIKLAB/SeeDiff) from their released code; DAAM's attention
+read in BRACE's own generation pass so the images are identical \\
 BRACE & regenerated with the prompt-corrected capture (runs/20), F's
 code imported unchanged; reproduces runs/20 to 0.001 \\
 Threshold & chosen on VOC-Sim (5-fold out-of-fold), reused unchanged on
@@ -833,10 +832,12 @@ COCO-Cap
 --- & \textbf{0.831} & \textbf{0.708} & --- & --- \\
 & fine-only (ours, the rule's choice; runs/25) & --- & 0.824 & 0.673 &
 \ensuremath{-}0.007 {[}\ensuremath{-}0.013, \ensuremath{-}0.001{]} & \ensuremath{-}0.036 {[}\ensuremath{-}0.046, \ensuremath{-}0.024{]} \\
-& OVAM, class word (our run) & --- & {[}pending{]} & {[}pending{]} &
-{[}pending{]} & {[}pending{]} \\
-& DAAM (our run) & --- & {[}pending{]} & {[}pending{]} & {[}pending{]} &
-{[}pending{]} \\
+& OVAM, class word (our run) & --- & 0.703 & 0.568 & \ensuremath{-}0.128 {[}\ensuremath{-}0.143,
+\ensuremath{-}0.114{]} & \ensuremath{-}0.140 {[}\ensuremath{-}0.160, \ensuremath{-}0.120{]} \\
+& DAAM (our run) & --- & 0.727 & 0.644\textsuperscript{c} & \ensuremath{-}0.104 {[}\ensuremath{-}0.119, \ensuremath{-}0.091{]} &
+\ensuremath{-}0.067 {[}\ensuremath{-}0.093, \ensuremath{-}0.039{]}\textsuperscript{c} \\
+& SeeDiff & --- & 0.723 & 0.665\textsuperscript{c} & \ensuremath{-}0.108 {[}\ensuremath{-}0.122, \ensuremath{-}0.094{]} & \ensuremath{-}0.046
+{[}\ensuremath{-}0.070, \ensuremath{-}0.018{]}\textsuperscript{c} \\
 & DiffSegmenter & --- & 0.795 & 0.688 & \ensuremath{-}0.036 {[}\ensuremath{-}0.049, \ensuremath{-}0.023{]} &
 \ensuremath{-}0.020 {[}\ensuremath{-}0.041, +0.001{]} \\
 & GoCA, SD 1.5 & --- & 0.753 & 0.599 & \ensuremath{-}0.078 {[}\ensuremath{-}0.095, \ensuremath{-}0.060{]} &
@@ -850,13 +851,13 @@ COCO-Cap
 \textbf{+0.032 {[}+0.007, +0.060{]}} \\
 & NERVE, 20-class vocabulary & CLIP ViT-L/14 & 0.839 & 0.747 & +0.008
 {[}\ensuremath{-}0.007, +0.023{]} & \textbf{+0.039 {[}+0.013, +0.068{]}} \\
-& SCLIP + DenseCRF & CLIP ViT-B/16 & {[}pending{]} & {[}pending{]} &
-{[}pending{]} & {[}pending{]} \\
+& SCLIP + DenseCRF & CLIP ViT-B/16 & 0.764 & 0.652 & \ensuremath{-}0.067 {[}\ensuremath{-}0.084,
+\ensuremath{-}0.052{]} & \ensuremath{-}0.057 {[}\ensuremath{-}0.084, \ensuremath{-}0.031{]} \\
 & SCLIP seed + BRACE hierarchy (F, runs/20) & CLIP ViT-B/16 & 0.852 &
 0.734 & & \\
 \textbf{Paired, few-shot (optimized token; not training-free)} & OVAM,
-optimized token (our run) & --- & {[}pending{]} & {[}pending{]} &
-{[}pending{]} & {[}pending{]} \\
+optimized token (our run) & --- & 0.828 & 0.664 & \ensuremath{-}0.003 {[}\ensuremath{-}0.016,
++0.010{]} & \ensuremath{-}0.044 {[}\ensuremath{-}0.063, \ensuremath{-}0.026{]} \\
 & BRACE, optimized token (\#4; runs/25) & --- & 0.864 & 0.693 & +0.032
 {[}+0.023, +0.041{]} & \ensuremath{-}0.015 {[}\ensuremath{-}0.030, \ensuremath{-}0.000{]} \\
 \textbf{Published, not paired} (OVAM's Table 1; other images and
@@ -868,6 +869,13 @@ post-processing) & DAAM & --- & .662 & .484 & & \\
 & DatasetDM (trains a decoder) & --- & .803 & .593 & & \\
 \end{longtable}
 }
+
+\textsuperscript{c} DAAM and SeeDiff need the class word in the caption, so on COCO-Cap
+they are scored on the 437 such images; BRACE on the same 437 images:
+0.711. Our OVAM run with its own rule gives 0.696 / 0.546 (published:
+0.704 / 0.582). SeeDiff (AAAI 2025, github.com/BAIKLAB/SeeDiff) has
+public code and publishes no numbers on these benchmarks. SCLIP uses
+only CLIP (no diffusion model).
 
 \textbf{Reading.} BRACE is the best method that uses only the diffusion
 model. NERVE, which adds CLIP, is tied on VOC-Sim and better on
@@ -882,8 +890,7 @@ tunes its background score on the test set, so it has no fair own-rule
 row. All rows are exploratory; BRACE's VOC-Sim number is in-sample for
 its design.
 
-\textbf{LaTeX draft} (replaces \texttt{tables/tab\_published.tex}; fill
-{[}pending{]} rows when done):
+\textbf{LaTeX draft} (replaces \texttt{tables/tab\_published.tex}):
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -896,12 +903,19 @@ its design.
 \FunctionTok{\textbackslash{}midrule}
 \FunctionTok{\textbackslash{}multicolumn}\NormalTok{\{5\}\{}\CharTok{@\{\}}\NormalTok{l\}\{}\FunctionTok{\textbackslash{}emph}\NormalTok{\{Paired, same images, diffusion only, class word\}\}}\FunctionTok{\textbackslash{}\textbackslash{}}
 \FunctionTok{\textbackslash{}textbf}\NormalTok{\{BRACE (ours)\} }\OperatorTok{\&} \FunctionTok{\textbackslash{}textbf}\NormalTok{\{.831\} }\OperatorTok{\&} \FunctionTok{\textbackslash{}textbf}\NormalTok{\{.708\} }\OperatorTok{\&}\NormalTok{ {-}{-} }\OperatorTok{\&}\NormalTok{ {-}{-} }\FunctionTok{\textbackslash{}\textbackslash{}}
+\NormalTok{OVAM, class word\textasciitilde{}}\KeywordTok{\textbackslash{}cite}\NormalTok{\{}\ExtensionTok{marcosmanchon2024ovam}\NormalTok{\} }\OperatorTok{\&}\NormalTok{ .703 }\OperatorTok{\&}\NormalTok{ .568 }\OperatorTok{\&} \SpecialStringTok{${-}$}\NormalTok{.128 }\OperatorTok{\&} \SpecialStringTok{${-}$}\NormalTok{.140 }\FunctionTok{\textbackslash{}\textbackslash{}}
+\NormalTok{DAAM\textasciitilde{}}\KeywordTok{\textbackslash{}cite}\NormalTok{\{}\ExtensionTok{tang2023daam}\NormalTok{\} }\OperatorTok{\&}\NormalTok{ .727 }\OperatorTok{\&}\NormalTok{ .644}\SpecialStringTok{$\^{}*$} \OperatorTok{\&} \SpecialStringTok{${-}$}\NormalTok{.104 }\OperatorTok{\&} \SpecialStringTok{${-}$}\NormalTok{.067 }\FunctionTok{\textbackslash{}\textbackslash{}}
+\NormalTok{SeeDiff\textasciitilde{}}\KeywordTok{\textbackslash{}cite}\NormalTok{\{}\ExtensionTok{park2025seediff}\NormalTok{\} }\OperatorTok{\&}\NormalTok{ .723 }\OperatorTok{\&}\NormalTok{ .665}\SpecialStringTok{$\^{}*$} \OperatorTok{\&} \SpecialStringTok{${-}$}\NormalTok{.108 }\OperatorTok{\&} \SpecialStringTok{${-}$}\NormalTok{.046 }\FunctionTok{\textbackslash{}\textbackslash{}}
 \NormalTok{DiffSegmenter\textasciitilde{}}\KeywordTok{\textbackslash{}cite}\NormalTok{\{}\ExtensionTok{...}\NormalTok{\} }\OperatorTok{\&}\NormalTok{ .795 }\OperatorTok{\&}\NormalTok{ .688 }\OperatorTok{\&} \SpecialStringTok{${-}$}\NormalTok{.036 }\OperatorTok{\&} \SpecialStringTok{${-}$}\NormalTok{.020 }\FunctionTok{\textbackslash{}\textbackslash{}}
 \NormalTok{GoCA, SD 1.5\textasciitilde{}}\KeywordTok{\textbackslash{}cite}\NormalTok{\{}\ExtensionTok{meng2026making}\NormalTok{\} }\OperatorTok{\&}\NormalTok{ .753 }\OperatorTok{\&}\NormalTok{ .599 }\OperatorTok{\&} \SpecialStringTok{${-}$}\NormalTok{.078 }\OperatorTok{\&} \SpecialStringTok{${-}$}\NormalTok{.110 }\FunctionTok{\textbackslash{}\textbackslash{}}
 \NormalTok{GoCA, SDXL\textasciitilde{}}\KeywordTok{\textbackslash{}cite}\NormalTok{\{}\ExtensionTok{meng2026making}\NormalTok{\} }\OperatorTok{\&}\NormalTok{ .797 }\OperatorTok{\&}\NormalTok{ .606 }\OperatorTok{\&} \SpecialStringTok{${-}$}\NormalTok{.034 }\OperatorTok{\&} \SpecialStringTok{${-}$}\NormalTok{.102 }\FunctionTok{\textbackslash{}\textbackslash{}}
 \FunctionTok{\textbackslash{}midrule}
 \FunctionTok{\textbackslash{}multicolumn}\NormalTok{\{5\}\{}\CharTok{@\{\}}\NormalTok{l\}\{}\FunctionTok{\textbackslash{}emph}\NormalTok{\{Paired, with a CLIP model\}\}}\FunctionTok{\textbackslash{}\textbackslash{}}
 \NormalTok{NERVE\textasciitilde{}}\KeywordTok{\textbackslash{}cite}\NormalTok{\{}\ExtensionTok{mahatha2025nerve}\NormalTok{\} }\OperatorTok{\&}\NormalTok{ .844 }\OperatorTok{\&}\NormalTok{ .740 }\OperatorTok{\&}\NormalTok{ +.012 }\OperatorTok{\&} \FunctionTok{\textbackslash{}textbf}\NormalTok{\{+.032\} }\FunctionTok{\textbackslash{}\textbackslash{}}
+\NormalTok{SCLIP + DenseCRF }\OperatorTok{\&}\NormalTok{ .764 }\OperatorTok{\&}\NormalTok{ .652 }\OperatorTok{\&} \SpecialStringTok{${-}$}\NormalTok{.067 }\OperatorTok{\&} \SpecialStringTok{${-}$}\NormalTok{.057 }\FunctionTok{\textbackslash{}\textbackslash{}}
+\FunctionTok{\textbackslash{}midrule}
+\FunctionTok{\textbackslash{}multicolumn}\NormalTok{\{5\}\{}\CharTok{@\{\}}\NormalTok{l\}\{}\FunctionTok{\textbackslash{}emph}\NormalTok{\{Paired, few{-}shot (optimized token)\}\}}\FunctionTok{\textbackslash{}\textbackslash{}}
+\NormalTok{OVAM, optimized token }\OperatorTok{\&}\NormalTok{ .828 }\OperatorTok{\&}\NormalTok{ .664 }\OperatorTok{\&} \SpecialStringTok{${-}$}\NormalTok{.003 }\OperatorTok{\&} \SpecialStringTok{${-}$}\NormalTok{.044 }\FunctionTok{\textbackslash{}\textbackslash{}}
 \FunctionTok{\textbackslash{}midrule}
 \FunctionTok{\textbackslash{}multicolumn}\NormalTok{\{5\}\{}\CharTok{@\{\}}\NormalTok{l\}\{}\FunctionTok{\textbackslash{}emph}\NormalTok{\{Published (OVAM\textquotesingle{}s runs; not paired)\}\}}\FunctionTok{\textbackslash{}\textbackslash{}}
 \NormalTok{DAAM\textasciitilde{}}\KeywordTok{\textbackslash{}cite}\NormalTok{\{}\ExtensionTok{tang2023daam}\NormalTok{\} }\OperatorTok{\&}\NormalTok{ .662 }\OperatorTok{\&}\NormalTok{ .484 }\OperatorTok{\&} \OperatorTok{\&} \FunctionTok{\textbackslash{}\textbackslash{}}
@@ -1558,8 +1572,8 @@ One-line answer
 override and its timing; drop ``six times''; narrow to diffusion-only \\
 2 & done & Contributions 1--2 well supported; 3--4 rely on the
 supplement; add the rule's choice next to ours \\
-3 & done (OVAM, DAAM, SCLIP {[}pending{]}) & BRACE best among
-diffusion-only methods; NERVE (with CLIP) better on COCO-Cap \\
+3 & done & BRACE best among diffusion-only methods (OVAM \ensuremath{-}0.13 / \ensuremath{-}0.14
+on the same images); NERVE (with CLIP) better on COCO-Cap \\
 4 & done & No test leakage; the token helps VOC-Sim, and with it the
 hierarchy no longer helps on COCO-Cap \\
 5 & done & Hierarchy holds on SD 1.5 and SD 2.1, fails on SDXL; GoCA

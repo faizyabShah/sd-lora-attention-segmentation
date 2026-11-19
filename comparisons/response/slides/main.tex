@@ -84,16 +84,16 @@ Method & VOC-Sim & COCO-Cap & $\Delta$ COCO vs BRACE \\
 \midrule
 \textbf{BRACE} & \textbf{0.831} & \textbf{0.708} & -- \\
 fine-only (rule's choice) & 0.824 & 0.673 & $-0.036$ \\
-DiffSegmenter & 0.795 & 0.688 & $-0.020$ \\
 GoCA, SDXL & 0.797 & 0.606 & $-0.102$ \\
-OVAM, class word & \pend & \pend & \pend \\
-DAAM & \pend & \pend & \pend \\
+OVAM, class word & 0.703 & 0.568 & $-0.140$ \\
+DAAM & 0.727 & 0.644$^*$ & $-0.067$ \\
+SeeDiff & 0.723 & 0.665$^*$ & $-0.046$ \\
 \midrule
 NERVE (adds CLIP) & 0.844 & 0.740 & \textbf{+0.032} \\
 \bottomrule
 \end{tabular}
 \end{slidetable}
-\src{\texttt{comparisons/official/result.md}; class word, DenseCRF, threshold chosen on VOC-Sim}
+\src{class word, DenseCRF, threshold chosen on VOC-Sim. $^*$437 COCO-Cap images with the word in the caption. Also below BRACE: DiffSegmenter, SCLIP}
 \end{frame}
 
 \begin{frame}{3.\ Published numbers stay, marked as not paired}
@@ -126,6 +126,7 @@ BRACE, threshold 0.55 & VOC-Sim & COCO-Cap \\
 class word & 0.832 & 0.708 \\
 OVAM's optimized token & \textbf{0.864} & 0.693 \\
 hierarchy gain with the token & +0.009 & $-0.019$ \\
+OVAM itself, optimized token & 0.828 & 0.664 \\
 \bottomrule
 \end{tabular}
 \end{slidetable}
