@@ -183,7 +183,7 @@ Block & Method & VOC-Sim & COCO-Cap & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
 \midrule
  & \textbf{BRACE} & \textbf{0.831} & \textbf{0.708} & --- & --- \\
 \midrule
-Few-shot & OVAM, optimized token$^\ddagger$ & 0.825 & --- & $-0.006$ & --- \\
+Few-shot & OVAM, optimized token$^\ddagger$ & 0.825 & 0.692 & $-0.006$ & $-0.016$ \\
 \midrule
 With CLIP & NERVE, class word & 0.844 & 0.740 & $+0.012$ & \pos{+0.032} \\
  & NERVE, 20-class vocabulary & 0.839 & 0.747 & $+0.008$ & \pos{+0.039} \\
@@ -197,10 +197,10 @@ Not rerun & Attn2Mask & TBR & TBR & TBR & TBR \\
 \bottomrule
 \end{tabular}}
 \end{slidetable}
-{\footnotesize $\Delta$ = method $-$ BRACE, paired. DenseCRF; threshold chosen on VOC-Sim. Bold: interval excludes zero. $^\dagger$Other capture; vs BRACE 0.832 / 0.709 there. $^\ddagger$Published in the OVAM paper; not paired, no COCO-Cap value.}
+{\footnotesize $\Delta$ = method $-$ BRACE, paired. DenseCRF; threshold chosen on VOC-Sim. Bold: interval excludes zero. $^\dagger$Other capture; vs BRACE 0.832 / 0.709 there. $^\ddagger$Published in the OVAM paper; not paired, so no interval.}
 \end{frame}
 
-\begin{frame}{3. Published numbers on the same benchmarks (OVAM, Table 1)}
+\begin{frame}{3. Published numbers on the same benchmarks (OVAM paper)}
 \begin{slidetable}
 \renewcommand{\arraystretch}{1.0}
 \resizebox{\linewidth}{!}{%
@@ -214,11 +214,11 @@ Attn2Mask & 0.687 & 0.550 & $-0.144$ & $-0.158$ & \\
 DAAM & 0.662 & 0.484 & $-0.169$ & $-0.224$ & \\
 Grounded Diffusion & 0.621 & 0.502 & $-0.210$ & $-0.206$ & trains a module \\
 OVAM, class word & 0.704 & 0.582 & $-0.127$ & $-0.126$ & \\
-OVAM, optimized token & 0.825 & --- & $-0.006$ & --- & few-shot \\
+OVAM, optimized token & 0.825 & 0.692 & $-0.006$ & $-0.016$ & few-shot \\
 \bottomrule
 \end{tabular}}
 \end{slidetable}
-{\footnotesize Numbers as printed in OVAM (CVPR 2024), Table 1. $\Delta$ = published $-$ BRACE; not paired, so no interval.}
+{\footnotesize Numbers as printed in OVAM (CVPR 2024), Tables 1--2. $\Delta$ = published $-$ BRACE; not paired, so no interval.}
 \end{frame}
 
 \begin{frame}{3. NERVE's lead needs its CLIP seed and its walk together}
