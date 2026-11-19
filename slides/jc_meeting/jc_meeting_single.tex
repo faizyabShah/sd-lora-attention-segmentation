@@ -122,23 +122,14 @@ DenseCRF helps capped maps 6$\times$ more & comes from comparing at two threshol
 {\footnotesize VOC-Sim / COCO-Cap; threshold chosen on VOC-Sim. Raw maps except the OVAM and NERVE rows, which include DenseCRF. Cap: older capture.}
 \end{frame}
 
-\begin{frame}{1. The override saw COCO-Cap: we disclose it}
+\begin{frame}{1. Our gains show in clutter, but we selected on simple scenes}
 \begin{itemize}
-\item The registered rule kept fine-only: the hierarchy won every VOC-Sim fold ($+0.006$) but failed the worst-class guard ($-0.050$).
-\item The override cites the COCO-Cap $+0.034$, so COCO-Cap is not untouched for this decision.
-\item All other settings were selected on VOC-Sim folds only.
+\item Most of our components barely change VOC-Sim (one object per image) and help on COCO-Cap (cluttered scenes).
+\item Our selection rule used VOC-Sim only, so it could not see these gains: it kept fine-only, and we adopted the hierarchy after seeing COCO-Cap.
+\item We disclose this in the paper.
+\item \textbf{Proposal:} change the selection set. Select on 50\% of VOC-Sim and 50\% of COCO-Cap images (split by class), and report every number on the other half of each.
+\item The test halves are then untouched by selection, and the rule can see clutter.
 \end{itemize}
-\begin{slidetable}
-\begin{tabular}{@{}L{0.42\linewidth}L{0.34\linewidth}l@{}}
-\toprule
-Option for the headline & Changes & Cost \\
-\midrule
-\textbf{A. Best diffusion-only method, CLIP block separate} & abstract, contributions, table blocks & text \\
-B. Analysis paper, no ranking claim & headline = calibration finding & text \\
-C. Third untouched cluttered benchmark & clean check of the override & data + one run \\
-\bottomrule
-\end{tabular}
-\end{slidetable}
 \end{frame}
 
 % =====================================================================
