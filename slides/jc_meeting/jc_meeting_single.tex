@@ -484,6 +484,40 @@ Hierarchy & VOC-Sim-selected & 0.818 & 0.816 & $-0.001$ & & 0.692 & 0.717 & \pos
 {\footnotesize Raw maps; profiles never include the test image. COCO-Cap was used to screen the gate. Bold: 95\% paired interval excludes zero.}
 \end{frame}
 
+\begin{frame}{Exploring: the gate needs a negative profile}
+\begin{slidetable}
+\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Each pixel's query compared with & VOC-Sim & COCO-Cap & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
+\midrule
+\textbf{No gate (BRACE)} & \textbf{0.832} & \textbf{0.709} & --- & --- \\
+object vs absent-class profile & 0.832 & 0.722 & $+0.000$ & \pos{+0.014} \\
+object vs all-pixel profile & 0.831 & 0.719 & $-0.001$ & \pos{+0.011} \\
+object profile only & 0.831 & 0.703 & $-0.001$ & $-0.006$ \\
+object vs the image's own average & 0.807 & 0.697 & \pos{-0.025} & $-0.011$ \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+{\footnotesize Hierarchy + DenseCRF; threshold chosen on VOC-Sim. Bold: 95\% paired interval excludes zero.}
+\end{frame}
+
+\begin{frame}{Exploring: choosing the gate strength per class}
+\begin{slidetable}
+\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Gate & VOC-Sim & COCO-Cap & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
+\midrule
+\textbf{No gate (BRACE)} & \textbf{0.832} & \textbf{0.709} & --- & --- \\
+Gate, same for every class & 0.832 & 0.722 & $+0.000$ & \pos{+0.014} \\
+Strength per class (none / half / full) & 0.836 & 0.726 & \pos{+0.004} & \pos{+0.018} \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+{\footnotesize Hierarchy + DenseCRF; threshold chosen on VOC-Sim. The strength is chosen per class on VOC-Sim (on the other folds) and applied unchanged to COCO-Cap; e.g.\ tv and train stay ungated. Bold: 95\% paired interval excludes zero.}
+\end{frame}
+
 \begin{frame}{Exploring: the gate on COCO-Cap is a class-dependent trade-off}
 \begin{slidetable}
 \begin{tabular}{lrrr}
@@ -514,7 +548,7 @@ Gate improves seeds and fine-only? & yes, both benchmarks \\
 Gate improves BRACE on VOC-Sim? & no \\
 Gate improves BRACE on COCO-Cap? & $+0.014$, screened (exploratory) \\
 Profiles estimated on VOC-sim work on COCO? & yes \\
-A class adaptive gate? & under study \\
+A class adaptive gate? & first gain on both: $+0.004$ / $+0.018$ \\
 \bottomrule
 \end{tabular}
 \end{slidetable}
