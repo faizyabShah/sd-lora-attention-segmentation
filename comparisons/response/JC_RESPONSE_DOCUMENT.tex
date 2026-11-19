@@ -831,8 +831,8 @@ COCO-Cap
 \endlastfoot
 \textbf{Paired, diffusion only, class word} & \textbf{BRACE (ours)} &
 --- & \textbf{0.831} & \textbf{0.708} & --- & --- \\
-& fine-only (ours, the rule's choice) & --- & {[}pending{]} &
-{[}pending{]} & {[}pending{]} & {[}pending{]} \\
+& fine-only (ours, the rule's choice; runs/25) & --- & 0.824 & 0.673 &
+\ensuremath{-}0.007 {[}\ensuremath{-}0.013, \ensuremath{-}0.001{]} & \ensuremath{-}0.036 {[}\ensuremath{-}0.046, \ensuremath{-}0.024{]} \\
 & OVAM, class word (our run) & --- & {[}pending{]} & {[}pending{]} &
 {[}pending{]} & {[}pending{]} \\
 & DAAM (our run) & --- & {[}pending{]} & {[}pending{]} & {[}pending{]} &
@@ -857,8 +857,8 @@ COCO-Cap
 \textbf{Paired, few-shot (optimized token; not training-free)} & OVAM,
 optimized token (our run) & --- & {[}pending{]} & {[}pending{]} &
 {[}pending{]} & {[}pending{]} \\
-& BRACE, optimized token (\#4) & --- & {[}pending{]} (Entry 8, old
-prompts: 0.861 / 0.681 at 0.55) & & & \\
+& BRACE, optimized token (\#4; runs/25) & --- & 0.864 & 0.693 & +0.032
+{[}+0.023, +0.041{]} & \ensuremath{-}0.015 {[}\ensuremath{-}0.030, \ensuremath{-}0.000{]} \\
 \textbf{Published, not paired} (OVAM's Table 1; other images and
 post-processing) & DAAM & --- & .662 & .484 & & \\
 & Attn2Mask & --- & .687 & .550 & & \\
@@ -1013,12 +1013,51 @@ class-word seed, and a strong seed leaves nothing to fix. The COCO-Cap
 drop is concentrated in a few classes (sofa 0.70 \ensuremath{\rightarrow} 0.34, car 0.76 \ensuremath{\rightarrow}
 0.66; person rises 0.28 \ensuremath{\rightarrow} 0.62).
 
-\subsection{4.3 Rerun on the corrected prompts (runs/25, full)
-{[}pending{]}}
+\subsection{4.3 Rerun on the corrected prompts (F, runs/25) --- done}
 
-The same ladder on the prompt-corrected capture, exactly as F
-pre-registered it (\texttt{runs/25\_token\_ladder\_nr/PREREG.md});
-outputs in \texttt{comparisons/token\_ladder\_nr/}. Scoring is running.
+F ran the full pre-registered ladder on the prompt-corrected capture
+(\texttt{runs/25\_token\_ladder\_nr/result.md}, commit a64aff6); N's
+copy of the same run is an independent reproduction only. DenseCRF,
+paired, 95\% intervals:
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+VOC-Sim
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+COCO-Cap
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+BRACE, class word (0.55) & 0.832 & 0.708 \\
+BRACE, optimized token (0.55) & \textbf{0.864} & 0.693 \\
+token \ensuremath{-} word, BRACE (0.55) & +0.031 {[}+0.022, +0.040{]} & \ensuremath{-}0.015
+{[}\ensuremath{-}0.030, \ensuremath{-}0.000{]} \\
+hierarchy \ensuremath{-} fine-only, class word, VOC-sel. & +0.007 {[}+0.001,
++0.013{]} & \textbf{+0.036 {[}+0.024, +0.046{]}} \\
+hierarchy \ensuremath{-} fine-only, class word, 0.55 & +0.036 & +0.010 {[}\ensuremath{-}0.005,
++0.026{]} \\
+hierarchy \ensuremath{-} fine-only, token, VOC-sel. & \ensuremath{-}0.011 {[}\ensuremath{-}0.017, \ensuremath{-}0.005{]} &
+\ensuremath{-}0.007 {[}\ensuremath{-}0.014, \ensuremath{-}0.000{]} \\
+hierarchy \ensuremath{-} fine-only, token, 0.55 & +0.009 & \textbf{\ensuremath{-}0.019 {[}\ensuremath{-}0.031,
+\ensuremath{-}0.009{]}} \\
+\end{longtable}
+}
+
+Same picture as Entry 8, now on the corrected data: the token helps on
+VOC-Sim (+0.032) and slightly hurts on COCO-Cap, and with the token the
+hierarchy no longer helps. With the class word and each map at its own
+VOC-selected threshold, the hierarchy's COCO-Cap gain is \textbf{+0.036
+{[}+0.024, +0.046{]}}, the cleanest version of the \#1 number (one
+threshold rule, corrected data). Under F's registered rule (judged at
+0.55), ``the hierarchy helps'' does not hold for either query.
 
 \subsection{4.4 Paper}
 
@@ -1487,9 +1526,8 @@ override and its timing; drop ``six times''; narrow to diffusion-only \\
 supplement; add the rule's choice next to ours \\
 3 & done (OVAM, DAAM, SCLIP {[}pending{]}) & BRACE best among
 diffusion-only methods; NERVE (with CLIP) better on COCO-Cap \\
-4 & done (corrected-prompt rerun {[}pending{]}) & No test leakage; the
-token helps VOC-Sim, and with it the hierarchy no longer helps on
-COCO-Cap \\
+4 & done & No test leakage; the token helps VOC-Sim, and with it the
+hierarchy no longer helps on COCO-Cap \\
 5 & done & Hierarchy holds on SD 1.5 and SD 2.1, fails on SDXL; GoCA
 wins on SDXL \\
 6 & done & 22 fixes listed \\

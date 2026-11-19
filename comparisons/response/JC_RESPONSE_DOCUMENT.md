@@ -222,7 +222,7 @@ VOC-Sim / COCO-Cap mIoU. Paired rows: DenseCRF, VOC-selected threshold. Δ = met
 | Block | Method | Extra model | VOC-Sim | COCO-Cap | Δ VOC-Sim | Δ COCO-Cap |
 |---|---|---|---|---|---|---|
 | **Paired, diffusion only, class word** | **BRACE (ours)** | — | **0.831** | **0.708** | — | — |
-| | fine-only (ours, the rule's choice) | — | ⏳ | ⏳ | ⏳ | ⏳ |
+| | fine-only (ours, the rule's choice; runs/25) | — | 0.824 | 0.673 | −0.007 [−0.013, −0.001] | −0.036 [−0.046, −0.024] |
 | | OVAM, class word (our run) | — | ⏳ | ⏳ | ⏳ | ⏳ |
 | | DAAM (our run) | — | ⏳ | ⏳ | ⏳ | ⏳ |
 | | DiffSegmenter | — | 0.795 | 0.688 | −0.036 [−0.049, −0.023] | −0.020 [−0.041, +0.001] |
@@ -234,7 +234,7 @@ VOC-Sim / COCO-Cap mIoU. Paired rows: DenseCRF, VOC-selected threshold. Δ = met
 | | SCLIP + DenseCRF | CLIP ViT-B/16 | ⏳ | ⏳ | ⏳ | ⏳ |
 | | SCLIP seed + BRACE hierarchy (F, runs/20) | CLIP ViT-B/16 | 0.852 | 0.734 | | |
 | **Paired, few-shot (optimized token; not training-free)** | OVAM, optimized token (our run) | — | ⏳ | ⏳ | ⏳ | ⏳ |
-| | BRACE, optimized token (#4) | — | ⏳ (Entry 8, old prompts: 0.861 / 0.681 at 0.55) | | | |
+| | BRACE, optimized token (#4; runs/25) | — | 0.864 | 0.693 | +0.032 [+0.023, +0.041] | −0.015 [−0.030, −0.000] |
 | **Published, not paired** (OVAM's Table 1; other images and post-processing) | DAAM | — | .662 | .484 | | |
 | | Attn2Mask | — | .687 | .550 | | |
 | | OVAM, class word | — | .704 | .582 | | |
@@ -318,9 +318,21 @@ Do our components still help with the token? (Δ with the token; with the class 
 
 **Reading.** The token makes the seed much better (+0.18). With such a strong seed the hierarchy is no longer needed; on COCO-Cap it even hurts. So JC's "stronger message" (BRACE helps regardless of the query) **does not hold**; the "why" is that BRACE fixes a weak class-word seed, and a strong seed leaves nothing to fix. The COCO-Cap drop is concentrated in a few classes (sofa 0.70 → 0.34, car 0.76 → 0.66; person rises 0.28 → 0.62).
 
-### 4.3 Rerun on the corrected prompts (runs/25, full) ⏳
+### 4.3 Rerun on the corrected prompts (F, runs/25) — done
 
-The same ladder on the prompt-corrected capture, exactly as F pre-registered it (`runs/25_token_ladder_nr/PREREG.md`); outputs in `comparisons/token_ladder_nr/`. Scoring is running.
+F ran the full pre-registered ladder on the prompt-corrected capture (`runs/25_token_ladder_nr/result.md`, commit a64aff6); N's copy of the same run is an independent reproduction only. DenseCRF, paired, 95% intervals:
+
+| | VOC-Sim | COCO-Cap |
+|---|---|---|
+| BRACE, class word (0.55) | 0.832 | 0.708 |
+| BRACE, optimized token (0.55) | **0.864** | 0.693 |
+| token − word, BRACE (0.55) | +0.031 [+0.022, +0.040] | −0.015 [−0.030, −0.000] |
+| hierarchy − fine-only, class word, VOC-sel. | +0.007 [+0.001, +0.013] | **+0.036 [+0.024, +0.046]** |
+| hierarchy − fine-only, class word, 0.55 | +0.036 | +0.010 [−0.005, +0.026] |
+| hierarchy − fine-only, token, VOC-sel. | −0.011 [−0.017, −0.005] | −0.007 [−0.014, −0.000] |
+| hierarchy − fine-only, token, 0.55 | +0.009 | **−0.019 [−0.031, −0.009]** |
+
+Same picture as Entry 8, now on the corrected data: the token helps on VOC-Sim (+0.032) and slightly hurts on COCO-Cap, and with the token the hierarchy no longer helps. With the class word and each map at its own VOC-selected threshold, the hierarchy's COCO-Cap gain is **+0.036 [+0.024, +0.046]**, the cleanest version of the #1 number (one threshold rule, corrected data). Under F's registered rule (judged at 0.55), "the hierarchy helps" does not hold for either query.
 
 ### 4.4 Paper
 
@@ -496,7 +508,7 @@ One-pass setting (#5), per image on A100: SD 1.5 0.21 s / 5.1 GiB, SD 2.1 0.19 s
 | 1 | text drafted | Reframe around clutter and calibration; disclose the override and its timing; drop "six times"; narrow to diffusion-only |
 | 2 | done | Contributions 1–2 well supported; 3–4 rely on the supplement; add the rule's choice next to ours |
 | 3 | done (OVAM, DAAM, SCLIP ⏳) | BRACE best among diffusion-only methods; NERVE (with CLIP) better on COCO-Cap |
-| 4 | done (corrected-prompt rerun ⏳) | No test leakage; the token helps VOC-Sim, and with it the hierarchy no longer helps on COCO-Cap |
+| 4 | done | No test leakage; the token helps VOC-Sim, and with it the hierarchy no longer helps on COCO-Cap |
 | 5 | done | Hierarchy holds on SD 1.5 and SD 2.1, fails on SDXL; GoCA wins on SDXL |
 | 6 | done | 22 fixes listed |
 | 7 | numbers ⏳ | New columns: COCO Δ, folds won, explicit references, visible .691 → .756 → .789 |

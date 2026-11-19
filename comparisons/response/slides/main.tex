@@ -204,6 +204,7 @@ Statistics & paired $\Delta$ = method $-$ BRACE, 95\% image bootstrap \\
 Paired, diffusion only & VOC-Sim & COCO-Cap & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
 \midrule
 \textbf{BRACE} & \textbf{0.831} & \textbf{0.708} & -- & -- \\
+fine-only (the rule's choice) & 0.824 & 0.673 & $-0.007$ & $-0.036$ \\
 OVAM, class word & [pending] & [pending] & [pending] & [pending] \\
 DAAM & [pending] & [pending] & [pending] & [pending] \\
 DiffSegmenter & 0.795 & 0.688 & $-0.036$ & $-0.020$ \\
@@ -213,10 +214,7 @@ GoCA, SDXL & 0.797 & 0.606 & $-0.034$ & $-0.102$ \\
 \bottomrule
 \end{tabular}
 \end{slidetable}
-\begin{itemize}
-\item Every interval excludes zero except DiffSegmenter on COCO-Cap ([$-0.041$, $+0.001$]).
-\end{itemize}
-\src{\texttt{comparisons/official/result.md}; DenseCRF, VOC-selected threshold}
+\src{\texttt{comparisons/official/result.md}, runs/25; DenseCRF, VOC-selected threshold; all intervals exclude zero except DiffSegmenter on COCO-Cap}
 \end{frame}
 
 \begin{frame}{Comment 3: NERVE, which adds CLIP, leads on COCO-Cap}
@@ -274,24 +272,24 @@ DatasetDM & .803 & .593 & trains a decoder \\
 \end{frame}
 
 \begin{frame}{Comment 4: with the token, the hierarchy no longer helps on COCO-Cap}
-\status{done; corrected-prompt rerun pending}
+\status{done}
 \begin{slidetable}
 \begin{tabular}{@{}lrr@{}}
 \toprule
-Fixed threshold 0.55, DenseCRF, paired & VOC-Sim & COCO-Cap \\
+DenseCRF, paired, 0.55 unless noted & VOC-Sim & COCO-Cap \\
 \midrule
-BRACE, class word & 0.830 & 0.696 \\
-BRACE, optimized token & \textbf{0.861} & 0.681 \\
-Hierarchy $-$ fine-only, token & +0.010 & $\mathbf{-0.017}$ \\
-Hierarchy $-$ fine-only, class word & +0.034 & +0.012 \\
-Layer weights, token (class word) & +0.003 (+0.004) & +0.004 (+0.024) \\
+BRACE, class word & 0.832 & 0.708 \\
+BRACE, optimized token & \textbf{0.864} & 0.693 \\
+Hierarchy $-$ fine-only, token & +0.009 & $\mathbf{-0.019}$ \\
+Hierarchy $-$ fine-only, class word & +0.036 & +0.010 \\
+Same, class word, each map's VOC-sel. threshold & +0.007 & \textbf{+0.036} \\
 \bottomrule
 \end{tabular}
 \end{slidetable}
 \begin{itemize}
 \item The token lifts the seed by 0.18: BRACE repairs a weak seed, a strong one leaves little to repair (a limitation).
 \end{itemize}
-\src{workplan Entry 8 (runs/15); corrected-prompt rerun [pending]}
+\src{F, runs/25 (corrected prompts; a64aff6); same picture as Entry 8 (runs/15)}
 \end{frame}
 
 % ---------------------------------------------------------------- #5
