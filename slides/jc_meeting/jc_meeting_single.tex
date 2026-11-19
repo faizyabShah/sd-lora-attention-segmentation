@@ -200,23 +200,24 @@ Not rerun & Attn2Mask & TBR & TBR & TBR & TBR \\
 {\footnotesize $\Delta$ = method $-$ BRACE, paired. DenseCRF; threshold chosen on VOC-Sim. Bold: interval excludes zero. $^\dagger$Other capture; vs BRACE 0.832 / 0.709 there. $^\ddagger$Published in the OVAM paper; not paired, no COCO-Cap value.}
 \end{frame}
 
-\begin{frame}{3. Published numbers (not paired, other images and post-processing)}
+\begin{frame}{3. Published numbers on the same benchmarks (OVAM, Table 1)}
 \begin{slidetable}
-\begin{tabular}{@{}lrrl@{}}
+\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrrl@{}}
 \toprule
-Published (OVAM, Table 1) & VOC-Sim & COCO-Cap & Note \\
+Method & VOC-Sim & COCO-Cap & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap & Note \\
 \midrule
-DAAM & 0.662 & 0.484 & OVAM's run \\
-Attn2Mask & 0.687 & 0.550 & OVAM's run \\
-OVAM, class word & 0.704 & 0.582 & \\
-OVAM, optimized token & 0.825 & --- & few-shot \\
-Grounded Diffusion & 0.621 & 0.502 & trains a module \\
-DatasetDM & 0.803 & 0.593 & trains a decoder \\
+\textbf{BRACE} & \textbf{0.831} & \textbf{0.708} & --- & --- & \\
+DatasetDM & 0.803 & 0.593 & $-0.028$ & $-0.115$ & trains a decoder \\
+Attn2Mask & 0.687 & 0.550 & $-0.144$ & $-0.158$ & \\
+DAAM & 0.662 & 0.484 & $-0.169$ & $-0.224$ & \\
+Grounded Diffusion & 0.621 & 0.502 & $-0.210$ & $-0.206$ & trains a module \\
+OVAM, class word & 0.704 & 0.582 & $-0.127$ & $-0.126$ & \\
+OVAM, optimized token & 0.825 & --- & $-0.006$ & --- & few-shot \\
 \bottomrule
 \end{tabular}
 \end{slidetable}
-Proposed Table 5 blocks: paired diffusion-only; paired with an extra model; few-shot; published.
-\src{OVAM (CVPR 2024), Table 1}
+{\footnotesize Numbers as printed in OVAM (CVPR 2024), Table 1. $\Delta$ = published $-$ BRACE; not paired, so no interval.}
 \end{frame}
 
 \begin{frame}{3. NERVE's lead needs its CLIP seed and its walk together}
