@@ -153,40 +153,52 @@ Thirteen results support no contribution: candidates to move to the supplement.
 
 % =====================================================================
 \section{Comment 3}
-\begin{frame}{3. Methods rerun from their own code, class word, same images}
+\begin{frame}{3. Diffusion-only methods, same images, class word}
 \begin{slidetable}
-\begin{tabular}{@{}llllr@{}}
+\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrr@{}}
 \toprule
-Method & Venue & Backbone & Code & Verdict \\
+Method & VOC-Sim & COCO-Cap & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
 \midrule
-GoCA & CVPR 2026 & SD 1.5, SD 2.1, SDXL & yes & go \\
-NERVE & WACV 2026 & SD 1.5 + CLIP ViT-L/14 & yes & go \\
-DiffSegmenter & TIP 2025 & SD 1.5 & yes & go \\
-SPARK & 2026 & --- & no & published block \\
+\textbf{BRACE} & \textbf{0.831} & \textbf{0.708} & --- & --- \\
+DiffSegmenter & 0.795 & 0.688 & \pos{-0.036} & $-0.020$ \\
+GoCA, SDXL & 0.797 & 0.606 & \pos{-0.034} & \pos{-0.102} \\
+GoCA, SD 1.5 & 0.753 & 0.599 & \pos{-0.078} & \pos{-0.110} \\
+GoCA, SD 2.1-base & 0.740 & 0.597 & \pos{-0.091} & \pos{-0.111} \\
+DAAM & 0.727 & 0.644$^*$ & \pos{-0.104} & \pos{-0.067} \\
+SeeDiff & 0.723 & 0.665$^*$ & \pos{-0.108} & \pos{-0.046} \\
+OVAM, class word & 0.703 & 0.568 & \pos{-0.128} & \pos{-0.140} \\
 \bottomrule
 \end{tabular}
 \end{slidetable}
+{\footnotesize $\Delta$ = method $-$ BRACE, paired. DenseCRF; threshold chosen on VOC-Sim. Bold: interval excludes zero. $^*$437 COCO-Cap images whose caption contains the class word (BRACE 0.711 on them).}
 \end{frame}
 
-\begin{frame}{3. BRACE is best without CLIP; NERVE leads on COCO-Cap}
+\begin{frame}{3. Few-shot and CLIP-based methods, same images}
 \begin{slidetable}
-\resizebox{\linewidth}{!}{%
+\renewcommand{\arraystretch}{0.92}
+\resizebox{0.97\linewidth}{!}{%
 \begin{tabular}{@{}llrrrr@{}}
 \toprule
 Block & Method & VOC-Sim & COCO-Cap & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
 \midrule
-Diffusion only & \textbf{BRACE} & \textbf{0.831} & \textbf{0.708} & --- & --- \\
- & DiffSegmenter & 0.795 & 0.688 & \pos{-0.036} & $-0.020$ \\
- & GoCA, SDXL & 0.797 & 0.606 & \pos{-0.034} & \pos{-0.102} \\
- & GoCA, SD 1.5 & 0.753 & 0.599 & \pos{-0.078} & \pos{-0.110} \\
+ & \textbf{BRACE} & \textbf{0.831} & \textbf{0.708} & --- & --- \\
+\midrule
+Few-shot & OVAM, optimized token & 0.828 & 0.664 & $-0.003$ & \pos{-0.044} \\
 \midrule
 With CLIP & NERVE, class word & 0.844 & 0.740 & $+0.012$ & \pos{+0.032} \\
  & NERVE, 20-class vocabulary & 0.839 & 0.747 & $+0.008$ & \pos{+0.039} \\
+ & SCLIP + DenseCRF & 0.764 & 0.652 & \pos{-0.067} & \pos{-0.057} \\
+ & SCLIP seed + BRACE$^\dagger$ & 0.852 & 0.734 & \pos{+0.020} & $+0.025$ \\
+\midrule
+Not rerun & Attn2Mask & TBR & TBR & TBR & TBR \\
+ & Grounded Diffusion & TBR & TBR & TBR & TBR \\
+ & DatasetDM & TBR & TBR & TBR & TBR \\
+ & SPARK & \multicolumn{4}{c}{no public code} \\
 \bottomrule
 \end{tabular}}
 \end{slidetable}
-$\Delta$ = method $-$ BRACE, paired. DenseCRF; threshold chosen on VOC-Sim. With its own released rule NERVE drops to 0.812 / 0.663.
-\src{\texttt{comparisons/official/result.md}}
+{\footnotesize $\Delta$ = method $-$ BRACE, paired. DenseCRF; threshold chosen on VOC-Sim. Bold: interval excludes zero. $^\dagger$Other capture; vs BRACE 0.832 / 0.709 there.}
 \end{frame}
 
 \begin{frame}{3. Published numbers (not paired, other images and post-processing)}
