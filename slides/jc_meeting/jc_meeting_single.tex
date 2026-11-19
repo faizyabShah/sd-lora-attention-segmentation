@@ -104,22 +104,23 @@ best (uses labels) & 0.807 & 0.813 & \pos{+0.005} & & 0.662 & 0.693 & \pos{+0.03
 {\footnotesize Raw maps, fine-only stage; same capture. Bold: 95\% paired interval excludes zero.}
 \end{frame}
 
-\begin{frame}{1. Most of the gain over OVAM is configuration}
+\begin{frame}{1. What changes in the paper's claims}
 \begin{slidetable}
 \resizebox{\linewidth}{!}{%
-\begin{tabular}{@{}L{0.30\linewidth}L{0.44\linewidth}L{0.20\linewidth}@{}}
+\begin{tabular}{@{}L{0.28\linewidth}L{0.44\linewidth}L{0.24\linewidth}@{}}
 \toprule
-Claim in the draft & Evidence now & Action \\
+The draft says & What we find & Change in the paper \\
 \midrule
-$+0.125$ / $+0.114$ over class-word OVAM & mostly configuration & table row, not headline \\
-Hierarchy $+0.034$ on COCO-Cap & $+0.018$ with each map at its best threshold & restate as calibration \\
-SA-guided layer weighting helps & $+0.024$ [$+0.013$, $+0.036$] COCO-Cap & keep \\
-One-sided cap helps & $+0.010$ VOC-Sim; $-0.005$ COCO-Cap & weaken \\
-DenseCRF gains 6$\times$ more on capped maps & two-threshold artefact & drop \\
-Best training-free method & a CLIP-seeded method is stronger on COCO-Cap & narrow to diffusion-only \\
+$+0.125$ / $+0.114$ over OVAM & configuration $+0.113$ / $+0.083$; our two new parts $+0.012$ / $+0.051$ & credit only the new parts \\
+Hierarchy adds $+0.034$ on COCO-Cap & $+0.023$ (raw); $+0.017$ with each map at its best threshold & report the smaller number \\
+SA-guided weights help & $+0.004$ / $+0.027$ & keep \\
+The cap helps & about $+0.01$ on VOC-Sim; nothing on COCO-Cap & do not claim it for clutter \\
+DenseCRF helps capped maps 6$\times$ more & comes from comparing at two thresholds & drop \\
+Best training-free method & NERVE (adds CLIP) is $+0.032$ better on COCO-Cap & ``best diffusion-only method'' \\
 \bottomrule
 \end{tabular}}
 \end{slidetable}
+{\footnotesize VOC-Sim / COCO-Cap; threshold chosen on VOC-Sim. Raw maps except the OVAM and NERVE rows, which include DenseCRF. Cap: older capture.}
 \end{frame}
 
 \begin{frame}{1. The override saw COCO-Cap: we disclose it}
