@@ -1,3 +1,90 @@
 % Comment 1: contribution and claim (reframing)
 % Owner: N. Only this side edits this file.
 % Add frames below; one message per frame. See docs/JC_REVIEW_WORKPLAN.md, Section 6.
+
+\begin{frame}{Comment 1: the claim moves from ``+12.5 over OVAM'' to cluttered scenes}
+\status{done, unreviewed}
+\begin{itemize}
+\item \textbf{Comment:} frame the paper around why the structure matters in cluttered scenes, not around the gain over OVAM; be careful with the owner override.
+\item \textbf{Found:} most of the gain over class-word OVAM is configuration; the two new components add about $+0.006$ each on VOC-Sim.
+\item \textbf{Found:} the $+0.034$ COCO-Cap gain of the hierarchy is cross-image calibration plus threshold transfer, not better ranking within an image (trace: comment 7 slides).
+\item \textbf{Found:} the decision to adopt the hierarchy was taken after the COCO-Cap result was seen.
+\end{itemize}
+\src{\texttt{comparisons/notes/entry\_1\_8\_reframing\_and\_structure.md}; workplan Entries 8--10}
+\end{frame}
+
+\begin{frame}{Comment 1: the claims we keep, restated}
+\status{done, unreviewed}
+\begin{slidetable}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.30\linewidth}>{\raggedright\arraybackslash}p{0.44\linewidth}>{\raggedright\arraybackslash}p{0.18\linewidth}@{}}
+\toprule
+Claim in the draft & Evidence now & Action \\
+\midrule
+$+0.125$ / $+0.114$ over class-word OVAM & mostly configuration & a table row, not the headline \\
+Hierarchy $+0.034$ on COCO-Cap & $+0.018$ with each map at its best threshold; per-image oracle a tie (0.896 vs 0.895) & \textbf{restate as calibration} \\
+SA-guided layer weighting helps & $+0.024$ [$+0.013$, $+0.036$] on COCO-Cap, threshold 0.55 & keep \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\src{workplan Entries 8 (component ladder) and 9 (trace of $+0.034$); N audit, \texttt{comparisons/notes/audit\_F\_entries\_8\_10.md}}
+\end{frame}
+
+\begin{frame}{Comment 1: the claims we weaken or drop}
+\status{done, unreviewed}
+\begin{slidetable}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.30\linewidth}>{\raggedright\arraybackslash}p{0.44\linewidth}>{\raggedright\arraybackslash}p{0.18\linewidth}@{}}
+\toprule
+Claim in the draft & Evidence now & Action \\
+\midrule
+One-sided cap beats no cap & $+0.010$ VOC-Sim; $-0.005$ [$-0.011$, $-0.001$] COCO-Cap, threshold 0.55 & weaken \\
+DenseCRF gains six times more on capped maps & two-threshold artefact; about $+0.014$ for both maps at matched thresholds & \textbf{drop} \\
+Best training-free method & a CLIP-seeded method is stronger on COCO-Cap & narrow to diffusion-only \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\src{workplan Entries 8 and 10 (seed and walk swap); N audit, \texttt{comparisons/notes/audit\_F\_entries\_8\_10.md}}
+\end{frame}
+
+\begin{frame}{Comment 1: the override saw COCO-Cap, so we disclose it}
+\status{done, unreviewed}
+\begin{itemize}
+\item The registered rule kept the fine-only pipeline: the hierarchy won every VOC-Sim fold ($+0.006$, CI [$+0.001$, $+0.012$]) but failed the worst-class guard ($-0.050$).
+\item The owner override (protocol log, 31 October 2026) cites the COCO-Cap $+0.034$, so COCO-Cap is not untouched for this one decision.
+\item Every other setting was selected on VOC-Sim folds only.
+\item Proposed text: report both pipelines on both benchmarks; use the COCO-Cap gain for the calibration analysis, not as held-out confirmation.
+\item \textbf{Option:} a third cluttered benchmark, scored once with both pipelines frozen.
+\end{itemize}
+\src{protocol log Section 135; \texttt{comparisons/notes/entry\_1\_8\_reframing\_and\_structure.md}, Sec.~4}
+\end{frame}
+
+\begin{frame}{Comment 1: proposed headline and contributions}
+\status{planned}
+\begin{enumerate}
+\item A diffusion-only, training-free pipeline: SA-guided CA layer weighting, coarse-to-fine SA propagation, one-sided cap.
+\item The scale structure matters in clutter, not on single objects: about $+0.006$ per component on VOC-Sim, $+0.034$ on COCO-Cap, explained as cross-image calibration.
+\item An oracle threshold analysis that explains the gain and the main failure (objects that fill the frame).
+\item A fold-safe protocol that reports the registered rule, the override and its timing, and every negative result; paired reruns of published methods.
+\end{enumerate}
+\begin{itemize}
+\item Methods that add a second vision-language model (NERVE, SCLIP seed) go in a separate block.
+\end{itemize}
+\src{draft abstract and contribution list in \texttt{comparisons/notes/entry\_1\_8\_reframing\_and\_structure.md}, Secs.~2--3}
+\end{frame}
+
+\begin{frame}{Comment 1: possible actions}
+\status{planned}
+\begin{slidetable}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.30\linewidth}>{\raggedright\arraybackslash}p{0.42\linewidth}>{\raggedright\arraybackslash}p{0.20\linewidth}@{}}
+\toprule
+Option & What changes & Cost \\
+\midrule
+\textbf{A. Best diffusion-only method, with a CLIP block} (recommended) & abstract, contributions, Table 5 split into blocks & text only \\
+B. Analysis paper, no ranking claim & headline is the calibration finding; comparison is context & text only \\
+C. Add a third untouched cluttered benchmark & clean held-out check of the override & new data and one scoring run \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item To decide with JC: is A acceptable as the headline, and is C worth its cost before 8 March?
+\end{itemize}
+\end{frame}

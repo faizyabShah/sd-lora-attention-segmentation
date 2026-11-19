@@ -39,6 +39,11 @@ def main():
     p.add_argument("--config", type=Path, default=gc.GOCA / "configs/config-model/config_model_15.py")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--shard", default="0/1")
+    p.add_argument("--model-path", default=None,
+                   help="load the diffusion weights from this HF repo id or local dir instead of the id hard-coded "
+                        "in generic-diffusion-feature (models.py); passed as FeatureExtractor(offline_lora=...) "
+                        "without a filename, which models.py uses as model_id and which loads no LoRA. "
+                        "Used for SD 2.1-base: the official repo was removed (PREREG_backbones.md)")
     args = p.parse_args()
 
     rows = []
@@ -70,7 +75,8 @@ def main():
         if "dense_feat_id" in task:
             layer.add(task["dense_feat_id"])
     t_load = time.time()
-    fe = gc.FeatureExtractor(layer={l: True for l in layer}, version=cfg.version, device="cuda", img_size=cfg.img_size)
+    fe = gc.FeatureExtractor(layer={l: True for l in layer}, version=cfg.version, device="cuda", img_size=cfg.img_size,
+                             offline_lora=args.model_path)
     load_s = time.time() - t_load
     sch = copy.deepcopy(fe.scheduler_backup)
     sch.set_timesteps(1000, device="cuda")
@@ -103,12 +109,30 @@ def main():
             "t_config": cfg.t, "t_actual_scheduler": actual_t, "scheduler": type(fe.pipe.scheduler).__name__,
             "dtype": str(fe.pipe.unet.dtype), "noise_seed": args.seed, "model_load_seconds": round(load_s, 1),
             "gpu": torch.cuda.get_device_name(0), "node": os.uname().nodename, "torch": torch.__version__,
-            "slurm_job": os.environ.get("SLURM_JOB_ID"), "shard": args.shard}
+            "slurm_job": os.environ.get("SLURM_JOB_ID"), "shard": args.shard,
+            "model_path": args.model_path or "generic-diffusion-feature default"}
     (args.out / f"meta_shard{si}of{sn}_job{meta['slurm_job']}.json").write_text(json.dumps(meta, indent=1))
     print(json.dumps(meta), flush=True)
 
-    with torch.no_grad():  # warm-up (not timed, not saved), as in the smoke
+    # warm-up (not timed, not saved), as in the smoke; it also checks that the extractor returns every
+    # requested layer: GoCA silently falls back to plain head averaging when a special-* key is missing.
+    seen = {}
+    extract = fe.extract
+
+    def extract_check(*a, **k):
+        out = extract(*a, **k)
+        seen.setdefault("keys", set(out))
+        return out
+    fe.extract = extract_check
+    with torch.no_grad():
         run_one(Image.open(todo[0]["image"]), todo[0]["classname"])
+    fe.extract = extract
+    missing = sorted(set(layer) - seen["keys"])
+    counts = {"cross-map": sum("cross-map" in l for l in layer), "special": sum("special" in l for l in layer),
+              "self-map": sum("self-map" in l for l in layer), "requested": len(layer), "returned": len(seen["keys"])}
+    print(json.dumps({"layer_check": counts, "missing": missing}), flush=True)
+    if missing:
+        raise SystemExit(f"extractor did not return {len(missing)} requested layers, e.g. {missing[:5]}")
     torch.cuda.synchronize()
 
     for n, r in enumerate(todo):

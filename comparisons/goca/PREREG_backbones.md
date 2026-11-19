@@ -94,4 +94,61 @@ If it is unblocked, the plan, fixed here, is:
 
 ## Amendments (dated, appended only)
 
-(none)
+### 2026-11-19: SD 2.1-base unblocked with a community mirror (Narmeen's approval)
+
+- **Weights.** `sd2-community/stable-diffusion-2-1-base`, revision `4e63672c03103b6c636b8fb4119ba982469b2955`,
+  diffusers format, fp32 safetensors only (no `.ckpt`, `.bin` or fp16 copies downloaded).
+  The 768 px v-prediction model `sd2-community/stable-diffusion-2-1` was not used: the plan and the 512 px
+  benchmark images need the 512 px epsilon-prediction base model.
+  Local sha256 after download, equal to the mirror's LFS ids:
+
+  | File | sha256 |
+  |---|---|
+  | `unet/diffusion_pytorch_model.safetensors` | `6dfae3e5f7d459b50f4b0850ead945972c75bb0e1897628933e169eb43974214` |
+  | `text_encoder/model.safetensors` | `cce6febb0b6d876ee5eb24af35e27e764eb4f9b1d0b7c026c8c3333d4cfc916c` |
+  | `vae/diffusion_pytorch_model.safetensors` | `a1d993488569e928462932c8c38a0760b874d166399b14414135bd9c42df5815` |
+
+  **Provenance check.** The same three hashes are listed for `kaseris/stable-diffusion-2-1-base`, an independent
+  copy whose history says "Cloned from stabilityai/stable-diffusion-2-1-base". The mirror's
+  `v2-1_512-ema-pruned.ckpt` has sha256 `88ecb782…0f36`, the id in the LFS pointer of Stability's original
+  upload commit. The scheduler config is PNDM, `prediction_type: epsilon`; the UNet `sample_size` is 64.
+  Side F should use the same revision for its #5 runs, so that every SD 2.1 row shares one set of weights.
+- **Config.** `n_side/configs/config_model_21.py` (copy in `comparisons/goca/configs/`): `config_model_15.py`
+  with only `name='21'` and `version='2-1'` changed, as planned.
+- **Loading (deviation from "the only per-backbone input is `--config`").** generic-diffusion-feature hard-codes
+  `stabilityai/stable-diffusion-2-1-base`, which no longer exists. `goca_full.py` gained
+  `--model-path`, passed as `FeatureExtractor(offline_lora=<path>)` without a filename. `models.py` then uses
+  it as `model_id` and loads no LoRA, so no vendored code changed. The SD 2.1 run passes the local snapshot dir;
+  SD 1.5 and SDXL runs pass nothing and behave as before. The scheduler is the one models.py builds for '2-1'
+  (EulerDiscreteScheduler from the snapshot's config); the timestep used is 99 (SD 1.5, PNDM: 101).
+- **Pad-token fix, as planned.** `sd15_tokenization` maps every position with `attention_mask == 0` to `<pad>`.
+  Checked on all 22 class names of both benchmarks: SD 1.5 tokens and prompt bookkeeping are identical
+  to the old code; SD 2.1 has no `!` left and the same object, rescaling and background token ids as SD 1.5.
+- **Layer check, as planned.** `goca_full.py` now checks, during the warm-up, that the extractor returns every
+  requested key: 16 cross-map, 48 `special-*` (value, post-value, weight for each cross layer),
+  16 self-map, 81 in total. All 81 were returned for SD 2.1 (and for SD 1.5 in the regression).
+- **Regression of the edited adapter on SD 1.5** (7 items, same node): tokens and rescaling ids identical,
+  IoU within 0.002 of the stored SD 1.5 run (fp16 non-determinism).
+- **Run.** Job 253878, V100 16 GB (erdos), 5 min 38 s for 1197 items, 0 failures, 0 NaN or constant maps.
+
+  | Backbone (fixed 0.5, no DenseCRF; sanity) | VOC-Sim | COCO-Cap | s / image | peak alloc. | GPU |
+  |---|---|---|---|---|---|
+  | SD 1.5 | 0.671 | 0.452 | 0.14 | 4.4 GB | A100 |
+  | SD 2.1-base | 0.710 | 0.546 | 0.20 | 3.8 GB | V100 |
+  | SDXL | 0.788 | 0.607 | 0.66 | 13.3 GB | A100 |
+
+  SD 2.1 timings are on a V100, the others on an A100, so they are not directly comparable.
+- **Official scoring** (`comparisons/official/`, `goca_sd21` added to `score_n.py` and `report.py`; the rows of the
+  other methods are unchanged in the regenerated `result.md`). VOC-Sim / COCO-Cap:
+
+  | GoCA SD 2.1-base | raw | DenseCRF R2 |
+  |---|---|---|
+  | VOC-sel. threshold (0.575 raw, 0.550 CRF; same in all 5 OOF folds) | 0.719 / 0.586 | 0.740 / 0.597 |
+  | fixed 0.5 | 0.710 / 0.546 | 0.733 / 0.565 |
+  | GoCA's own rule, VOC-sel. offset (+0.1) | 0.720 / 0.576 | 0.740 / 0.597 |
+  | Paired Δ vs BRACE, both VOC-sel. | −0.098 [−0.117, −0.080] / −0.107 [−0.129, −0.084] | −0.091 [−0.110, −0.072] / −0.111 [−0.134, −0.086] |
+
+  SD 2.1-base beats SD 1.5 only at the fixed 0.5 threshold (0.710 / 0.546 vs 0.671 / 0.452, raw). With the
+  VOC-selected threshold SD 1.5 is as good or better (raw 0.738 / 0.610, DenseCRF 0.753 / 0.599; paired Δ vs BRACE
+  −0.079 / −0.082 raw), because SD 1.5's best threshold is far from 0.5. SDXL is the best GoCA backbone under every
+  rule. All three GoCA backbones are below BRACE, with intervals that exclude zero.

@@ -1,0 +1,2149 @@
+{
+ "label": "official N-side comparison rows (workplan Section 3); see result.md for rule labels",
+ "threshold_grid": [
+  0.05,
+  0.1,
+  0.15,
+  0.2,
+  0.25,
+  0.3,
+  0.325,
+  0.35,
+  0.375,
+  0.4,
+  0.425,
+  0.45,
+  0.475,
+  0.5,
+  0.525,
+  0.55,
+  0.575,
+  0.6,
+  0.625,
+  0.65,
+  0.675,
+  0.7,
+  0.75,
+  0.8,
+  0.85,
+  0.9,
+  0.95
+ ],
+ "bootstrap": 2000,
+ "rows": [
+  {
+   "method": "brace",
+   "densecrf": false,
+   "rule": "VOC-sel.",
+   "voc_sim": 0.8175546529770392,
+   "coco_cap": 0.6924865650255894,
+   "note": "\u03c4 full-VOC 0.550; OOF folds 0.550/0.550/0.550/0.550/0.575"
+  },
+  {
+   "method": "brace",
+   "densecrf": false,
+   "rule": "fixed 0.5",
+   "voc_sim": 0.8121144212965558,
+   "coco_cap": 0.6643288824610983,
+   "note": "fixed-threshold"
+  },
+  {
+   "method": "brace",
+   "densecrf": false,
+   "rule": "fixed 0.55 (frozen)",
+   "voc_sim": 0.8190505379065861,
+   "coco_cap": 0.6924865650255894,
+   "note": "fixed-threshold; BRACE's frozen rule"
+  },
+  {
+   "method": "brace",
+   "densecrf": false,
+   "rule": "best on set (audit)",
+   "voc_sim": 0.8190505379065861,
+   "coco_cap": 0.7089055459560565,
+   "note": "in-sample audit: \u03c4 VOC-Sim 0.550, COCO-Cap 0.625"
+  },
+  {
+   "method": "brace",
+   "densecrf": true,
+   "rule": "VOC-sel.",
+   "voc_sim": 0.8312656916201732,
+   "coco_cap": 0.7081473167531958,
+   "note": "\u03c4 full-VOC 0.550; OOF folds 0.550/0.525/0.550/0.550/0.550"
+  },
+  {
+   "method": "brace",
+   "densecrf": true,
+   "rule": "fixed 0.5",
+   "voc_sim": 0.8292759809909022,
+   "coco_cap": 0.681736320183897,
+   "note": "fixed-threshold"
+  },
+  {
+   "method": "brace",
+   "densecrf": true,
+   "rule": "fixed 0.55 (frozen)",
+   "voc_sim": 0.8323917248943177,
+   "coco_cap": 0.7081473167531958,
+   "note": "fixed-threshold; BRACE's frozen rule"
+  },
+  {
+   "method": "brace",
+   "densecrf": true,
+   "rule": "best on set (audit)",
+   "voc_sim": 0.8323917248943177,
+   "coco_cap": 0.718540923521218,
+   "note": "in-sample audit: \u03c4 VOC-Sim 0.550, COCO-Cap 0.600"
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": false,
+   "rule": "VOC-sel.",
+   "voc_sim": 0.7381557251364661,
+   "coco_cap": 0.6102305963097863,
+   "note": "\u03c4 full-VOC 0.750; OOF folds 0.700/0.750/0.750/0.750/0.750"
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": false,
+   "rule": "fixed 0.5",
+   "voc_sim": 0.671424232738379,
+   "coco_cap": 0.45244402762963754,
+   "note": "fixed-threshold"
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": false,
+   "rule": "best on set (audit)",
+   "voc_sim": 0.7398869044149653,
+   "coco_cap": 0.6141505168313298,
+   "note": "in-sample audit: \u03c4 VOC-Sim 0.750, COCO-Cap 0.800"
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": false,
+   "rule": "own rule (offset 0)",
+   "voc_sim": 0.6714382536462107,
+   "coco_cap": 0.45246421351359417,
+   "note": "GoCA argmax(class, background + offset), offset 0, no tuning"
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": false,
+   "rule": "own rule, VOC-sel. offset",
+   "voc_sim": 0.7391901252016615,
+   "coco_cap": 0.5861783215474053,
+   "note": "offset full-VOC +0.4; OOF folds +0.4/+0.4/+0.4/+0.4/+0.4"
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": false,
+   "rule": "own rule, best offset on set (audit)",
+   "voc_sim": 0.7391901252016615,
+   "coco_cap": 0.5861783215474053,
+   "note": "in-sample audit (GoCA's eval sweeps offsets \u22120.4\u2026+0.4 on the evaluated set): offset VOC-Sim +0.4, COCO-Cap +0.4"
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": true,
+   "rule": "VOC-sel.",
+   "voc_sim": 0.7529765831416575,
+   "coco_cap": 0.5985212080719867,
+   "note": "\u03c4 full-VOC 0.700; OOF folds 0.700/0.700/0.700/0.700/0.700"
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": true,
+   "rule": "fixed 0.5",
+   "voc_sim": 0.6937210348869195,
+   "coco_cap": 0.463853880778894,
+   "note": "fixed-threshold"
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": true,
+   "rule": "best on set (audit)",
+   "voc_sim": 0.7529765831416577,
+   "coco_cap": 0.6214403238104663,
+   "note": "in-sample audit: \u03c4 VOC-Sim 0.700, COCO-Cap 0.800"
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": true,
+   "rule": "own rule (offset 0)",
+   "voc_sim": 0.6937190125381845,
+   "coco_cap": 0.46385952673539677,
+   "note": "GoCA argmax(class, background + offset), offset 0, no tuning"
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": true,
+   "rule": "own rule, VOC-sel. offset",
+   "voc_sim": 0.7528768676855735,
+   "coco_cap": 0.5986064591196637,
+   "note": "offset full-VOC +0.4; OOF folds +0.4/+0.4/+0.4/+0.4/+0.4"
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": true,
+   "rule": "own rule, best offset on set (audit)",
+   "voc_sim": 0.7528768676855735,
+   "coco_cap": 0.5986064591196636,
+   "note": "in-sample audit (GoCA's eval sweeps offsets \u22120.4\u2026+0.4 on the evaluated set): offset VOC-Sim +0.4, COCO-Cap +0.4"
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": false,
+   "rule": "VOC-sel.",
+   "voc_sim": 0.786760042542331,
+   "coco_cap": 0.6021475978960785,
+   "note": "\u03c4 full-VOC 0.475; OOF folds 0.475/0.450/0.475/0.475/0.475"
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": false,
+   "rule": "fixed 0.5",
+   "voc_sim": 0.7875603814687484,
+   "coco_cap": 0.6071367261305058,
+   "note": "fixed-threshold"
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": false,
+   "rule": "best on set (audit)",
+   "voc_sim": 0.7886982774755956,
+   "coco_cap": 0.6089617499021599,
+   "note": "in-sample audit: \u03c4 VOC-Sim 0.475, COCO-Cap 0.525"
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": false,
+   "rule": "own rule (offset 0)",
+   "voc_sim": 0.787476303855245,
+   "coco_cap": 0.6074261601528661,
+   "note": "GoCA argmax(class, background + offset), offset 0, no tuning"
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": false,
+   "rule": "own rule, VOC-sel. offset",
+   "voc_sim": 0.7845589855920331,
+   "coco_cap": 0.595745138258504,
+   "note": "offset full-VOC -0.1; OOF folds -0.1/-0.1/+0.0/+0.0/-0.1"
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": false,
+   "rule": "own rule, best offset on set (audit)",
+   "voc_sim": 0.7880416156343962,
+   "coco_cap": 0.607426160152866,
+   "note": "in-sample audit (GoCA's eval sweeps offsets \u22120.4\u2026+0.4 on the evaluated set): offset VOC-Sim -0.1, COCO-Cap +0.0"
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": true,
+   "rule": "VOC-sel.",
+   "voc_sim": 0.7971051000905546,
+   "coco_cap": 0.6061731420399058,
+   "note": "\u03c4 full-VOC 0.450; OOF folds 0.450/0.450/0.450/0.475/0.450"
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": true,
+   "rule": "fixed 0.5",
+   "voc_sim": 0.7941369716482506,
+   "coco_cap": 0.6144468914194853,
+   "note": "fixed-threshold"
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": true,
+   "rule": "best on set (audit)",
+   "voc_sim": 0.7985468051067095,
+   "coco_cap": 0.6144468914194856,
+   "note": "in-sample audit: \u03c4 VOC-Sim 0.450, COCO-Cap 0.500"
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": true,
+   "rule": "own rule (offset 0)",
+   "voc_sim": 0.7939112320462339,
+   "coco_cap": 0.6146544937218016,
+   "note": "GoCA argmax(class, background + offset), offset 0, no tuning"
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": true,
+   "rule": "own rule, VOC-sel. offset",
+   "voc_sim": 0.7986866622321527,
+   "coco_cap": 0.6063845463780748,
+   "note": "offset full-VOC -0.1; OOF folds -0.1/-0.1/-0.1/-0.1/-0.1"
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": true,
+   "rule": "own rule, best offset on set (audit)",
+   "voc_sim": 0.7986866622321528,
+   "coco_cap": 0.6146544937218016,
+   "note": "in-sample audit (GoCA's eval sweeps offsets \u22120.4\u2026+0.4 on the evaluated set): offset VOC-Sim -0.1, COCO-Cap +0.0"
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": false,
+   "rule": "VOC-sel.",
+   "voc_sim": 0.7193481071427505,
+   "coco_cap": 0.585798506785659,
+   "note": "\u03c4 full-VOC 0.575; OOF folds 0.575/0.575/0.575/0.550/0.575"
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": false,
+   "rule": "fixed 0.5",
+   "voc_sim": 0.7100833782238313,
+   "coco_cap": 0.5459432246458387,
+   "note": "fixed-threshold"
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": false,
+   "rule": "best on set (audit)",
+   "voc_sim": 0.7200580112909573,
+   "coco_cap": 0.5946770816573052,
+   "note": "in-sample audit: \u03c4 VOC-Sim 0.575, COCO-Cap 0.625"
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": false,
+   "rule": "own rule (offset 0)",
+   "voc_sim": 0.7099275286944035,
+   "coco_cap": 0.5459225530077937,
+   "note": "GoCA argmax(class, background + offset), offset 0, no tuning"
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": false,
+   "rule": "own rule, VOC-sel. offset",
+   "voc_sim": 0.7195088628902783,
+   "coco_cap": 0.5756228680096155,
+   "note": "offset full-VOC +0.1; OOF folds +0.1/+0.1/+0.1/+0.1/+0.1"
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": false,
+   "rule": "own rule, best offset on set (audit)",
+   "voc_sim": 0.7195088628902783,
+   "coco_cap": 0.5939619593088649,
+   "note": "in-sample audit (GoCA's eval sweeps offsets \u22120.4\u2026+0.4 on the evaluated set): offset VOC-Sim +0.1, COCO-Cap +0.3"
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": true,
+   "rule": "VOC-sel.",
+   "voc_sim": 0.740274085650651,
+   "coco_cap": 0.5974351001681931,
+   "note": "\u03c4 full-VOC 0.550; OOF folds 0.550/0.550/0.550/0.550/0.550"
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": true,
+   "rule": "fixed 0.5",
+   "voc_sim": 0.7333929760629394,
+   "coco_cap": 0.5653107546695402,
+   "note": "fixed-threshold"
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": true,
+   "rule": "best on set (audit)",
+   "voc_sim": 0.740274085650651,
+   "coco_cap": 0.6123586254814855,
+   "note": "in-sample audit: \u03c4 VOC-Sim 0.550, COCO-Cap 0.625"
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": true,
+   "rule": "own rule (offset 0)",
+   "voc_sim": 0.7331874213345675,
+   "coco_cap": 0.5652010506103071,
+   "note": "GoCA argmax(class, background + offset), offset 0, no tuning"
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": true,
+   "rule": "own rule, VOC-sel. offset",
+   "voc_sim": 0.7401255861746413,
+   "coco_cap": 0.5973161876609775,
+   "note": "offset full-VOC +0.1; OOF folds +0.1/+0.1/+0.1/+0.1/+0.1"
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": true,
+   "rule": "own rule, best offset on set (audit)",
+   "voc_sim": 0.7401255861746413,
+   "coco_cap": 0.6106521884762073,
+   "note": "in-sample audit (GoCA's eval sweeps offsets \u22120.4\u2026+0.4 on the evaluated set): offset VOC-Sim +0.1, COCO-Cap +0.2"
+  },
+  {
+   "method": "diffseg",
+   "densecrf": false,
+   "rule": "VOC-sel.",
+   "voc_sim": 0.772495367718425,
+   "coco_cap": 0.6676689154246909,
+   "note": "\u03c4 full-VOC 0.375; OOF folds 0.375/0.375/0.375/0.350/0.350"
+  },
+  {
+   "method": "diffseg",
+   "densecrf": false,
+   "rule": "fixed 0.5",
+   "voc_sim": 0.7126954296152788,
+   "coco_cap": 0.6529323270437547,
+   "note": "fixed-threshold"
+  },
+  {
+   "method": "diffseg",
+   "densecrf": false,
+   "rule": "best on set (audit)",
+   "voc_sim": 0.7718774485563593,
+   "coco_cap": 0.674007093864066,
+   "note": "in-sample audit: \u03c4 VOC-Sim 0.375, COCO-Cap 0.425"
+  },
+  {
+   "method": "diffseg",
+   "densecrf": false,
+   "rule": "own rule (in-sample bg sweep)",
+   "voc_sim": 0.7718774485563593,
+   "coco_cap": 0.674007093864066,
+   "note": "DiffSegmenter's evaluation script: background score swept 0.30\u20130.74 on the evaluated set (here step 0.025); in-sample, uses labels"
+  },
+  {
+   "method": "diffseg",
+   "densecrf": true,
+   "rule": "VOC-sel.",
+   "voc_sim": 0.795094384730489,
+   "coco_cap": 0.6882911528715084,
+   "note": "\u03c4 full-VOC 0.350; OOF folds 0.350/0.350/0.350/0.350/0.350"
+  },
+  {
+   "method": "diffseg",
+   "densecrf": true,
+   "rule": "fixed 0.5",
+   "voc_sim": 0.7211657902600456,
+   "coco_cap": 0.6646422477318731,
+   "note": "fixed-threshold"
+  },
+  {
+   "method": "diffseg",
+   "densecrf": true,
+   "rule": "best on set (audit)",
+   "voc_sim": 0.7950943847304888,
+   "coco_cap": 0.6968553967274177,
+   "note": "in-sample audit: \u03c4 VOC-Sim 0.350, COCO-Cap 0.400"
+  },
+  {
+   "method": "diffseg",
+   "densecrf": true,
+   "rule": "own rule (in-sample bg sweep)",
+   "voc_sim": 0.7950943847304888,
+   "coco_cap": 0.6968553967274177,
+   "note": "DiffSegmenter's evaluation script: background score swept 0.30\u20130.74 on the evaluated set (here step 0.025); in-sample, uses labels"
+  },
+  {
+   "method": "nerve_A",
+   "densecrf": false,
+   "rule": "VOC-sel.",
+   "voc_sim": 0.8318527759967982,
+   "coco_cap": 0.7438065454743071,
+   "note": "\u03c4 full-VOC 0.550; OOF folds 0.550/0.550/0.550/0.525/0.525"
+  },
+  {
+   "method": "nerve_A",
+   "densecrf": false,
+   "rule": "fixed 0.5",
+   "voc_sim": 0.8301958751112528,
+   "coco_cap": 0.7294612651095628,
+   "note": "fixed-threshold"
+  },
+  {
+   "method": "nerve_A",
+   "densecrf": false,
+   "rule": "best on set (audit)",
+   "voc_sim": 0.83208128772538,
+   "coco_cap": 0.747118534518338,
+   "note": "in-sample audit: \u03c4 VOC-Sim 0.550, COCO-Cap 0.575"
+  },
+  {
+   "method": "nerve_A",
+   "densecrf": false,
+   "rule": "own rule",
+   "voc_sim": 0.7897491962444925,
+   "coco_cap": 0.6450261673308683,
+   "note": "NERVE cam_to_label (bkg_thre 0, cls_thre 0.5) with its image-score gate; fixed"
+  },
+  {
+   "method": "nerve_A",
+   "densecrf": true,
+   "rule": "VOC-sel.",
+   "voc_sim": 0.8437596061827799,
+   "coco_cap": 0.7403621402406931,
+   "note": "\u03c4 full-VOC 0.500; OOF folds 0.500/0.500/0.500/0.500/0.500"
+  },
+  {
+   "method": "nerve_A",
+   "densecrf": true,
+   "rule": "fixed 0.5",
+   "voc_sim": 0.8437596061827799,
+   "coco_cap": 0.7403621402406931,
+   "note": "fixed-threshold"
+  },
+  {
+   "method": "nerve_A",
+   "densecrf": true,
+   "rule": "best on set (audit)",
+   "voc_sim": 0.8437596061827799,
+   "coco_cap": 0.7521352933628318,
+   "note": "in-sample audit: \u03c4 VOC-Sim 0.500, COCO-Cap 0.575"
+  },
+  {
+   "method": "nerve_A",
+   "densecrf": true,
+   "rule": "own rule",
+   "voc_sim": 0.8115046649909464,
+   "coco_cap": 0.6634812885470098,
+   "note": "NERVE cam_to_label (bkg_thre 0, cls_thre 0.5) with its image-score gate; fixed"
+  },
+  {
+   "method": "nerve_V",
+   "densecrf": false,
+   "rule": "VOC-sel.",
+   "voc_sim": 0.8231999492187079,
+   "coco_cap": 0.740517186812325,
+   "note": "\u03c4 full-VOC 0.475; OOF folds 0.500/0.500/0.500/0.475/0.450"
+  },
+  {
+   "method": "nerve_V",
+   "densecrf": false,
+   "rule": "fixed 0.5",
+   "voc_sim": 0.8235877446650264,
+   "coco_cap": 0.7430503749810919,
+   "note": "fixed-threshold"
+  },
+  {
+   "method": "nerve_V",
+   "densecrf": false,
+   "rule": "best on set (audit)",
+   "voc_sim": 0.8236034452065508,
+   "coco_cap": 0.7435993722559804,
+   "note": "in-sample audit: \u03c4 VOC-Sim 0.475, COCO-Cap 0.525"
+  },
+  {
+   "method": "nerve_V",
+   "densecrf": false,
+   "rule": "own rule",
+   "voc_sim": 0.7993455916989325,
+   "coco_cap": 0.6865241503404939,
+   "note": "NERVE cam_to_label (bkg_thre 0, cls_thre 0.5) with its image-score gate; fixed"
+  },
+  {
+   "method": "nerve_V",
+   "densecrf": true,
+   "rule": "VOC-sel.",
+   "voc_sim": 0.8394029723743278,
+   "coco_cap": 0.7470809463288538,
+   "note": "\u03c4 full-VOC 0.425; OOF folds 0.425/0.450/0.425/0.425/0.425"
+  },
+  {
+   "method": "nerve_V",
+   "densecrf": true,
+   "rule": "fixed 0.5",
+   "voc_sim": 0.8340058334534082,
+   "coco_cap": 0.751050281460323,
+   "note": "fixed-threshold"
+  },
+  {
+   "method": "nerve_V",
+   "densecrf": true,
+   "rule": "best on set (audit)",
+   "voc_sim": 0.8397270793271305,
+   "coco_cap": 0.751050281460323,
+   "note": "in-sample audit: \u03c4 VOC-Sim 0.425, COCO-Cap 0.500"
+  },
+  {
+   "method": "nerve_V",
+   "densecrf": true,
+   "rule": "own rule",
+   "voc_sim": 0.8210260476682766,
+   "coco_cap": 0.7050485283227398,
+   "note": "NERVE cam_to_label (bkg_thre 0, cls_thre 0.5) with its image-score gate; fixed"
+  },
+  {
+   "method": "nerve_W",
+   "densecrf": false,
+   "rule": "VOC-sel.",
+   "voc_sim": 0.8145773930594963,
+   "coco_cap": 0.7209641150864542,
+   "note": "\u03c4 full-VOC 0.425; OOF folds 0.425/0.450/0.425/0.450/0.425"
+  },
+  {
+   "method": "nerve_W",
+   "densecrf": false,
+   "rule": "fixed 0.5",
+   "voc_sim": 0.8103319901618782,
+   "coco_cap": 0.7292657085411924,
+   "note": "fixed-threshold"
+  },
+  {
+   "method": "nerve_W",
+   "densecrf": false,
+   "rule": "best on set (audit)",
+   "voc_sim": 0.8152095542541924,
+   "coco_cap": 0.7292657085411924,
+   "note": "in-sample audit: \u03c4 VOC-Sim 0.425, COCO-Cap 0.500"
+  },
+  {
+   "method": "nerve_W",
+   "densecrf": false,
+   "rule": "own rule",
+   "voc_sim": 0.8034636041074874,
+   "coco_cap": 0.7012447133238684,
+   "note": "NERVE cam_to_label (bkg_thre 0, cls_thre 0.5) with its image-score gate; fixed"
+  },
+  {
+   "method": "nerve_W",
+   "densecrf": true,
+   "rule": "VOC-sel.",
+   "voc_sim": 0.8295015570090257,
+   "coco_cap": 0.7299335822359433,
+   "note": "\u03c4 full-VOC 0.400; OOF folds 0.400/0.425/0.425/0.425/0.400"
+  },
+  {
+   "method": "nerve_W",
+   "densecrf": true,
+   "rule": "fixed 0.5",
+   "voc_sim": 0.8170682573255214,
+   "coco_cap": 0.7341907323420256,
+   "note": "fixed-threshold"
+  },
+  {
+   "method": "nerve_W",
+   "densecrf": true,
+   "rule": "best on set (audit)",
+   "voc_sim": 0.8300825080796894,
+   "coco_cap": 0.7349785127969719,
+   "note": "in-sample audit: \u03c4 VOC-Sim 0.400, COCO-Cap 0.475"
+  },
+  {
+   "method": "nerve_W",
+   "densecrf": true,
+   "rule": "own rule",
+   "voc_sim": 0.8216806106734508,
+   "coco_cap": 0.7168778771211561,
+   "note": "NERVE cam_to_label (bkg_thre 0, cls_thre 0.5) with its image-score gate; fixed"
+  }
+ ],
+ "paired": [
+  {
+   "method": "goca_sd15",
+   "densecrf": false,
+   "method_rule": "VOC-sel.",
+   "brace_rule": "VOC-sel.",
+   "voc": [
+    -0.07939892784057312,
+    -0.09522635162420053,
+    -0.0629460885689263
+   ],
+   "voc_resolved": [
+    -0.08233630328745911,
+    -0.09975770858170982,
+    -0.0651121744335395
+   ],
+   "voc_close1": [
+    -0.07938594671023502,
+    -0.09587601661128488,
+    -0.06306681655056712
+   ],
+   "coco": [
+    -0.0822559687158031,
+    -0.1064345992810676,
+    -0.05762279283956793
+   ],
+   "coco_resolved": [
+    -0.08836470277827657,
+    -0.11124575450020564,
+    -0.062057911759245334
+   ],
+   "coco_close1": [
+    -0.09462116989193659,
+    -0.1184197795335408,
+    -0.06610100345954417
+   ]
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": false,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.14762630516820707,
+    -0.16665353922441273,
+    -0.12900058542795514
+   ],
+   "coco": [
+    -0.24004253739595183,
+    -0.2595161690496833,
+    -0.21969781433869093
+   ]
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": false,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.5",
+   "voc": [
+    -0.14069018855817672,
+    -0.1590045788435994,
+    -0.12312471081365242
+   ],
+   "coco": [
+    -0.2118848548314608,
+    -0.23121397207368996,
+    -0.19223401479831945
+   ]
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": false,
+   "method_rule": "own rule (offset 0)",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.14761228426037543,
+    -0.1666660563380426,
+    -0.12895274565348808
+   ],
+   "coco": [
+    -0.2400223515119952,
+    -0.2595326569534795,
+    -0.21964802473759634
+   ]
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": false,
+   "method_rule": "own rule, VOC-sel. offset",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.07986041270492461,
+    -0.09594819281070266,
+    -0.06296440957495666
+   ],
+   "coco": [
+    -0.10630824347818402,
+    -0.1299179836155109,
+    -0.08238204023535763
+   ]
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": true,
+   "method_rule": "VOC-sel.",
+   "brace_rule": "VOC-sel.",
+   "voc": [
+    -0.07828910847851567,
+    -0.09533151333775079,
+    -0.06036392306505907
+   ],
+   "voc_resolved": [
+    -0.08342261726657951,
+    -0.10244128793154564,
+    -0.06480132568806554
+   ],
+   "voc_close1": [
+    -0.08062262291236066,
+    -0.09866809464101518,
+    -0.06245415724241083
+   ],
+   "coco": [
+    -0.10962610868120903,
+    -0.13440757890091626,
+    -0.08440315963127448
+   ],
+   "coco_resolved": [
+    -0.11440595308218682,
+    -0.13788334464486238,
+    -0.08888881647720878
+   ],
+   "coco_close1": [
+    -0.11907034555772922,
+    -0.14360885172801943,
+    -0.0899843098793502
+   ]
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": true,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.13867069000739818,
+    -0.158797618510641,
+    -0.11866446865913372
+   ],
+   "coco": [
+    -0.24429343597430175,
+    -0.26484080394605264,
+    -0.2222061879537287
+   ]
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": true,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.5",
+   "voc": [
+    -0.13555494610398267,
+    -0.15526723128510514,
+    -0.11614683414083936
+   ],
+   "coco": [
+    -0.21788243940500296,
+    -0.23851343283477122,
+    -0.19702082256590667
+   ]
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": true,
+   "method_rule": "own rule (offset 0)",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.1386727123561332,
+    -0.15878029214402672,
+    -0.11861781466781535
+   ],
+   "coco": [
+    -0.244287790017799,
+    -0.26484074398377333,
+    -0.22223896092319442
+   ]
+  },
+  {
+   "method": "goca_sd15",
+   "densecrf": true,
+   "method_rule": "own rule, VOC-sel. offset",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.07951485720874418,
+    -0.09655458557406048,
+    -0.06153722164631566
+   ],
+   "coco": [
+    -0.10954085763353205,
+    -0.13432960002536523,
+    -0.08425068466442155
+   ]
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": false,
+   "method_rule": "VOC-sel.",
+   "brace_rule": "VOC-sel.",
+   "voc": [
+    -0.030794610434708214,
+    -0.04317682572437718,
+    -0.01843844755431118
+   ],
+   "voc_resolved": [
+    -0.03440192755569882,
+    -0.04606451214737654,
+    -0.022165693242331967
+   ],
+   "voc_close1": [
+    -0.03561776092362967,
+    -0.04826650634808013,
+    -0.022189169573256538
+   ],
+   "coco": [
+    -0.09033896712951084,
+    -0.11256801940578953,
+    -0.06733730024926578
+   ],
+   "coco_resolved": [
+    -0.09216637172740783,
+    -0.11324980195478812,
+    -0.06889841559751499
+   ],
+   "coco_close1": [
+    -0.09410700362299196,
+    -0.1170694026147239,
+    -0.06847696039447566
+   ]
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": false,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.0314901564378377,
+    -0.043812189426787426,
+    -0.018732201699194786
+   ],
+   "coco": [
+    -0.08534983889508352,
+    -0.10831990576935475,
+    -0.06117430122424029
+   ]
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": false,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.5",
+   "voc": [
+    -0.02455403982780735,
+    -0.0390973238068191,
+    -0.009314960763067294
+   ],
+   "coco": [
+    -0.05719215633059249,
+    -0.08042874901288244,
+    -0.033512833679535156
+   ]
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": false,
+   "method_rule": "own rule (offset 0)",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.03157423405134108,
+    -0.043884583620443056,
+    -0.01875935488703978
+   ],
+   "coco": [
+    -0.08506040487272326,
+    -0.10804540759060272,
+    -0.06096776459389716
+   ]
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": false,
+   "method_rule": "own rule, VOC-sel. offset",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.03449155231455303,
+    -0.047510125141327575,
+    -0.021615372474818317
+   ],
+   "coco": [
+    -0.09674142676708541,
+    -0.1179970980133948,
+    -0.07415286822016175
+   ]
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": true,
+   "method_rule": "VOC-sel.",
+   "brace_rule": "VOC-sel.",
+   "voc": [
+    -0.03416059152961859,
+    -0.04766171016809281,
+    -0.02104362741187715
+   ],
+   "voc_resolved": [
+    -0.038327381448285625,
+    -0.05109826452284505,
+    -0.025261888274276313
+   ],
+   "voc_close1": [
+    -0.03958101524271196,
+    -0.052973443151856675,
+    -0.025927160513129422
+   ],
+   "coco": [
+    -0.10197417471328996,
+    -0.12439938168447183,
+    -0.0782866611563451
+   ],
+   "coco_resolved": [
+    -0.10331049203492992,
+    -0.12462491511375544,
+    -0.0799200291906825
+   ],
+   "coco_close1": [
+    -0.10406112562420666,
+    -0.12783540308955854,
+    -0.07896080926221129
+   ]
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": true,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.038254753246067086,
+    -0.051431107776782475,
+    -0.0249622035623065
+   ],
+   "coco": [
+    -0.09370042533371048,
+    -0.11787667691611735,
+    -0.06909556879473962
+   ]
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": true,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.5",
+   "voc": [
+    -0.03513900934265157,
+    -0.050617887263722336,
+    -0.019526724974587774
+   ],
+   "coco": [
+    -0.06728942876441169,
+    -0.0913903400540929,
+    -0.042433100094071315
+   ]
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": true,
+   "method_rule": "own rule (offset 0)",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.03848049284808375,
+    -0.05160518817583037,
+    -0.025150629790810137
+   ],
+   "coco": [
+    -0.09349282303139417,
+    -0.11772489795851347,
+    -0.06882197237860929
+   ]
+  },
+  {
+   "method": "goca_sdxl",
+   "densecrf": true,
+   "method_rule": "own rule, VOC-sel. offset",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.033705062662165,
+    -0.045887094062292494,
+    -0.02127925076986188
+   ],
+   "coco": [
+    -0.10176277037512094,
+    -0.12422856532510024,
+    -0.0780069746650257
+   ]
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": false,
+   "method_rule": "VOC-sel.",
+   "brace_rule": "VOC-sel.",
+   "voc": [
+    -0.09820654583428867,
+    -0.11664703364839625,
+    -0.07996913141809096
+   ],
+   "voc_resolved": [
+    -0.10005034420850833,
+    -0.11896430691772265,
+    -0.08355025813669678
+   ],
+   "voc_close1": [
+    -0.09794158045719059,
+    -0.11619748440327005,
+    -0.0804785230246026
+   ],
+   "coco": [
+    -0.10668805823993033,
+    -0.12935400695116703,
+    -0.08363946533084224
+   ],
+   "coco_resolved": [
+    -0.11128486306604035,
+    -0.1339751930221334,
+    -0.08543721101559683
+   ],
+   "coco_close1": [
+    -0.11053305438026928,
+    -0.13397674931280085,
+    -0.08557000513397175
+   ]
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": false,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.10896715968275483,
+    -0.12799047814816095,
+    -0.09066867385051183
+   ],
+   "coco": [
+    -0.1465433403797507,
+    -0.167071304873841,
+    -0.12506304519348352
+   ]
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": false,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.5",
+   "voc": [
+    -0.10203104307272448,
+    -0.12171567063839876,
+    -0.08443945656650827
+   ],
+   "coco": [
+    -0.11838565781525967,
+    -0.1386770657298006,
+    -0.0972250204755868
+   ]
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": false,
+   "method_rule": "own rule (offset 0)",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.10912300921218265,
+    -0.1281492267611398,
+    -0.09078206234498987
+   ],
+   "coco": [
+    -0.14656401201779568,
+    -0.16721900633619044,
+    -0.1251028794514449
+   ]
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": false,
+   "method_rule": "own rule, VOC-sel. offset",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.09954167501630784,
+    -0.11735345606276996,
+    -0.08174832102938512
+   ],
+   "coco": [
+    -0.11686369701597388,
+    -0.13912969598007985,
+    -0.09420805716133962
+   ]
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": true,
+   "method_rule": "VOC-sel.",
+   "brace_rule": "VOC-sel.",
+   "voc": [
+    -0.09099160596952216,
+    -0.1099265337430967,
+    -0.07209291389999198
+   ],
+   "voc_resolved": [
+    -0.09321596055783488,
+    -0.11159479302785417,
+    -0.07578005433433495
+   ],
+   "voc_close1": [
+    -0.09061591405172975,
+    -0.10891443595926875,
+    -0.07257124605134857
+   ],
+   "coco": [
+    -0.11071221658500263,
+    -0.13405218616735373,
+    -0.08614442768342237
+   ],
+   "coco_resolved": [
+    -0.11526678866802786,
+    -0.13836581549760396,
+    -0.0889552434189789
+   ],
+   "coco_close1": [
+    -0.11346990321752237,
+    -0.13789041300593077,
+    -0.08582256371380732
+   ]
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": true,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.09899874883137827,
+    -0.11992915605385789,
+    -0.07975967387605666
+   ],
+   "coco": [
+    -0.14283656208365558,
+    -0.16489660168881756,
+    -0.11914642306409445
+   ]
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": true,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.5",
+   "voc": [
+    -0.09588300492796276,
+    -0.11722041179827215,
+    -0.07681359859351596
+   ],
+   "coco": [
+    -0.11642556551435679,
+    -0.13818198042612795,
+    -0.09318448677643672
+   ]
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": true,
+   "method_rule": "own rule (offset 0)",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.09920430355975018,
+    -0.12027164087997455,
+    -0.07983615217434739
+   ],
+   "coco": [
+    -0.14294626614288863,
+    -0.16518296113749406,
+    -0.1193754452536891
+   ]
+  },
+  {
+   "method": "goca_sd21",
+   "densecrf": true,
+   "method_rule": "own rule, VOC-sel. offset",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.09226613871967637,
+    -0.1111281830573107,
+    -0.07347739336014457
+   ],
+   "coco": [
+    -0.11083112909221826,
+    -0.13425554141074597,
+    -0.08642509475512836
+   ]
+  },
+  {
+   "method": "diffseg",
+   "densecrf": false,
+   "method_rule": "VOC-sel.",
+   "brace_rule": "VOC-sel.",
+   "voc": [
+    -0.045059285258614246,
+    -0.05763091983186425,
+    -0.03214909569130074
+   ],
+   "voc_resolved": [
+    -0.046920020312274824,
+    -0.05996141011695952,
+    -0.0353308643574637
+   ],
+   "voc_close1": [
+    -0.04496561757896522,
+    -0.057307343848945036,
+    -0.03229842122352132
+   ],
+   "coco": [
+    -0.024817649600898495,
+    -0.0452109090959007,
+    -0.004965326683428833
+   ],
+   "coco_resolved": [
+    -0.029781669213987394,
+    -0.04880801644227553,
+    -0.009022524951447407
+   ],
+   "coco_close1": [
+    -0.030371325277207317,
+    -0.0502477987048335,
+    -0.009341098811094482
+   ]
+  },
+  {
+   "method": "diffseg",
+   "densecrf": false,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.10635510829130734,
+    -0.12140037225859876,
+    -0.0887734729124845
+   ],
+   "coco": [
+    -0.03955423798183466,
+    -0.06530487802682279,
+    -0.012614750607816076
+   ]
+  },
+  {
+   "method": "diffseg",
+   "densecrf": false,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.5",
+   "voc": [
+    -0.09941899168127699,
+    -0.11613377094341118,
+    -0.08085564939125535
+   ],
+   "coco": [
+    -0.011396555417343635,
+    -0.036643903283340995,
+    0.016394308878429867
+   ]
+  },
+  {
+   "method": "diffseg",
+   "densecrf": true,
+   "method_rule": "VOC-sel.",
+   "brace_rule": "VOC-sel.",
+   "voc": [
+    -0.036171306889684174,
+    -0.04889532219343803,
+    -0.02283168243431965
+   ],
+   "voc_resolved": [
+    -0.0391131947511737,
+    -0.05196772012244781,
+    -0.027554248252095834
+   ],
+   "voc_close1": [
+    -0.0371597915542099,
+    -0.04923621360913057,
+    -0.024761759281025256
+   ],
+   "coco": [
+    -0.019856163881687316,
+    -0.04056083485188462,
+    0.000948796374504046
+   ],
+   "coco_resolved": [
+    -0.023737845748592834,
+    -0.04354921767620423,
+    -0.0022813792929895675
+   ],
+   "coco_close1": [
+    -0.024073496097290925,
+    -0.04484457435777075,
+    -0.0010343720767091655
+   ]
+  },
+  {
+   "method": "diffseg",
+   "densecrf": true,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.1112259346342721,
+    -0.1279717939108806,
+    -0.09182125597033328
+   ],
+   "coco": [
+    -0.04350506902132267,
+    -0.07085651122867422,
+    -0.014688220159431485
+   ]
+  },
+  {
+   "method": "diffseg",
+   "densecrf": true,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.5",
+   "voc": [
+    -0.10811019073085659,
+    -0.12611217720600537,
+    -0.08829619797771954
+   ],
+   "coco": [
+    -0.01709407245202388,
+    -0.04432915074748173,
+    0.012898860332249323
+   ]
+  },
+  {
+   "method": "nerve_A",
+   "densecrf": false,
+   "method_rule": "VOC-sel.",
+   "brace_rule": "VOC-sel.",
+   "voc": [
+    0.014298123019758968,
+    0.00020610983456025597,
+    0.028706922156937053
+   ],
+   "voc_resolved": [
+    0.009229338677902765,
+    -0.004053303048451559,
+    0.022272438540168978
+   ],
+   "voc_close1": [
+    0.007846398881276473,
+    -0.0070552191322612754,
+    0.021833160839934723
+   ],
+   "coco": [
+    0.05131998044871777,
+    0.026422827997038222,
+    0.07875207148559833
+   ],
+   "coco_resolved": [
+    0.047707291062974444,
+    0.02317664330729988,
+    0.07497548846747291
+   ],
+   "coco_close1": [
+    0.0440682017189199,
+    0.0186274471507996,
+    0.07348737759808936
+   ]
+  },
+  {
+   "method": "nerve_A",
+   "densecrf": false,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    0.011145337204666705,
+    -0.002436478582745763,
+    0.024510665333139565
+   ],
+   "coco": [
+    0.03697470008397341,
+    0.013084799532122318,
+    0.06319054615443137
+   ]
+  },
+  {
+   "method": "nerve_A",
+   "densecrf": false,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.5",
+   "voc": [
+    0.018081453814697057,
+    0.004057852659138111,
+    0.03176884997973911
+   ],
+   "coco": [
+    0.06513238264846444,
+    0.041634029920561505,
+    0.0918334941287505
+   ]
+  },
+  {
+   "method": "nerve_A",
+   "densecrf": false,
+   "method_rule": "own rule",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.02930134166209364,
+    -0.04761227189695769,
+    -0.011818971642507675
+   ],
+   "coco": [
+    -0.0474603976947211,
+    -0.0758515934286933,
+    -0.01737603157639406
+   ]
+  },
+  {
+   "method": "nerve_A",
+   "densecrf": true,
+   "method_rule": "VOC-sel.",
+   "brace_rule": "VOC-sel.",
+   "voc": [
+    0.012493914562606734,
+    -0.0022248695934723476,
+    0.027506818746089387
+   ],
+   "voc_resolved": [
+    0.006181142433060338,
+    -0.008191537356998305,
+    0.020009453096495045
+   ],
+   "voc_close1": [
+    0.005133071489615282,
+    -0.010516699837157941,
+    0.019182387539660957
+   ],
+   "coco": [
+    0.03221482348749738,
+    0.007447133421938345,
+    0.06032276811859992
+   ],
+   "coco_resolved": [
+    0.02788981779488886,
+    0.004435538851259374,
+    0.05519951426798263
+   ],
+   "coco_close1": [
+    0.026663549489790994,
+    0.0016023239427662567,
+    0.05638523441105841
+   ]
+  },
+  {
+   "method": "nerve_A",
+   "densecrf": true,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    0.011367881288462223,
+    -0.003121557858429541,
+    0.025631015138255255
+   ],
+   "coco": [
+    0.03221482348749738,
+    0.007447133421938345,
+    0.06032276811859992
+   ]
+  },
+  {
+   "method": "nerve_A",
+   "densecrf": true,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.5",
+   "voc": [
+    0.014483625191877736,
+    -0.0004749065983538775,
+    0.028951215330595005
+   ],
+   "coco": [
+    0.058625820056796174,
+    0.034426142839166736,
+    0.08599832177132953
+   ]
+  },
+  {
+   "method": "nerve_A",
+   "densecrf": true,
+   "method_rule": "own rule",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.020887059903371252,
+    -0.04020376410387447,
+    -0.0017835049250734057
+   ],
+   "coco": [
+    -0.044666028206185926,
+    -0.07435659179258282,
+    -0.012219806543870221
+   ]
+  },
+  {
+   "method": "nerve_V",
+   "densecrf": false,
+   "method_rule": "VOC-sel.",
+   "brace_rule": "VOC-sel.",
+   "voc": [
+    0.005645296241668651,
+    -0.008838083173505772,
+    0.02026654922416773
+   ],
+   "voc_resolved": [
+    0.0007043318397321752,
+    -0.013519794638535454,
+    0.014403854084994828
+   ],
+   "voc_close1": [
+    0.00031238338951966593,
+    -0.014790102800893656,
+    0.015705260393370828
+   ],
+   "coco": [
+    0.04803062178673567,
+    0.022161033180957603,
+    0.07630013981629126
+   ],
+   "coco_resolved": [
+    0.044895980694629745,
+    0.020047059498188823,
+    0.07326395449833886
+   ],
+   "coco_close1": [
+    0.039191202554601734,
+    0.012242968619412872,
+    0.0701408275609012
+   ]
+  },
+  {
+   "method": "nerve_V",
+   "densecrf": false,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    0.004537206758440271,
+    -0.009862580196177317,
+    0.018602023329161707
+   ],
+   "coco": [
+    0.05056380995550258,
+    0.02453188487495023,
+    0.07963564273084078
+   ]
+  },
+  {
+   "method": "nerve_V",
+   "densecrf": false,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.5",
+   "voc": [
+    0.011473323368470623,
+    -0.0025149914311792115,
+    0.026310509680075506
+   ],
+   "coco": [
+    0.07872149251999361,
+    0.05229355338844871,
+    0.10742976748372714
+   ]
+  },
+  {
+   "method": "nerve_V",
+   "densecrf": false,
+   "method_rule": "own rule",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.019704946207653617,
+    -0.03591527492205653,
+    -0.0033029206836599177
+   ],
+   "coco": [
+    -0.005962414685095507,
+    -0.03071768426550635,
+    0.022043385787723867
+   ]
+  },
+  {
+   "method": "nerve_V",
+   "densecrf": true,
+   "method_rule": "VOC-sel.",
+   "brace_rule": "VOC-sel.",
+   "voc": [
+    0.008137280754154652,
+    -0.007308084139188734,
+    0.022570670462333253
+   ],
+   "voc_resolved": [
+    0.0023222596779026716,
+    -0.01201396451429918,
+    0.016411858353692337
+   ],
+   "voc_close1": [
+    0.001648079378141043,
+    -0.013552743819769463,
+    0.01636589917644026
+   ],
+   "coco": [
+    0.038933629575658046,
+    0.013247473126486298,
+    0.06814352774861186
+   ],
+   "coco_resolved": [
+    0.03494169599640795,
+    0.010320993218780633,
+    0.06310315414149896
+   ],
+   "coco_close1": [
+    0.03099678284619667,
+    0.0037108683280594468,
+    0.061743123912131666
+   ]
+  },
+  {
+   "method": "nerve_V",
+   "densecrf": true,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    0.001614108559090499,
+    -0.013980491794684066,
+    0.0165558661647953
+   ],
+   "coco": [
+    0.04290296470712729,
+    0.01602798898159756,
+    0.07316923732074955
+   ]
+  },
+  {
+   "method": "nerve_V",
+   "densecrf": true,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.5",
+   "voc": [
+    0.004729852462506012,
+    -0.010593344449177394,
+    0.020697979652273043
+   ],
+   "coco": [
+    0.06931396127642608,
+    0.04214629264111208,
+    0.09940936670918718
+   ]
+  },
+  {
+   "method": "nerve_V",
+   "densecrf": true,
+   "method_rule": "own rule",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.011365677226041093,
+    -0.028983194198986935,
+    0.005768509731667725
+   ],
+   "coco": [
+    -0.0030987884304559676,
+    -0.028983846797081513,
+    0.026571162787896688
+   ]
+  },
+  {
+   "method": "nerve_W",
+   "densecrf": false,
+   "method_rule": "VOC-sel.",
+   "brace_rule": "VOC-sel.",
+   "voc": [
+    -0.0029772599175429404,
+    -0.017342413930123857,
+    0.010412891934562624
+   ],
+   "voc_resolved": [
+    -0.007896061691221479,
+    -0.02148973289362337,
+    0.005532488213629137
+   ],
+   "voc_close1": [
+    -0.008470100486938748,
+    -0.023347873822159054,
+    0.005163431572380626
+   ],
+   "coco": [
+    0.02847755006086483,
+    0.002182579617414424,
+    0.05673277868767377
+   ],
+   "coco_resolved": [
+    0.02401646022914028,
+    -0.0015576602790104363,
+    0.05232472561193793
+   ],
+   "coco_close1": [
+    0.019443623196018445,
+    -0.007747478077183938,
+    0.05135026725567968
+   ]
+  },
+  {
+   "method": "nerve_W",
+   "densecrf": false,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.008718547744707927,
+    -0.02271068230452032,
+    0.0049886302072441905
+   ],
+   "coco": [
+    0.036779143515603074,
+    0.009132072760714777,
+    0.06702979333623471
+   ]
+  },
+  {
+   "method": "nerve_W",
+   "densecrf": false,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.5",
+   "voc": [
+    -0.0017824311346775756,
+    -0.016278040471944467,
+    0.012429118800784402
+   ],
+   "coco": [
+    0.0649368260800941,
+    0.03613141478089249,
+    0.09539136501101038
+   ]
+  },
+  {
+   "method": "nerve_W",
+   "densecrf": false,
+   "method_rule": "own rule",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.015586933799098701,
+    -0.031077076898930307,
+    -0.0006747020074705746
+   ],
+   "coco": [
+    0.008758148298279034,
+    -0.0164635080788256,
+    0.036743774866118246
+   ]
+  },
+  {
+   "method": "nerve_W",
+   "densecrf": true,
+   "method_rule": "VOC-sel.",
+   "brace_rule": "VOC-sel.",
+   "voc": [
+    -0.0017641346111474387,
+    -0.016510928142124355,
+    0.012428967629986423
+   ],
+   "voc_resolved": [
+    -0.007803060829501107,
+    -0.02239339171888346,
+    0.0067014907045369375
+   ],
+   "voc_close1": [
+    -0.008105586762052419,
+    -0.023710037883584726,
+    0.006157035141658452
+   ],
+   "coco": [
+    0.021786265482747535,
+    -0.004842387825252534,
+    0.05214823773551127
+   ],
+   "coco_resolved": [
+    0.01695012537315632,
+    -0.009234599275333313,
+    0.046969841157744795
+   ],
+   "coco_close1": [
+    0.013963265646353862,
+    -0.013801198390596639,
+    0.04738450749862382
+   ]
+  },
+  {
+   "method": "nerve_W",
+   "densecrf": true,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.015323467568796323,
+    -0.030513011048368083,
+    -0.0009071943469953123
+   ],
+   "coco": [
+    0.026043415588829832,
+    -0.003094766506162022,
+    0.05735081653372514
+   ]
+  },
+  {
+   "method": "nerve_W",
+   "densecrf": true,
+   "method_rule": "fixed 0.5",
+   "brace_rule": "fixed 0.5",
+   "voc": [
+    -0.01220772366538081,
+    -0.02769590147834499,
+    0.002780376197156203
+   ],
+   "coco": [
+    0.05245441215812863,
+    0.02252995536221389,
+    0.08385589409949552
+   ]
+  },
+  {
+   "method": "nerve_W",
+   "densecrf": true,
+   "method_rule": "own rule",
+   "brace_rule": "fixed 0.55 (frozen)",
+   "voc": [
+    -0.010711114220866902,
+    -0.0271172196138982,
+    0.004774032007495348
+   ],
+   "coco": [
+    0.008730560367960383,
+    -0.017882026410927232,
+    0.038269204879894325
+   ]
+  }
+ ],
+ "brace_repro": {
+  "V3+R2": {
+   "voc_sel": 0.8312656916201732,
+   "coco_sel": 0.7081473167531958,
+   "voc_055": 0.8323917248943177,
+   "coco_055": 0.7081473167531958,
+   "tau_full_voc": 0.55,
+   "coco_best": 0.718540923521218,
+   "runs20": [
+    0.832,
+    0.709,
+    0.833,
+    0.709,
+    0.55,
+    0.719
+   ]
+  },
+  "V3": {
+   "voc_sel": 0.8175546529770392,
+   "coco_sel": 0.6924865650255894,
+   "voc_055": 0.8190505379065861,
+   "coco_055": 0.6924865650255894,
+   "tau_full_voc": 0.55,
+   "coco_best": 0.7089055459560565,
+   "runs20": [
+    0.818,
+    0.693,
+    0.819,
+    0.693,
+    null,
+    null
+   ]
+  },
+  "V0": {
+   "voc_sel": 0.8110865584329243,
+   "coco_sel": 0.6698384856591877,
+   "voc_055": 0.7918345458020405,
+   "coco_055": 0.6898862196868649,
+   "tau_full_voc": 0.45,
+   "coco_best": 0.6926342856398376,
+   "runs20": [
+    0.811,
+    0.67,
+    0.792,
+    0.69,
+    null,
+    null
+   ]
+  },
+  "seed": {
+   "voc_sel": 0.7061050729531873,
+   "coco_sel": 0.5914460147785203,
+   "voc_055": 0.612671484755473,
+   "coco_055": 0.5102960333445805,
+   "tau_full_voc": 0.4,
+   "coco_best": 0.5914460147785203,
+   "runs20": [
+    0.706,
+    0.592,
+    0.613,
+    0.51,
+    null,
+    null
+   ]
+  }
+ },
+ "checks": {
+  "voc": {
+   "n": 490,
+   "changed_prompt": 50,
+   "bit_identical_to_official": 0,
+   "mean_abs_diff_lt1": 431,
+   "mean_abs_diff_ge2": 36,
+   "median_mean_abs_diff": 0.17299588521321613,
+   "class_labels_match": true,
+   "truth_identical_brace_vs_annotation": 490,
+   "truth_identical_across_n_methods": true,
+   "brace_seconds_median": 17.347672559320927,
+   "brace_seconds_total": 8381.382993679494,
+   "brace_peak_mib_max": 5396.38818359375,
+   "brace_gpu": [
+    "Tesla V100-PCIE-16GB"
+   ]
+  },
+  "coco": {
+   "n": 707,
+   "changed_prompt": 86,
+   "bit_identical_to_official": 0,
+   "mean_abs_diff_lt1": 583,
+   "mean_abs_diff_ge2": 52,
+   "median_mean_abs_diff": 0.26656341552734375,
+   "class_labels_match": true,
+   "truth_identical_brace_vs_annotation": 707,
+   "truth_identical_across_n_methods": true,
+   "brace_seconds_median": 17.32988255470991,
+   "brace_seconds_total": 12258.923007570207,
+   "brace_peak_mib_max": 5403.65185546875,
+   "brace_gpu": [
+    "Tesla V100-PCIE-16GB"
+   ]
+  }
+ },
+ "tau": {
+  "brace|raw|VOC-sel.": {
+   "full_voc": 0.55,
+   "oof_folds": [
+    0.55,
+    0.55,
+    0.55,
+    0.55,
+    0.575
+   ]
+  },
+  "brace|R2|VOC-sel.": {
+   "full_voc": 0.55,
+   "oof_folds": [
+    0.55,
+    0.525,
+    0.55,
+    0.55,
+    0.55
+   ]
+  },
+  "goca_sd15|raw|VOC-sel.": {
+   "full_voc": 0.75,
+   "oof_folds": [
+    0.7,
+    0.75,
+    0.75,
+    0.75,
+    0.75
+   ]
+  },
+  "goca_sd15|R2|VOC-sel.": {
+   "full_voc": 0.7,
+   "oof_folds": [
+    0.7,
+    0.7,
+    0.7,
+    0.7,
+    0.7
+   ]
+  },
+  "goca_sdxl|raw|VOC-sel.": {
+   "full_voc": 0.475,
+   "oof_folds": [
+    0.475,
+    0.45,
+    0.475,
+    0.475,
+    0.475
+   ]
+  },
+  "goca_sdxl|R2|VOC-sel.": {
+   "full_voc": 0.45,
+   "oof_folds": [
+    0.45,
+    0.45,
+    0.45,
+    0.475,
+    0.45
+   ]
+  },
+  "goca_sd21|raw|VOC-sel.": {
+   "full_voc": 0.575,
+   "oof_folds": [
+    0.575,
+    0.575,
+    0.575,
+    0.55,
+    0.575
+   ]
+  },
+  "goca_sd21|R2|VOC-sel.": {
+   "full_voc": 0.55,
+   "oof_folds": [
+    0.55,
+    0.55,
+    0.55,
+    0.55,
+    0.55
+   ]
+  },
+  "diffseg|raw|VOC-sel.": {
+   "full_voc": 0.375,
+   "oof_folds": [
+    0.375,
+    0.375,
+    0.375,
+    0.35,
+    0.35
+   ]
+  },
+  "diffseg|R2|VOC-sel.": {
+   "full_voc": 0.35,
+   "oof_folds": [
+    0.35,
+    0.35,
+    0.35,
+    0.35,
+    0.35
+   ]
+  },
+  "nerve_A|raw|VOC-sel.": {
+   "full_voc": 0.55,
+   "oof_folds": [
+    0.55,
+    0.55,
+    0.55,
+    0.525,
+    0.525
+   ]
+  },
+  "nerve_A|R2|VOC-sel.": {
+   "full_voc": 0.5,
+   "oof_folds": [
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5
+   ]
+  },
+  "nerve_V|raw|VOC-sel.": {
+   "full_voc": 0.475,
+   "oof_folds": [
+    0.5,
+    0.5,
+    0.5,
+    0.475,
+    0.45
+   ]
+  },
+  "nerve_V|R2|VOC-sel.": {
+   "full_voc": 0.425,
+   "oof_folds": [
+    0.425,
+    0.45,
+    0.425,
+    0.425,
+    0.425
+   ]
+  },
+  "nerve_W|raw|VOC-sel.": {
+   "full_voc": 0.425,
+   "oof_folds": [
+    0.425,
+    0.45,
+    0.425,
+    0.45,
+    0.425
+   ]
+  },
+  "nerve_W|R2|VOC-sel.": {
+   "full_voc": 0.4,
+   "oof_folds": [
+    0.4,
+    0.425,
+    0.425,
+    0.425,
+    0.4
+   ]
+  }
+ }
+}

@@ -64,7 +64,14 @@ def sd15_tokenization(tokenizer, s):
     out = tokenizer(s, padding="max_length", max_length=tokenizer.model_max_length, truncation=True)
     vocab = {v: k for k, v in tokenizer.get_vocab().items()}
     refined = []
-    for token in [vocab[i] for i in out["input_ids"]]:
+    # SD 2.1 (OpenCLIP tokenizer) pads with "!" (id 0), not <|endoftext|>: positions past the
+    # attention mask are padding and become <pad>, so they never join an entity or the rescaling
+    # set (PREREG_backbones.md, SD 2.1-base). For SD 1.5 those positions are <|endoftext|> -> <pad>
+    # already, so its output is unchanged.
+    mask = out.get("attention_mask") or [1] * len(out["input_ids"])
+    for token, m in zip([vocab[i] for i in out["input_ids"]], mask):
+        if not m:
+            token = "<|endoftext|>"
         if token == "<|startoftext|>":
             token = "<sos>"
         elif token == "<|endoftext|>":
