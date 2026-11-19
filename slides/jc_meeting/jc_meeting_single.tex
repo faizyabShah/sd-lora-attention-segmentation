@@ -44,23 +44,6 @@
 
 
 
-\begin{frame}{Evidence: comparisons and extensions}
-\begin{slidetable}
-\begin{tabular}{@{}lrrl@{}}
-\toprule
-Comparison & VOC-Sim & COCO-Cap & Verdict \\
-\midrule
-BRACE vs GoCA, SD 1.5 & \pos{+0.078} & \pos{+0.110} & BRACE ahead \\
-BRACE vs DiffSegmenter & \pos{+0.036} & $+0.020$ & BRACE ahead on VOC-Sim \\
-BRACE vs NERVE (uses CLIP) & $-0.012$ & \pos{-0.032} & NERVE ahead on COCO-Cap \\
-Optimized token vs class word & \pos{+0.031} & $-0.015$ & few-shot; VOC-Sim only \\
-Query-profile gate vs BRACE & $+0.000$ & \pos{+0.014} & exploratory, screened \\
-\bottomrule
-\end{tabular}
-\end{slidetable}
-Bold: 95\% paired bootstrap interval excludes zero.
-\end{frame}
-
 % =====================================================================
 \section{Comment 1}
 \begin{frame}{1. The two new components add 0.012 on VOC-Sim, 0.051 on COCO-Cap}
