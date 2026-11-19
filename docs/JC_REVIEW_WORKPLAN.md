@@ -298,7 +298,7 @@ Edited in place by the owner. States: `not started`, `in progress`,
 | #3 SCLIP + DenseCRF | F | not started | — |
 | #3 GoCA | N | done, awaiting review (official paired rows, SD 1.5 and SDXL) | Entries 2–4, 11 |
 | #3 NERVE | N | done, awaiting review (official paired rows for A, V, W; A is the class-word row) | Entries 2–4, 11 |
-| #3 seed × propagation swap, BRACE and NERVE (cross-side diagnostic; does not replace N's NERVE row) | F | done, awaiting review | Entry 10 |
+| #3 seed × propagation swap, BRACE and NERVE (cross-side diagnostic; does not replace N's NERVE row) | F | reviewed with issues (Entry 10); corrected, awaiting review | Entries 10, 16 |
 | #3 DiffSegmenter | N | done, awaiting review (official paired class-word row) | Entries 2–4, 11 |
 | #3 SPARK | N | no-go | Entry 2 |
 | #3 published block | N | done, awaiting review | Entry 12 |
@@ -605,10 +605,75 @@ entry is requested.
 
 **Review — F, <date>:** pending
 
-### Entry 16 — N (Narmeen), 2026-11-19
+### Entry 16 — F (Faizyab's Claude), 2026-11-19
+**Item:** #3 seed × propagation swap, BRACE and NERVE (correction of Entry 10, answering N's review of it)
+**Kind:** correction
+**What was done:**
+- Accepted both issues in N's review of Entry 10.
+- Recomputed the swap contrasts from the committed-design runs/20 counts (CPU job; same scorer, OOF and bootstrap
+  code as Entry 10). The cells come from runs/20's single capture with corrected prompts and the safety checker
+  off. There, the CLIP seed and NERVE's walk read **our own regenerated image**, so every cell of a comparison sees
+  the same image, the one the mask is scored against. NERVE's noised pass is ported and verified equal to NERVE's
+  code (runs/20 PREREG, step 4).
+- No new capture.
+
+**Where:** `runs/20_new_reruns/{PREREG.md, result.md}` (8baa528ad); `runs/19_source_rule/` addendum (5520bd310,
+bb10eb8fd); this commit.
+
+**Corrections to Entry 10:**
+1. **Caveat (1) and the "bit-identical" sensitivity are withdrawn.**
+   - `jc_swap.py:65` compared the regeneration with the stored paper capture, not with the official OVAM PNG that
+     the CLIP seed, the walk and the annotation use.
+   - The stored captures themselves differ from the official PNG on 101/707 COCO-Cap and 55/490 VOC-Sim images
+     (runs/19 addendum). So the 238/243-image subsets did not control the mismatch they were meant to control.
+   - The same conflation was in the runs/17 PREREG text; it is a design-text error, not a change after
+     registration.
+2. **The headline "NERVE leads 0.737 vs 0.696 on COCO-Cap" is superseded.**
+   - The mismatch inflated it. On the 528 COCO-Cap images matched to the official PNG, the two tie: −0.001
+     [−0.028, +0.043] (runs/19 addendum, post hoc).
+   - On the prompt-corrected rerun (runs/20), NERVE − BRACE is +0.011 [−0.003, +0.026] on VOC-Sim and **+0.027
+     [+0.002, +0.054]** on COCO-Cap (DenseCRF, VOC-sel.).
+
+**Result (corrected swap, runs/20 capture; DenseCRF; VOC-Sim OOF threshold, COCO-Cap full-VOC-Sim threshold):**
+
+| Propagation | VOC-Sim, CA seed | VOC-Sim, CLIP seed | COCO-Cap, CA seed | COCO-Cap, CLIP seed |
+|---|---:|---:|---:|---:|
+| none | 0.736 | 0.761 | 0.629 | 0.692 |
+| BRACE fine-only | 0.824 | 0.831 | 0.673 | 0.713 |
+| BRACE capped hierarchy | 0.832 | 0.840 | 0.709 | 0.719 |
+| NERVE walk | 0.831 | 0.843 | 0.675 | 0.735 |
+
+| Contrast (Entry 10 name) | VOC-Sim | COCO-Cap |
+|---|---|---|
+| Walk − hierarchy, CLIP seed (P-CLIP) | +0.003 [−0.005, +0.012] | +0.016 [+0.004, +0.030] |
+| Walk − hierarchy, CA seed (P-CA) | −0.001 [−0.011, +0.009] | −0.033 [−0.045, −0.020] |
+| CLIP − CA seed, hierarchy (S-H) | +0.008 [−0.006, +0.020] | +0.010 [−0.011, +0.034] |
+| CLIP − CA seed, walk (S-W) | +0.012 [−0.001, +0.027] | +0.060 [+0.037, +0.084] |
+| Interaction | +0.004 [−0.008, +0.017] | +0.049 [+0.033, +0.065] |
+
+- These match N's recomputation in `comparisons/notes/audit_F_entries_8_10.md` to three decimals. The VOC-Sim
+  column and the interaction interval are new here.
+- **Reading under the registered rule: still mixed.** S-H crosses zero, so the seed alone does not explain the
+  lead; P-CA is negative, so the walk alone does not explain it either.
+- NERVE's remaining COCO-Cap lead (+0.027) appears only when its walk runs on its CLIP seed. On VOC-Sim, no
+  contrast excludes zero.
+- **Labels:** exploratory. Both benchmarks were used to develop BRACE, not NERVE. The CLIP-seed cells use a second
+  model and are not SD-only.
+
+**Slides:** `slides/jc_meeting/sections/c3_F.tex`. Both frames now carry the runs/20 numbers and one line on the
+correction. `main.pdf` is not rebuilt in this commit; the owner rebuilds the deck.
+
+**Open points:**
+- Entries 8 and 9 use the pre-correction capture as well. N's reviews of them stand (numbers trace), but their
+  values differ slightly from the corrected data (BRACE 0.830/0.696 → 0.832/0.709). Table 1 (#7) will be rebuilt
+  on the corrected capture.
+
+**Review — N, <date>:** pending
+
+### Entry 17 — N (Narmeen), 2026-11-19
 **Item:** coordination: F items run by N today
 **Kind:** plan
-**What was done:** At Narmeen's request, side N is running the remaining F items so that every JC experiment is finished before the meeting: #3 OVAM class word, OVAM optimized tokens, DAAM, SeeDiff, SCLIP + DenseCRF (paired rows); #4 runs/25 on the corrected data (full run per its PREREG, outputs outside `runs/`); #7 the COCO-Cap capture for Table 1's first rows and a draft table; #8 runtime and memory. #5 fine-only and BRACE is already done (Entry 15).
+**What was done:** At Narmeen's request, side N is running the remaining F items so that every JC experiment is finished before the meeting: #3 OVAM class word, OVAM optimized tokens, DAAM, SeeDiff, SCLIP + DenseCRF (paired rows); #4 runs/25 on the corrected data (full run per its PREREG, outputs outside `runs/`; F committed its own full runs/25 result in a64aff6 while this was running, so N's copy is reported only as an independent reproduction); #7 the COCO-Cap capture for Table 1's first rows and a draft table; #8 runtime and memory. #5 fine-only and BRACE is already done (Entry 15).
 **Where:** `comparisons/notes/handoff_to_F_agent_2026-11-19.md` (full list, output paths, SD 2.1 revision); this commit.
 **Result:** none yet; each run gets its own entry when it finishes.
 **Slides:** none (coordination only).

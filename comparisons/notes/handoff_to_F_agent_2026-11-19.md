@@ -8,7 +8,7 @@ of them running, add a workplan entry saying so; side N will then stop its own c
 Side N edits none of F's files. All N code and outputs are in `comparisons/` (repo) and in N's git-ignored folder.
 F's committed modules are imported unchanged.
 
-## 1. Done and pushed (commit `d239b2b`; workplan Entries 11–15)
+## 1. Done and pushed (commit `d239b2b`; workplan Entries 11–15; coordination entry: Entry 17)
 
 | JC # | What | Where | Entry |
 |---|---|---|---|
@@ -30,7 +30,7 @@ commit. Narmeen approved this copy; please confirm in a workplan entry.
 | JC # | Run | N output (repo) | Status board row |
 |---|---|---|---|
 | #3 | OVAM with the class word; OVAM with its released optimized tokens (few-shot block); DAAM; SeeDiff (a documented no-go if no code is released); SCLIP + DenseCRF as a standalone row; all paired with BRACE under the Section 3 contract | `comparisons/official_f_rows/` | #3 OVAM class word, OVAM optimized tokens, DAAM, SeeDiff, SCLIP + DenseCRF |
-| #4 | runs/25 stage ladder on the corrected data, run in full exactly as `runs/25_token_ladder_nr/PREREG.md` specifies, with outputs in N's folder (nothing is written to `runs/`) | `comparisons/token_ladder_nr/` | #4 BRACE with optimized tokens (corrected data) |
+| #4 | runs/25 stage ladder on the corrected data, run in full as `runs/25_token_ladder_nr/PREREG.md` specifies, outputs in N's folder. **F's own full result (a64aff6) is the official one; N's copy is an independent reproduction only.** | `comparisons/token_ladder_nr/` | — |
 | #7 | A fresh capture for the COCO-Cap values of Table 1's first rows, plus a **draft** Table 1 in LaTeX with every number traced to its committed source | `comparisons/drafts/table1_jc7.tex` | #7 Table 1 (numbers) |
 | #8 | Runtime and peak GPU memory per image for BRACE and fine-only (A100 and V100, split by stage), plus a hardware and software paragraph for Sec. 4 | `comparisons/cost/` | #8 cost and hardware |
 
