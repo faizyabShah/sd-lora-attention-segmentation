@@ -25,7 +25,7 @@
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 \newcommand{\pos}[1]{$\mathbf{#1}$}   % interval excludes zero
 
-\title{BRACE: response to the review comments}
+\title{TRDP update}
 \author{Faizyab Shah \and Narmeen}
 \date{}
 
@@ -36,91 +36,13 @@
 \end{frame}
 
 % =====================================================================
-\begin{frame}{Overview: what was done per comment}
-\begin{slidetable}
-\renewcommand{\arraystretch}{1.0}
-\resizebox{\linewidth}{!}{%
-\begin{tabular}{@{}lL{0.62\linewidth}l@{}}
-\toprule
-Comment & Done & Status \\
-\midrule
-1 Claim & configuration vs new components; claims kept, weakened, dropped & done \\
-2 Mapping & contribution $\to$ evidence table & done \\
-3 Comparison & GoCA, NERVE, DiffSegmenter rerun, paired with BRACE; seed/propagation swap & done \\
-4 Optimized tokens & BRACE with OVAM's token; token provenance & done \\
-5 Backbones & BRACE, fine-only and GoCA on SD 1.5, SD 2.1, SDXL & done \\
-6 Consistency & 162 numbers traced & done \\
-7 Table 1 & ladder on corrected data, COCO-Cap, $\Delta$s, folds won & done (draft table) \\
-8 Structure, cost & new outline; runtime and memory per image & done \\
-9 Venue & ICPR 2027 dates, format, page fit & done \\
-Extra & query-profile gate (training-free) & exploratory \\
-\bottomrule
-\end{tabular}}
-\end{slidetable}
-\end{frame}
 
-\begin{frame}{Evidence: our components, threshold selected on VOC-Sim}
-\begin{slidetable}
-\resizebox{\linewidth}{!}{%
-\begin{tabular}{@{}lrrrcrrr@{}}
-\toprule
- & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
-\cmidrule(lr){2-4}\cmidrule(lr){6-8}
-Comparison (A vs B) & A & B & $\Delta$ & & A & B & $\Delta$ \\
-\midrule
-Hierarchy vs fine-only (generation, CRF) & 0.832 & 0.824 & \pos{+0.007} & & 0.709 & 0.673 & \pos{+0.036} \\
-SA-guided vs uniform weights (generation, CRF) & 0.832 & 0.828 & $+0.004$ & & 0.709 & 0.674 & \pos{+0.035} \\
-Cap vs no cap (generation, raw$^\dagger$) & 0.816 & 0.807 & \pos{+0.008} & & 0.682 & 0.678 & $+0.004$ \\
-Hierarchy vs fine-only, SD 1.5 (one pass, raw) & 0.793 & 0.784 & \pos{+0.009} & & 0.650 & 0.612 & \pos{+0.038} \\
-Hierarchy vs fine-only, SD 2.1 (one pass, raw) & 0.803 & 0.749 & \pos{+0.054} & & 0.658 & 0.599 & \pos{+0.060} \\
-Hierarchy vs fine-only, SDXL (one pass, raw) & 0.739 & 0.761 & \pos{-0.022} & & 0.496 & 0.506 & \pos{-0.011} \\
-\bottomrule
-\end{tabular}}
-\end{slidetable}
-Bold: 95\% paired interval excludes zero. $^\dagger$pre-correction capture (the only one with an uncapped map).
-\end{frame}
 
-\begin{frame}{Evidence: our components, fixed threshold 0.55}
-\begin{slidetable}
-\resizebox{\linewidth}{!}{%
-\begin{tabular}{@{}lrrrcrrr@{}}
-\toprule
- & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
-\cmidrule(lr){2-4}\cmidrule(lr){6-8}
-Comparison (A vs B) & A & B & $\Delta$ & & A & B & $\Delta$ \\
-\midrule
-Hierarchy vs fine-only (generation, CRF) & 0.833 & 0.797 & \pos{+0.036} & & 0.709 & 0.698 & $+0.010$ \\
-SA-guided vs uniform weights (generation, CRF) & 0.833 & 0.829 & $+0.003$ & & 0.709 & 0.684 & \pos{+0.025} \\
-Cap vs no cap (generation, raw$^\dagger$) & 0.817 & 0.807 & \pos{+0.010} & & 0.682 & 0.687 & \pos{-0.005} \\
-Hierarchy vs fine-only, SD 1.5 (one pass, raw) & 0.792 & 0.710 & \pos{+0.082} & & 0.654 & 0.611 & \pos{+0.043} \\
-Hierarchy vs fine-only, SD 2.1 (one pass, raw) & 0.803 & 0.674 & \pos{+0.129} & & 0.658 & 0.608 & \pos{+0.050} \\
-Hierarchy vs fine-only, SDXL (one pass, raw) & 0.711 & 0.624 & \pos{+0.088} & & 0.488 & 0.439 & \pos{+0.049} \\
-\bottomrule
-\end{tabular}}
-\end{slidetable}
-Bold: 95\% paired interval excludes zero. $^\dagger$pre-correction capture (the only one with an uncapped map).
-\end{frame}
 
-\begin{frame}{Evidence: our components, each map at its best threshold (uses labels)}
-\begin{slidetable}
-\resizebox{\linewidth}{!}{%
-\begin{tabular}{@{}lrrrcrrr@{}}
-\toprule
- & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
-\cmidrule(lr){2-4}\cmidrule(lr){6-8}
-Comparison (A vs B) & A & B & $\Delta$ & & A & B & $\Delta$ \\
-\midrule
-Hierarchy vs fine-only (generation, CRF) & 0.833 & 0.826 & $+0.006$ & & 0.719 & 0.702 & \pos{+0.016} \\
-SA-guided vs uniform weights (generation, CRF) & 0.833 & 0.829 & $+0.003$ & & 0.719 & 0.697 & \pos{+0.022} \\
-Cap vs no cap (generation, raw$^\dagger$) & 0.817 & 0.807 & \pos{+0.010} & & 0.698 & 0.697 & $+0.000$ \\
-Hierarchy vs fine-only, SD 1.5 (one pass, raw) & 0.793 & 0.784 & \pos{+0.009} & & 0.661 & 0.629 & \pos{+0.032} \\
-Hierarchy vs fine-only, SD 2.1 (one pass, raw) & 0.803 & 0.750 & \pos{+0.053} & & 0.670 & 0.624 & \pos{+0.046} \\
-Hierarchy vs fine-only, SDXL (one pass, raw) & 0.739 & 0.761 & \pos{-0.021} & & 0.500 & 0.513 & \pos{-0.013} \\
-\bottomrule
-\end{tabular}}
-\end{slidetable}
-Bold: 95\% paired interval excludes zero. $^\dagger$pre-correction capture (the only one with an uncapped map).
-\end{frame}
+
+
+
+
 
 \begin{frame}{Evidence: comparisons and extensions}
 \begin{slidetable}
@@ -161,6 +83,304 @@ Table 1 rows & Step & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap & Kind \\
 \end{slidetable}
 The novelty shows in clutter. Corrected data, threshold chosen on VOC-Sim.
 \src{workplan Entry 19 (Table 1 ladder)}
+\end{frame}
+
+\begin{frame}{1. Components: cross-attention modules and SA propagation}
+\textbf{Drop the five 32-px cross-attention modules}\\[-0.3em]
+{\centering\small\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrcrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Threshold & 16 modules & 11 modules & $\Delta$ & & 16 modules & 11 modules & $\Delta$ \\
+\midrule
+VOC-Sim-selected & 0.707 & 0.714 & \pos{+0.008} & & 0.574 & 0.572 & $-0.002$ \\
+fixed 0.55 & 0.545 & 0.590 & \pos{+0.045} & & 0.449 & 0.456 & $+0.007$ \\
+best (uses labels) & 0.707 & 0.714 & \pos{+0.008} & & 0.580 & 0.572 & \pos{-0.008} \\
+\bottomrule
+\end{tabular}\par}\vspace{0.4em}
+\textbf{SA propagation, one pass}\\[-0.3em]
+{\centering\small\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrcrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Threshold & none & one pass & $\Delta$ & & none & one pass & $\Delta$ \\
+\midrule
+VOC-Sim-selected & 0.714 & 0.790 & \pos{+0.076} & & 0.572 & 0.629 & \pos{+0.057} \\
+fixed 0.55 & 0.590 & 0.754 & \pos{+0.164} & & 0.456 & 0.642 & \pos{+0.187} \\
+best (uses labels) & 0.714 & 0.790 & \pos{+0.076} & & 0.572 & 0.647 & \pos{+0.075} \\
+\bottomrule
+\end{tabular}\par}\vspace{0.4em}
+{\footnotesize Raw maps; one capture (Table 1 ladder, corrected data). Bold: 95\% paired interval excludes zero.}
+\end{frame}
+
+\begin{frame}{1. Components: which SA modules, how many passes}
+\textbf{One SA pass: all 16 SA modules vs the 64-px module}\\[-0.3em]
+{\centering\small\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrcrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Threshold & all 16 & 64 px & $\Delta$ & & all 16 & 64 px & $\Delta$ \\
+\midrule
+VOC-Sim-selected & 0.759 & 0.790 & \pos{+0.032} & & 0.632 & 0.629 & $-0.003$ \\
+fixed 0.55 & 0.748 & 0.754 & \pos{+0.007} & & 0.638 & 0.642 & $+0.005$ \\
+best (uses labels) & 0.759 & 0.790 & \pos{+0.032} & & 0.638 & 0.647 & \pos{+0.009} \\
+\bottomrule
+\end{tabular}\par}\vspace{0.4em}
+\textbf{Second SA pass}\\[-0.3em]
+{\centering\small\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrcrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Threshold & one & two & $\Delta$ & & one & two & $\Delta$ \\
+\midrule
+VOC-Sim-selected & 0.790 & 0.803 & \pos{+0.012} & & 0.629 & 0.636 & \pos{+0.008} \\
+fixed 0.55 & 0.754 & 0.778 & \pos{+0.024} & & 0.642 & 0.658 & \pos{+0.016} \\
+best (uses labels) & 0.790 & 0.803 & \pos{+0.012} & & 0.647 & 0.658 & \pos{+0.011} \\
+\bottomrule
+\end{tabular}\par}\vspace{0.4em}
+{\footnotesize Raw maps; same capture. Bold: 95\% paired interval excludes zero.}
+\end{frame}
+
+\begin{frame}{1. Components: SA calls and DenseCRF}
+\textbf{SA from all calls vs calls 10--20}\\[-0.3em]
+{\centering\small\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrcrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Threshold & all & 10--20 & $\Delta$ & & all & 10--20 & $\Delta$ \\
+\midrule
+VOC-Sim-selected & 0.803 & 0.807 & \pos{+0.005} & & 0.636 & 0.643 & \pos{+0.007} \\
+fixed 0.55 & 0.778 & 0.781 & \pos{+0.003} & & 0.658 & 0.662 & \pos{+0.004} \\
+best (uses labels) & 0.803 & 0.807 & \pos{+0.005} & & 0.658 & 0.662 & \pos{+0.004} \\
+\bottomrule
+\end{tabular}\par}\vspace{0.4em}
+\textbf{DenseCRF on the final map}\\[-0.3em]
+{\centering\small\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrcrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Threshold & raw & DenseCRF & $\Delta$ & & raw & DenseCRF & $\Delta$ \\
+\midrule
+VOC-Sim-selected & 0.818 & 0.832 & \pos{+0.014} & & 0.693 & 0.709 & \pos{+0.016} \\
+fixed 0.55 & 0.819 & 0.833 & \pos{+0.013} & & 0.693 & 0.709 & \pos{+0.016} \\
+best (uses labels) & 0.819 & 0.833 & \pos{+0.013} & & 0.709 & 0.719 & \pos{+0.010} \\
+\bottomrule
+\end{tabular}\par}\vspace{0.4em}
+{\footnotesize DenseCRF row: BRACE map, prompt-corrected rerun. Bold: interval excludes zero.}
+\end{frame}
+
+\begin{frame}{1. Components: the two new parts}
+\textbf{SA-guided cross-attention layer weights (fine-only)}\\[-0.3em]
+{\centering\small\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrcrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Threshold & uniform & guided & $\Delta$ & & uniform & guided & $\Delta$ \\
+\midrule
+VOC-Sim-selected & 0.807 & 0.811 & $+0.004$ & & 0.643 & 0.670 & \pos{+0.027} \\
+fixed 0.55 & 0.781 & 0.792 & \pos{+0.010} & & 0.662 & 0.690 & \pos{+0.028} \\
+best (uses labels) & 0.807 & 0.813 & \pos{+0.005} & & 0.662 & 0.693 & \pos{+0.030} \\
+\bottomrule
+\end{tabular}\par}\vspace{0.4em}
+\textbf{Coarse-to-fine hierarchy with cap vs fine-only}\\[-0.3em]
+{\centering\small\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrcrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Threshold & fine-only & hierarchy & $\Delta$ & & fine-only & hierarchy & $\Delta$ \\
+\midrule
+VOC-Sim-selected & 0.811 & 0.818 & \pos{+0.007} & & 0.670 & 0.693 & \pos{+0.023} \\
+fixed 0.55 & 0.792 & 0.819 & \pos{+0.027} & & 0.690 & 0.693 & $+0.003$ \\
+best (uses labels) & 0.813 & 0.819 & \pos{+0.007} & & 0.693 & 0.709 & \pos{+0.017} \\
+\bottomrule
+\end{tabular}\par}\vspace{0.4em}
+{\footnotesize Raw maps; same capture. Bold: 95\% paired interval excludes zero.}
+\end{frame}
+
+\begin{frame}{1. Components: the one-sided cap}
+\textbf{One-sided cap vs no cap (hierarchy)}\\[-0.3em]
+{\centering\small\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrcrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Threshold & no cap & cap & $\Delta$ & & no cap & cap & $\Delta$ \\
+\midrule
+VOC-Sim-selected & 0.807 & 0.816 & \pos{+0.008} & & 0.678 & 0.682 & $+0.004$ \\
+fixed 0.55 & 0.807 & 0.817 & \pos{+0.010} & & 0.687 & 0.682 & \pos{-0.005} \\
+best (uses labels) & 0.807 & 0.817 & \pos{+0.010} & & 0.697 & 0.698 & $+0.000$ \\
+\bottomrule
+\end{tabular}\par}\vspace{0.4em}
+{\footnotesize Raw maps; pre-correction capture (the only one with an uncapped map). Bold: 95\% paired interval excludes zero.}
+\end{frame}
+
+\begin{frame}{1. Query-profile gate (exploratory): the idea}
+\begin{itemize}
+\item The class word's attention also fires on pixels that are not the object.
+\item From unlabeled generations, per class and layer: the mean query where the word attends on images \emph{of} the class, and where it attends when the class is \emph{absent} (caption does not mention it).
+\item At test time, each pixel's query is compared with the two profiles; a soft gate down-weights pixels that look like false firings. Then the unchanged pipeline.
+\item Label-free; BRACE stays frozen. All results here are exploratory.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{1. Gate, first screen (COCO-Cap, 707 images)}
+\begin{slidetable}
+\begin{tabular}{lrrr}
+\toprule
+Variant (hierarchy + DenseCRF, 0.55) & mIoU & $\Delta$ vs BRACE & 95\% interval \\
+\midrule
+BRACE & 0.708 & --- & --- \\
+\textbf{Absent-class gate} & \textbf{0.731} & \pos{+0.022} & [$+0.011$, $+0.035$] \\
+SDXL seed alone & 0.497 & \pos{-0.211} & [$-0.236$, $-0.181$] \\
+BRACE $\times$ SDXL seed & 0.684 & \pos{-0.025} & [$-0.037$, $-0.013$] \\
+Class competition in the hierarchy & 0.663 & \pos{-0.046} & [$-0.062$, $-0.028$] \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+Only the gate helped. COCO-Cap was used to screen, so it is no longer untuned transfer for this idea.
+\src{runs/28\_trio\_screen/result.md}
+\end{frame}
+
+\begin{frame}{1. Query-profile gate (exploratory): seed and fine-only}
+\textbf{Gate on the seed}\\[-0.3em]
+{\centering\small\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrcrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Threshold & no gate & gate & $\Delta$ & & no gate & gate & $\Delta$ \\
+\midrule
+VOC-Sim-selected & 0.706 & 0.724 & \pos{+0.018} & & 0.591 & 0.620 & \pos{+0.029} \\
+fixed 0.55 & 0.613 & 0.550 & \pos{-0.063} & & 0.510 & 0.502 & $-0.008$ \\
+best (uses labels) & 0.706 & 0.724 & \pos{+0.018} & & 0.591 & 0.629 & \pos{+0.038} \\
+\bottomrule
+\end{tabular}\par}\vspace{0.4em}
+\textbf{Gate, fine-only propagation}\\[-0.3em]
+{\centering\small\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrcrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Threshold & no gate & gate & $\Delta$ & & no gate & gate & $\Delta$ \\
+\midrule
+VOC-Sim-selected & 0.811 & 0.817 & \pos{+0.006} & & 0.670 & 0.704 & \pos{+0.034} \\
+fixed 0.55 & 0.792 & 0.774 & \pos{-0.018} & & 0.690 & 0.717 & \pos{+0.027} \\
+best (uses labels) & 0.813 & 0.818 & $+0.005$ & & 0.693 & 0.723 & \pos{+0.030} \\
+\bottomrule
+\end{tabular}\par}\vspace{0.4em}
+{\footnotesize Raw maps; profiles never include the test image (cross-fitted). Bold: 95\% paired interval excludes zero.}
+\end{frame}
+
+\begin{frame}{1. Query-profile gate (exploratory): with the hierarchy}
+\textbf{Gate, BRACE hierarchy}\\[-0.3em]
+{\centering\small\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrcrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Threshold & no gate & gate & $\Delta$ & & no gate & gate & $\Delta$ \\
+\midrule
+VOC-Sim-selected & 0.818 & 0.816 & $-0.001$ & & 0.692 & 0.717 & \pos{+0.025} \\
+fixed 0.55 & 0.819 & 0.818 & $-0.001$ & & 0.692 & 0.717 & \pos{+0.025} \\
+best (uses labels) & 0.819 & 0.818 & $-0.001$ & & 0.709 & 0.730 & \pos{+0.021} \\
+\bottomrule
+\end{tabular}\par}\vspace{0.4em}
+\textbf{Absent-class profiles vs all-pixel control}\\[-0.3em]
+{\centering\small\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrcrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Threshold & control & absent & $\Delta$ & & control & absent & $\Delta$ \\
+\midrule
+VOC-Sim-selected & 0.817 & 0.816 & $-0.001$ & & 0.712 & 0.717 & $+0.005$ \\
+fixed 0.55 & 0.817 & 0.818 & $+0.001$ & & 0.712 & 0.717 & $+0.005$ \\
+best (uses labels) & 0.817 & 0.818 & $+0.001$ & & 0.721 & 0.730 & \pos{+0.009} \\
+\bottomrule
+\end{tabular}\par}\vspace{0.4em}
+{\footnotesize Raw maps. COCO-Cap was used to screen the gate. Bold: 95\% paired interval excludes zero.}
+\end{frame}
+
+\begin{frame}{1. Query-profile gate (exploratory): gated fine-only vs BRACE}
+\textbf{Gated fine-only vs ungated BRACE}\\[-0.3em]
+{\centering\small\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrcrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Threshold & BRACE & gated fine & $\Delta$ & & BRACE & gated fine & $\Delta$ \\
+\midrule
+VOC-Sim-selected & 0.818 & 0.817 & $-0.001$ & & 0.692 & 0.704 & $+0.012$ \\
+fixed 0.55 & 0.819 & 0.774 & \pos{-0.046} & & 0.692 & 0.717 & \pos{+0.025} \\
+best (uses labels) & 0.819 & 0.818 & $-0.002$ & & 0.709 & 0.723 & $+0.014$ \\
+\bottomrule
+\end{tabular}\par}\vspace{0.4em}
+{\footnotesize Raw maps. Bold: 95\% paired interval excludes zero.}
+\end{frame}
+
+\begin{frame}{1. Gate, registered tests: development check fails}
+\begin{slidetable}
+\begin{tabular}{llrl}
+\toprule
+Test (hierarchy + DenseCRF) & Benchmark & $\Delta$ [95\% interval] & Result \\
+\midrule
+\textbf{Gate $-$ BRACE (primary)} & VOC-Sim & $+0.000$ [$-0.005$, $+0.006$] & \textbf{fail} \\
+VOC-Sim profiles $-$ BRACE & COCO-Cap & \pos{+0.013} [$+0.001$, $+0.025$] & above zero \\
+Gate $-$ BRACE & COCO-Cap & \pos{+0.014} [$+0.003$, $+0.026$] & above zero \\
+Gate $-$ control (absent set needed?) & VOC-Sim & $+0.001$ [$-0.001$, $+0.005$] & not supported \\
+Gate $-$ BRACE, seed only & both & \pos{+0.016} / \pos{+0.030} & above zero \\
+Gate $-$ BRACE, fine-only & both & \pos{+0.007} / \pos{+0.036} & above zero \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+The absent-class set is not what helps: a generic object-profile gate does as well. COCO-Cap result is screened.
+\src{runs/29\_absent\_class\_study/result.md}
+\end{frame}
+
+\begin{frame}{1. Gate on COCO-Cap: a class-dependent trade-off}
+\begin{slidetable}
+\begin{tabular}{lrrr}
+\toprule
+Class (hierarchy + DenseCRF) & BRACE & gate & $\Delta$ \\
+\midrule
+person       & 0.28 & 0.39 & $+0.11$ \\
+dining table & 0.47 & 0.54 & $+0.07$ \\
+aeroplane    & 0.80 & 0.85 & $+0.05$ \\
+chair        & 0.47 & 0.52 & $+0.05$ \\
+\midrule
+train        & 0.75 & 0.67 & $-0.08$ \\
+potted plant & 0.74 & 0.66 & $-0.08$ \\
+tv           & 0.79 & 0.69 & $-0.10$ \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\src{runs/29\_absent\_class\_study/result.md, per-class line}
+\end{frame}
+
+\begin{frame}{1. Gate: where it stands and next steps}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.42\linewidth}L{0.50\linewidth}@{}}
+\toprule
+Question & Status \\
+\midrule
+Absent-class profiles better than generic? & no \\
+Gate improves seeds and fine-only? & yes, both benchmarks \\
+Gate improves BRACE on VOC-Sim? & no \\
+Gate improves BRACE on COCO-Cap? & $+0.014$, screened (exploratory) \\
+Needs transductive profiles? & no (VOC-Sim profiles work) \\
+Which part works; class-adaptive gate & running (mechanism study) \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+Not in the paper's method. A claim would need a pre-registered test on fresh annotated images.
 \end{frame}
 
 \begin{frame}{1. Most of the gain over OVAM is configuration}
@@ -377,6 +597,33 @@ The components matter most when the seed is weak. Recommended: separate few-shot
 
 % =====================================================================
 \section{Comment 5}
+\begin{frame}{5. Hierarchy vs fine-only on three backbones, three threshold rules}
+\begin{slidetable}
+\renewcommand{\arraystretch}{0.95}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}llrrrcrrr@{}}
+\toprule
+ & & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){3-5}\cmidrule(lr){7-9}
+Backbone & Threshold & fine-only & hierarchy & $\Delta$ & & fine-only & hierarchy & $\Delta$ \\
+\midrule
+SD 1.5 & VOC-Sim-selected & 0.784 & 0.793 & \pos{+0.009} & & 0.612 & 0.650 & \pos{+0.038} \\
+ & fixed 0.55 & 0.710 & 0.792 & \pos{+0.082} & & 0.611 & 0.654 & \pos{+0.043} \\
+ & best (uses labels) & 0.784 & 0.793 & \pos{+0.009} & & 0.629 & 0.661 & \pos{+0.032} \\
+\midrule
+SD 2.1-base & VOC-Sim-selected & 0.749 & 0.803 & \pos{+0.054} & & 0.599 & 0.658 & \pos{+0.060} \\
+ & fixed 0.55 & 0.674 & 0.803 & \pos{+0.129} & & 0.608 & 0.658 & \pos{+0.050} \\
+ & best (uses labels) & 0.750 & 0.803 & \pos{+0.053} & & 0.624 & 0.670 & \pos{+0.046} \\
+\midrule
+SDXL & VOC-Sim-selected & 0.761 & 0.739 & \pos{-0.022} & & 0.506 & 0.496 & \pos{-0.011} \\
+ & fixed 0.55 & 0.624 & 0.711 & \pos{+0.088} & & 0.439 & 0.488 & \pos{+0.049} \\
+ & best (uses labels) & 0.761 & 0.739 & \pos{-0.021} & & 0.513 & 0.500 & \pos{-0.013} \\
+\bottomrule
+\end{tabular}}
+\end{slidetable}
+{\footnotesize Raw maps; stored images, one noising pass. Bold: 95\% paired interval excludes zero.}
+\end{frame}
+
 \begin{frame}{5. Backbones: the hierarchy holds on SD 1.5 and 2.1, not on SDXL}
 \begin{slidetable}
 \resizebox{\linewidth}{!}{%
@@ -502,111 +749,17 @@ Conference & online only, October 2027 \\
 The current text already fills about 13.5 of 15 pages: the additions need moves to the supplement.
 \end{frame}
 
-% =====================================================================
-\section{Query-profile gate}
-\begin{frame}{Extra: a training-free query-profile gate}
-\begin{itemize}
-\item The class word's attention also fires on pixels that are not the object.
-\item From unlabeled generations, per class and layer: the mean query where the word attends on images \emph{of} the class, and where it attends when the class is \emph{absent} (caption does not mention it).
-\item At test time, each pixel's query is compared with the two profiles; a soft gate down-weights pixels that look like false firings. Then the unchanged pipeline.
-\item Label-free; BRACE stays frozen. All results here are exploratory.
-\end{itemize}
-\end{frame}
 
-\begin{frame}{Gate, first screen (COCO-Cap, 707 images)}
-\begin{slidetable}
-\begin{tabular}{lrrr}
-\toprule
-Variant (hierarchy + DenseCRF, 0.55) & mIoU & $\Delta$ vs BRACE & 95\% interval \\
-\midrule
-BRACE & 0.708 & --- & --- \\
-\textbf{Absent-class gate} & \textbf{0.731} & \pos{+0.022} & [$+0.011$, $+0.035$] \\
-SDXL seed alone & 0.497 & \pos{-0.211} & [$-0.236$, $-0.181$] \\
-BRACE $\times$ SDXL seed & 0.684 & \pos{-0.025} & [$-0.037$, $-0.013$] \\
-Class competition in the hierarchy & 0.663 & \pos{-0.046} & [$-0.062$, $-0.028$] \\
-\bottomrule
-\end{tabular}
-\end{slidetable}
-Only the gate helped. COCO-Cap was used to screen, so it is no longer untuned transfer for this idea.
-\src{runs/28\_trio\_screen/result.md}
-\end{frame}
 
-\begin{frame}{Gate, component study: helps seeds everywhere, the hierarchy only on COCO-Cap}
-\begin{slidetable}
-\resizebox{\linewidth}{!}{%
-\begin{tabular}{lrrrcrrr}
-\toprule
- & \multicolumn{3}{c}{VOC-Sim (out-of-fold threshold)} & & \multicolumn{3}{c}{COCO-Cap (VOC-Sim threshold)} \\
-\cmidrule(lr){2-4}\cmidrule(lr){6-8}
-Seed & seed & fine-only & hierarchy & & seed & fine-only & hierarchy \\
-\midrule
-BRACE seed                          & 0.736 & 0.825 & 0.832 & & 0.629 & 0.673 & 0.708 \\
-Absent-class gate (cross-fitted)    & 0.753 & 0.831 & 0.832 & & 0.659 & 0.708 & \textbf{0.722} \\
-Control gate (all-pixel, no absent set) & 0.757 & 0.831 & 0.831 & & 0.660 & 0.697 & 0.719 \\
-Gate with VOC-Sim profiles only     & 0.752 & 0.840 & 0.838 & & 0.657 & 0.715 & 0.721 \\
-\bottomrule
-\end{tabular}}
-\end{slidetable}
-DenseCRF. Profiles never include the test image. Gated fine-only on COCO-Cap (0.708) equals ungated BRACE.
-\src{runs/29\_absent\_class\_study/result.md}
-\end{frame}
 
-\begin{frame}{Gate, registered tests: development check fails}
-\begin{slidetable}
-\begin{tabular}{llrl}
-\toprule
-Test (hierarchy + DenseCRF) & Benchmark & $\Delta$ [95\% interval] & Result \\
-\midrule
-\textbf{Gate $-$ BRACE (primary)} & VOC-Sim & $+0.000$ [$-0.005$, $+0.006$] & \textbf{fail} \\
-VOC-Sim profiles $-$ BRACE & COCO-Cap & \pos{+0.013} [$+0.001$, $+0.025$] & above zero \\
-Gate $-$ BRACE & COCO-Cap & \pos{+0.014} [$+0.003$, $+0.026$] & above zero \\
-Gate $-$ control (absent set needed?) & VOC-Sim & $+0.001$ [$-0.001$, $+0.005$] & not supported \\
-Gate $-$ BRACE, seed only & both & \pos{+0.016} / \pos{+0.030} & above zero \\
-Gate $-$ BRACE, fine-only & both & \pos{+0.007} / \pos{+0.036} & above zero \\
-\bottomrule
-\end{tabular}
-\end{slidetable}
-The absent-class set is not what helps: a generic object-profile gate does as well. COCO-Cap result is screened.
-\src{runs/29\_absent\_class\_study/result.md}
-\end{frame}
 
-\begin{frame}{Gate on COCO-Cap: a class-dependent trade-off}
-\begin{slidetable}
-\begin{tabular}{lrrr}
-\toprule
-Class (hierarchy + DenseCRF) & BRACE & gate & $\Delta$ \\
-\midrule
-person       & 0.28 & 0.39 & $+0.11$ \\
-dining table & 0.47 & 0.54 & $+0.07$ \\
-aeroplane    & 0.80 & 0.85 & $+0.05$ \\
-chair        & 0.47 & 0.52 & $+0.05$ \\
-\midrule
-train        & 0.75 & 0.67 & $-0.08$ \\
-potted plant & 0.74 & 0.66 & $-0.08$ \\
-tv           & 0.79 & 0.69 & $-0.10$ \\
-\bottomrule
-\end{tabular}
-\end{slidetable}
-\src{runs/29\_absent\_class\_study/result.md, per-class line}
-\end{frame}
 
-\begin{frame}{Gate: where it stands and next steps}
-\begin{slidetable}
-\begin{tabular}{@{}L{0.42\linewidth}L{0.50\linewidth}@{}}
-\toprule
-Question & Status \\
-\midrule
-Absent-class profiles better than generic? & no \\
-Gate improves seeds and fine-only? & yes, both benchmarks \\
-Gate improves BRACE on VOC-Sim? & no \\
-Gate improves BRACE on COCO-Cap? & $+0.014$, screened (exploratory) \\
-Needs transductive profiles? & no (VOC-Sim profiles work) \\
-Which part works; class-adaptive gate & running (mechanism study) \\
-\bottomrule
-\end{tabular}
-\end{slidetable}
-Not in the paper's method. A claim would need a pre-registered test on fresh annotated images.
-\end{frame}
+
+
+
+
+
+
 
 % =====================================================================
 \begin{frame}{Questions for JC}
