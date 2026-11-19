@@ -420,21 +420,27 @@ All intervals exclude zero. At one fixed threshold of 0.55, BRACE beats fine-onl
 - Δ is not the difference between consecutive rows (each comes from its own paired run), e.g. .789 → .800 is +.011, printed +.012.
 - Row 3's Δ (+.033) is measured against a row that is not in the table (.756, one pass through all 16 SA modules), which hides the .691 → .789 jump.
 
-### 7.2 Proposed Table 1 (draft; the COCO-Cap values of rows 1–3 come from a fresh capture ⏳)
+### 7.2 New Table 1, rebuilt from one capture on both benchmarks — done
 
-| Row | Change | VOC-Sim | Δ VOC (vs row) | folds won | COCO-Cap | Δ COCO (vs row) |
-|---|---|---|---|---|---|---|
-| 1 | CA only, all scales | .665 | | | ⏳ | |
-| 2 | drop 32-px CA | .691 | +.026 (vs 1) | 4/5 | ⏳ | ⏳ |
-| 3a | SA propagation, all 16 modules, one pass | .756 | +.065 (vs 2) | ⏳ | ⏳ | ⏳ |
-| 3b | SA 64 px only | .789 | +.033 (vs 3a) | 5/5 | ⏳ | ⏳ |
-| 4 | two passes | .800 | +.011 (vs 3b) | 5/5ᵇ | .625 | ⏳ |
-| 5 | DenseCRF | .813 | +.013 (vs 4) | 5/5 | .637 | +.012 |
-| 6 | SA calls 10–20 | .817 | +.004 (vs 5) | 4/5 | .644 | +.007 |
-| 7 | SA-guided weights | .823 | +.006 (vs 6) | 4/5 | .662 | **+.018** |
-| 8 | coarse-to-fine + cap | .829 | +.006 (vs 7) | 5/5 | .696 | **+.034** |
+Configuration: all nine rows of the current Table 1 rebuilt from **one** live generation per image (prompt-corrected capture, frozen runtime), 490 VOC-Sim and 707 COCO-Cap images, pre-registered (`comparisons/drafts/table1_ladder/PREREG.md`). Each Δ is paired against the row named in "vs", with a 95% bootstrap interval. Threshold chosen on VOC-Sim (5-fold OOF) and reused on COCO-Cap. Rows 5–8 with DenseCRF.
 
-ᵇ with DenseCRF. Folds won from supp. Tab. 10. Δ printed as the difference of the printed values; the paired Δ and interval go in a separate column or the supplement. The COCO-Cap Δ of rows 7–8 needs the threshold note of #1 (+0.034 is two thresholds; +0.012 at a shared one). LaTeX draft: `comparisons/drafts/table1_jc7.tex` ⏳. Putting it into `paper/` is F's.
+| Row | Change | vs | VOC-Sim | Δ VOC-Sim | folds | COCO-Cap | Δ COCO-Cap |
+|---|---|---|---|---|---|---|---|
+| 1 | CA, all 16 modules (reference) | — | .707 | — | — | .574 | — |
+| 2 | drop the five 32-px CA modules | 1 | .714 | +.008 [+.003, +.012] | 5/5 | .572 | −.002 [−.009, +.004] |
+| 3a | one SA pass, all 16 SA modules (alternative) | 2 | .759 | +.044 [+.038, +.052] | 5/5 | .632 | +.060 [+.050, +.071] |
+| 3 | one SA pass, 64-px module only | 2 | .790 | **+.076 [+.069, +.085]** | 5/5 | .629 | **+.057 [+.045, +.069]** |
+| 4 | second SA pass | 3 | .803 | +.012 [+.009, +.017] | 5/5 | .636 | +.008 [+.004, +.012] |
+| 5 | DenseCRF | 4 | .816 | +.013 [+.010, +.016] | 5/5 | .651 | +.014 [+.012, +.017] |
+| 6 | SA calls 10–20 | 5 | .820 | +.004 [+.001, +.007] | 4/5 | .657 | +.007 [+.004, +.009] |
+| 7 | SA-guided CA weights (= fine-only reference) | 6 | .825 | +.005 [−.001, +.011] | 4/5 | .673 | +.015 [+.004, +.026] |
+| 8 | hierarchy with one-sided cap (BRACE) | 7 | .832 | +.007 [+.001, +.013] | 4/5 | .708 | **+.036 [+.024, +.046]** |
+
+- **COCO-Cap now has a value and a Δ for every row**, and every Δ names its reference.
+- **The hidden jump is visible**: adding SA propagation (row 3) is the largest step, +.076 on VOC-Sim and +.057 on COCO-Cap; the all-16-module alternative (row 3a) sits beside it.
+- **Reproduces the paper**: VOC-Sim at the early-screen threshold 0.45 gives .667 / .696 / (.757) / .790 / .803 / .816 / .821 (paper: .665 / .691 / (.756) / .789 / .800 / .813 / .817).
+- **Threshold caveat for row 8**: rows 7 and 8 use different VOC-selected thresholds (0.425 vs 0.55). At one shared threshold of 0.55 the row-8 COCO-Cap Δ is +.010 [−.005, +.026] (#1). The caption must say so; a shared-0.55 column is in the LaTeX draft.
+- LaTeX (fits the LNCS width): `comparisons/drafts/table1_jc7.tex`. Putting it into `paper/` is F's.
 
 **Slides:** F's `c7_F.tex`.
 
@@ -456,28 +462,29 @@ All intervals exclude zero. At one fixed threshold of 0.55, BRACE beats fine-onl
 | 7 Discussion and limitations | 6 Discussion and limitations (+ token scope, CLIP-seeded methods, SDXL, SD3/FLUX out of scope) |
 | Conclusion | 7 Conclusion |
 
-### 8.2 Cost per image (measured; workplan entry to come)
+### 8.2 Cost per image — done
 
-Configuration: 100 benchmark images (50 + 50), SD 1.5, 30 steps, guidance 7.5, F's frozen runtime; median per image.
+Configuration: 100 benchmark images (50 VOC-Sim + 50 COCO-Cap), SD 1.5 in float32, 30 steps, guidance 7.5, 512 px, batch 1, F's frozen runtime unchanged; median per image, warm-up discarded. Checks: the recorded image is bit-identical to plain generation and the maps equal the frozen code's output on all 100 images.
 
 | Stage | A100 (40 GB) | V100 |
 |---|---|---|
-| generation, no attention recording | 2.66 s | ⏳ |
-| generation with attention recording | 6.94 s (+4.27 s) | ⏳ |
-| seed + maps (hierarchy 0.04 s; same as fine-only) | 0.15 s | ⏳ |
-| DenseCRF (CPU, one core) | 5.9 s | ⏳ |
-| **total, BRACE** (fine-only is the same) | **12.9 s** | ⏳ (earlier full run: median 17.3 s) |
-| peak GPU memory | 5.1 GiB | ⏳ (earlier: 5.3 GiB) |
+| generation alone | 2.66 s | 12.11 s |
+| generation with attention recording | 6.94 s | 12.02 s |
+| fine-only map / BRACE map | 0.034 s / 0.038 s | 0.080 s / 0.098 s |
+| DenseCRF (one CPU core) | 5.92 s | 5.07 s |
+| **total, BRACE** (fine-only is the same) | **12.9 s** (7.0 s on the GPU) | **17.2 s** (12.1 s on the GPU) |
+| peak GPU memory | 5.1 GiB | 5.1 GiB |
 
 One-pass setting (#5), per image on A100: SD 1.5 0.21 s / 5.1 GiB, SD 2.1 0.19 s / 5.5 GiB, SDXL 1.49 s / 15.6 GiB.
 
-**Paragraph for Sec. 4 (draft):**
+**Paragraph for Sec. 4 (ready to paste):**
+> *Implementation and cost.* All experiments use Stable Diffusion 1.5 in float32 with its default PNDM scheduler, 30 denoising steps and classifier-free guidance 7.5 at 512 × 512 (PyTorch 2.4.1, CUDA 12.1, diffusers 0.36). We measured cost on 100 benchmark images at batch size 1. On an NVIDIA A100 (40 GB), generating an image takes 2.7 s; recording the attention BRACE needs raises this to 6.9 s (on a V100 both take 12.0 s). Building the maps costs 0.04 s for BRACE and 0.03 s for fine-only propagation, and DenseCRF adds 5.9 s on one CPU core. One image therefore takes 12.9 s end to end on the A100 (17.2 s on a V100), of which 7.0 s is GPU time, with a peak of 5.1 GiB of GPU memory. The hierarchy adds no measurable time or memory over fine-only propagation, and the method trains nothing.
 
-> *Hardware and cost.* Experiments ran on NVIDIA V100 (16/32 GB) and A100 (40 GB) GPUs with PyTorch 2.4.1 (CUDA 12.1), diffusers 0.36 and transformers 5.6. Per image on an A100, generation alone takes 2.7 s; recording the attention maps adds 4.3 s; building the seed and the hierarchy takes 0.15 s, the same as fine-only propagation; DenseCRF takes 5.9 s on one CPU core. Peak GPU memory is 5.1 GiB. The hierarchy therefore costs almost nothing over fine-only propagation; recording the attention and DenseCRF dominate.
+(JC worried about storing 64×64 SA maps over many calls: the maps are reduced on the fly, so the peak stays at 5.1 GiB.)
 
-(The paragraph says "recording" rather than "storing 64×64 SA maps over many calls", because the maps are reduced on the fly; JC's concern about memory is answered by the 5.1 GiB peak.)
+**Slides:** `c8_N.tex` (structure); cost slide in the response deck.
 
-**Slides:** `c8_N.tex` (structure); cost frame to add.
+
 
 ---
 
@@ -511,6 +518,6 @@ One-pass setting (#5), per image on A100: SD 1.5 0.21 s / 5.1 GiB, SD 2.1 0.19 s
 | 4 | done | No test leakage; the token helps VOC-Sim, and with it the hierarchy no longer helps on COCO-Cap |
 | 5 | done | Hierarchy holds on SD 1.5 and SD 2.1, fails on SDXL; GoCA wins on SDXL |
 | 6 | done | 22 fixes listed |
-| 7 | numbers ⏳ | New columns: COCO Δ, folds won, explicit references, visible .691 → .756 → .789 |
-| 8 | done (V100 ⏳) | Structure proposal; 12.9 s and 5.1 GiB per image; the hierarchy is nearly free |
+| 7 | done | Rebuilt from one capture: COCO-Cap value and Δ for every row, folds won, explicit references; SA propagation (+.076 / +.057) is the biggest step |
+| 8 | done | Structure proposal; 12.9 s (A100) / 17.2 s (V100) and 5.1 GiB per image; the hierarchy is free |
 | 9 | done | ICPR confirmed; about 13.5 of 15 pages used before the additions |

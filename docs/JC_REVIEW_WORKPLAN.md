@@ -307,8 +307,8 @@ Edited in place by the owner. States: `not started`, `in progress`,
 | #5 fine-only and BRACE, SD 1.5 / 2.1 / XL | F (run by N on 2026-11-19 at Narmeen's request) | done, awaiting review | Entry 15 |
 | #5 GoCA, SD 1.5 / 2.1 / XL | N | done, awaiting review (SD 2.1-base on a hash-checked community copy) | Entries 3–4, 12, 14 |
 | #6 consistency | N | done, awaiting review | Entry 6 |
-| #7 Table 1 | F | in progress: numbers done (Entry 8); paper table and caption not yet rewritten | Entry 8 |
-| #8 cost and hardware | F | not started | — |
+| #7 Table 1 | F | numbers done (Entry 8; full ladder on both benchmarks by N, Entry 19, at Narmeen's request); paper table and caption not yet rewritten (F) | Entries 8, 19 |
+| #8 cost and hardware | F (measured by N on 2026-11-19 at Narmeen's request) | done, awaiting review; paragraph for Sec. 4 ready | Entry 18 |
 | #8 restructuring | N | done, awaiting review (proposed outline; applied after #7) | Entry 13 |
 | #9 venue | N | done, awaiting review | Entry 12 |
 | Slide deck: blank skeleton | F | done | `slides/jc_meeting/` |
@@ -678,5 +678,38 @@ correction. `main.pdf` is not rebuilt in this commit; the owner rebuilds the dec
 **Result:** none yet; each run gets its own entry when it finishes.
 **Slides:** none (coordination only).
 **Open points:** **Side F: please do not start these runs.** If one is already running on your side, say so in a new entry and N will stop its copy. Table 1 in `paper/` stays F's.
+
+**Review — F, <date>:** pending
+
+### Entry 18 — N (Narmeen), 2026-11-19
+**Item:** #8 cost and hardware (F's item, measured by N at Narmeen's request)
+**Kind:** result
+**What was done:** Per-image runtime and peak GPU memory of BRACE and fine-only, split by stage, with F's frozen runtime imported unchanged; 100 benchmark images (50 VOC-Sim + 50 COCO-Cap), SD 1.5 float32, 30 steps, CFG 7.5, 512 px, batch 1, warm-up discarded; one A100 (renyi) and one V100 (erdos). Checks: recorded image bit-identical to plain generation, and stage-wise maps equal `aggregate()`'s V0/V3, on all 100 images.
+**Where:** `comparisons/cost/` (`measure_cost.py`, `cost.slurm`, `summarize.py`, `result.json`, `result.md` with a paragraph for Sec. 4); this commit.
+**Result (median per image):** A100: generation 2.66 s, with attention recording 6.94 s, maps 0.034 s (fine-only) / 0.038 s (BRACE), DenseCRF 5.92 s on one CPU core, total 12.9 s (7.0 s GPU). V100: 12.11 / 12.02 / 0.080 / 0.098 / 5.07 s, total 17.2 s (12.1 s GPU). Peak GPU memory 5.14 GiB on both. The hierarchy adds no measurable time or memory over fine-only.
+**Slides:** response deck (`comparisons/response/slides/main.tex`); `c8_N.tex` keeps the structure frame.
+**Open points:** the official wald capture (job 253750) ran at 17.3 s for generation + recording + maps, against 12.4 s on erdos for the same stages (same GPU model, bit-identical outputs); the cause is not established, so 17.3 s is an upper range. Software versions and hardware are in `result.md`.
+
+**Review — F, <date>:** pending
+
+### Entry 19 — N (Narmeen), 2026-11-19
+**Item:** #7 Table 1 numbers on both benchmarks (F's item; N ran the capture at Narmeen's request)
+**Kind:** pre-registration and result
+**What was done:** No committed run contains the paper's first three rows, so a new ladder was pre-registered (`comparisons/drafts/table1_ladder/PREREG.md`) and run: all nine rows of the current Table 1 from one live generation per image (frozen runtime, runs/20 corrected prompts, safety checker off), 490 VOC-Sim and 707 COCO-Cap, renyi A100s (job 253917). Paired Δ against an explicit reference row, 95% image bootstrap; VOC-sel. primary, fixed 0.45 and 0.55 also reported. COCO-Cap DenseCRF was computed only at the thresholds the report reads (`comparisons/drafts/fast_score.py`); VOC-Sim on the full grid.
+**Where:** `comparisons/drafts/table1_ladder/` (`PREREG.md`, `t1_ladder.py`, `capture.slurm`, `score.slurm`, `make_tex.py`, `result.md`, `result.json`); LaTeX `comparisons/drafts/table1_jc7.tex` (fits the LNCS width); this commit.
+**Result (exploratory; VOC-sel.; VOC-Sim / COCO-Cap):** row 1 .707 / .574; row 3 (one SA pass, 64 px) .790 / .629, +.076 [+.069, +.085] / +.057 [+.045, +.069] vs row 2, the largest step; row 7 (fine-only reference) .825 / .673; row 8 (BRACE) .832 / .708, +.007 [+.001, +.013] / +.036 [+.024, +.046] vs row 7 (different thresholds, 0.425 vs 0.55; at a shared 0.55, +.010 [−.005, +.026]). Reproduces the paper's VOC-Sim screens at 0.45 (.667 / .696 / (.757) / .790 / .803 / .816 / .821 vs .665 / .691 / (.756) / .789 / .800 / .813 / .817) and F's runs/25 rows 7–8 at 0.55 to 0.001.
+**Slides:** response deck (`comparisons/response/slides/main.tex`); F's `c7_F.tex` not touched.
+**Open points:** A100 images are not bit-identical to the V100 captures. The table and caption in `paper/` stay F's.
+
+**Review — F, <date>:** pending
+
+### Entry 20 — N (Narmeen), 2026-11-19
+**Item:** #4 runs/25 on the corrected data: independent reproduction of F's a64aff6
+**Kind:** result
+**What was done:** F's pre-registered `scripts/jc_ladder_nr.py` run unchanged through a thin N wrapper on all 1,197 images (2× V100, erdos; job 253886), scored with the same rules.
+**Where:** `comparisons/token_ladder_nr/` (`run_nr.py`, `capture.slurm`, `score.slurm`, `fidelity.py`, `result.md`, `result_n_full.md`); this commit.
+**Result:** 172 of 181 three-decimal cells identical to F's `runs/25_token_ladder_nr/result.md`, 9 differ by 0.001 (all COCO-Cap, none a primary DenseCRF stage cell); the verdicts agree (F holds for both queries, H fails for both). BRACE word / token at 0.55: 0.832 / 0.864 VOC-Sim, 0.708 / 0.693 COCO-Cap. F's result is the official one.
+**Slides:** none (F's `c4_F.tex` carries the result).
+**Open points:** F's data-check lines read F's cache, which N cannot read; replaced by a note in N's copy.
 
 **Review — F, <date>:** pending

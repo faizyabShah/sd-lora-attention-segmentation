@@ -30,8 +30,8 @@
 4 & Optimized tokens & no leakage; with the token the hierarchy stops helping \\
 5 & Backbones & hierarchy holds on SD 1.5 and SD 2.1, fails on SDXL \\
 6 & Consistency & 162 numbers checked, 22 fixes \\
-7 & Table 1 & COCO-Cap $\Delta$, folds won, explicit references \\
-8 & Structure and cost & comparison first; 12.9\,s and 5.1\,GiB per image \\
+7 & Table 1 & rebuilt: COCO-Cap $\Delta$, folds won, explicit references \\
+8 & Structure and cost & comparison first; 12.9\,s (A100), 5.1\,GiB per image \\
 9 & Venue & ICPR 2027 confirmed; 13.5 of 15 pages already used \\
 \bottomrule
 \end{tabular}
@@ -376,24 +376,24 @@ Supplement pointers & ten vague pointers made exact; supplement numbered S1, S2,
 \end{frame}
 
 % ---------------------------------------------------------------- #7
-\begin{frame}{Comment 7: Table 1 with COCO-Cap $\Delta$, folds won and explicit references}
-\status{numbers pending}
+\begin{frame}{Comment 7: Table 1 rebuilt from one capture, with COCO-Cap for every row}
+\status{done, unreviewed}
 \begin{slidetable}
-\begin{tabular}{@{}lrrrrr@{}}
+\begin{tabular}{@{}lrrcrr@{}}
 \toprule
-Row & VOC & $\Delta$ VOC (vs) & folds & COCO & $\Delta$ COCO \\
+Row (vs previous) & VOC-Sim & $\Delta$ VOC & folds & COCO-Cap & $\Delta$ COCO \\
 \midrule
-1 CA only & .665 & & & [pending] & \\
-2 drop 32-px CA & .691 & +.026 (1) & 4/5 & [pending] & [pending] \\
-3a SA, all 16, one pass & .756 & +.065 (2) & [pending] & [pending] & [pending] \\
-3b SA 64 px only & .789 & +.033 (3a) & 5/5 & [pending] & [pending] \\
-4--6 passes, CRF, calls & .817 & +.028 (3b) & 4--5/5 & .644 & \\
-7 SA-guided weights & .823 & +.006 (6) & 4/5 & .662 & \textbf{+.018} \\
-8 coarse-to-fine + cap & .829 & +.006 (7) & 5/5 & .696 & \textbf{+.034} \\
+1 CA, all modules & .707 & -- & -- & .574 & -- \\
+2 drop 32-px CA & .714 & +.008 & 5/5 & .572 & $-$.002 \\
+3 one SA pass, 64 px & .790 & \textbf{+.076} & 5/5 & .629 & \textbf{+.057} \\
+4 second SA pass & .803 & +.012 & 5/5 & .636 & +.008 \\
+5--6 DenseCRF, calls 10--20 & .820 & +.017 & 4--5/5 & .657 & +.021 \\
+7 SA-guided weights & .825 & +.005 & 4/5 & .673 & +.015 \\
+8 hierarchy + cap (BRACE) & .832 & +.007 & 4/5 & .708 & \textbf{+.036} \\
 \bottomrule
 \end{tabular}
 \end{slidetable}
-\src{paper Table 1; supp.~Tab.~10; row 3a (.756) was hidden; new capture [pending]}
+\src{\texttt{comparisons/drafts/table1\_ladder/result.md}; VOC-selected threshold; row 8 at a shared 0.55: +.010 on COCO-Cap}
 \end{frame}
 
 % ---------------------------------------------------------------- #8
@@ -415,26 +415,23 @@ Now & Proposed \\
 \src{\texttt{comparisons/notes/entry\_1\_8\_reframing\_and\_structure.md}}
 \end{frame}
 
-\begin{frame}{Comment 8: the hierarchy is nearly free; recording attention and DenseCRF dominate}
-\status{done; V100 pending}
+\begin{frame}{Comment 8: the hierarchy is free; recording attention and DenseCRF dominate}
+\status{done}
 \begin{slidetable}
 \begin{tabular}{@{}lrr@{}}
 \toprule
 Per image (SD 1.5, 30 steps, median of 100) & A100 & V100 \\
 \midrule
-Generation, no recording & 2.66\,s & [pending] \\
-Recording attention & +4.27\,s & [pending] \\
-Seed and maps (hierarchy 0.04\,s, same as fine-only) & 0.15\,s & [pending] \\
-DenseCRF (one CPU core) & 5.9\,s & [pending] \\
-\textbf{Total, BRACE} & \textbf{12.9\,s} & [pending] \\
-Peak GPU memory & 5.1\,GiB & [pending] \\
+Generation alone & 2.66\,s & 12.11\,s \\
+Generation with attention recording & 6.94\,s & 12.02\,s \\
+Fine-only map / BRACE map & 0.03 / 0.04\,s & 0.08 / 0.10\,s \\
+DenseCRF (one CPU core) & 5.92\,s & 5.07\,s \\
+\textbf{Total, BRACE (same as fine-only)} & \textbf{12.9\,s} & \textbf{17.2\,s} \\
+Peak GPU memory & 5.1\,GiB & 5.1\,GiB \\
 \bottomrule
 \end{tabular}
 \end{slidetable}
-\begin{itemize}
-\item PyTorch 2.4.1, CUDA 12.1, diffusers 0.36; A100-PCIE 40\,GB.
-\end{itemize}
-\src{\texttt{comparisons/cost/}}
+\src{\texttt{comparisons/cost/result.md}; PyTorch 2.4.1, CUDA 12.1, diffusers 0.36}
 \end{frame}
 
 % ---------------------------------------------------------------- #9

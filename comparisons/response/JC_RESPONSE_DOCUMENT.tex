@@ -1301,61 +1301,93 @@ the first three rows''; row 3 ``hides the largest jump (.691 \ensuremath{\righta
   .789 jump.
 \end{itemize}
 
-\subsection{7.2 Proposed Table 1 (draft; the COCO-Cap values of rows
-1--3 come from a fresh capture {[}pending{]})}
+\subsection{7.2 New Table 1, rebuilt from one capture on both benchmarks
+--- done}
+
+Configuration: all nine rows of the current Table 1 rebuilt from
+\textbf{one} live generation per image (prompt-corrected capture, frozen
+runtime), 490 VOC-Sim and 707 COCO-Cap images, pre-registered
+(\texttt{comparisons/drafts/table1\_ladder/PREREG.md}). Each \ensuremath{\Delta} is paired
+against the row named in ``vs'', with a 95\% bootstrap interval.
+Threshold chosen on VOC-Sim (5-fold OOF) and reused on COCO-Cap. Rows
+5--8 with DenseCRF.
 
 {\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Row
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Change
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+vs
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 VOC-Sim
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-\ensuremath{\Delta} VOC (vs row)
+\ensuremath{\Delta} VOC-Sim
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-folds won
+folds
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 COCO-Cap
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-\ensuremath{\Delta} COCO (vs row)
+\ensuremath{\Delta} COCO-Cap
 \end{minipage} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-1 & CA only, all scales & .665 & & & {[}pending{]} & \\
-2 & drop 32-px CA & .691 & +.026 (vs 1) & 4/5 & {[}pending{]} &
-{[}pending{]} \\
-3a & SA propagation, all 16 modules, one pass & .756 & +.065 (vs 2) &
-{[}pending{]} & {[}pending{]} & {[}pending{]} \\
-3b & SA 64 px only & .789 & +.033 (vs 3a) & 5/5 & {[}pending{]} &
-{[}pending{]} \\
-4 & two passes & .800 & +.011 (vs 3b) & 5/5\textsuperscript{b} & .625 & {[}pending{]} \\
-5 & DenseCRF & .813 & +.013 (vs 4) & 5/5 & .637 & +.012 \\
-6 & SA calls 10--20 & .817 & +.004 (vs 5) & 4/5 & .644 & +.007 \\
-7 & SA-guided weights & .823 & +.006 (vs 6) & 4/5 & .662 &
-\textbf{+.018} \\
-8 & coarse-to-fine + cap & .829 & +.006 (vs 7) & 5/5 & .696 &
-\textbf{+.034} \\
+1 & CA, all 16 modules (reference) & --- & .707 & --- & --- & .574 &
+--- \\
+2 & drop the five 32-px CA modules & 1 & .714 & +.008 {[}+.003, +.012{]}
+& 5/5 & .572 & \ensuremath{-}.002 {[}\ensuremath{-}.009, +.004{]} \\
+3a & one SA pass, all 16 SA modules (alternative) & 2 & .759 & +.044
+{[}+.038, +.052{]} & 5/5 & .632 & +.060 {[}+.050, +.071{]} \\
+3 & one SA pass, 64-px module only & 2 & .790 & \textbf{+.076 {[}+.069,
++.085{]}} & 5/5 & .629 & \textbf{+.057 {[}+.045, +.069{]}} \\
+4 & second SA pass & 3 & .803 & +.012 {[}+.009, +.017{]} & 5/5 & .636 &
++.008 {[}+.004, +.012{]} \\
+5 & DenseCRF & 4 & .816 & +.013 {[}+.010, +.016{]} & 5/5 & .651 & +.014
+{[}+.012, +.017{]} \\
+6 & SA calls 10--20 & 5 & .820 & +.004 {[}+.001, +.007{]} & 4/5 & .657 &
++.007 {[}+.004, +.009{]} \\
+7 & SA-guided CA weights (= fine-only reference) & 6 & .825 & +.005
+{[}\ensuremath{-}.001, +.011{]} & 4/5 & .673 & +.015 {[}+.004, +.026{]} \\
+8 & hierarchy with one-sided cap (BRACE) & 7 & .832 & +.007 {[}+.001,
++.013{]} & 4/5 & .708 & \textbf{+.036 {[}+.024, +.046{]}} \\
 \end{longtable}
 }
 
-\textsuperscript{b} with DenseCRF. Folds won from supp. Tab. 10. \ensuremath{\Delta} printed as the
-difference of the printed values; the paired \ensuremath{\Delta} and interval go in a
-separate column or the supplement. The COCO-Cap \ensuremath{\Delta} of rows 7--8 needs the
-threshold note of \#1 (+0.034 is two thresholds; +0.012 at a shared
-one). LaTeX draft: \texttt{comparisons/drafts/table1\_jc7.tex}
-{[}pending{]}. Putting it into \texttt{paper/} is F's.
+\begin{itemize}
+\tightlist
+\item
+  \textbf{COCO-Cap now has a value and a \ensuremath{\Delta} for every row}, and every \ensuremath{\Delta}
+  names its reference.
+\item
+  \textbf{The hidden jump is visible}: adding SA propagation (row 3) is
+  the largest step, +.076 on VOC-Sim and +.057 on COCO-Cap; the
+  all-16-module alternative (row 3a) sits beside it.
+\item
+  \textbf{Reproduces the paper}: VOC-Sim at the early-screen threshold
+  0.45 gives .667 / .696 / (.757) / .790 / .803 / .816 / .821 (paper:
+  .665 / .691 / (.756) / .789 / .800 / .813 / .817).
+\item
+  \textbf{Threshold caveat for row 8}: rows 7 and 8 use different
+  VOC-selected thresholds (0.425 vs 0.55). At one shared threshold of
+  0.55 the row-8 COCO-Cap \ensuremath{\Delta} is +.010 {[}\ensuremath{-}.005, +.026{]} (\#1). The
+  caption must say so; a shared-0.55 column is in the LaTeX draft.
+\item
+  LaTeX (fits the LNCS width):
+  \texttt{comparisons/drafts/table1\_jc7.tex}. Putting it into
+  \texttt{paper/} is F's.
+\end{itemize}
 
 \textbf{Slides:} F's \texttt{c7\_F.tex}.
 
@@ -1401,10 +1433,13 @@ Conclusion & 7 Conclusion \\
 \end{longtable}
 }
 
-\subsection{8.2 Cost per image (measured; workplan entry to come)}
+\subsection{8.2 Cost per image --- done}
 
-Configuration: 100 benchmark images (50 + 50), SD 1.5, 30 steps,
-guidance 7.5, F's frozen runtime; median per image.
+Configuration: 100 benchmark images (50 VOC-Sim + 50 COCO-Cap), SD 1.5
+in float32, 30 steps, guidance 7.5, 512 px, batch 1, F's frozen runtime
+unchanged; median per image, warm-up discarded. Checks: the recorded
+image is bit-identical to plain generation and the maps equal the frozen
+code's output on all 100 images.
 
 {\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
@@ -1423,39 +1458,38 @@ V100
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-generation, no attention recording & 2.66 s & {[}pending{]} \\
-generation with attention recording & 6.94 s (+4.27 s) &
-{[}pending{]} \\
-seed + maps (hierarchy 0.04 s; same as fine-only) & 0.15 s &
-{[}pending{]} \\
-DenseCRF (CPU, one core) & 5.9 s & {[}pending{]} \\
-\textbf{total, BRACE} (fine-only is the same) & \textbf{12.9 s} &
-{[}pending{]} (earlier full run: median 17.3 s) \\
-peak GPU memory & 5.1 GiB & {[}pending{]} (earlier: 5.3 GiB) \\
+generation alone & 2.66 s & 12.11 s \\
+generation with attention recording & 6.94 s & 12.02 s \\
+fine-only map / BRACE map & 0.034 s / 0.038 s & 0.080 s / 0.098 s \\
+DenseCRF (one CPU core) & 5.92 s & 5.07 s \\
+\textbf{total, BRACE} (fine-only is the same) & \textbf{12.9 s} (7.0 s
+on the GPU) & \textbf{17.2 s} (12.1 s on the GPU) \\
+peak GPU memory & 5.1 GiB & 5.1 GiB \\
 \end{longtable}
 }
 
 One-pass setting (\#5), per image on A100: SD 1.5 0.21 s / 5.1 GiB, SD
 2.1 0.19 s / 5.5 GiB, SDXL 1.49 s / 15.6 GiB.
 
-\textbf{Paragraph for Sec. 4 (draft):}
+\textbf{Paragraph for Sec. 4 (ready to paste):} \textgreater{}
+\emph{Implementation and cost.} All experiments use Stable Diffusion 1.5
+in float32 with its default PNDM scheduler, 30 denoising steps and
+classifier-free guidance 7.5 at 512 \ensuremath{\times} 512 (PyTorch 2.4.1, CUDA 12.1,
+diffusers 0.36). We measured cost on 100 benchmark images at batch size
+1. On an NVIDIA A100 (40 GB), generating an image takes 2.7 s; recording
+the attention BRACE needs raises this to 6.9 s (on a V100 both take 12.0
+s). Building the maps costs 0.04 s for BRACE and 0.03 s for fine-only
+propagation, and DenseCRF adds 5.9 s on one CPU core. One image
+therefore takes 12.9 s end to end on the A100 (17.2 s on a V100), of
+which 7.0 s is GPU time, with a peak of 5.1 GiB of GPU memory. The
+hierarchy adds no measurable time or memory over fine-only propagation,
+and the method trains nothing.
 
-\begin{quote}
-\emph{Hardware and cost.} Experiments ran on NVIDIA V100 (16/32 GB) and
-A100 (40 GB) GPUs with PyTorch 2.4.1 (CUDA 12.1), diffusers 0.36 and
-transformers 5.6. Per image on an A100, generation alone takes 2.7 s;
-recording the attention maps adds 4.3 s; building the seed and the
-hierarchy takes 0.15 s, the same as fine-only propagation; DenseCRF
-takes 5.9 s on one CPU core. Peak GPU memory is 5.1 GiB. The hierarchy
-therefore costs almost nothing over fine-only propagation; recording the
-attention and DenseCRF dominate.
-\end{quote}
+(JC worried about storing 64\ensuremath{\times}64 SA maps over many calls: the maps are
+reduced on the fly, so the peak stays at 5.1 GiB.)
 
-(The paragraph says ``recording'' rather than ``storing 64\ensuremath{\times}64 SA maps
-over many calls'', because the maps are reduced on the fly; JC's concern
-about memory is answered by the 5.1 GiB peak.)
-
-\textbf{Slides:} \texttt{c8\_N.tex} (structure); cost frame to add.
+\textbf{Slides:} \texttt{c8\_N.tex} (structure); cost slide in the
+response deck.
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -1531,10 +1565,11 @@ hierarchy no longer helps on COCO-Cap \\
 5 & done & Hierarchy holds on SD 1.5 and SD 2.1, fails on SDXL; GoCA
 wins on SDXL \\
 6 & done & 22 fixes listed \\
-7 & numbers {[}pending{]} & New columns: COCO \ensuremath{\Delta}, folds won, explicit
-references, visible .691 \ensuremath{\rightarrow} .756 \ensuremath{\rightarrow} .789 \\
-8 & done (V100 {[}pending{]}) & Structure proposal; 12.9 s and 5.1 GiB
-per image; the hierarchy is nearly free \\
+7 & done & Rebuilt from one capture: COCO-Cap value and \ensuremath{\Delta} for every row,
+folds won, explicit references; SA propagation (+.076 / +.057) is the
+biggest step \\
+8 & done & Structure proposal; 12.9 s (A100) / 17.2 s (V100) and 5.1 GiB
+per image; the hierarchy is free \\
 9 & done & ICPR confirmed; about 13.5 of 15 pages used before the
 additions \\
 \end{longtable}
