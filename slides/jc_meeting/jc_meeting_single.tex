@@ -44,14 +44,14 @@
 \toprule
 Comment & Done & Status \\
 \midrule
-1 Claim & gain breakdown; claims kept, weakened, dropped; reframed text & done \\
+1 Claim & configuration vs new components; claims kept, weakened, dropped & done \\
 2 Mapping & contribution $\to$ evidence table & done \\
 3 Comparison & GoCA, NERVE, DiffSegmenter rerun, paired with BRACE; seed/propagation swap & done \\
 4 Optimized tokens & BRACE with OVAM's token; token provenance & done \\
 5 Backbones & BRACE, fine-only and GoCA on SD 1.5, SD 2.1, SDXL & done \\
 6 Consistency & 162 numbers traced & done \\
-7 Table 1 & ladder with COCO-Cap, $\Delta$s, folds won & corrected rerun planned \\
-8 Structure, cost & new outline; one-pass runtime and memory & full cost planned \\
+7 Table 1 & ladder on corrected data, COCO-Cap, $\Delta$s, folds won & done (draft table) \\
+8 Structure, cost & new outline; runtime and memory per image & done \\
 9 Venue & ICPR 2027 dates, format, page fit & done \\
 Extra & query-profile gate (training-free) & exploratory \\
 \bottomrule
@@ -95,6 +95,28 @@ Bold: 95\% paired bootstrap interval excludes zero.
 
 % =====================================================================
 \section{Comment 1}
+\begin{frame}{1. The two new components add 0.012 on VOC-Sim, 0.051 on COCO-Cap}
+\begin{slidetable}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}llrrl@{}}
+\toprule
+Table 1 rows & Step & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap & Kind \\
+\midrule
+1 $\to$ 2 & drop the 32-px CA modules & $+0.008$ & $-0.002$ & configuration \\
+2 $\to$ 3 & SA propagation (64 px) & $+0.076$ & $+0.057$ & configuration \\
+3 $\to$ 6 & second pass, DenseCRF, calls 10--20 & $+0.030$ & $+0.028$ & configuration \\
+\midrule
+6 $\to$ 7 & \textbf{SA-guided layer weights} & $+0.005$ & $+0.015$ & new \\
+7 $\to$ 8 & \textbf{coarse-to-fine hierarchy + cap} & $+0.007$ & $+0.036$ & new \\
+\midrule
+ & total configuration / new & $+0.113$ / $+0.012$ & $+0.083$ / $+0.051$ & \\
+\bottomrule
+\end{tabular}}
+\end{slidetable}
+The novelty shows in clutter. Corrected data, threshold chosen on VOC-Sim.
+\src{workplan Entry 19 (Table 1 ladder)}
+\end{frame}
+
 \begin{frame}{1. Most of the gain over OVAM is configuration}
 \begin{slidetable}
 \resizebox{\linewidth}{!}{%
@@ -189,6 +211,25 @@ $\Delta$ = method $-$ BRACE, paired. DenseCRF; threshold chosen on VOC-Sim. With
 \src{\texttt{comparisons/official/result.md}}
 \end{frame}
 
+\begin{frame}{3. Published numbers (not paired, other images and post-processing)}
+\begin{slidetable}
+\begin{tabular}{@{}lrrl@{}}
+\toprule
+Published (OVAM, Table 1) & VOC-Sim & COCO-Cap & Note \\
+\midrule
+DAAM & 0.662 & 0.484 & OVAM's run \\
+Attn2Mask & 0.687 & 0.550 & OVAM's run \\
+OVAM, class word & 0.704 & 0.582 & \\
+OVAM, optimized token & 0.825 & --- & few-shot \\
+Grounded Diffusion & 0.621 & 0.502 & trains a module \\
+DatasetDM & 0.803 & 0.593 & trains a decoder \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+Proposed Table 5 blocks: paired diffusion-only; paired with an extra model; few-shot; published.
+\src{OVAM (CVPR 2024), Table 1}
+\end{frame}
+
 \begin{frame}{3. NERVE's lead needs its CLIP seed and its walk together}
 \begin{slidetable}
 \begin{tabular}{lrrcrr}
@@ -265,7 +306,7 @@ Seed, uniform layers      & 0.588 & 0.766 & 0.444 & 0.625 \\
 \bottomrule
 \end{tabular}
 \end{slidetable}
-Token $-$ word: \pos{+0.031} VOC-Sim, $-0.015$ COCO-Cap. Tokens were optimized on 57 separate images (no overlap with either benchmark): few-shot, no leakage.
+Pre-correction capture. Corrected data, full pipeline at 0.55: word 0.832 / 0.708, token 0.864 / 0.693 (VOC-Sim / COCO-Cap). Tokens: 57 separate images, no overlap; few-shot, no leakage.
 \src{runs/15\_token\_ladder/result.md; \texttt{comparisons/notes/entry\_4\_token\_provenance.md}}
 \end{frame}
 
@@ -321,25 +362,28 @@ Cells: VOC-Sim / COCO-Cap, threshold chosen on VOC-Sim. Stored images, noise at 
 
 % =====================================================================
 \section{Comment 7}
-\begin{frame}{7. Table 1 with COCO-Cap values and consecutive differences}
+\begin{frame}{7. Table 1 on the corrected data, both benchmarks}
 \begin{slidetable}
+\renewcommand{\arraystretch}{1.0}
 \begin{tabular}{lrrcrr}
 \toprule
  & \multicolumn{3}{c}{VOC-Sim} & \multicolumn{2}{c}{COCO-Cap} \\
 \cmidrule(lr){2-4}\cmidrule(lr){5-6}
 Step & mIoU & $\Delta$ & folds & mIoU & $\Delta$ \\
 \midrule
-Seed, uniform layers      & 0.588 & ---      & --- & 0.444 & --- \\
-+ guided layer weights    & 0.611 & $+0.023$ & 0/5 & 0.501 & $+0.056$ \\
-+ fine-only propagation   & 0.791 & $+0.180$ & 5/5 & 0.677 & $+0.176$ \\
-+ hierarchy, no cap       & 0.807 & $+0.016$ & 3/5 & 0.687 & $+0.010$ \\
-+ one-sided cap           & 0.817 & $+0.010$ & 4/5 & 0.682 & $-0.005$ \\
-\textbf{+ DenseCRF (full)} & \textbf{0.830} & $+0.013$ & 5/5 & \textbf{0.696} & $+0.014$ \\
+1 Cross-attention, all 16 modules           & 0.707 & ---          & --- & 0.574 & --- \\
+2 Drop the five 32-px modules               & 0.714 & \pos{+0.008} & 5/5 & 0.572 & $-0.002$ \\
+3 One SA pass, 64-px module                 & 0.790 & \pos{+0.076} & 5/5 & 0.629 & \pos{+0.057} \\
+4 Second SA pass                            & 0.803 & \pos{+0.012} & 5/5 & 0.636 & \pos{+0.008} \\
+5 DenseCRF                                  & 0.816 & \pos{+0.013} & 5/5 & 0.651 & \pos{+0.014} \\
+6 SA calls 10--20                           & 0.820 & \pos{+0.004} & 4/5 & 0.657 & \pos{+0.007} \\
+7 SA-guided CA weights (fine-only)          & 0.825 & $+0.005$     & 4/5 & 0.673 & \pos{+0.015} \\
+\textbf{8 Hierarchy with one-sided cap (BRACE)} & \textbf{0.832} & \pos{+0.007} & 4/5 & \textbf{0.708} & \pos{+0.036} \\
 \bottomrule
 \end{tabular}
 \end{slidetable}
-Row minus row above, one capture, threshold 0.55. Pre-correction capture; a factorial rerun on the corrected data is planned.
-\src{runs/15\_token\_ladder/result.md}
+Row minus row above, one capture, threshold chosen on VOC-Sim. Row 8 vs 7 at a shared 0.55: $+0.036$ / $+0.010$ (n.s.).
+\src{workplan Entry 19}
 \end{frame}
 
 \begin{frame}{7. The hierarchy's COCO-Cap gain depends on the threshold convention}
@@ -355,7 +399,7 @@ Each at its COCO-Cap best (0.60 / 0.525)     & 0.707 & 0.689 & \pos{+0.018} \\
 \bottomrule
 \end{tabular}
 \end{slidetable}
-About half of the $+0.034$ is better localisation; the rest is that the hierarchy's threshold transfers better. Last row uses COCO-Cap labels (diagnostic).
+About half of the $+0.034$ is better localisation; the rest is threshold transfer. Pre-correction capture; last row uses COCO-Cap labels (diagnostic).
 \src{runs/16\_trace\_034/result.md}
 \end{frame}
 
@@ -375,7 +419,24 @@ Now & Proposed \\
 \bottomrule
 \end{tabular}
 \end{slidetable}
-Cost (one pass, A100): 0.21 s and 5.1 GiB per image on SD 1.5; DenseCRF 4.5 s on one CPU core. Generation-time cost: planned.
+\end{frame}
+
+\begin{frame}{8. Cost: the hierarchy is free; attention recording and DenseCRF dominate}
+\begin{slidetable}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Per image (SD 1.5, 30 steps, median of 100) & A100 & V100 \\
+\midrule
+Generation alone & 2.66\,s & 12.11\,s \\
+Generation with attention recording & 6.94\,s & 12.02\,s \\
+Fine-only map / BRACE map & 0.03 / 0.04\,s & 0.08 / 0.10\,s \\
+DenseCRF (one CPU core) & 5.92\,s & 5.07\,s \\
+\textbf{Total, BRACE (same as fine-only)} & \textbf{12.9\,s} & \textbf{17.2\,s} \\
+Peak GPU memory & 5.1\,GiB & 5.1\,GiB \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\src{\texttt{comparisons/cost/result.md} (workplan Entry 18)}
 \end{frame}
 
 \begin{frame}{9. ICPR 2027}
@@ -499,6 +560,18 @@ Which part works; class-adaptive gate & running (mechanism study) \\
 \end{tabular}
 \end{slidetable}
 Not in the paper's method. A claim would need a pre-registered test on fresh annotated images.
+\end{frame}
+
+% =====================================================================
+\begin{frame}{Questions for JC}
+\begin{enumerate}
+\item Headline: best diffusion-only method, with CLIP methods in a separate block?
+\item Which blocks of the new Table 5 go in the main paper?
+\item Optimized tokens and SDXL: report as limitations, or drop the blocks?
+\item Which capture is canonical: original (0.829 / 0.696) or prompt-corrected (0.832 / 0.709)?
+\item SD 2.1: is the verified community copy acceptable?
+\item Author list and order for ICPR (fixed on 1 March); online-only venue acceptable?
+\end{enumerate}
 \end{frame}
 
 \end{document}
