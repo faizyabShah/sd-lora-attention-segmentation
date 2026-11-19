@@ -670,8 +670,8 @@ def report(a):
     S = {ds: _load_scores(ds, a.tag) for ds in SETS}
     sub = lambda s, sel: {k: (v[sel] if isinstance(v, np.ndarray) and len(v) == len(sel) else v) for k, v in s.items()}
     dev = {ds: sub(S[ds], S[ds]["part"] == "dev") for ds in SETS}; tst = {ds: sub(S[ds], S[ds]["part"] == "test") for ds in SETS}
-    mi = lambda D, P: cc.miou(P[:, None], D["cls"], np.ones(len(D["cls"]), bool))[0]
-    curve = lambda D, k: cc.miou(D[k], D["cls"], np.ones(len(D["cls"]), bool))
+    mi = lambda D, P: cc.miou(P[:, None], D["cls"], np.ones(len(D["cls"]), bool))[0] if len(D["cls"]) else np.nan
+    curve = lambda D, k: cc.miou(D[k], D["cls"], np.ones(len(D["cls"]), bool)) if len(D["cls"]) else np.zeros(len(THR))
 
     def thr(reg, k):
         cv = curve(dev["voc"], k)
@@ -706,6 +706,8 @@ def report(a):
         return P, ch
 
     def dci(ds, Pa, Pb):
+        if len(tst[ds]["cls"]) < 2:
+            return "n/a", np.nan, np.nan, np.nan
         lo, hi = cc.boot(tst[ds], Pa, Pb, n=a.boot); d = mi(tst[ds], Pa) - mi(tst[ds], Pb)
         return f"{d:+.3f} [{lo:+.3f}, {hi:+.3f}]", d, lo, hi
 
