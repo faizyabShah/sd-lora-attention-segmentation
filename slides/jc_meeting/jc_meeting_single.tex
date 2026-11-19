@@ -68,14 +68,14 @@ The novelty shows in clutter. Corrected data, threshold chosen on VOC-Sim.
 \src{workplan Entry 19 (Table 1 ladder)}
 \end{frame}
 
-\begin{frame}{1. Coarse-to-fine hierarchy vs fine-only propagation}
+\begin{frame}{1. Capped coarse-to-fine hierarchy vs fine-only propagation}
 \begin{slidetable}
 \renewcommand{\arraystretch}{1.0}
 \begin{tabular}{@{}lrrrcrrr@{}}
 \toprule
  & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
 \cmidrule(lr){2-4}\cmidrule(lr){6-8}
-Threshold & fine-only & hierarchy & $\Delta$ & & fine-only & hierarchy & $\Delta$ \\
+Threshold & fine-only & capped hier. & $\Delta$ & & fine-only & capped hier. & $\Delta$ \\
 \midrule
 VOC-Sim-selected & 0.811 & 0.818 & \pos{+0.007} & & 0.670 & 0.693 & \pos{+0.023} \\
 fixed 0.55 & 0.792 & 0.819 & \pos{+0.027} & & 0.690 & 0.693 & $+0.003$ \\
@@ -86,27 +86,22 @@ best (uses labels) & 0.813 & 0.819 & \pos{+0.007} & & 0.693 & 0.709 & \pos{+0.01
 {\footnotesize Raw maps; one capture (Table 1 ladder, corrected data). Bold: 95\% paired interval excludes zero.}
 \end{frame}
 
-\begin{frame}{1. The other new parts: SA-guided weights and the cap}
+\begin{frame}{1. SA-guided cross-attention layer weights}
 \begin{slidetable}
 \renewcommand{\arraystretch}{1.0}
-\resizebox{\linewidth}{!}{%
-\begin{tabular}{@{}llrrrcrrr@{}}
+\begin{tabular}{@{}lrrrcrrr@{}}
 \toprule
- &  & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
-\cmidrule(lr){3-5}\cmidrule(lr){7-9}
-Comparison & Threshold & without & with & $\Delta$ & & without & with & $\Delta$ \\
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Threshold & uniform & guided & $\Delta$ & & uniform & guided & $\Delta$ \\
 \midrule
-SA-guided weights & VOC-Sim-selected & 0.807 & 0.811 & $+0.004$ & & 0.643 & 0.670 & \pos{+0.027} \\
- & fixed 0.55 & 0.781 & 0.792 & \pos{+0.010} & & 0.662 & 0.690 & \pos{+0.028} \\
- & best (uses labels) & 0.807 & 0.813 & \pos{+0.005} & & 0.662 & 0.693 & \pos{+0.030} \\
-\midrule
-Cap$^\dagger$ & VOC-Sim-selected & 0.807 & 0.816 & \pos{+0.008} & & 0.678 & 0.682 & $+0.004$ \\
- & fixed 0.55 & 0.807 & 0.817 & \pos{+0.010} & & 0.687 & 0.682 & \pos{-0.005} \\
- & best (uses labels) & 0.807 & 0.817 & \pos{+0.010} & & 0.697 & 0.698 & $+0.000$ \\
+VOC-Sim-selected & 0.807 & 0.811 & $+0.004$ & & 0.643 & 0.670 & \pos{+0.027} \\
+fixed 0.55 & 0.781 & 0.792 & \pos{+0.010} & & 0.662 & 0.690 & \pos{+0.028} \\
+best (uses labels) & 0.807 & 0.813 & \pos{+0.005} & & 0.662 & 0.693 & \pos{+0.030} \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{slidetable}
-{\footnotesize Raw maps. $^\dagger$Pre-correction capture, the only one with an uncapped map. Bold: 95\% paired interval excludes zero.}
+{\footnotesize Raw maps, fine-only stage; same capture. Bold: 95\% paired interval excludes zero.}
 \end{frame}
 
 \begin{frame}{1. Query-profile gate (exploratory): the idea}
