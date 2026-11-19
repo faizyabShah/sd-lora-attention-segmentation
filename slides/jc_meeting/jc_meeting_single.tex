@@ -126,9 +126,9 @@ DenseCRF helps capped maps 6$\times$ more & comes from comparing at two threshol
 \begin{itemize}
 \item Most of our components barely change VOC-Sim (one object per image) and help on COCO-Cap (cluttered scenes).
 \item Our selection rule used VOC-Sim only, so it could not see these gains: it kept fine-only, and we adopted the hierarchy after seeing COCO-Cap.
-\item We disclose this in the paper.
 \item \textbf{Proposal:} change the selection set. Select on 50\% of VOC-Sim and 50\% of COCO-Cap images (split by class), and report every number on the other half of each.
 \item The test halves are then untouched by selection, and the rule can see clutter.
+\item We can then show final numbers on each dataset.
 \end{itemize}
 \end{frame}
 
@@ -152,7 +152,6 @@ Thirteen results support no contribution: candidates to move to the supplement.
 \end{frame}
 
 % =====================================================================
-\section{Comment 3}
 \begin{frame}{3. Diffusion-only methods, same images, class word}
 \begin{slidetable}
 \renewcommand{\arraystretch}{1.0}
@@ -167,11 +166,11 @@ GoCA, SD 1.5 & 0.753 & 0.599 & \pos{-0.078} & \pos{-0.110} \\
 GoCA, SD 2.1-base & 0.740 & 0.597 & \pos{-0.091} & \pos{-0.111} \\
 DAAM & 0.727 & 0.644$^*$ & \pos{-0.104} & \pos{-0.067} \\
 SeeDiff & 0.723 & 0.665$^*$ & \pos{-0.108} & \pos{-0.046} \\
-OVAM, class word & 0.703 & 0.568 & \pos{-0.128} & \pos{-0.140} \\
+OVAM, class word$^\ddagger$ & 0.704 & 0.582 & $-0.127$ & $-0.126$ \\
 \bottomrule
 \end{tabular}
 \end{slidetable}
-{\footnotesize $\Delta$ = method $-$ BRACE, paired. DenseCRF; threshold chosen on VOC-Sim. Bold: interval excludes zero. $^*$437 COCO-Cap images whose caption contains the class word (BRACE 0.711 on them).}
+{\footnotesize $\Delta$ = method $-$ BRACE, paired. DenseCRF; threshold chosen on VOC-Sim. Bold: interval excludes zero. $^*$437 COCO-Cap images whose caption contains the class word (BRACE 0.711 on them). $^\ddagger$Published in the OVAM paper; not paired, so no interval.}
 \end{frame}
 
 \begin{frame}{3. Few-shot and CLIP-based methods, same images}
@@ -184,11 +183,11 @@ Block & Method & VOC-Sim & COCO-Cap & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
 \midrule
  & \textbf{BRACE} & \textbf{0.831} & \textbf{0.708} & --- & --- \\
 \midrule
-Few-shot & OVAM, optimized token & 0.828 & 0.664 & $-0.003$ & \pos{-0.044} \\
+Few-shot & OVAM, optimized token$^\ddagger$ & 0.825 & --- & $-0.006$ & --- \\
 \midrule
 With CLIP & NERVE, class word & 0.844 & 0.740 & $+0.012$ & \pos{+0.032} \\
  & NERVE, 20-class vocabulary & 0.839 & 0.747 & $+0.008$ & \pos{+0.039} \\
- & SCLIP + DenseCRF & 0.764 & 0.652 & \pos{-0.067} & \pos{-0.057} \\
+ & SCLIP seed + fine-only$^\dagger$ & 0.838 & 0.712 & $+0.007$ & $+0.004$ \\
  & SCLIP seed + BRACE$^\dagger$ & 0.852 & 0.734 & \pos{+0.020} & $+0.025$ \\
 \midrule
 Not rerun & Attn2Mask & TBR & TBR & TBR & TBR \\
@@ -198,7 +197,7 @@ Not rerun & Attn2Mask & TBR & TBR & TBR & TBR \\
 \bottomrule
 \end{tabular}}
 \end{slidetable}
-{\footnotesize $\Delta$ = method $-$ BRACE, paired. DenseCRF; threshold chosen on VOC-Sim. Bold: interval excludes zero. $^\dagger$Other capture; vs BRACE 0.832 / 0.709 there.}
+{\footnotesize $\Delta$ = method $-$ BRACE, paired. DenseCRF; threshold chosen on VOC-Sim. Bold: interval excludes zero. $^\dagger$Other capture; vs BRACE 0.832 / 0.709 there. $^\ddagger$Published in the OVAM paper; not paired, no COCO-Cap value.}
 \end{frame}
 
 \begin{frame}{3. Published numbers (not paired, other images and post-processing)}
