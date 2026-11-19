@@ -289,28 +289,28 @@ Edited in place by the owner. States: `not started`, `in progress`,
 |---|---|---|---|
 | Contract and manifests | F | not started | — |
 | #1 gain breakdown | F | in progress: step-by-step numbers in Entry 8; configuration vs new-component split not yet written | Entry 8 |
-| #1 reframing text | N | not started | — |
+| #1 reframing text | N | done, awaiting review (draft; nothing in `paper/` changed) | Entry 13 |
 | #2 mapping table | N | done, awaiting review | Entry 7 |
 | #3 OVAM class word | F | not started | — |
 | #3 OVAM optimized tokens | F | not started | — |
 | #3 DAAM | F | not started | — |
 | #3 SeeDiff | F | not started | — |
 | #3 SCLIP + DenseCRF | F | not started | — |
-| #3 GoCA | N | done, awaiting review (sanity only; official scoring waits for Entry 1) | Entries 2–4 |
-| #3 NERVE | N | done, awaiting review (sanity only; official row undecided: A or V) | Entries 2–4 |
+| #3 GoCA | N | done, awaiting review (official paired rows, SD 1.5 and SDXL) | Entries 2–4, 11 |
+| #3 NERVE | N | done, awaiting review (official paired rows for A, V, W; A is the class-word row) | Entries 2–4, 11 |
 | #3 seed × propagation swap, BRACE and NERVE (cross-side diagnostic; does not replace N's NERVE row) | F | done, awaiting review | Entry 10 |
-| #3 DiffSegmenter | N | done, awaiting review (sanity only; class-word row) | Entries 2–4 |
+| #3 DiffSegmenter | N | done, awaiting review (official paired class-word row) | Entries 2–4, 11 |
 | #3 SPARK | N | no-go | Entry 2 |
-| #3 published block | N | not started | — |
+| #3 published block | N | done, awaiting review | Entry 12 |
 | #4 BRACE with optimized tokens | F | done, awaiting review | Entry 8 |
 | #4 token provenance | N | done, awaiting review | Entry 5 |
-| #5 fine-only and BRACE, SD 1.5 / 2.1 / XL | F | not started | — |
-| #5 GoCA, SD 1.5 / 2.1 / XL | N | in progress: SD 1.5 and SDXL done; SD 2.1 blocked (official weights removed) | Entries 3–4 |
+| #5 fine-only and BRACE, SD 1.5 / 2.1 / XL | F (run by N on 2026-11-19 at Narmeen's request) | done, awaiting review | Entry 15 |
+| #5 GoCA, SD 1.5 / 2.1 / XL | N | done, awaiting review (SD 2.1-base on a hash-checked community copy) | Entries 3–4, 12, 14 |
 | #6 consistency | N | done, awaiting review | Entry 6 |
 | #7 Table 1 | F | in progress: numbers done (Entry 8); paper table and caption not yet rewritten | Entry 8 |
 | #8 cost and hardware | F | not started | — |
-| #8 restructuring | N | not started | — |
-| #9 venue | N | not started | — |
+| #8 restructuring | N | done, awaiting review (proposed outline; applied after #7) | Entry 13 |
+| #9 venue | N | done, awaiting review | Entry 12 |
 | Slide deck: blank skeleton | F | done | `slides/jc_meeting/` |
 | Slides: own sections | F and N | in progress | Entries 2–8 |
 
@@ -450,7 +450,17 @@ entry, not by editing the reviewed one.
 - Paper Table 1 and its caption are not rewritten yet. The configuration vs new-component split for #1 is not written yet.
 - Entry 1 (contract) was dropped as a separate task: both sides have the same benchmark data. The scoring rules of Section 3 stand.
 
-**Review — N, <date>:** pending
+**Review — N, 2026-11-19:** confirmed with notes. I traced every number to `runs/15_token_ladder/result.md` and
+found no mismatch. The PREREG (`95288dc`, 18:41) precedes every job: smoke at 18:41:40, full jobs 253146–253153 at
+18:45:18 per `sacct`, scoring 20:41–21:58. The only later change (`95381a4`) guards empty folds in the report and
+does not touch scoring (diff read). The token verdict ("none of H, L, C holds") is the registered rule's verdict.
+Notes: (1) under the same rule the class-word rerun also fails H (+0.012 [−0.002, +0.026]) and C (COCO-Cap −0.005
+[−0.011, −0.001]); only L holds, and the entry should say so. (2) At 0.55, fine-only is scored away from its
+VOC-Sim optimum, so the class-word VOC-Sim H of +0.034 is partly threshold, the mirror of Entry 9. (3) "Best token
+cell = fine-only + DenseCRF" holds at 0.55 only. (4) runs/15's DenseCRF grid is 0.05, so its VOC-sel. values are
+not comparable with runs/17/20. (5) The PREREG asked for OVAM's published token scores as an unpaired reference;
+they are missing. (6) The capture predates the prompt correction (runs/19 addendum), so these numbers wait for
+runs/25 before going into the paper. Not checked: the bootstrap intervals and per-image maps (not committed).
 
 ### Entry 9 — F (Faizyab's Claude), 2026-11-16
 **Item:** #7 Table 1; #1 claim (source of the draft's COCO-Cap hierarchy gain, +0.034)
@@ -468,7 +478,18 @@ entry, not by editing the reviewed one.
 **Slides:** `slides/jc_meeting/sections/c7_F.tex` (one bullet rewritten, one slide added).
 **Open points:** The paper text is not changed. Proposed wording for the claim: the hierarchy's map transfers to cluttered scenes at its VOC-Sim threshold, where the fine-only map does not; about half of the +0.034 remains when each map is given its best threshold. This agrees with protocol Section 134 ("cross-image calibration, not better localisation").
 
-**Review — N, <date>:** pending
+**Review — N, 2026-11-19:** confirmed with notes. I traced every number to `runs/16_trace_034/result.md` and found
+no mismatch, and I recomputed the source from the committed counts of the original run (`sg_combined_v3` shards).
+That gives thresholds 0.425/0.55, +0.0341 [+0.0224, +0.0454] (0.6964 − 0.6623), +0.0123 [−0.0026, +0.0265] at a
+common 0.55, and +0.0175 at each map's COCO-best, so the two-threshold attribution holds on the original run too.
+The work is post hoc and labelled so, with no selection. Notes: (1) calling the +0.018 at each map's best threshold
+"localisation" contradicts Section 134 and the paper's per-image oracle (tie, 0.896 vs 0.895), which the entry says
+it agrees with. Both parts are cross-image calibration: about +0.018 at a COCO-chosen global threshold and about
++0.016 from transferring fine-only's VOC-Sim threshold. (2) The same convention produces the paper's "DenseCRF gains
+six times more on capped maps" (+0.002 vs +0.014). At matched thresholds DenseCRF adds +0.014 [+0.012, +0.016] to
+fine-only at 0.45, against +0.014 for the capped map at 0.55 (N's recomputation, post hoc). (3) runs/20 reproduces
+the pattern on the corrected data: +0.036 at the VOC-selected thresholds, +0.010 [−0.004, +0.026] at 0.55, +0.017 at
+COCO-best. Not checked: runs/16's own intervals (no per-image counts committed).
 
 ### Entry 10 — F (Faizyab's Claude), 2026-11-17
 **Item:** #3 comparison methods (cross-side diagnostic: where NERVE's lead over BRACE comes from)
@@ -494,4 +515,92 @@ entry, not by editing the reviewed one.
 **Slides:** `slides/jc_meeting/sections/c3_F.tex` (two slides).
 **Open points:** N to confirm that the NERVE cell here matches the intended variant A. Whether the paper states this result (e.g. one sentence: with the same CLIP seed, our hierarchy and NERVE's walk differ by +0.033 on COCO-Cap in NERVE's favour; with the SD-only seed, by 0.019 in ours) is for the owners.
 
-**Review — N, <date>:** pending
+**Review — N, 2026-11-19:** issues (numbers and rule confirmed; one caveat wrong; headline superseded). I traced
+every number to `runs/17_seed_walk_swap/result.md` and found no mismatch. The PREREG (`6a445fc`, 22:55) precedes
+the full jobs 253191–253203 (submitted 23:05:16 per `sacct`, scoring 23:59–02:05). The only change (`150586f`) is a
+report guard and an output suffix, with no scoring change (diff read). "Mixed" is the registered rule's outcome. The
+NERVE cell is N's variant A (class word + NERVE's 25 background words, d = 40, K=1 guard; checked in
+`jc_swap_nerve.py` against `PREREG_sd15.md`). Its 0.8302/0.7295 equals N's `sanity_summary.json` and N's recomputed
+counts (0.83020/0.72946) to four decimals; the per-image residuals were not checked (not committed). Issues: (1)
+caveat (1) and the "bit-identical" sensitivity compare the regeneration with the stored paper capture
+(`jc_swap.py:65`), not with the official PNG that the CLIP seed, the walk and the annotation use. Those differ on
+101 COCO-Cap images (runs/19 addendum), so the subset does not control the mismatch. (2) The 0.737 vs 0.696 lead is
+superseded. On corrected prompts (runs/20) NERVE − BRACE is +0.027 [+0.002, +0.054] on COCO-Cap and +0.011
+[−0.003, +0.026] on VOC-Sim. The swap stays mixed (P-CLIP +0.016 [+0.004, +0.030], P-CA −0.033 [−0.045, −0.020],
+S-H +0.010 [−0.011, +0.034], S-W +0.060 [+0.037, +0.084]). (3) `c3_F.tex` needs the corrected numbers; a correction
+entry is requested.
+
+### Entry 11 — N (Narmeen), 2026-11-19
+**Item:** #3 GoCA, NERVE, DiffSegmenter: official rows paired with BRACE
+**Kind:** result
+**What was done:** BRACE regenerated with side F's committed modules imported unchanged (`scripts/jc_newrerun.rows` with the runs/20 corrected prompts, `sg27_runtime.live_maps`, `sg_combined_v2.aggregate`), safety checker off, job 253750 (wald V100). N methods scored from their stored soft maps (jobs 253753, 253757, 253803). Metric, OOF and bootstrap code reused unchanged from `scripts/sg_class_comp.py`; DenseCRF R2 = `src/segmentation/ovam_full.apply_ovam_densecrf`. Threshold grid: runs/20's 0.30–0.70 extended to 0.05–0.95 (27 values), because GoCA SD 1.5 peaks above 0.70; BRACE's numbers are the same on either grid.
+**Where:** `comparisons/official/` (`brace_repro.py`, `score_n.py`, `report.py`, `result.md`, `summary.json`, `per_item_counts.csv`); this commit.
+**Result (exploratory; BRACE's VOC-Sim numbers are in-sample for its design):**
+- BRACE reproduction of runs/20: DenseCRF 0.831 / 0.708 VOC-sel. (runs/20: 0.832 / 0.709); raw 0.818 / 0.692 (0.818 / 0.693); fine-only and seed-alone cells within 0.001. Ground-truth masks identical on 1197/1197 items.
+- Paired Δ, method − BRACE, DenseCRF, VOC-sel., 2000-sample image bootstrap:
+
+| Method | Δ VOC-Sim | Δ COCO-Cap |
+|---|---|---|
+| GoCA SD 1.5 | −0.078 [−0.095, −0.060] | −0.110 [−0.134, −0.084] |
+| GoCA SDXL | −0.034 [−0.048, −0.021] | −0.102 [−0.124, −0.078] |
+| DiffSegmenter | −0.036 [−0.049, −0.023] | −0.020 [−0.041, +0.001] |
+| NERVE A (class word) | +0.012 [−0.002, +0.028] | +0.032 [+0.007, +0.060] |
+| NERVE V (20-class vocabulary) | +0.008 [−0.007, +0.023] | +0.039 [+0.013, +0.068] |
+| NERVE W (NERVE's names) | −0.002 [−0.017, +0.012] | +0.022 [−0.005, +0.052] |
+
+- Raw maps give the same signs. With its own released rule (image-score gate) NERVE A is 0.812 / 0.663 (DenseCRF), below BRACE. DiffSegmenter's own evaluation sweeps its background score on the evaluated set, so its own-rule row is an in-sample audit only.
+- Sensitivity: restricting to items whose regenerated image is within 1 or 2 grey levels of the stored PNG keeps every sign.
+**Slides:** `slides/jc_meeting/sections/c3_N.tex` (three frames added; sanity frame set to done).
+**Open points:** The pairs are not same-setting: BRACE reads attention during generation, the N methods segment the stored image; regeneration differs from the stored PNG by under one grey level on 431/490 and 583/707 items. NERVE uses a second model (CLIP ViT-L/14). Two workarounds outside the repo, neither touching scoring: SimpleCRF 0.2.1.1 built with a numpy-2 define; the COCO-Cap CSV rebuilt with the committed `scripts/build_coco_cap_manifest.py`.
+
+**Review — F, <date>:** pending
+
+### Entry 12 — N (Narmeen), 2026-11-19
+**Item:** #3 published block; #9 venue; #5 SD 2.1 weights
+**Kind:** result
+**What was done:** Read each paper and the ICPR 2027 pages; rescored Attn2Mask's released masks; compiled the current paper with the ICPR `llncs` template in a scratch copy (not committed). Checked the SD 2.1-base community copy against independent copies.
+**Where:** `comparisons/notes/entry_venue_and_published_block.md`; this commit.
+**Result:**
+- Published block: none of DAAM, Attn2Mask, Grounded Diffusion, DatasetDM publishes VOC-Sim or COCO-Cap numbers; the draft's Table 5 rows are OVAM's runs of them (the caption is right, supplement line 434 is not). GoCA, NERVE, DiffSegmenter, SPARK and PEARL report only real-image benchmarks, so they enter only through paired reruns. Rescoring Attn2Mask's released masks gives 0.603 on VOC-Sim against OVAM's printed 68.7 (to be checked). BibTeX for the five papers is in the note.
+- Venue: ICPR 2027 (ICPRv) is online only (October 2027), Springer LNCS one column, 15 pages plus references, double-blind, with mandatory self-review pages including an LLM-use disclosure; arXiv allowed. Registration 1 March 2027 and submission 8 March 2027 (AoE) confirmed (the site marks dates tentative). The unchanged text fills about 13.5 of the 15 pages before JC's additions; Table 3 is about 6.5 cm too wide for LNCS.
+- SD 2.1: `sd2-community/stable-diffusion-2-1-base` has unet / text_encoder / vae safetensors with the same sha256 as `kaseris/stable-diffusion-2-1-base` (a clone of Stability's repository), and its `v2-1_512-ema-pruned.ckpt` sha256 (88ecb782…) equals the LFS pointer in Stability's original commit. Narmeen approved this copy for every method on 2026-11-19; side F has not confirmed yet.
+**Slides:** `slides/jc_meeting/sections/c9_N.tex` (two frames); `c3_N.tex` caveats frame.
+**Open points:** The self-review page count (one or two) differs between the ICPR sources; follow the two-page template. The Attn2Mask gap is not explained yet.
+
+**Review — F, <date>:** pending
+
+### Entry 13 — N (Narmeen), 2026-11-19
+**Item:** #1 reframing text; #8 restructuring
+**Kind:** text
+**What was done:** Drafted the reframed abstract, contribution list and owner-override sentence, a claim-by-claim table, and the proposed section outline, from Entries 8–10, runs/20 and the protocol log (Section 135). Nothing in `paper/` is changed.
+**Where:** `comparisons/notes/entry_1_8_reframing_and_structure.md`; `comparisons/notes/audit_F_entries_8_10.md` (N's audit behind the review lines of Entries 8–10); this commit.
+**Result:**
+- The protocol log shows the override that adopted the hierarchy was made after COCO-Cap was scored and cites its +0.0341, so COCO-Cap is not untouched for that one decision; the draft says so.
+- The +0.034 is restated as cross-image calibration (Entry 9 and N's review of it); "DenseCRF gains six times more on capped maps" is dropped (same two-threshold artefact; about +0.014 for both maps at matched thresholds); "best training-free method" is narrowed to diffusion-only, with CLIP-seeded methods in a separate block.
+- #8: comparison moves to the front of a renamed Sec. 5 "Experimental results"; hardware, runtime and memory go into Sec. 4. To be applied in one commit after F's Table 1 rewrite (#7).
+**Slides:** `slides/jc_meeting/sections/c1_N.tex` (five frames), `c8_N.tex` (one frame).
+**Open points:** The abstract's headline numbers follow the owners' choice between the original and the corrected capture (runs/19–20).
+
+**Review — F, <date>:** pending
+
+### Entry 14 — N (Narmeen), 2026-11-19
+**Item:** #5 GoCA on SD 2.1-base
+**Kind:** result
+**What was done:** GoCA's `config_model_15.py` copied to `config_model_21.py` with only `name` and `version` changed; weights `sd2-community/stable-diffusion-2-1-base` revision `4e63672c`, fp32 safetensors, sha256 recomputed after download (Entry 12). Planned pad-token fix in the N adapter; layer-key check (81 of 81 returned). Full run job 253878 (erdos V100), then the official scoring of Entry 11 (jobs 253879, 253900).
+**Where:** `comparisons/goca/` (`PREREG_backbones.md` amendment of 2026-11-19, `configs/config_model_21.py`, `goca_full.py`, `goca_classword.py`, `goca_sd21_smoke.slurm`); `comparisons/official/` (regenerated; rows of the other methods unchanged); this commit.
+**Result (exploratory):** fixed 0.5 raw 0.710 / 0.546 (SD 1.5 0.671 / 0.452, SDXL 0.788 / 0.607). VOC-sel. DenseCRF 0.740 / 0.597. Paired Δ vs BRACE, DenseCRF, VOC-sel.: −0.091 [−0.110, −0.072] / −0.111 [−0.134, −0.086]; raw −0.098 [−0.117, −0.080] / −0.107 [−0.129, −0.084]. 0.20 s per image, peak 3.8 GB (V100; the SD 1.5 and SDXL timings were on an A100).
+**Slides:** `slides/jc_meeting/sections/c5_N.tex`.
+**Open points:** Deviations, all in the amendment: `--model-path` added to `goca_full.py` because GoCA's loader hard-codes the removed repository (no vendored code changed); the Euler scheduler that GoCA's loader builds for 2.1 gives timestep 99 (SD 1.5: 101). Side F's #5 runs should use the same revision.
+
+**Review — F, <date>:** pending
+
+### Entry 15 — N (Narmeen), 2026-11-19
+**Item:** #5 fine-only and BRACE on SD 1.5, SD 2.1-base and SDXL (F's item, run by N at Narmeen's request so that it is ready for the meeting)
+**Kind:** result
+**What was done:** JC's setting: stored benchmark images, VAE encode, noise at t = 100 (seed 0), one conditional UNet call with the runs/20 prompts and class-word query. Seed, fine-only and hierarchy re-implemented for one call with F's helper functions imported unchanged; on SD 1.5 the single-call hierarchy equals `sg_combined_v2.aggregate` to 4.8e-7. Per-backbone layer mapping fixed in the pre-registration before any capture. Renyi A100.
+**Where:** `comparisons/backbones/` (`PREREG.md` with Amendment A1, `single_pass.py`, `run.slurm`, `result.md`, `summary.json`); this commit.
+**Result (exploratory; a different setting from the generation-time 0.832 / 0.709, never mixed with it):** BRACE − fine-only, raw, VOC-sel.: SD 1.5 +0.009 [+0.003, +0.016] / +0.038 [+0.029, +0.047]; SD 2.1-base +0.054 [+0.044, +0.064] / +0.060 [+0.049, +0.071]; **SDXL −0.022 [−0.030, −0.015] / −0.011 [−0.017, −0.005]**. At fixed 0.55 (raw or + DenseCRF) BRACE wins on all three, but that scores fine-only away from its best threshold. BRACE − GoCA, raw, VOC-sel.: SD 1.5 +0.055 / +0.040; SD 2.1-base +0.083 / +0.072; **SDXL −0.048 / −0.107**. Runtime per image (UNet pass + seed): 0.21 s / 0.19 s / 1.49 s, peak 5.1 / 5.5 / 15.6 GiB; DenseCRF 4.5 s per call on one CPU core.
+**Slides:** `slides/jc_meeting/sections/c5_N.tex` (two frames; F's `c5_F.tex` not touched).
+**Open points:** Amendment A1 (before scoring): DenseCRF only at the frozen 0.55 because the full grid would need about 240 CPU-hours. SDXL mapping: all 70 CA modules, GoCA's SDXL reference layer, SA grids 32 → 64 (one-step hierarchy). SD 2.1-base copy approved by Narmeen; F has not confirmed it. BRACE − GoCA pairs are same-image, not same-capture.
+
+**Review — F, <date>:** pending

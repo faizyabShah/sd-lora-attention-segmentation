@@ -2,22 +2,65 @@
 % Owner: N. Only this side edits this file.
 % Add frames below; one message per frame. See docs/JC_REVIEW_WORKPLAN.md, Section 6.
 
-\begin{frame}{GoCA gains strongly from SDXL; SD 2.1 weights are no longer public}
-\status{running}
+\begin{frame}{GoCA is best on SDXL and stays below BRACE on every backbone}
+\status{done, unreviewed}
 \begin{slidetable}
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
-GoCA backbone & VOC-Sim & COCO-Cap & s / image & GPU mem. \\
+GoCA backbone & VOC-Sim & COCO-Cap & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
 \midrule
-SD 1.5 & 0.671 & 0.452 & 0.14 & 4.4 GB \\
-SDXL & \textbf{0.788} & \textbf{0.607} & 0.66 & 13.3 GB \\
-SD 2.1 & \multicolumn{4}{c}{blocked (weights removed)} \\
+SD 1.5 & 0.753 & 0.599 & $-0.078$ & $-0.110$ \\
+SD 2.1-base & 0.740 & 0.597 & $-0.091$ & $-0.111$ \\
+SDXL & \textbf{0.797} & \textbf{0.606} & $-0.034$ & $-0.102$ \\
 \bottomrule
 \end{tabular}
 \end{slidetable}
 \begin{itemize}
-\item Fixed threshold 0.5, no DenseCRF. Same images, noise seed and prompt; SDXL uses GoCA's own configuration, pre-registered before the run.
-\item Possible actions for SD 2.1: use an agreed community copy for every method, or report SD 1.5 and SDXL only.
+\item DenseCRF, VOC-selected threshold; $\Delta$ = GoCA $-$ BRACE, same images; every 95\% interval excludes zero.
+\item SD 2.1-base: community copy, hash-identical to a clone of Stability's repository.
+\item At fixed 0.5, SD 2.1 sits between SD 1.5 and SDXL (0.710 / 0.546).
 \end{itemize}
-\src{Workplan Entries 3--4; \texttt{comparisons/goca/PREREG\_backbones.md}}
+\src{\texttt{comparisons/official/result.md}; \texttt{comparisons/goca/PREREG\_backbones.md}, amendment of 2026-11-19}
+\end{frame}
+
+\begin{frame}{Comment 5: the hierarchy holds on SD 1.5 and SD 2.1, not on SDXL}
+\status{done, unreviewed}
+\begin{slidetable}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+One noising pass, raw, VOC-sel. & fine-only & BRACE & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
+\midrule
+SD 1.5 (reference) & 0.784 / 0.612 & 0.793 / 0.650 & $+0.009$ & $\mathbf{+0.038}$ \\
+SD 2.1-base & 0.749 / 0.599 & 0.803 / 0.658 & $\mathbf{+0.054}$ & $\mathbf{+0.060}$ \\
+SDXL (two scales) & 0.761 / 0.506 & 0.739 / 0.496 & $\mathbf{-0.022}$ & $\mathbf{-0.011}$ \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item Stored images, noise at $t=100$, one UNet call; cells are VOC-Sim / COCO-Cap; $\Delta$ = BRACE $-$ fine-only, paired; every 95\% interval excludes zero.
+\item Not comparable with the generation-time numbers (0.832 / 0.709).
+\item At one fixed 0.55 threshold BRACE wins on all three, but that compares fine-only away from its best threshold.
+\end{itemize}
+\src{\texttt{comparisons/backbones/result.md}; pre-registered in \texttt{comparisons/backbones/PREREG.md}}
+\end{frame}
+
+\begin{frame}{Comment 5: GoCA overtakes BRACE on SDXL}
+\status{done, unreviewed}
+\begin{slidetable}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Backbone (one pass, raw, VOC-sel.) & GoCA & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
+\midrule
+SD 1.5 & 0.738 / 0.610 & $+0.055$ & $+0.040$ \\
+SD 2.1-base & 0.719 / 0.586 & $+0.083$ & $+0.072$ \\
+SDXL & \textbf{0.787 / 0.602} & $-0.048$ & $-0.107$ \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item $\Delta$ = BRACE $-$ GoCA, same images and masks, different captures; every 95\% interval excludes zero.
+\item Reading: with only two attention scales, our coarse-to-fine step does not help, and GoCA scales with the stronger model as it claims.
+\item Possible actions: report it as a limitation (``the principle needs at least three scales''), or test a finer SDXL hierarchy as future work.
+\end{itemize}
+\src{\texttt{comparisons/backbones/result.md}}
 \end{frame}
