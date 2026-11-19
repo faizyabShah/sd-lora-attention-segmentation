@@ -203,6 +203,7 @@ Not rerun & Attn2Mask & TBR & TBR & TBR & TBR \\
 \begin{frame}{3. Published numbers on the same benchmarks (OVAM, Table 1)}
 \begin{slidetable}
 \renewcommand{\arraystretch}{1.0}
+\resizebox{\linewidth}{!}{%
 \begin{tabular}{@{}lrrrrl@{}}
 \toprule
 Method & VOC-Sim & COCO-Cap & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap & Note \\
@@ -215,7 +216,7 @@ Grounded Diffusion & 0.621 & 0.502 & $-0.210$ & $-0.206$ & trains a module \\
 OVAM, class word & 0.704 & 0.582 & $-0.127$ & $-0.126$ & \\
 OVAM, optimized token & 0.825 & --- & $-0.006$ & --- & few-shot \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{slidetable}
 {\footnotesize Numbers as printed in OVAM (CVPR 2024), Table 1. $\Delta$ = published $-$ BRACE; not paired, so no interval.}
 \end{frame}
