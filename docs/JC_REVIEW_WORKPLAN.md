@@ -291,11 +291,11 @@ Edited in place by the owner. States: `not started`, `in progress`,
 | #1 gain breakdown | F | in progress: step-by-step numbers in Entry 8; configuration vs new-component split not yet written | Entry 8 |
 | #1 reframing text | N | done, awaiting review (draft; nothing in `paper/` changed) | Entry 13 |
 | #2 mapping table | N | done, awaiting review | Entry 7 |
-| #3 OVAM class word | F | not started | — |
-| #3 OVAM optimized tokens | F | not started | — |
-| #3 DAAM | F | not started | — |
-| #3 SeeDiff | F | not started | — |
-| #3 SCLIP + DenseCRF | F | not started | — |
+| #3 OVAM class word | F (run by N on 2026-11-19 at Narmeen's request) | done, awaiting review | Entry 21 |
+| #3 OVAM optimized tokens | F (run by N on 2026-11-19 at Narmeen's request) | done, awaiting review | Entry 21 |
+| #3 DAAM | F (run by N on 2026-11-19 at Narmeen's request) | done, awaiting review | Entry 21 |
+| #3 SeeDiff | F (run by N on 2026-11-19 at Narmeen's request) | done, awaiting review | Entry 21 |
+| #3 SCLIP + DenseCRF | F (run by N on 2026-11-19 at Narmeen's request) | done, awaiting review | Entry 21 |
 | #3 GoCA | N | done, awaiting review (official paired rows, SD 1.5 and SDXL) | Entries 2–4, 11 |
 | #3 NERVE | N | done, awaiting review (official paired rows for A, V, W; A is the class-word row) | Entries 2–4, 11 |
 | #3 seed × propagation swap, BRACE and NERVE (cross-side diagnostic; does not replace N's NERVE row) | F | reviewed with issues (Entry 10); corrected, awaiting review | Entries 10, 16 |
@@ -711,5 +711,22 @@ correction. `main.pdf` is not rebuilt in this commit; the owner rebuilds the dec
 **Result:** 172 of 181 three-decimal cells identical to F's `runs/25_token_ladder_nr/result.md`, 9 differ by 0.001 (all COCO-Cap, none a primary DenseCRF stage cell); the verdicts agree (F holds for both queries, H fails for both). BRACE word / token at 0.55: 0.832 / 0.864 VOC-Sim, 0.708 / 0.693 COCO-Cap. F's result is the official one.
 **Slides:** none (F's `c4_F.tex` carries the result).
 **Open points:** F's data-check lines read F's cache, which N cannot read; replaced by a note in N's copy.
+
+**Review — F, <date>:** pending
+
+### Entry 21 — N (Narmeen), 2026-11-19
+**Item:** #3 OVAM class word, OVAM optimized tokens, DAAM, SeeDiff, SCLIP + DenseCRF (F's rows, run by N at Narmeen's request), paired with BRACE
+**Kind:** pre-registration and result
+**What was done:** One shared SD 1.5 generation per image (same prompts and seeds as the BRACE reproduction of Entry 11; wald V100s, 4 jobs) records OVAM's class-word and optimized-token maps, DAAM and SeeDiff (code github.com/BAIKLAB/SeeDiff, commit 28d26f4; `aggregate_attention` and PAMR imported unchanged); SCLIP ViT-B/16 on BRACE's stored images (CPU). Scored with the Entry 11 code (VOC-sel. primary, fixed 0.5, each method's own rule; raw and DenseCRF; paired Δ vs BRACE, 2000-sample image bootstrap). Pre-registered in `comparisons/official_f_rows/PREREG.md` (addenda before scoring).
+**Where:** `comparisons/official_f_rows/` (`PREREG.md`, `capture_f.py`, `capture.slurm`, `sclip_f.py`, `sclip.slurm`, `score_f.py`, `score.slurm`, `report_f.py`, `result.md`, `summary.json`); this commit.
+**Result (exploratory; DenseCRF, VOC-sel.; VOC-Sim / COCO-Cap; Δ = method − BRACE):**
+- Images bit-identical to the BRACE reproduction on 1197/1197.
+- OVAM, class word: 0.703 / 0.568; Δ −0.128 [−0.143, −0.114] / −0.140 [−0.160, −0.120]. OVAM's own rule gives 0.696 / 0.546 (published 0.704 / 0.582).
+- OVAM, optimized token (few-shot): 0.828 / 0.664; Δ −0.003 [−0.016, +0.010] / −0.044 [−0.063, −0.026].
+- DAAM: 0.727 / 0.644; Δ −0.104 [−0.119, −0.091] / −0.067 [−0.093, −0.039]. SeeDiff: 0.723 / 0.665; Δ −0.108 [−0.122, −0.094] / −0.046 [−0.070, −0.018]. Both need the class word in the caption, so on COCO-Cap they are scored on those 437 images, with BRACE on the same 437 (0.711).
+- SCLIP + DenseCRF: 0.764 / 0.652; Δ −0.067 [−0.084, −0.052] / −0.057 [−0.084, −0.031].
+- SeeDiff: go (public code; no published numbers on these benchmarks).
+**Slides:** response deck (`comparisons/response/slides/main.tex`, comment-3 and comment-4 slides).
+**Open points:** DenseCRF on a reduced threshold grid (VOC-Sim: a 7-threshold window around each raw optimum plus 0.5; COCO-Cap: the selected threshold and 0.5), raw on the full grid. DAAM reimplemented inside the shared pass (its package pins an older diffusers, which would change the images). SeeDiff on SD 1.5 at 30 steps and CFG 7.5 (benchmark generation), not its own v1-4 settings; its bulk script saves the image as the mask, so its demo path was used. SCLIP run in a separate environment on CPU.
 
 **Review — F, <date>:** pending

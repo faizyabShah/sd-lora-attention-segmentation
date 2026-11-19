@@ -6,7 +6,6 @@ Draft, 19 Nov 2026. For Narmeen, as the source for the meeting slides and for th
 
 - **"p. 4, Sec. 4 'Selection status'"** = the PDF JC read ("TRDP_Paper (2).pdf", 9 pages, attached with his email).
 - **`sec/4_protocol.tex:10`** = the same text in the repo copy of the paper (`sd-lora-attention-segmentation/paper/`), where the edit will be made. The repo copy matches JC's PDF except for the equation numbering in Sec. 3.3 (see #6).
-- **⏳** = a run is still on the cluster; the cell is filled in when it finishes (same day).
 
 **Words used throughout.**
 
@@ -134,9 +133,8 @@ and delete "DenseCRF gains six times more on capped maps in cluttered scenes." f
 
 *Replace with:*
 
-> Table 5 compares BRACE with competing methods on the same images (paired block) and lists the numbers published for these benchmarks (unpaired block). Among methods that use only the diffusion model, BRACE is the strongest on both benchmarks: GoCA trails it by 0.08 / 0.11 with SD 1.5 and by 0.03 / 0.10 with SDXL, and DiffSegmenter by 0.04 / 0.02. NERVE, which adds a CLIP seed, is on par on VOC-Sim and stronger on COCO-Cap (+0.032 [+0.007, +0.060]); with its own released thresholding rule it falls below BRACE (0.812 / 0.663). The published numbers come from OVAM's reruns of each method and use other images and post-processing, so they are indicative only.
+> Table 5 compares BRACE with competing methods on the same images (paired block) and lists the numbers published for these benchmarks (unpaired block). Among methods that use only the diffusion model, BRACE is the strongest on both benchmarks: our run of OVAM with the class word trails it by 0.13 / 0.14 on the same images, DAAM by 0.10 / 0.07, SeeDiff by 0.11 / 0.05, GoCA by 0.08 / 0.11 with SD 1.5 and by 0.03 / 0.10 with SDXL, and DiffSegmenter by 0.04 / 0.02. OVAM with its optimized token, which is few-shot, ties BRACE on VOC-Sim (−0.003 [−0.016, +0.010]) and trails it on COCO-Cap (−0.044). NERVE, which adds a CLIP seed, is on par on VOC-Sim and stronger on COCO-Cap (+0.032 [+0.007, +0.060]); with its own released thresholding rule it falls below BRACE (0.812 / 0.663). The published numbers come from OVAM's reruns of each method and use other images and post-processing, so they are indicative only.
 
-(OVAM, DAAM and SCLIP rows ⏳, see #3.)
 
 **(g) Sec. 7, "Failure modes and scope", last sentence** — p. 8; `sec/7_discussion.tex:7`.
 
@@ -203,7 +201,7 @@ Full version with the committed source of every number: `comparisons/notes/entry
 |---|---|
 | Images | the same 490 VOC-Sim + 707 COCO-Cap images and annotations for every method (ground truth checked identical on 1,197/1,197) |
 | Query | the class word only, for every method |
-| Code | each method from its own public repository and settings (GoCA github.com/Darkbblue/goca; NERVE; DiffSegmenter); OVAM and DAAM from their released code ⏳ |
+| Code | each method from its own public repository and settings (GoCA github.com/Darkbblue/goca; NERVE; DiffSegmenter); OVAM, DAAM and SeeDiff (github.com/BAIKLAB/SeeDiff) from their released code; DAAM's attention read in BRACE's own generation pass so the images are identical |
 | BRACE | regenerated with the prompt-corrected capture (runs/20), F's code imported unchanged; reproduces runs/20 to 0.001 |
 | Threshold | chosen on VOC-Sim (5-fold out-of-fold), reused unchanged on COCO-Cap; also fixed 0.5 and each method's own rule (in `result.md`) |
 | Post-processing | the same DenseCRF (OVAM's parameters) for every method; raw numbers also reported |
@@ -223,17 +221,18 @@ VOC-Sim / COCO-Cap mIoU. Paired rows: DenseCRF, VOC-selected threshold. Δ = met
 |---|---|---|---|---|---|---|
 | **Paired, diffusion only, class word** | **BRACE (ours)** | — | **0.831** | **0.708** | — | — |
 | | fine-only (ours, the rule's choice; runs/25) | — | 0.824 | 0.673 | −0.007 [−0.013, −0.001] | −0.036 [−0.046, −0.024] |
-| | OVAM, class word (our run) | — | ⏳ | ⏳ | ⏳ | ⏳ |
-| | DAAM (our run) | — | ⏳ | ⏳ | ⏳ | ⏳ |
+| | OVAM, class word (our run) | — | 0.703 | 0.568 | −0.128 [−0.143, −0.114] | −0.140 [−0.160, −0.120] |
+| | DAAM (our run) | — | 0.727 | 0.644ᶜ | −0.104 [−0.119, −0.091] | −0.067 [−0.093, −0.039]ᶜ |
+| | SeeDiff | — | 0.723 | 0.665ᶜ | −0.108 [−0.122, −0.094] | −0.046 [−0.070, −0.018]ᶜ |
 | | DiffSegmenter | — | 0.795 | 0.688 | −0.036 [−0.049, −0.023] | −0.020 [−0.041, +0.001] |
 | | GoCA, SD 1.5 | — | 0.753 | 0.599 | −0.078 [−0.095, −0.060] | −0.110 [−0.134, −0.084] |
 | | GoCA, SD 2.1-base | — | 0.740 | 0.597 | −0.091 [−0.110, −0.072] | −0.111 [−0.134, −0.086] |
 | | GoCA, SDXL | — | 0.797 | 0.606 | −0.034 [−0.048, −0.021] | −0.102 [−0.124, −0.078] |
 | **Paired, with an extra vision-language model** | NERVE, class word | CLIP ViT-L/14 | 0.844 | 0.740 | +0.012 [−0.002, +0.028] | **+0.032 [+0.007, +0.060]** |
 | | NERVE, 20-class vocabulary | CLIP ViT-L/14 | 0.839 | 0.747 | +0.008 [−0.007, +0.023] | **+0.039 [+0.013, +0.068]** |
-| | SCLIP + DenseCRF | CLIP ViT-B/16 | ⏳ | ⏳ | ⏳ | ⏳ |
+| | SCLIP + DenseCRF | CLIP ViT-B/16 | 0.764 | 0.652 | −0.067 [−0.084, −0.052] | −0.057 [−0.084, −0.031] |
 | | SCLIP seed + BRACE hierarchy (F, runs/20) | CLIP ViT-B/16 | 0.852 | 0.734 | | |
-| **Paired, few-shot (optimized token; not training-free)** | OVAM, optimized token (our run) | — | ⏳ | ⏳ | ⏳ | ⏳ |
+| **Paired, few-shot (optimized token; not training-free)** | OVAM, optimized token (our run) | — | 0.828 | 0.664 | −0.003 [−0.016, +0.010] | −0.044 [−0.063, −0.026] |
 | | BRACE, optimized token (#4; runs/25) | — | 0.864 | 0.693 | +0.032 [+0.023, +0.041] | −0.015 [−0.030, −0.000] |
 | **Published, not paired** (OVAM's Table 1; other images and post-processing) | DAAM | — | .662 | .484 | | |
 | | Attn2Mask | — | .687 | .550 | | |
@@ -242,11 +241,13 @@ VOC-Sim / COCO-Cap mIoU. Paired rows: DenseCRF, VOC-selected threshold. Δ = met
 | | Grounded Diffusion (trains a module) | — | .621 | .502 | | |
 | | DatasetDM (trains a decoder) | — | .803 | .593 | | |
 
+ᶜ DAAM and SeeDiff need the class word in the caption, so on COCO-Cap they are scored on the 437 such images; BRACE on the same 437 images: 0.711. Our OVAM run with its own rule gives 0.696 / 0.546 (published: 0.704 / 0.582). SeeDiff (AAAI 2025, github.com/BAIKLAB/SeeDiff) has public code and publishes no numbers on these benchmarks. SCLIP uses only CLIP (no diffusion model).
+
 **Reading.** BRACE is the best method that uses only the diffusion model. NERVE, which adds CLIP, is tied on VOC-Sim and better on COCO-Cap. With its own released thresholding rule NERVE drops to 0.812 / 0.663, below BRACE. Without DenseCRF every sign is the same.
 
 **Caveats to print in the caption.** BRACE reads attention while generating, so it regenerates each image; the other methods segment the stored image (the two differ by under one grey level on most images; every sign holds on the closest subset). DiffSegmenter's own evaluation tunes its background score on the test set, so it has no fair own-rule row. All rows are exploratory; BRACE's VOC-Sim number is in-sample for its design.
 
-**LaTeX draft** (replaces `tables/tab_published.tex`; fill ⏳ rows when done):
+**LaTeX draft** (replaces `tables/tab_published.tex`):
 
 ```latex
 \begin{table}[t]
@@ -258,12 +259,19 @@ Method & VOC-Sim & COCO-Cap & $\Delta$ VOC & $\Delta$ COCO \\
 \midrule
 \multicolumn{5}{@{}l}{\emph{Paired, same images, diffusion only, class word}}\\
 \textbf{BRACE (ours)} & \textbf{.831} & \textbf{.708} & -- & -- \\
+OVAM, class word~\cite{marcosmanchon2024ovam} & .703 & .568 & $-$.128 & $-$.140 \\
+DAAM~\cite{tang2023daam} & .727 & .644$^*$ & $-$.104 & $-$.067 \\
+SeeDiff~\cite{park2025seediff} & .723 & .665$^*$ & $-$.108 & $-$.046 \\
 DiffSegmenter~\cite{...} & .795 & .688 & $-$.036 & $-$.020 \\
 GoCA, SD 1.5~\cite{meng2026making} & .753 & .599 & $-$.078 & $-$.110 \\
 GoCA, SDXL~\cite{meng2026making} & .797 & .606 & $-$.034 & $-$.102 \\
 \midrule
 \multicolumn{5}{@{}l}{\emph{Paired, with a CLIP model}}\\
 NERVE~\cite{mahatha2025nerve} & .844 & .740 & +.012 & \textbf{+.032} \\
+SCLIP + DenseCRF & .764 & .652 & $-$.067 & $-$.057 \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{Paired, few-shot (optimized token)}}\\
+OVAM, optimized token & .828 & .664 & $-$.003 & $-$.044 \\
 \midrule
 \multicolumn{5}{@{}l}{\emph{Published (OVAM's runs; not paired)}}\\
 DAAM~\cite{tang2023daam} & .662 & .484 & & \\
@@ -514,7 +522,7 @@ One-pass setting (#5), per image on A100: SD 1.5 0.21 s / 5.1 GiB, SD 2.1 0.19 s
 |---|---|---|
 | 1 | text drafted | Reframe around clutter and calibration; disclose the override and its timing; drop "six times"; narrow to diffusion-only |
 | 2 | done | Contributions 1–2 well supported; 3–4 rely on the supplement; add the rule's choice next to ours |
-| 3 | done (OVAM, DAAM, SCLIP ⏳) | BRACE best among diffusion-only methods; NERVE (with CLIP) better on COCO-Cap |
+| 3 | done | BRACE best among diffusion-only methods (OVAM −0.13 / −0.14 on the same images); NERVE (with CLIP) better on COCO-Cap |
 | 4 | done | No test leakage; the token helps VOC-Sim, and with it the hierarchy no longer helps on COCO-Cap |
 | 5 | done | Hierarchy holds on SD 1.5 and SD 2.1, fails on SDXL; GoCA wins on SDXL |
 | 6 | done | 22 fixes listed |
