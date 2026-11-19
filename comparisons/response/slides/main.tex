@@ -1,0 +1,475 @@
+% Response to JC's review: one deck, point by point.
+% Built from comparisons/response/JC_RESPONSE_DOCUMENT.md (same numbers, same sources).
+% Overleaf: upload this folder (main.tex, style.tex, figures/), compiler pdfLaTeX.
+% Cells marked [pending] are filled in when the last runs finish.
+\documentclass[aspectratio=169,11pt]{beamer}
+\input{style}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\title{BRACE: response to the review comments}
+\subtitle{What each comment means, what we did, what changes}
+\author{Faizyab Shah \and Narmeen}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% ---------------------------------------------------------------- overview
+\begin{frame}{Overview: every comment has a result or a fix}
+\begin{slidetable}
+\begin{tabular}{@{}cL{0.26\linewidth}L{0.64\linewidth}@{}}
+\toprule
+\# & Comment & Answer \\
+\midrule
+1 & Claim and contribution & reframe around clutter and calibration; disclose override \\
+2 & Contribution to evidence & 1--2 well supported; 3--4 rely on the supplement \\
+3 & Paired state of the art & BRACE best without an extra model; NERVE (CLIP) better on COCO-Cap \\
+4 & Optimized tokens & no leakage; with the token the hierarchy stops helping \\
+5 & Backbones & hierarchy holds on SD 1.5 and SD 2.1, fails on SDXL \\
+6 & Consistency & 162 numbers checked, 22 fixes \\
+7 & Table 1 & COCO-Cap $\Delta$, folds won, explicit references \\
+8 & Structure and cost & comparison first; 12.9\,s and 5.1\,GiB per image \\
+9 & Venue & ICPR 2027 confirmed; 13.5 of 15 pages already used \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\end{frame}
+
+% ---------------------------------------------------------------- #1
+\begin{frame}{Comment 1: on VOC-Sim the two new components add 0.012 of the gain}
+\status{done}
+\begin{slidetable}
+\begin{tabular}{@{}lrrl@{}}
+\toprule
+Table 1 step & VOC-Sim & $\Delta$ & Kind \\
+\midrule
+CA only, then drop 32-px CA & .665 $\rightarrow$ .691 & +.026 & configuration \\
+SA propagation (64 px) & .691 $\rightarrow$ .789 & +.098 & configuration \\
+two passes, DenseCRF, calls 10--20 & .789 $\rightarrow$ .817 & +.028 & configuration \\
+\textbf{SA-guided layer weights} & .817 $\rightarrow$ .823 & \textbf{+.006} & new \\
+\textbf{coarse-to-fine + cap} & .823 $\rightarrow$ .829 & \textbf{+.006} & new \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item The ``+0.125 over OVAM'' headline is mostly configuration.
+\item On COCO-Cap the same two components add +0.018 and +0.034: the novelty shows in clutter.
+\end{itemize}
+\src{paper Table 1 (p.~4); differences of printed values}
+\end{frame}
+
+\begin{frame}{Comment 1: what ``the rule kept the simpler reference'' means}
+\status{done}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.30\linewidth}L{0.26\linewidth}L{0.36\linewidth}@{}}
+\toprule
+New component & Simpler reference kept & Why the rule kept it \\
+\midrule
+SA-guided CA layer weights & uniform layer weights & won 4/5 folds, but the multi-candidate screen kept uniform \\
+Coarse-to-fine hierarchy + cap & fine-only + DenseCRF & won 5/5 folds (+0.006), but sheep lost 0.057--0.104, above the 0.05 guard \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item Rule (Sec.~4): gain $\geq$ 0.010 (or 0.005 with 12/20 classes up and no class below $-0.05$), and $\geq$ 4/5 folds.
+\item Applied as registered, the final method would be fine-only with uniform weights (0.823).
+\end{itemize}
+\src{paper Sec.~4 ``Fold-safe selection'', ``Selection status'' (p.~4); supplement Tab.~10}
+\end{frame}
+
+\begin{frame}{Comment 1: the problem is that the override saw COCO-Cap}
+\status{done}
+\begin{itemize}
+\item The decision to adopt the hierarchy was taken after COCO-Cap was scored, citing its +0.034 (protocol log, 31 Oct).
+\item Yet the intro says ``Every choice is made on VOC-Sim folds, with COCO-Cap used only after freezing'' (p.~1).
+\item Contribution 4 claims a protocol that ``made every choice''; the two novel choices were not made by it.
+\item 0.829 is a forced out-of-fold score of the owners' variant; the procedure's own score is 0.823.
+\item A reviewer can read this as choosing the method on the test set.
+\end{itemize}
+\src{protocol Section 135; paper abstract and Sec.~1 (p.~1)}
+\end{frame}
+
+\begin{frame}{Comment 1: how we handle it}
+\status{planned}
+\begin{enumerate}
+\item State what the rule chose and why, and print it next to BRACE on both benchmarks.
+\item State that the override came after COCO-Cap; use COCO-Cap for the calibration analysis, not as held-out confirmation.
+\item Label 0.829 ``forced out-of-fold'' everywhere.
+\item Reword contribution 4: a protocol that records every decision, including the two overrides.
+\item Cite a test scored after the decision was frozen: new backbones (comment 5), where the hierarchy holds on SD 2.1 and fails on SDXL.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Comment 1: claims we keep, restate or drop}
+\status{done, unreviewed}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.30\linewidth}L{0.45\linewidth}L{0.17\linewidth}@{}}
+\toprule
+Claim & Evidence now & Action \\
+\midrule
++0.125 / +0.114 over OVAM & mostly configuration & a row, not the headline \\
+Hierarchy +0.034 on COCO-Cap & two thresholds (0.55 vs 0.425); +0.018 at each map's best; oracle tie 0.896 vs 0.895 & \textbf{restate as calibration} \\
+Layer weighting helps & +0.024 [+0.013, +0.036] on COCO-Cap at 0.55 & keep \\
+Cap beats no cap & $-0.005$ [$-0.011$, $-0.001$] on COCO-Cap at 0.55 & weaken \\
+DenseCRF gains six times more & two-threshold artefact; +0.014 for both & \textbf{drop} \\
+Best training-free method & NERVE (with CLIP) better on COCO-Cap & diffusion-only \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\src{workplan Entries 8--10 and their N reviews}
+\end{frame}
+
+\begin{frame}{Comment 1: where the paper changes}
+\status{planned}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.33\linewidth}L{0.59\linewidth}@{}}
+\toprule
+Location (JC's PDF) & Change \\
+\midrule
+Abstract (p.~1) & clutter framing; drop ``six times''; disclose override \\
+Intro (p.~1--2) & results paragraph and the four contributions rewritten \\
+Sec.~4 ``Selection status'' (p.~4) & what the rule kept, why, and when we overrode it \\
+Sec.~5.4, Table 4 (p.~6--7) & drop ``six times''; keep the image counts \\
+Sec.~6 (p.~8) & paired comparison text instead of ``+0.125 over OVAM'' \\
+Sec.~7 and Conclusion (p.~8) & timing of the override; backbone scope \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\src{replacement texts: \texttt{JC\_RESPONSE\_DOCUMENT.md}, Sec.~1.5}
+\end{frame}
+
+\begin{frame}{Comment 1: proposed contributions}
+\status{planned}
+\begin{enumerate}
+\item A diffusion-only, training-free pipeline: SA-guided CA layer weighting, coarse-to-fine SA propagation, one-sided cap.
+\item The scale structure matters in clutter, not on single objects: +0.006 per component on VOC-Sim, +0.034 and +0.018 on COCO-Cap.
+\item An oracle threshold analysis: the gain is cross-image calibration, which also explains the main failure.
+\item A protocol that records every decision, including the two overrides and their timing, plus paired reruns of competing methods.
+\end{enumerate}
+\begin{itemize}
+\item To decide: is ``best diffusion-only method, CLIP methods in a separate block'' an acceptable headline?
+\end{itemize}
+\end{frame}
+
+% ---------------------------------------------------------------- #2
+\begin{frame}{Comment 2: contributions 3 and 4 rely on the supplement}
+\status{done}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.19\linewidth}L{0.13\linewidth}L{0.21\linewidth}L{0.26\linewidth}L{0.10\linewidth}@{}}
+\toprule
+Contribution & Sections & Tables / figures & Key number & Where \\
+\midrule
+1 Pipeline & 3, 5, 6 & Tab.~1, 5; Fig.~1, 2 & 0.829 / 0.696 & main \\
+2 Ablations & 3.2--3.5, 5.1--5.4 & Tab.~1--4; Fig.~3--5 & cap removes 13\% bg, 0.5\% object & main \\
+3 Oracle analysis & 5.5 & Fig.~6; Tab.~S7 & oracle tie 0.896 vs 0.895 & part supp \\
+4 Protocol & 4, 7 & none; Tab.~S8--S10 & rule's choice (0.823) not printed & supp \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+Fix: a main-paper table with the rule's choice next to ours (also answers comment 1).
+\src{\texttt{comparisons/notes/entry\_2\_mapping.md}}
+\end{frame}
+
+% ---------------------------------------------------------------- #3
+\begin{frame}{Comment 3: every method rerun on the same images}
+\status{done}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.22\linewidth}L{0.70\linewidth}@{}}
+\toprule
+Setting & Value \\
+\midrule
+Images & the same 490 VOC-Sim and 707 COCO-Cap images and masks for every method \\
+Query & the class word only \\
+Code & each method's public repository and settings \\
+Threshold & chosen on VOC-Sim (5-fold out-of-fold), reused on COCO-Cap \\
+Post-processing & the same DenseCRF for all; raw numbers also reported \\
+Statistics & paired $\Delta$ = method $-$ BRACE, 95\% image bootstrap \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item None of GoCA, NERVE, DiffSegmenter, SPARK, PEARL reports VOC-Sim or COCO-Cap: paired reruns only. SPARK: no code. PEARL: related work.
+\end{itemize}
+\src{\texttt{comparisons/official/result.md}; workplan Entries 11, 14}
+\end{frame}
+
+\begin{frame}{Comment 3: BRACE is the best method without an extra model}
+\status{done; 2 rows pending}
+\begin{slidetable}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Paired, diffusion only & VOC-Sim & COCO-Cap & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
+\midrule
+\textbf{BRACE} & \textbf{0.831} & \textbf{0.708} & -- & -- \\
+OVAM, class word & [pending] & [pending] & [pending] & [pending] \\
+DAAM & [pending] & [pending] & [pending] & [pending] \\
+DiffSegmenter & 0.795 & 0.688 & $-0.036$ & $-0.020$ \\
+GoCA, SD 1.5 & 0.753 & 0.599 & $-0.078$ & $-0.110$ \\
+GoCA, SD 2.1-base & 0.740 & 0.597 & $-0.091$ & $-0.111$ \\
+GoCA, SDXL & 0.797 & 0.606 & $-0.034$ & $-0.102$ \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item Every interval excludes zero except DiffSegmenter on COCO-Cap ([$-0.041$, $+0.001$]).
+\end{itemize}
+\src{\texttt{comparisons/official/result.md}; DenseCRF, VOC-selected threshold}
+\end{frame}
+
+\begin{frame}{Comment 3: NERVE, which adds CLIP, leads on COCO-Cap}
+\status{done; 2 rows pending}
+\begin{slidetable}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Paired, extra model or few-shot & VOC-Sim & COCO-Cap & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
+\midrule
+NERVE, class word (CLIP) & 0.844 & 0.740 & +0.012 & \textbf{+0.032} \\
+NERVE, 20-class vocabulary (CLIP) & 0.839 & 0.747 & +0.008 & \textbf{+0.039} \\
+SCLIP + DenseCRF & [pending] & [pending] & [pending] & [pending] \\
+SCLIP seed + BRACE hierarchy & 0.852 & 0.734 & & \\
+OVAM, optimized token (few-shot) & [pending] & [pending] & [pending] & [pending] \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+NERVE's COCO-Cap lead: +0.032 [+0.007, +0.060]; with its own rule, 0.812 / 0.663.
+\src{\texttt{comparisons/official/result.md}; runs/20 (SCLIP seed)}
+\end{frame}
+
+\begin{frame}{Comment 3: the published block, marked as not paired}
+\status{done}
+\begin{slidetable}
+\begin{tabular}{@{}lrrl@{}}
+\toprule
+Published (OVAM's Table 1) & VOC-Sim & COCO-Cap & Note \\
+\midrule
+DAAM & .662 & .484 & OVAM's run \\
+Attn2Mask & .687 & .550 & OVAM's run; released masks give .603 \\
+OVAM, class word & .704 & .582 & \\
+OVAM, optimized token & .825 & -- & few-shot \\
+Grounded Diffusion & .621 & .502 & trains a module \\
+DatasetDM & .803 & .593 & trains a decoder \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item These are OVAM's reruns on other images and post-processing; citations to add for all three missing papers.
+\item Proposed Table 5: paired diffusion-only, paired with an extra model, few-shot, published.
+\end{itemize}
+\src{OVAM, CVPR 2024, Table 1; \texttt{comparisons/notes/entry\_venue\_and\_published\_block.md}}
+\end{frame}
+
+% ---------------------------------------------------------------- #4
+\begin{frame}{Comment 4: the optimized tokens never saw a test image}
+\status{done}
+\begin{itemize}
+\item OVAM released 57 per-image tokens (2--3 per class), optimized on 63 separate generated training images.
+\item No shared class and seed with any of the 500 VOC-Sim rows; no identical pixels.
+\item No shared seed with COCO-Cap, whose prompts are captions, not ``a photograph of a [class]''.
+\item So the block is few-shot (57 annotated images), not training-free, with no leakage.
+\end{itemize}
+\src{workplan Entry 5; \texttt{comparisons/notes/entry\_4\_token\_provenance.md}}
+\end{frame}
+
+\begin{frame}{Comment 4: with the token, the hierarchy no longer helps on COCO-Cap}
+\status{done; corrected-prompt rerun pending}
+\begin{slidetable}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Fixed threshold 0.55, DenseCRF, paired & VOC-Sim & COCO-Cap \\
+\midrule
+BRACE, class word & 0.830 & 0.696 \\
+BRACE, optimized token & \textbf{0.861} & 0.681 \\
+Hierarchy $-$ fine-only, token & +0.010 & $\mathbf{-0.017}$ \\
+Hierarchy $-$ fine-only, class word & +0.034 & +0.012 \\
+Layer weights, token (class word) & +0.003 (+0.004) & +0.004 (+0.024) \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item The token lifts the seed by 0.18: BRACE repairs a weak seed, a strong one leaves little to repair (a limitation).
+\end{itemize}
+\src{workplan Entry 8 (runs/15); corrected-prompt rerun [pending]}
+\end{frame}
+
+% ---------------------------------------------------------------- #5
+\begin{frame}{Comment 5: three backbones, on the stored images, one pass}
+\status{done}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.20\linewidth}L{0.72\linewidth}@{}}
+\toprule
+Setting & Value \\
+\midrule
+Images & the stored benchmark images, so the annotations stay valid \\
+Noise & Gaussian noise at step 100 of 1000, fixed seed; one network call \\
+SD 1.5, SD 2.1-base & the frozen BRACE layers; hierarchy 16 $\rightarrow$ 32 $\rightarrow$ 64 \\
+SDXL & all CA layers; hierarchy 32 $\rightarrow$ 64 (its two scales, one step) \\
+Weights & SD 2.1-base from a community copy, hash-identical to a clone of Stability's repository \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item Pre-registered before any capture; SD 1.5 run the same way as the reference.
+\item Not comparable with the paper's generation-time numbers (0.829 / 0.696).
+\end{itemize}
+\src{\texttt{comparisons/backbones/PREREG.md}}
+\end{frame}
+
+\begin{frame}{Comment 5: the hierarchy holds on SD 1.5 and SD 2.1, not on SDXL}
+\status{done}
+\begin{slidetable}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Raw, VOC-selected threshold & fine-only & BRACE & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
+\midrule
+SD 1.5 (reference) & 0.784 / 0.612 & 0.793 / 0.650 & +0.009 & \textbf{+0.038} \\
+SD 2.1-base & 0.749 / 0.599 & 0.803 / 0.658 & \textbf{+0.054} & \textbf{+0.060} \\
+SDXL (two scales) & 0.761 / 0.506 & 0.739 / 0.496 & $\mathbf{-0.022}$ & $\mathbf{-0.011}$ \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item Cells are VOC-Sim / COCO-Cap; $\Delta$ = BRACE $-$ fine-only; every interval excludes zero.
+\item At one fixed threshold BRACE wins on all three, but that scores fine-only away from its best threshold.
+\end{itemize}
+\src{\texttt{comparisons/backbones/result.md}; workplan Entry 15}
+\end{frame}
+
+\begin{frame}{Comment 5: GoCA overtakes BRACE on SDXL}
+\status{done}
+\begin{slidetable}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+One pass, raw, VOC-selected & GoCA & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
+\midrule
+SD 1.5 & 0.738 / 0.610 & +0.055 & +0.040 \\
+SD 2.1-base & 0.719 / 0.586 & +0.083 & +0.072 \\
+SDXL & \textbf{0.787 / 0.602} & $-0.048$ & $-0.107$ \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item $\Delta$ = BRACE $-$ GoCA, same images.
+\item With two attention scales the coarse-to-fine step does not help, and GoCA scales with the stronger model.
+\item Paper: a backbone subsection; SD3 and FLUX out of scope (one resolution, joint attention).
+\end{itemize}
+\src{\texttt{comparisons/backbones/result.md}}
+\end{frame}
+
+% ---------------------------------------------------------------- #6
+\begin{frame}{Comment 6: 162 numbers checked, 22 to fix}
+\status{done}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.24\linewidth}L{0.68\linewidth}@{}}
+\toprule
+Item & Fix \\
+\midrule
+0.829 vs 0.830 & one run (v3) everywhere: 0.829 / 0.696; Table 4's .830 is in-sample \\
+Raw and DenseCRF mixed & one stage per comparison (Sec.~5.2, abstract, Table 5) \\
+``Eq.~??'' in Fig.~2 & label the seed equation (Eq.~4 in JC's PDF) on Overleaf \\
+Missing citations & Attn2Mask, Grounded Diffusion, DatasetDM (BibTeX ready) \\
+Supplement pointers & ten vague pointers made exact; supplement numbered S1, S2, \ldots \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\src{\texttt{comparisons/notes/entry\_6\_consistency.md}}
+\end{frame}
+
+% ---------------------------------------------------------------- #7
+\begin{frame}{Comment 7: Table 1 with COCO-Cap $\Delta$, folds won and explicit references}
+\status{numbers pending}
+\begin{slidetable}
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Row & VOC & $\Delta$ VOC (vs) & folds & COCO & $\Delta$ COCO \\
+\midrule
+1 CA only & .665 & & & [pending] & \\
+2 drop 32-px CA & .691 & +.026 (1) & 4/5 & [pending] & [pending] \\
+3a SA, all 16, one pass & .756 & +.065 (2) & [pending] & [pending] & [pending] \\
+3b SA 64 px only & .789 & +.033 (3a) & 5/5 & [pending] & [pending] \\
+4--6 passes, CRF, calls & .817 & +.028 (3b) & 4--5/5 & .644 & \\
+7 SA-guided weights & .823 & +.006 (6) & 4/5 & .662 & \textbf{+.018} \\
+8 coarse-to-fine + cap & .829 & +.006 (7) & 5/5 & .696 & \textbf{+.034} \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\src{paper Table 1; supp.~Tab.~10; row 3a (.756) was hidden; new capture [pending]}
+\end{frame}
+
+% ---------------------------------------------------------------- #8
+\begin{frame}{Comment 8: the comparison becomes the first result}
+\status{planned}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.36\linewidth}L{0.56\linewidth}@{}}
+\toprule
+Now & Proposed \\
+\midrule
+4 Experimental setup & 4 Setup, with protocol, override, hardware and cost \\
+5 What each stage contributes & \textbf{5 Experimental results} \\
+6 Comparison & 5.1 Comparison (new Table 5) \\
+ & 5.2--5.6 former 5.1--5.5; 5.7 tokens; 5.8 backbones \\
+7 Discussion and limitations & 6 Discussion (token scope, CLIP methods, SDXL) \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\src{\texttt{comparisons/notes/entry\_1\_8\_reframing\_and\_structure.md}}
+\end{frame}
+
+\begin{frame}{Comment 8: the hierarchy is nearly free; recording attention and DenseCRF dominate}
+\status{done; V100 pending}
+\begin{slidetable}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Per image (SD 1.5, 30 steps, median of 100) & A100 & V100 \\
+\midrule
+Generation, no recording & 2.66\,s & [pending] \\
+Recording attention & +4.27\,s & [pending] \\
+Seed and maps (hierarchy 0.04\,s, same as fine-only) & 0.15\,s & [pending] \\
+DenseCRF (one CPU core) & 5.9\,s & [pending] \\
+\textbf{Total, BRACE} & \textbf{12.9\,s} & [pending] \\
+Peak GPU memory & 5.1\,GiB & [pending] \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item PyTorch 2.4.1, CUDA 12.1, diffusers 0.36; A100-PCIE 40\,GB.
+\end{itemize}
+\src{\texttt{comparisons/cost/}}
+\end{frame}
+
+% ---------------------------------------------------------------- #9
+\begin{frame}{Comment 9: ICPR 2027 confirmed, and the page budget is tight}
+\status{done}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.34\linewidth}L{0.58\linewidth}@{}}
+\toprule
+Item & ICPR 2027 \\
+\midrule
+Registration / submission & 1 March / 8 March 2027 (author list fixed on 1 March) \\
+Format & Springer LNCS, one column, 15 pages plus references \\
+Review & double-blind; self-review pages with LLM-use disclosure \\
+Conference & online only, October 2027 \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item The current text fills about 13.5 of 15 pages before any addition.
+\item Move to the supplement: Table 4, Fig.~5, one of Figs.~3 and 6, the top of Table 2.
+\end{itemize}
+\src{icpr2027.com; \texttt{comparisons/notes/entry\_venue\_and\_published\_block.md}}
+\end{frame}
+
+% ---------------------------------------------------------------- close
+\begin{frame}{Questions for JC}
+\begin{enumerate}
+\item Headline: best diffusion-only method, with CLIP methods in a separate block?
+\item Which blocks of the new Table 5 go in the main paper?
+\item Optimized tokens and SDXL: report as limitations, or drop the blocks?
+\item SD 2.1: is the verified community copy acceptable?
+\item Author list and order for ICPR (fixed on 1 March); online-only venue OK?
+\end{enumerate}
+\end{frame}
+
+\end{document}
