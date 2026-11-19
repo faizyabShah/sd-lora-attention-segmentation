@@ -239,24 +239,6 @@ Bold: the two published pipelines. Seed and propagation swapped within one captu
 \src{runs/20\_new\_reruns/result.md; workplan Entry 16}
 \end{frame}
 
-\begin{frame}{3. Swap contrasts: neither part alone explains the lead}
-\begin{slidetable}
-\begin{tabular}{lrr}
-\toprule
-Contrast (DenseCRF) & VOC-Sim & COCO-Cap \\
-\midrule
-CLIP $-$ our seed, under our hierarchy  & $+0.008$ & $+0.010$ \\
-CLIP $-$ our seed, under NERVE's walk   & $+0.012$ & \pos{+0.060} \\
-Walk $-$ hierarchy, on the CLIP seed    & $+0.003$ & \pos{+0.016} \\
-Walk $-$ hierarchy, on our seed         & $-0.001$ & \pos{-0.033} \\
-Interaction                             & $+0.004$ & \pos{+0.049} \\
-\bottomrule
-\end{tabular}
-\end{slidetable}
-Within diffusion-only pipelines our hierarchy is the better propagator. The earlier 0.737 vs 0.696 gap was inflated by prompt mismatches.
-\src{runs/20\_new\_reruns/result.md; workplan Entry 16}
-\end{frame}
-
 \begin{frame}{3. Extra: a CLIP seed through our hierarchy}
 \begin{slidetable}
 \resizebox{\linewidth}{!}{%
