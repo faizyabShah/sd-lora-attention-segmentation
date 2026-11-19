@@ -303,7 +303,7 @@ The components matter most when the seed is weak. Recommended: separate few-shot
 
 % =====================================================================
 \section{Comment 5}
-\begin{frame}{5. Hierarchy vs fine-only on three backbones, three threshold rules}
+\begin{frame}{5. Hierarchy vs fine-only on three backbones, three threshold rules (renoised images, one SD pass)}
 \begin{slidetable}
 \renewcommand{\arraystretch}{0.95}
 \resizebox{\linewidth}{!}{%
@@ -348,15 +348,14 @@ Cells: VOC-Sim / COCO-Cap, threshold chosen on VOC-Sim. Stored images, noise at 
 \end{frame}
 
 % =====================================================================
-\section{Comment 6}
-\begin{frame}{6. 137 of 162 numbers trace to a committed result; 22 need a fix}
+\begin{frame}{6. Issue with numbers in paper}
 \begin{itemize}
-\item One estimate throughout; no raw and DenseCRF values in one comparison.
-\item Label every number (0.829 is a forced out-of-fold estimate).
-\item The stated failure case (frame-filling objects) contradicts the record.
-\item Ten vague supplement pointers; both PDFs to be rebuilt.
+\item The same result appears with slightly different values (0.829 / 0.830): use one run everywhere.
+\item Two comparisons mix numbers with and without DenseCRF: separate them.
+\item Say how each number was obtained (e.g. 0.829 uses out-of-fold thresholds).
+\item The stated failure case (frame-filling objects) is not supported: only sheep loses.
+\item Ten vague ``see supplement'' pointers to make specific; rebuild both PDFs.
 \end{itemize}
-\src{\texttt{comparisons/notes/entry\_6\_consistency.md}}
 \end{frame}
 
 % =====================================================================
@@ -403,21 +402,12 @@ About half of the $+0.034$ is better localisation; the rest is threshold transfe
 \end{frame}
 
 % =====================================================================
-\section{Comments 8 and 9}
-\begin{frame}{8. Proposed structure}
-\begin{slidetable}
-\begin{tabular}{@{}L{0.38\linewidth}L{0.56\linewidth}@{}}
-\toprule
-Now & Proposed \\
-\midrule
-4 Experimental setup & 4 Setup: protocol with the override, \textbf{hardware, runtime, memory} \\
-5 What each stage contributes & \textbf{5 Experimental results} \\
-6 Comparison with published methods & 5.1 Comparison (paired, extra-model, published blocks) \\
- & 5.2--5.6 the former 5.1--5.5 \\
-7 Discussion and limitations & 6 Discussion (token scope, CLIP seeds, backbones) \\
-\bottomrule
-\end{tabular}
-\end{slidetable}
+\begin{frame}{8. Paper structure, as requested}
+\begin{itemize}
+\item Section 5 to renamed ``Experimental results''; the comparison with other methods moves into it as 5.1.
+\item Section 4 gains hardware, software, runtime and memory per image (next slide).
+\item The discussion adds the token, CLIP-seed and backbone findings.
+\end{itemize}
 \end{frame}
 
 \begin{frame}{8. Cost: the hierarchy is free; attention recording and DenseCRF dominate}
@@ -441,7 +431,7 @@ Peak GPU memory & 5.1\,GiB & 5.1\,GiB \\
 \begin{frame}{9. ICPR 2027}
 \begin{itemize}
 \item Agreed: ICPR 2027 is the target (submission 8 March 2027).
-\item We continue working on the paper after the TRDP defense, to find stronger ideas worth publishing.
+\item We can also continue working on the paper after the TRDP defense, to find stronger ideas worth publishing.
 \end{itemize}
 \end{frame}
 
@@ -494,61 +484,6 @@ Hierarchy & VOC-Sim-selected & 0.818 & 0.816 & $-0.001$ & & 0.692 & 0.717 & \pos
 {\footnotesize Raw maps; profiles never include the test image. COCO-Cap was used to screen the gate. Bold: 95\% paired interval excludes zero.}
 \end{frame}
 
-\begin{frame}{Exploring: absent-class vs all-pixel profiles}
-\begin{slidetable}
-\renewcommand{\arraystretch}{1.0}
-\begin{tabular}{@{}lrrrcrrr@{}}
-\toprule
- & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
-\cmidrule(lr){2-4}\cmidrule(lr){6-8}
-Threshold & all-pixel & absent-class & $\Delta$ & & all-pixel & absent-class & $\Delta$ \\
-\midrule
-VOC-Sim-selected & 0.817 & 0.816 & $-0.001$ & & 0.712 & 0.717 & $+0.005$ \\
-fixed 0.55 & 0.817 & 0.818 & $+0.001$ & & 0.712 & 0.717 & $+0.005$ \\
-best (uses labels) & 0.817 & 0.818 & $+0.001$ & & 0.721 & 0.730 & \pos{+0.009} \\
-\bottomrule
-\end{tabular}
-\end{slidetable}
-{\footnotesize Raw maps, hierarchy. Bold: 95\% paired interval excludes zero.}
-\end{frame}
-
-\begin{frame}{Exploring: gated fine-only vs ungated BRACE}
-\begin{slidetable}
-\renewcommand{\arraystretch}{1.0}
-\begin{tabular}{@{}lrrrcrrr@{}}
-\toprule
- & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
-\cmidrule(lr){2-4}\cmidrule(lr){6-8}
-Threshold & BRACE & gated fine-only & $\Delta$ & & BRACE & gated fine-only & $\Delta$ \\
-\midrule
-VOC-Sim-selected & 0.818 & 0.817 & $-0.001$ & & 0.692 & 0.704 & $+0.012$ \\
-fixed 0.55 & 0.819 & 0.774 & \pos{-0.046} & & 0.692 & 0.717 & \pos{+0.025} \\
-best (uses labels) & 0.819 & 0.818 & $-0.002$ & & 0.709 & 0.723 & $+0.014$ \\
-\bottomrule
-\end{tabular}
-\end{slidetable}
-{\footnotesize Raw maps. Bold: 95\% paired interval excludes zero.}
-\end{frame}
-
-\begin{frame}{Exploring: registered tests, development check fails}
-\begin{slidetable}
-\begin{tabular}{llrl}
-\toprule
-Test (hierarchy + DenseCRF) & Benchmark & $\Delta$ [95\% interval] & Result \\
-\midrule
-\textbf{Gate $-$ BRACE (primary)} & VOC-Sim & $+0.000$ [$-0.005$, $+0.006$] & \textbf{fail} \\
-VOC-Sim profiles $-$ BRACE & COCO-Cap & \pos{+0.013} [$+0.001$, $+0.025$] & above zero \\
-Gate $-$ BRACE & COCO-Cap & \pos{+0.014} [$+0.003$, $+0.026$] & above zero \\
-Gate $-$ control (absent set needed?) & VOC-Sim & $+0.001$ [$-0.001$, $+0.005$] & not supported \\
-Gate $-$ BRACE, seed only & both & \pos{+0.016} / \pos{+0.030} & above zero \\
-Gate $-$ BRACE, fine-only & both & \pos{+0.007} / \pos{+0.036} & above zero \\
-\bottomrule
-\end{tabular}
-\end{slidetable}
-The absent-class set is not what helps: a generic object-profile gate does as well. COCO-Cap result is screened.
-\src{runs/29\_absent\_class\_study/result.md}
-\end{frame}
-
 \begin{frame}{Exploring: the gate on COCO-Cap is a class-dependent trade-off}
 \begin{slidetable}
 \begin{tabular}{lrrr}
@@ -575,28 +510,16 @@ tv           & 0.79 & 0.69 & $-0.10$ \\
 \toprule
 Question & Status \\
 \midrule
-Absent-class profiles better than generic? & no \\
 Gate improves seeds and fine-only? & yes, both benchmarks \\
 Gate improves BRACE on VOC-Sim? & no \\
 Gate improves BRACE on COCO-Cap? & $+0.014$, screened (exploratory) \\
-Needs transductive profiles? & no (VOC-Sim profiles work) \\
-Which part works; class-adaptive gate & running (mechanism study) \\
+Profiles estimated on VOC-sim work on COCO? & yes \\
+A class adaptive gate? & under study \\
 \bottomrule
 \end{tabular}
 \end{slidetable}
-Not in the paper's method. A claim would need a pre-registered test on fresh annotated images.
-\end{frame}
+Not in the paper's method, something new that worked. 
 
-% =====================================================================
-\begin{frame}{Questions for JC}
-\begin{enumerate}
-\item Headline: best diffusion-only method, with CLIP methods in a separate block?
-\item Which blocks of the new Table 5 go in the main paper?
-\item Optimized tokens and SDXL: report as limitations, or drop the blocks?
-\item Which capture is canonical: original (0.829 / 0.696) or prompt-corrected (0.832 / 0.709)?
-\item SD 2.1: is the verified community copy acceptable?
-\item Author list and order for ICPR (fixed on 1 March); online-only venue acceptable?
-\end{enumerate}
 \end{frame}
 
 \end{document}
