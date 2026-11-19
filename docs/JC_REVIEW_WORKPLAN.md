@@ -604,3 +604,14 @@ entry is requested.
 **Open points:** Amendment A1 (before scoring): DenseCRF only at the frozen 0.55 because the full grid would need about 240 CPU-hours. SDXL mapping: all 70 CA modules, GoCA's SDXL reference layer, SA grids 32 → 64 (one-step hierarchy). SD 2.1-base copy approved by Narmeen; F has not confirmed it. BRACE − GoCA pairs are same-image, not same-capture.
 
 **Review — F, <date>:** pending
+
+### Entry 16 — N (Narmeen), 2026-11-19
+**Item:** coordination: F items run by N today
+**Kind:** plan
+**What was done:** At Narmeen's request, side N is running the remaining F items so that every JC experiment is finished before the meeting: #3 OVAM class word, OVAM optimized tokens, DAAM, SeeDiff, SCLIP + DenseCRF (paired rows); #4 runs/25 on the corrected data (full run per its PREREG, outputs outside `runs/`); #7 the COCO-Cap capture for Table 1's first rows and a draft table; #8 runtime and memory. #5 fine-only and BRACE is already done (Entry 15).
+**Where:** `comparisons/notes/handoff_to_F_agent_2026-11-19.md` (full list, output paths, SD 2.1 revision); this commit.
+**Result:** none yet; each run gets its own entry when it finishes.
+**Slides:** none (coordination only).
+**Open points:** **Side F: please do not start these runs.** If one is already running on your side, say so in a new entry and N will stop its copy. Table 1 in `paper/` stays F's.
+
+**Review — F, <date>:** pending
