@@ -59,21 +59,67 @@ Extra & query-profile gate (training-free) & exploratory \\
 \end{slidetable}
 \end{frame}
 
-\begin{frame}{Evidence: our components (class word, DenseCRF, VOC-Sim threshold)}
+\begin{frame}{Evidence: our components, threshold selected on VOC-Sim}
 \begin{slidetable}
-\begin{tabular}{@{}lrrl@{}}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lrrrcrrr@{}}
 \toprule
-Claim & VOC-Sim & COCO-Cap & Verdict \\
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Comparison (A vs B) & A & B & $\Delta$ & & A & B & $\Delta$ \\
 \midrule
-Hierarchy vs fine-only propagation & \pos{+0.007} & \pos{+0.036} & holds (threshold-sensitive) \\
-SA-guided vs uniform layer weights & $+0.004$ & \pos{+0.035} & holds on COCO-Cap \\
-One-sided cap vs no cap (raw, 0.55) & $+0.010$ & \pos{-0.005} & weaken \\
-Hierarchy vs fine-only, SD 2.1 (one pass) & \pos{+0.054} & \pos{+0.060} & holds \\
-Hierarchy vs fine-only, SDXL (one pass) & \pos{-0.022} & \pos{-0.011} & fails (two scales) \\
+Hierarchy vs fine-only (generation, CRF) & 0.832 & 0.824 & \pos{+0.007} & & 0.709 & 0.673 & \pos{+0.036} \\
+SA-guided vs uniform weights (generation, CRF) & 0.832 & 0.828 & $+0.004$ & & 0.709 & 0.674 & \pos{+0.035} \\
+Cap vs no cap (generation, raw$^\dagger$) & 0.816 & 0.807 & \pos{+0.008} & & 0.682 & 0.678 & $+0.004$ \\
+Hierarchy vs fine-only, SD 1.5 (one pass, raw) & 0.793 & 0.784 & \pos{+0.009} & & 0.650 & 0.612 & \pos{+0.038} \\
+Hierarchy vs fine-only, SD 2.1 (one pass, raw) & 0.803 & 0.749 & \pos{+0.054} & & 0.658 & 0.599 & \pos{+0.060} \\
+Hierarchy vs fine-only, SDXL (one pass, raw) & 0.739 & 0.761 & \pos{-0.022} & & 0.496 & 0.506 & \pos{-0.011} \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{slidetable}
-Bold: 95\% paired bootstrap interval excludes zero.
+Bold: 95\% paired interval excludes zero. $^\dagger$pre-correction capture (the only one with an uncapped map).
+\end{frame}
+
+\begin{frame}{Evidence: our components, fixed threshold 0.55}
+\begin{slidetable}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lrrrcrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Comparison (A vs B) & A & B & $\Delta$ & & A & B & $\Delta$ \\
+\midrule
+Hierarchy vs fine-only (generation, CRF) & 0.833 & 0.797 & \pos{+0.036} & & 0.709 & 0.698 & $+0.010$ \\
+SA-guided vs uniform weights (generation, CRF) & 0.833 & 0.829 & $+0.003$ & & 0.709 & 0.684 & \pos{+0.025} \\
+Cap vs no cap (generation, raw$^\dagger$) & 0.817 & 0.807 & \pos{+0.010} & & 0.682 & 0.687 & \pos{-0.005} \\
+Hierarchy vs fine-only, SD 1.5 (one pass, raw) & 0.792 & 0.710 & \pos{+0.082} & & 0.654 & 0.611 & \pos{+0.043} \\
+Hierarchy vs fine-only, SD 2.1 (one pass, raw) & 0.803 & 0.674 & \pos{+0.129} & & 0.658 & 0.608 & \pos{+0.050} \\
+Hierarchy vs fine-only, SDXL (one pass, raw) & 0.711 & 0.624 & \pos{+0.088} & & 0.488 & 0.439 & \pos{+0.049} \\
+\bottomrule
+\end{tabular}}
+\end{slidetable}
+Bold: 95\% paired interval excludes zero. $^\dagger$pre-correction capture (the only one with an uncapped map).
+\end{frame}
+
+\begin{frame}{Evidence: our components, each map at its best threshold (uses labels)}
+\begin{slidetable}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lrrrcrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Comparison (A vs B) & A & B & $\Delta$ & & A & B & $\Delta$ \\
+\midrule
+Hierarchy vs fine-only (generation, CRF) & 0.833 & 0.826 & $+0.006$ & & 0.719 & 0.702 & \pos{+0.016} \\
+SA-guided vs uniform weights (generation, CRF) & 0.833 & 0.829 & $+0.003$ & & 0.719 & 0.697 & \pos{+0.022} \\
+Cap vs no cap (generation, raw$^\dagger$) & 0.817 & 0.807 & \pos{+0.010} & & 0.698 & 0.697 & $+0.000$ \\
+Hierarchy vs fine-only, SD 1.5 (one pass, raw) & 0.793 & 0.784 & \pos{+0.009} & & 0.661 & 0.629 & \pos{+0.032} \\
+Hierarchy vs fine-only, SD 2.1 (one pass, raw) & 0.803 & 0.750 & \pos{+0.053} & & 0.670 & 0.624 & \pos{+0.046} \\
+Hierarchy vs fine-only, SDXL (one pass, raw) & 0.739 & 0.761 & \pos{-0.021} & & 0.500 & 0.513 & \pos{-0.013} \\
+\bottomrule
+\end{tabular}}
+\end{slidetable}
+Bold: 95\% paired interval excludes zero. $^\dagger$pre-correction capture (the only one with an uncapped map).
 \end{frame}
 
 \begin{frame}{Evidence: comparisons and extensions}
