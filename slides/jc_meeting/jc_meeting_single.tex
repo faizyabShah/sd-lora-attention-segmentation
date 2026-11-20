@@ -556,4 +556,41 @@ Not in the paper's method, something new that worked.
 
 \end{frame}
 
+\begin{frame}{Exploring: several absent-class profiles instead of one}
+\begin{itemize}
+\item Wrong firings of a class word are not all alike, so one average absent-class profile blends them.
+\item Instead: group the absent-class queries into 4 profiles per class and layer; each pixel is compared with its nearest one.
+\item Profiles from unlabeled generations, built two ways:
+  \begin{itemize}
+  \item from VOC-Sim prompts only (transfer to COCO-Cap);
+  \item from VOC-Sim and COCO-Cap captions (no masks; the target domain's captions).
+  \end{itemize}
+\item Images split in half per class: profiles, threshold and per-class strength from one half; scores on the other half only.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Exploring: several profiles help most on COCO-Cap}
+\begin{slidetable}
+\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Gate & VOC-Sim & COCO-Cap & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{Profiles from VOC-Sim prompts only}} \\
+\textbf{No gate (BRACE)} & \textbf{0.840} & \textbf{0.708} & --- & --- \\
+one absent-class profile & 0.841 & 0.720 & $+0.001$ & $+0.012$ \\
+strength per class & 0.844 & 0.725 & \pos{+0.004} & \pos{+0.017} \\
+4 absent-class profiles & 0.844 & 0.732 & $+0.004$ & \pos{+0.023} \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{Profiles from VOC-Sim and COCO-Cap captions}} \\
+\textbf{No gate (BRACE)} & \textbf{0.841} & \textbf{0.725} & --- & --- \\
+one absent-class profile & 0.847 & 0.749 & $+0.006$ & \pos{+0.024} \\
+strength per class & 0.850 & 0.759 & \pos{+0.009} & \pos{+0.033} \\
+4 absent-class profiles & 0.854 & 0.771 & \pos{+0.012} & \pos{+0.046} \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+{\footnotesize Held-out halves (237 VOC-Sim, 351 COCO-Cap); hierarchy + DenseCRF; threshold from the other half (VOC-Sim only, or both benchmarks: hence two BRACE rows). Fixed 0.55: BRACE 0.843 / 0.718; 4 profiles 0.845 / 0.744 and 0.855 / 0.762. Bold: 95\% paired interval excludes zero. Exploratory.}
+\end{frame}
+
 \end{document}
