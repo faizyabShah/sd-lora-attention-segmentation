@@ -565,7 +565,7 @@ Not in the paper's method, something new that worked.
   \item from VOC-Sim prompts only (transfer to COCO-Cap);
   \item from VOC-Sim and COCO-Cap captions (no masks; the target domain's captions).
   \end{itemize}
-\item Images split in half per class: profiles, threshold and per-class strength from one half; scores on the other half only.
+\item Images split in half per class: profiles from one half; scores on the other half only.
 \end{itemize}
 \end{frame}
 
@@ -576,21 +576,19 @@ Not in the paper's method, something new that worked.
 \toprule
 Gate & VOC-Sim & COCO-Cap & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
 \midrule
+\textbf{No gate (BRACE)} & \textbf{0.843} & \textbf{0.718} & --- & --- \\
+\midrule
 \multicolumn{5}{@{}l}{\emph{Profiles from VOC-Sim prompts only}} \\
-\textbf{No gate (BRACE)} & \textbf{0.840} & \textbf{0.708} & --- & --- \\
-one absent-class profile & 0.841 & 0.720 & $+0.001$ & $+0.012$ \\
-strength per class & 0.844 & 0.725 & \pos{+0.004} & \pos{+0.017} \\
-4 absent-class profiles & 0.844 & 0.732 & $+0.004$ & \pos{+0.023} \\
+one absent-class profile & 0.843 & 0.738 & $+0.001$ & \pos{+0.019} \\
+4 absent-class profiles & 0.845 & 0.744 & $+0.003$ & \pos{+0.025} \\
 \midrule
 \multicolumn{5}{@{}l}{\emph{Profiles from VOC-Sim and COCO-Cap captions}} \\
-\textbf{No gate (BRACE)} & \textbf{0.841} & \textbf{0.725} & --- & --- \\
-one absent-class profile & 0.847 & 0.749 & $+0.006$ & \pos{+0.024} \\
-strength per class & 0.850 & 0.759 & \pos{+0.009} & \pos{+0.033} \\
-4 absent-class profiles & 0.854 & 0.771 & \pos{+0.012} & \pos{+0.046} \\
+one absent-class profile & 0.849 & 0.742 & $+0.007$ & \pos{+0.024} \\
+4 absent-class profiles & 0.855 & 0.762 & \pos{+0.012} & \pos{+0.044} \\
 \bottomrule
 \end{tabular}
 \end{slidetable}
-{\footnotesize Held-out halves (237 VOC-Sim, 351 COCO-Cap); hierarchy + DenseCRF; threshold from the other half (VOC-Sim only, or both benchmarks: hence two BRACE rows). Fixed 0.55: BRACE 0.843 / 0.718; 4 profiles 0.845 / 0.744 and 0.855 / 0.762. Bold: 95\% paired interval excludes zero. Exploratory.}
+{\footnotesize Held-out halves (237 VOC-Sim, 351 COCO-Cap); hierarchy + DenseCRF; fixed threshold 0.55, so no labels are used anywhere. Bold: 95\% paired interval excludes zero. Exploratory.}
 \end{frame}
 
 \end{document}
