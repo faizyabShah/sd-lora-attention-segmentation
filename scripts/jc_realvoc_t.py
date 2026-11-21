@@ -224,7 +224,7 @@ def capture(a):
     from PIL import Image
     from src.segmentation.sg25_sa import _attention
     pipe, rec = R.load(); W = R.word_map()
-    PF = {t: M.to_dev(torch.load(WORK / f"fit_t{t}{a.tag}.pt")["fit"]) for t in TS}
+    PF = {t: {s: M.to_dev(P) for s, P in torch.load(WORK / f"fit_t{t}{a.tag}.pt")["fit"].items()} for t in TS}
     out = WORK / f"cap_{a.split}{a.tag}"; out.mkdir(parents=True, exist_ok=True)
     w_u = torch.full((len(R.CA_IDX),), 1 / len(R.CA_IDX), device=DEV)
     checked = False
