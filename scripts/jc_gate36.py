@@ -72,7 +72,7 @@ def cons_w(kind, mods_res, Wrw):
 
 def rw_weights(mods, Mt, fs, Sp):
     """{regime: {base: {subset: {module: w}}}} from run 35's held-out per-module AUROC (class-balanced)."""
-    R35 = torch.load(W35 / "stage1_rows.pt")["R"]; out = {}
+    R35 = torch.load(W35 / "stage1_rows.pt", weights_only=False)["R"]; out = {}
     for r in REGIMES:
         out[r] = {}
         for b in BASES:
