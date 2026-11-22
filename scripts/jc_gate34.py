@@ -244,7 +244,8 @@ def _summ(R, st_, var, w, ids, cls, W=None):
     """Class-balanced retention [region, gamma] (or AUROC) per bootstrap weight row W (images)."""
     X = np.stack([np.nanmean(R[(st_, i)][var][w], 0) if var in R[(st_, i)] else np.full((3, len(GAMMAS)), np.nan) for i in ids]) \
         if w != "auc" else np.array([np.nanmean(R[(st_, i)][var]["auc"]) if var in R[(st_, i)] else np.nan for i in ids])
-    if W is None:
+    single = W is None
+    if single:
         W = np.ones((1, len(ids)))
     out = []
     for c in np.unique(cls):
@@ -253,7 +254,8 @@ def _summ(R, st_, var, w, ids, cls, W=None):
         Xi = np.nan_to_num(Xi)
         num = np.tensordot(Ws, Xi, axes=(1, 0)); den = Ws.sum(1).reshape((-1,) + (1,) * (Xi.ndim - 1))
         out.append(np.where(den > 0, num / np.maximum(den, 1e-12), np.nan))
-    return np.nanmean(np.stack(out), 0)
+    res = np.nanmean(np.stack(out), 0)
+    return res[0] if single else res
 
 
 def matched(Rc, Rb):
