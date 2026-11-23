@@ -1,134 +1,163 @@
-# Run 37: run 36 gates on real PASCAL VOC photos (`PREREG.md`)
+# Run 37: run 36 gates on real PASCAL VOC photos, strengths and RW weights fitted on VOC train (`PREREG.md`)
 
-**Exploratory; third look at VOC val.** VOC 2012 val: 12 photos, 12 items; thresholds chosen on VOC train (12 items, raw maps). One SD1.5 call per item at t = 100. Class-macro mIoU; 95% photo-bootstrap intervals (50 samples, paired). Gate strengths fixed from run 36 regime X: MK4 γ = 1.000, SN γ = 0.532, MK4-LR γ = 0.716, MK4-RW γ = 0.765. MK4-RW weights from run 36 regime X.
+**Exploratory; third look at VOC val.** VOC 2012 val: 12 photos, 12 items. Fitted on VOC train (12 items): thresholds per map, gate strength γ per gate family and map (grid [0.25, 0.5, 0.75, 1.0, 1.5, 2.0]), RW module weights (40 items). One SD1.5 call per item at t = 100. Class-macro mIoU; 95% photo-bootstrap intervals (50 samples, paired).
 
 
-## 1. Primary contrasts (val, + DenseCRF, train-selected threshold; source C, SA weights on)
+## 1. Primary contrasts (val, + DenseCRF, train-selected threshold and γ; source C, SA weights on)
 
 | # | Contrast | Hierarchy | Δ mIoU [95% CI] | Reading |
 |---|---|---|---|---|
-| P1 | MK4-LR − MK4 | capped hierarchy (V3) | -0.004 [-0.041, +0.025] | not resolved |
-| P2 | MK4-LR − MK4 | fine-only (V0) | +0.012 [-0.015, +0.038] | not resolved |
-| P3 | MK4-RW − MK4 | capped hierarchy (V3) | -0.003 [-0.036, +0.022] | not resolved |
-| P4 | MK4-RW − MK4 | fine-only (V0) | +0.021 [-0.006, +0.048] | not resolved |
-| P5 | SN − MK4 | capped hierarchy (V3) | -0.011 [-0.059, +0.021] | not resolved |
-| P6 | SN − MK4 | fine-only (V0) | -0.020 [-0.063, +0.024] | not resolved |
+| P1 | MK4-LR − MK4 | capped hierarchy (V3) | -0.047 [-0.120, +0.033] | not resolved |
+| P2 | MK4-LR − MK4 | fine-only (V0) | +0.017 [-0.010, +0.044] | not resolved |
+| P3 | MK4-RW − MK4 | capped hierarchy (V3) | -0.073 [-0.146, -0.002] | **hurts** |
+| P4 | MK4-RW − MK4 | fine-only (V0) | -0.003 [-0.033, +0.023] | not resolved |
+| P5 | SN − MK4 | capped hierarchy (V3) | -0.021 [-0.048, +0.004] | not resolved |
+| P6 | SN − MK4 | fine-only (V0) | +0.013 [-0.029, +0.056] | not resolved |
 
 - MK4-LR: does not hold on real photos (helps on V3 or V0, hurts on neither).
 - MK4-RW: does not hold on real photos (helps on V3 or V0, hurts on neither).
 - SN: does not hold on real photos (helps on V3 or V0, hurts on neither).
 
-## 2. Source C (real COCO photos, captions; label-free)
+## 2. Train-selected γ
 
-mIoU, primary rule (seed only: raw, train threshold):
+| Source | SA weights | Map | MK4 | SN | MK4-LR | MK4-RW |
+|---|:-:|---|---:|---:|---:|---:|
+| C |  | seed only | 0.5 | 1.5 | 2.0 | 2.0 |
+| C |  | fine-only (V0) | 0.5 | 2.0 | 2.0 | 2.0 |
+| C |  | capped hierarchy (V3) | 0.5 | 2.0 | 2.0 | 2.0 |
+| C | ✓ | seed only | 1.5 | 1.5 | 2.0 | 2.0 |
+| C | ✓ | fine-only (V0) | 2.0 | 2.0 | 2.0 | 2.0 |
+| C | ✓ | capped hierarchy (V3) | 0.75 | 2.0 | 2.0 | 2.0 |
+| A |  | seed only | 0.5 | 2.0 | 2.0 | 2.0 |
+| A |  | fine-only (V0) | 0.5 | 2.0 | 2.0 | 2.0 |
+| A |  | capped hierarchy (V3) | 0.5 | 2.0 | 2.0 | 2.0 |
+| A | ✓ | seed only | 2.0 | 2.0 | 2.0 | 2.0 |
+| A | ✓ | fine-only (V0) | 2.0 | 2.0 | 2.0 | 2.0 |
+| A | ✓ | capped hierarchy (V3) | 1.0 | 2.0 | 2.0 | 2.0 |
+
+## 3. Source C (real COCO photos, captions; label-free profiles)
+
+mIoU, primary rule (seed only: raw, train threshold), train-selected γ:
 
 | SA weights | Map | none | MK4 | SN | MK4-LR | MK4-RW |
 |:-:|---|---:|---:|---:|---:|---:|
-|  | fine-only (V0) | 0.647 | 0.754 | 0.645 | 0.694 | 0.750 |
-|  | capped hierarchy (V3) | 0.733 | 0.716 | 0.675 | 0.733 | 0.737 |
-|  | uncapped hierarchy (V1) | 0.655 | 0.685 | 0.682 | 0.698 | 0.704 |
-|  | seed only | 0.607 | 0.583 | 0.618 | 0.698 | 0.704 |
-| ✓ | fine-only (V0) | 0.695 | 0.710 | 0.690 | 0.722 | 0.731 |
-| ✓ | capped hierarchy (V3) | 0.756 | 0.733 | 0.722 | 0.729 | 0.730 |
-| ✓ | uncapped hierarchy (V1) | 0.638 | 0.739 | 0.725 | 0.705 | 0.710 |
-| ✓ | seed only | 0.608 | 0.592 | 0.618 | 0.675 | 0.678 |
+|  | fine-only (V0) | 0.647 | 0.733 | 0.686 | 0.713 | 0.681 |
+|  | capped hierarchy (V3) | 0.733 | 0.739 | 0.717 | 0.669 | 0.670 |
+|  | seed only | 0.607 | 0.645 | 0.578 | 0.647 | 0.631 |
+| ✓ | fine-only (V0) | 0.695 | 0.667 | 0.680 | 0.684 | 0.664 |
+| ✓ | capped hierarchy (V3) | 0.756 | 0.733 | 0.712 | 0.686 | 0.660 |
+| ✓ | seed only | 0.608 | 0.586 | 0.571 | 0.627 | 0.632 |
 
-Paired differences (primary rule; seed only: raw):
+Paired differences, train-selected γ:
 
 | SA weights | Map | MK4 − none | SN − MK4 | MK4-LR − MK4 | MK4-RW − MK4 |
 |:-:|---|---|---|---|---|
-|  | fine-only (V0) | +0.106 [+0.031, +0.191] | -0.108 [-0.181, -0.026] | -0.060 [-0.128, +0.008] | -0.004 [-0.040, +0.033] |
-|  | capped hierarchy (V3) | -0.016 [-0.056, +0.039] | -0.042 [-0.130, +0.031] | +0.017 [-0.035, +0.060] | +0.020 [-0.028, +0.059] |
-|  | uncapped hierarchy (V1) | +0.029 [-0.081, +0.164] | -0.003 [-0.114, +0.104] | +0.014 [-0.070, +0.080] | +0.019 [-0.058, +0.080] |
-|  | seed only | -0.024 [-0.112, +0.040] | +0.035 [+0.010, +0.069] | +0.114 [+0.070, +0.184] | +0.121 [+0.073, +0.194] |
-| ✓ | fine-only (V0) | +0.015 [-0.031, +0.067] | -0.020 [-0.063, +0.024] | +0.012 [-0.015, +0.038] | +0.021 [-0.006, +0.048] |
-| ✓ | capped hierarchy (V3) | -0.023 [-0.054, +0.009] | -0.011 [-0.059, +0.021] | -0.004 [-0.041, +0.025] | -0.003 [-0.036, +0.022] |
-| ✓ | uncapped hierarchy (V1) | +0.100 [+0.001, +0.208] | -0.014 [-0.061, +0.021] | -0.033 [-0.068, -0.002] | -0.029 [-0.059, -0.002] |
-| ✓ | seed only | -0.015 [-0.112, +0.055] | +0.026 [+0.004, +0.071] | +0.082 [+0.047, +0.148] | +0.086 [+0.050, +0.153] |
+|  | fine-only (V0) | +0.085 [+0.025, +0.161] | -0.047 [-0.080, -0.015] | -0.020 [-0.109, +0.068] | -0.052 [-0.135, +0.028] |
+|  | capped hierarchy (V3) | +0.006 [-0.022, +0.039] | -0.022 [-0.046, +0.002] | -0.070 [-0.146, +0.009] | -0.069 [-0.143, +0.009] |
+|  | seed only | +0.037 [-0.030, +0.088] | -0.067 [-0.116, -0.045] | +0.002 [-0.044, +0.052] | -0.013 [-0.059, +0.032] |
+| ✓ | fine-only (V0) | -0.028 [-0.104, +0.069] | +0.013 [-0.029, +0.056] | +0.017 [-0.010, +0.044] | -0.003 [-0.033, +0.023] |
+| ✓ | capped hierarchy (V3) | -0.023 [-0.055, +0.003] | -0.021 [-0.048, +0.004] | -0.047 [-0.120, +0.033] | -0.073 [-0.146, -0.002] |
+| ✓ | seed only | -0.021 [-0.124, +0.047] | -0.016 [-0.047, +0.009] | +0.040 [+0.010, +0.078] | +0.046 [+0.016, +0.082] |
 
-Component effects for MK4-LR (primary rule): SA weights and hierarchy, with the gate fixed:
+Component effects with the gate fixed (primary rule):
 
 | Gate | SA weights (on − off), V0 | SA weights, V3 | hierarchy V3 − V0, uniform | hierarchy V3 − V0, SA weights |
 |---|---|---|---|---|
 | none | +0.048 [+0.011, +0.088] | +0.023 [+0.002, +0.048] | +0.085 [+0.026, +0.156] | +0.061 [+0.004, +0.121] |
-| MK4 | -0.044 [-0.070, -0.020] | +0.017 [+0.009, +0.024] | -0.037 [-0.086, +0.010] | +0.023 [-0.023, +0.085] |
-| MK4-LR | +0.028 [-0.002, +0.057] | -0.004 [-0.014, +0.007] | +0.040 [-0.022, +0.103] | +0.007 [-0.042, +0.056] |
+| MK4 | -0.066 [-0.130, +0.006] | -0.006 [-0.014, +0.005] | +0.006 [-0.022, +0.033] | +0.066 [-0.021, +0.147] |
+| SN | -0.006 [-0.058, +0.052] | -0.005 [-0.024, +0.014] | +0.032 [-0.020, +0.071] | +0.032 [-0.024, +0.099] |
+| MK4-LR | -0.028 [-0.045, -0.003] | +0.017 [+0.009, +0.032] | -0.044 [-0.074, -0.004] | +0.001 [-0.030, +0.032] |
+| MK4-RW | -0.016 [-0.028, -0.001] | -0.010 [-0.016, -0.001] | -0.011 [-0.049, +0.027] | -0.005 [-0.049, +0.035] |
 
-## 3. Source A (VOC train labels; reference)
+Descriptive: every gate at γ = 1 (untuned), SA weights on, primary rule:
 
-mIoU, primary rule (seed only: raw, train threshold):
+| Map | MK4 | SN | MK4-LR | MK4-RW | MK4-LR − MK4 |
+|---|---:|---:|---:|---:|---|
+| fine-only (V0) | 0.710 | 0.665 | 0.689 | 0.690 | -0.021 [-0.069, +0.038] |
+| capped hierarchy (V3) | 0.733 | 0.735 | 0.696 | 0.696 | -0.037 [-0.097, +0.019] |
+
+## 4. Source A (VOC train labels; reference)
+
+mIoU, primary rule (seed only: raw, train threshold), train-selected γ:
 
 | SA weights | Map | none | MK4 | SN | MK4-LR | MK4-RW |
 |:-:|---|---:|---:|---:|---:|---:|
-|  | fine-only (V0) | 0.647 | 0.657 | 0.577 | 0.666 | 0.694 |
-|  | capped hierarchy (V3) | 0.733 | 0.665 | 0.659 | 0.659 | 0.674 |
-|  | uncapped hierarchy (V1) | 0.655 | 0.668 | 0.666 | 0.631 | 0.643 |
-|  | seed only | 0.607 | 0.577 | 0.627 | 0.676 | 0.681 |
-| ✓ | fine-only (V0) | 0.695 | 0.667 | 0.627 | 0.679 | 0.681 |
-| ✓ | capped hierarchy (V3) | 0.756 | 0.676 | 0.718 | 0.707 | 0.704 |
-| ✓ | uncapped hierarchy (V1) | 0.638 | 0.677 | 0.724 | 0.671 | 0.671 |
-| ✓ | seed only | 0.608 | 0.610 | 0.637 | 0.661 | 0.663 |
+|  | fine-only (V0) | 0.647 | 0.637 | 0.550 | 0.644 | 0.614 |
+|  | capped hierarchy (V3) | 0.733 | 0.669 | 0.621 | 0.646 | 0.678 |
+|  | seed only | 0.607 | 0.651 | 0.566 | 0.648 | 0.657 |
+| ✓ | fine-only (V0) | 0.695 | 0.627 | 0.598 | 0.617 | 0.595 |
+| ✓ | capped hierarchy (V3) | 0.756 | 0.676 | 0.607 | 0.670 | 0.691 |
+| ✓ | seed only | 0.608 | 0.558 | 0.576 | 0.631 | 0.634 |
 
-Paired differences (primary rule; seed only: raw):
+Paired differences, train-selected γ:
 
 | SA weights | Map | MK4 − none | SN − MK4 | MK4-LR − MK4 | MK4-RW − MK4 |
 |:-:|---|---|---|---|---|
-|  | fine-only (V0) | +0.010 [-0.107, +0.127] | -0.080 [-0.157, -0.021] | +0.008 [-0.045, +0.077] | +0.037 [+0.012, +0.078] |
-|  | capped hierarchy (V3) | -0.068 [-0.138, +0.020] | -0.005 [-0.101, +0.100] | -0.005 [-0.064, +0.056] | +0.009 [-0.034, +0.052] |
-|  | uncapped hierarchy (V1) | +0.012 [-0.110, +0.133] | -0.002 [-0.096, +0.110] | -0.037 [-0.103, +0.040] | -0.025 [-0.077, +0.035] |
-|  | seed only | -0.031 [-0.125, +0.050] | +0.050 [+0.031, +0.076] | +0.100 [+0.059, +0.151] | +0.105 [+0.061, +0.161] |
-| ✓ | fine-only (V0) | -0.028 [-0.111, +0.063] | -0.040 [-0.082, -0.003] | +0.012 [-0.011, +0.038] | +0.014 [-0.005, +0.036] |
-| ✓ | capped hierarchy (V3) | -0.080 [-0.151, -0.009] | +0.042 [-0.043, +0.116] | +0.031 [-0.018, +0.071] | +0.028 [-0.014, +0.062] |
-| ✓ | uncapped hierarchy (V1) | +0.038 [-0.094, +0.156] | +0.047 [-0.035, +0.123] | -0.006 [-0.041, +0.026] | -0.006 [-0.037, +0.023] |
-| ✓ | seed only | +0.002 [-0.092, +0.082] | +0.027 [+0.006, +0.056] | +0.051 [+0.023, +0.094] | +0.053 [+0.023, +0.098] |
+|  | fine-only (V0) | -0.010 [-0.117, +0.090] | -0.087 [-0.144, -0.036] | +0.007 [-0.072, +0.084] | -0.023 [-0.087, +0.046] |
+|  | capped hierarchy (V3) | -0.064 [-0.128, +0.009] | -0.047 [-0.088, -0.015] | -0.023 [-0.085, +0.044] | +0.010 [-0.022, +0.039] |
+|  | seed only | +0.044 [-0.030, +0.116] | -0.086 [-0.132, -0.053] | -0.004 [-0.067, +0.044] | +0.006 [-0.047, +0.043] |
+| ✓ | fine-only (V0) | -0.068 [-0.173, +0.020] | -0.029 [-0.099, +0.030] | -0.010 [-0.072, +0.060] | -0.032 [-0.091, +0.031] |
+| ✓ | capped hierarchy (V3) | -0.080 [-0.151, -0.009] | -0.069 [-0.114, -0.041] | -0.005 [-0.072, +0.054] | +0.015 [-0.020, +0.042] |
+| ✓ | seed only | -0.049 [-0.144, +0.029] | +0.018 [-0.008, +0.038] | +0.073 [+0.024, +0.113] | +0.075 [+0.034, +0.114] |
 
-Component effects for MK4-LR (primary rule): SA weights and hierarchy, with the gate fixed:
+Component effects with the gate fixed (primary rule):
 
 | Gate | SA weights (on − off), V0 | SA weights, V3 | hierarchy V3 − V0, uniform | hierarchy V3 − V0, SA weights |
 |---|---|---|---|---|
 | none | +0.048 [+0.011, +0.088] | +0.023 [+0.002, +0.048] | +0.085 [+0.026, +0.156] | +0.061 [+0.004, +0.121] |
-| MK4 | +0.010 [+0.001, +0.024] | +0.011 [+0.001, +0.022] | +0.008 [-0.017, +0.034] | +0.009 [-0.016, +0.037] |
-| MK4-LR | +0.013 [-0.027, +0.047] | +0.047 [+0.010, +0.078] | -0.006 [-0.039, +0.026] | +0.028 [-0.010, +0.067] |
+| MK4 | -0.010 [-0.035, +0.018] | +0.007 [-0.008, +0.025] | +0.031 [+0.016, +0.049] | +0.049 [+0.028, +0.071] |
+| SN | +0.048 [+0.030, +0.078] | -0.015 [-0.027, -0.002] | +0.071 [+0.009, +0.133] | +0.008 [-0.041, +0.045] |
+| MK4-LR | -0.027 [-0.042, -0.005] | +0.025 [+0.011, +0.047] | +0.002 [-0.026, +0.033] | +0.053 [+0.029, +0.073] |
+| MK4-RW | -0.019 [-0.031, -0.007] | +0.013 [+0.007, +0.028] | +0.064 [+0.008, +0.105] | +0.096 [+0.049, +0.135] |
 
-## 4. Other rules, source C, SA weights on
+Descriptive: every gate at γ = 1 (untuned), SA weights on, primary rule:
 
-| Map | Gate | + CRF, train thr (primary) | + CRF, 0.55 | raw, train thr | raw, 0.55 | train thr |
-|---|---|---:|---:|---:|---:|---:|
-| fine-only (V0) | none | 0.695 | 0.704 | 0.713 | 0.717 | 0.575 |
-| fine-only (V0) | MK4 | 0.710 | 0.750 | 0.734 | 0.763 | 0.575 |
-| fine-only (V0) | SN | 0.690 | 0.733 | 0.713 | 0.741 | 0.600 |
-| fine-only (V0) | MK4-LR | 0.722 | 0.722 | 0.741 | 0.741 | 0.550 |
-| fine-only (V0) | MK4-RW | 0.731 | 0.731 | 0.750 | 0.750 | 0.550 |
-| capped hierarchy (V3) | none | 0.756 | 0.758 | 0.753 | 0.750 | 0.575 |
-| capped hierarchy (V3) | MK4 | 0.733 | 0.771 | 0.756 | 0.775 | 0.650 |
-| capped hierarchy (V3) | SN | 0.722 | 0.767 | 0.739 | 0.764 | 0.675 |
-| capped hierarchy (V3) | MK4-LR | 0.729 | 0.791 | 0.747 | 0.790 | 0.650 |
-| capped hierarchy (V3) | MK4-RW | 0.730 | 0.791 | 0.749 | 0.790 | 0.650 |
+| Map | MK4 | SN | MK4-LR | MK4-RW | MK4-LR − MK4 |
+|---|---:|---:|---:|---:|---|
+| fine-only (V0) | 0.667 | 0.616 | 0.648 | 0.675 | -0.019 [-0.063, +0.033] |
+| capped hierarchy (V3) | 0.676 | 0.676 | 0.683 | 0.686 | +0.007 [-0.038, +0.042] |
 
-MK4-LR − MK4 under the other rules (source C, SA weights on):
+## 5. Other rules, source C, SA weights on (train-selected γ)
 
-| Map | + CRF, train thr (primary) | + CRF, 0.55 | raw, train thr | raw, 0.55 |
-|---|---|---|---|---|
-| fine-only (V0) | +0.012 [-0.015, +0.038] | -0.028 [-0.063, +0.008] | +0.007 [-0.013, +0.028] | -0.022 [-0.052, +0.006] |
-| capped hierarchy (V3) | -0.004 [-0.041, +0.025] | +0.020 [-0.005, +0.037] | -0.009 [-0.046, +0.021] | +0.014 [-0.007, +0.029] |
+| Map | Gate | + CRF, train thr (primary) | + CRF, 0.55 | raw, train thr | raw, 0.55 |
+|---|---|---:|---:|---:|---:|
+| fine-only (V0) | none | 0.695 | 0.704 | 0.713 | 0.717 |
+| fine-only (V0) | MK4 | 0.667 | 0.705 | 0.702 | 0.727 |
+| fine-only (V0) | SN | 0.680 | 0.680 | 0.702 | 0.702 |
+| fine-only (V0) | MK4-LR | 0.684 | 0.657 | 0.714 | 0.692 |
+| fine-only (V0) | MK4-RW | 0.664 | 0.664 | 0.700 | 0.700 |
+| capped hierarchy (V3) | none | 0.756 | 0.758 | 0.753 | 0.750 |
+| capped hierarchy (V3) | MK4 | 0.733 | 0.775 | 0.755 | 0.776 |
+| capped hierarchy (V3) | SN | 0.712 | 0.767 | 0.738 | 0.774 |
+| capped hierarchy (V3) | MK4-LR | 0.686 | 0.728 | 0.708 | 0.740 |
+| capped hierarchy (V3) | MK4-RW | 0.660 | 0.729 | 0.695 | 0.741 |
 
-## 5. Per class IoU (primary rule, source C, SA weights on)
+## 6. Per class IoU (primary rule, source C, SA weights on)
 
-| Class | items | none V3 | MK4 V3 | SN V3 | LR V3 | RW V3 | MK4 V0 | LR V0 |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| aeroplane | 1 | 0.789 | 0.567 | 0.786 | 0.593 | 0.598 | 0.779 | 0.807 |
-| bicycle | 1 | 0.292 | 0.347 | 0.331 | 0.341 | 0.338 | 0.444 | 0.427 |
-| bus | 1 | 0.836 | 0.826 | 0.823 | 0.835 | 0.834 | 0.866 | 0.866 |
-| cat | 1 | 0.979 | 0.960 | 0.956 | 0.959 | 0.960 | 0.960 | 0.969 |
-| chair | 1 | 0.286 | 0.210 | 0.236 | 0.348 | 0.331 | 0.204 | 0.242 |
-| dog | 2 | 0.944 | 0.866 | 0.804 | 0.870 | 0.865 | 0.947 | 0.947 |
-| motorbike | 1 | 0.873 | 0.895 | 0.886 | 0.903 | 0.903 | 0.767 | 0.889 |
-| person | 1 | 0.834 | 0.957 | 0.935 | 0.910 | 0.911 | 0.690 | 0.799 |
-| potted plant | 1 | 0.933 | 0.904 | 0.904 | 0.892 | 0.897 | 0.688 | 0.644 |
-| train | 1 | 0.825 | 0.841 | 0.842 | 0.877 | 0.878 | 0.838 | 0.860 |
-| tv | 1 | 0.724 | 0.695 | 0.439 | 0.493 | 0.519 | 0.626 | 0.493 |
+| Class | items | none V3 | MK4 V3 | SN V3 | MK4-LR V3 | MK4-RW V3 | none V0 | MK4 V0 | SN V0 | MK4-LR V0 | MK4-RW V0 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| aeroplane | 1 | 0.789 | 0.603 | 0.641 | 0.566 | 0.465 | 0.844 | 0.768 | 0.825 | 0.775 | 0.739 |
+| bicycle | 1 | 0.292 | 0.333 | 0.438 | 0.418 | 0.428 | 0.410 | 0.436 | 0.450 | 0.441 | 0.417 |
+| bus | 1 | 0.836 | 0.830 | 0.806 | 0.840 | 0.814 | 0.858 | 0.850 | 0.871 | 0.870 | 0.859 |
+| cat | 1 | 0.979 | 0.961 | 0.945 | 0.961 | 0.952 | 0.974 | 0.945 | 0.960 | 0.961 | 0.953 |
+| chair | 1 | 0.286 | 0.210 | 0.228 | 0.381 | 0.326 | 0.181 | 0.217 | 0.204 | 0.325 | 0.311 |
+| dog | 2 | 0.944 | 0.860 | 0.818 | 0.920 | 0.877 | 0.864 | 0.957 | 0.943 | 0.949 | 0.951 |
+| motorbike | 1 | 0.873 | 0.897 | 0.844 | 0.896 | 0.883 | 0.842 | 0.714 | 0.783 | 0.832 | 0.806 |
+| person | 1 | 0.834 | 0.955 | 0.908 | 0.934 | 0.913 | 0.492 | 0.717 | 0.646 | 0.791 | 0.732 |
+| potted plant | 1 | 0.933 | 0.905 | 0.897 | 0.256 | 0.251 | 0.903 | 0.255 | 0.495 | 0.258 | 0.254 |
+| train | 1 | 0.825 | 0.844 | 0.846 | 0.848 | 0.865 | 0.834 | 0.823 | 0.841 | 0.831 | 0.818 |
+| tv | 1 | 0.724 | 0.664 | 0.464 | 0.522 | 0.483 | 0.443 | 0.654 | 0.462 | 0.495 | 0.468 |
 
-Mean gate value over modules and pixels (val): C/MK4 0.472, C/SN 0.499, C/MK4-LR 0.516, C/MK4-RW 0.510, A/MK4 0.469, A/SN 0.500, A/MK4-LR 0.503, A/MK4-RW 0.501.
+## 7. RW module weights (VOC train, all items; w = clip(2·(AUROC − 0.5), 0, 1) of the MK4 gate, object vs far)
 
-Run 33 t = 100 (different capture, descriptive only, primary rule): all off 0.596, BRACE 0.608, SA weights + uncapped hierarchy 0.610, full stack A 0.646, full stack C 0.645 (uncapped hierarchy + MK4).
+| Source | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| C AUROC | 0.574 | 0.488 | 0.663 | 0.819 | 0.972 | 0.952 | 0.918 | 0.889 | 0.506 | 0.479 | 0.435 |
+| A AUROC | 0.671 | 0.483 | 0.723 | 0.861 | 0.992 | 0.993 | 0.962 | 0.884 | 0.482 | 0.458 | 0.424 |
+
+Modules: 0 = down_blocks.0.attentions.0.transformer_blocks.0.attn2, 1 = down_blocks.0.attentions.1.transformer_blocks.0.attn2, 2 = down_blocks.2.attentions.0.transformer_blocks.0.attn2, 3 = down_blocks.2.attentions.1.transformer_blocks.0.attn2, 4 = mid_block.attentions.0.transformer_blocks.0.attn2, 5 = up_blocks.1.attentions.0.transformer_blocks.0.attn2, 6 = up_blocks.1.attentions.1.transformer_blocks.0.attn2, 7 = up_blocks.1.attentions.2.transformer_blocks.0.attn2, 8 = up_blocks.3.attentions.0.transformer_blocks.0.attn2, 9 = up_blocks.3.attentions.1.transformer_blocks.0.attn2, 10 = up_blocks.3.attentions.2.transformer_blocks.0.attn2
+
+Mean gate value at γ = 1 over modules and pixels (val): C/MK4 0.472, C/SN 0.317, C/MK4-LR 0.411, C/MK4-RW 0.412, A/MK4 0.469, A/SN 0.319, A/MK4-LR 0.401, A/MK4-RW 0.405.
+
+Run 33 t = 100 (different capture, descriptive only, primary rule): all off 0.596, BRACE 0.608, full stack C 0.645 (uncapped hierarchy + MK4).
 
