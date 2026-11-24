@@ -183,27 +183,35 @@ COCO val2017, other classes           & real      & 60 & \x & \x & \x \\
 \centering
 \caption{}
 % Comparison with published class-word results on the OVAM benchmarks (mIoU).
-% $^\dagger$ = re-run by us on the same images.
-% SRC: published rows quoted from OVAM Table 1; NERVE and SCLIP re-run by us
-%      (runs/20 is on the old pipeline); ours = NEW RUN of the frozen pipeline
-%      on full VOC-Sim and COCO-Cap (runs/38 regime X is exploratory, half sets).
+% Last two columns: COCO-Cap split by whether the class word is in the
+% generation prompt (OVAM's word_included; the OVAM sense of querying a word
+% not in the prompt). Published rows report only the full sets.
+% $^\dagger$ = re-run by us on the same regenerated images, as released
+%   (NERVE: SD 2.1-base, own binarisation; SCLIP: ViT-B/16 VOC21 prediction).
+% Ours: fixed threshold 0.55 ("determined empirically in earlier experiments",
+%   as OVAM words it; it came from VOC-Sim for the earlier pipeline: say so).
+%   Profiles from the other half of each set (no image in its own profile).
+% SRC: published rows quoted from OVAM Table 1; all other rows runs/43.
 \label{tab:generated}
-\footnotesize\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}lccc@{}}
+\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lccccc@{}}
 \toprule
-Method & Extra training & VOC-Sim & COCO-Cap \\
+ & & & & \multicolumn{2}{c}{word in prompt} \\
+\cmidrule(lr){5-6}
+Method & Training & VOC-Sim & COCO-Cap & in & not in \\
 \midrule
-DAAM~\cite{tang2023daam}                 & no  & \x & \x \\
-Attn2Mask\citeneeded                     & no  & \x & \x \\
-OVAM~\cite{marcosmanchon2024ovam}        & no  & \x & \x \\
-NERVE~\cite{mahatha2025nerve}$^\dagger$  & no  & \x & \x \\
-SCLIP\citeneeded$^\dagger$               & no  & \x & \x \\
+DAAM~\cite{tang2023daam}                 & no  & \x & \x & -- & -- \\
+Attn2Mask\citeneeded                     & no  & \x & \x & -- & -- \\
+OVAM~\cite{marcosmanchon2024ovam}        & no  & \x & \x & -- & -- \\
+NERVE~\cite{mahatha2025nerve}$^\dagger$  & no  & \x & \x & \x & \x \\
+SCLIP\citeneeded$^\dagger$               & no  & \x & \x & \x & \x \\
 \midrule
-Grounded Diffusion\citeneeded            & yes & \x & \x \\
-DatasetDM\citeneeded                     & yes & \x & \x \\
+Grounded Diffusion\citeneeded            & yes & \x & \x & -- & -- \\
+DatasetDM\citeneeded                     & yes & \x & \x & -- & -- \\
 \midrule
-\method{} (raw)                          & no  & \x & \x \\
-\method{} + DenseCRF                     & no  & \x & \x \\
+No gate (ours, ablation)                 & no  & \x & \x & \x & \x \\
+\method{} (raw)                          & no  & \x & \x & \x & \x \\
+\method{} + DenseCRF                     & no  & \x & \x & \x & \x \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -257,8 +265,10 @@ Prototypes & OVDiff~\cite{karazija2024ovdiff} & \x & \x & \x \\
 \caption{}
 % Standard training-free open-vocabulary semantic segmentation (mIoU), all
 % classes compete per pixel. Published numbers quoted as reported.
-% SRC: NEW RUN; needs the multi-class competition rule (not yet designed or
-%      tested). Drop this table if that rule is not ready.
+% OPTIONAL (owner decision 2026-11-24): the paper uses OVAM's sense of open
+% vocabulary and does not claim open-vocabulary segmentation. Keep only if a
+% multi-class rule is added later; otherwise move to supplementary or drop.
+% SRC: NEW RUN; needs the multi-class competition rule (not designed).
 % $^\ddagger$ = diffusion-transformer backbone (FLUX), not SD1.5; quote only.
 \label{tab:multiclass}
 \footnotesize\setlength{\tabcolsep}{4pt}
