@@ -69,6 +69,20 @@
 
 \subsection{Segmentation from diffusion attention}
 % DAAM, OVAM, DiffSegmenter, iSeg, SeeDiff, M2N2, FA-Seg, Meng et al. 2026.
+% FA-Seg (Fig. 3) already shows SD attends to absent classes; their fix is
+% distractor classes in the prompt.
+
+\subsection{Prototype and reference-set methods}
+% Position the novelty here.
+% OVDiff: per-class positive and negative (background-context) prototypes from
+%   generated support images, k-means, nearest prototype. Closest for negatives;
+%   ours = the word's own false activations on photos without the word, used as
+%   a gate on the attention map, not as the classifier.
+% MaViSeg: prototypes from the top 2% tokens of unlabelled real images, in the
+%   model's own features, positives only, DiT backbones. Closest for profiles.
+% ReCo: retrieved real images; hand-picked context classes as a 1-P gate.
+% FreeDA, FOSSIL: caption-driven generated references with DINO features.
+% Still to obtain: ConceptAttention, Seg4Diff, CLIP as RNN (CaR).
 
 \subsection{Training-free open-vocabulary segmentation with CLIP}
 % MaskCLIP, SCLIP, ClearCLIP, NACLIP, ProxyCLIP, PEARL.
@@ -226,6 +240,8 @@ Family & Method & val & VOC classes & other 60 \\
 \midrule
 Random walk & NERVE~\cite{mahatha2025nerve} & \x & \x & \x \\
 \midrule
+Prototypes & OVDiff~\cite{karazija2024ovdiff} & \x & \x & \x \\
+\midrule
 \multirow{2}{*}{Ours}
  & \method{} (raw)                     & \x & \x & \x \\
  & \method{} + DenseCRF                & \x & \x & \x \\
@@ -243,6 +259,7 @@ Random walk & NERVE~\cite{mahatha2025nerve} & \x & \x & \x \\
 % classes compete per pixel. Published numbers quoted as reported.
 % SRC: NEW RUN; needs the multi-class competition rule (not yet designed or
 %      tested). Drop this table if that rule is not ready.
+% $^\ddagger$ = diffusion-transformer backbone (FLUX), not SD1.5; quote only.
 \label{tab:multiclass}
 \footnotesize\setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}lccc@{}}
@@ -258,6 +275,8 @@ PEARL~\cite{pei2026pearl}           & \x & \x & \x \\
 DiffSegmenter\citeneeded            & \x & \x & \x \\
 iSeg\citeneeded                     & \x & \x & \x \\
 Meng et al.~\cite{meng2026making}   & \x & \x & \x \\
+OVDiff~\cite{karazija2024ovdiff}    & \x & \x & \x \\
+MaViSeg~\cite{chakraborty2026maviseg}$^\ddagger$ & \x & \x & \x \\
 \midrule
 \method{}                           & \x & \x & \x \\
 \bottomrule
@@ -352,7 +371,11 @@ Cross-attention seed                      & \x & \x & \x & \x & \x \\
 \caption{}
 % Gate design choices; everything else fixed. Raw mIoU.
 % SRC: consensus variants: runs/39 (stage 1), runs/41 (end to end, median and
-%      trimmed fail); positives-only and K sweep: NEW RUN on the frozen pipeline.
+%      trimmed fail); negative type and K sweep: NEW RUN on the frozen pipeline,
+%      all in one capture. The negative-type block carries the novelty claim:
+%      none = positives only (as MaViSeg's prototypes);
+%      context = background of the positive reference photos (as OVDiff);
+%      false activations = the word's top attention on photos without it (ours).
 \label{tab:gate}
 \footnotesize\setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}llccc@{}}
@@ -361,11 +384,15 @@ Cross-attention seed                      & \x & \x & \x & \x & \x \\
 \cmidrule(lr){4-5}
 Factor & Setting & VOC val & VOC cl. & other 60 \\
 \midrule
-\multirow{4}{*}{Negatives}
+\multirow{3}{*}{Negative type}
  & none (object profile only) & \x & \x & \x \\
- & 1 centroid                 & \x & \x & \x \\
- & 2 centroids                & \x & \x & \x \\
- & 4 centroids                & \x & \x & \x \\
+ & context of reference photos & \x & \x & \x \\
+ & false activations (ours)   & \x & \x & \x \\
+\midrule
+\multirow{3}{*}{Centroids}
+ & 1                          & \x & \x & \x \\
+ & 2                          & \x & \x & \x \\
+ & 4 (ours)                   & \x & \x & \x \\
 \midrule
 \multirow{4}{*}{Modules}
  & each module separately     & \x & \x & \x \\
