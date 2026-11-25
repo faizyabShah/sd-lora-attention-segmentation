@@ -18,6 +18,8 @@ ALIAS = {"airplane": "aeroplane", "plane": "aeroplane", "aeroplane": "aeroplane"
          "plant": "potted plant", "tvmonitor": "tv", "tv monitor": "tv", "monitor": "tv", "tv": "tv", "couch": "sofa", "sofa": "sofa",
          "bicycle": "bicycle", "person": "person", "people": "person", "ship": "boat", "television monitor": "tv", "television": "tv"}
 
+CTX_ALIAS = {"laptop": "computer", "bedding": "bedclothes"}           # Context only ("laptop" is its own COCO class)
+
 
 def canon_sets():
     from jc_real44 import VOC20, CTX59
@@ -30,6 +32,8 @@ def to_canon(line, s, canon):
     first = line.split(",")[0].strip().lower()
     cands = [first, " ".join(first.split()[:2]), first.split()[0] if first else ""]
     for c in cands:
+        if s == "context" and c in CTX_ALIAS:                                  # iSeg's Context prompt words
+            return CTX_ALIAS[c]
         if s in ("voc", "context") and c == "table":
             return "dining table"
         if c in canon:
