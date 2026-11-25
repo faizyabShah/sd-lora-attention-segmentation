@@ -1,6 +1,6 @@
 # Run 44 plan: real-photo comparison for paper2 Table 3 (`tab:real`). DRAFT, not a pre-registration
 
-Status: plan for owner review. Nothing captured or scored. Once the open decisions (section 6) are settled, this becomes
+Status: all owner decisions settled (2026-11-25); next: data and environment setup, then `PREREG.md`. Nothing captured or scored. Once the open decisions (section 6) are settled, this becomes
 `PREREG.md` and is committed before any full capture.
 
 ## 1. Question
@@ -76,8 +76,9 @@ Ours (raw, 0.55) − NERVE (own rule), and ours − best CLIP method, on each co
    environment and Context / COCO-Object class lists (release is VOC-only).
 2. **NERVE on COCO: resolved, not needed.** NERVE ships a COCO-Object config and vocabulary (`ovs_coco5k.yaml`,
    `cls_coco81.txt`) and a Context60 one; the earlier note that it lacked one was wrong. Each column uses its released config.
-3. **VOC val profiles:** COCO-caption profiles (proposed, label-free) vs VOC train with labels (not label-free).
-4. **DAAM / OVAM on real photos:** noised single pass at t = 100 (proposed, same as ours) vs DDIM inversion.
+3. **Profiles:** COCO-caption profiles for all three columns (label-free), as proposed; not separately overruled.
+4. **DAAM / OVAM on real photos: decided (owner, 2026-11-25): one noised pass at t = 100**, prompt "A photograph of a
+   {class}", the same call and noise as ours (no DDIM inversion).
 
 ## 7. Cost (estimate)
 
