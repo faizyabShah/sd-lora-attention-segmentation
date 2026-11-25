@@ -153,8 +153,10 @@ PASCAL VOC 2012 train\citeneeded      & real      & 20 & 1,464 & 2,170 & develop
 PASCAL VOC 2012 val\citeneeded        & real      & 20 & 1,449 & 2,148 & evaluation (Tab.~\ref{tab:real}) \\
 COCO train2017 (threshold check)\citeneeded & real & 20 & 993 & 1,200 & threshold check \\
 COCO train2017 (profiles, captions only) & real   & 80 & 7,986 & -- & reference profiles \\
-COCO val2017, VOC classes             & real      & 20 & 3,582 & 5,414 & evaluation (Tab.~\ref{tab:real}) \\
-COCO val2017, other classes           & real      & 60 & 3,038 & 4,402 & evaluation (Tabs.~\ref{tab:real},~\ref{tab:openvocab}) \\
+PASCAL Context val (59 classes)\citeneeded & real & 59 & 5,104 & \x & evaluation (Tab.~\ref{tab:real}) \\
+COCO-Object (COCO val2017)\citeneeded & real & 80 & 4,571 & 9,816 & evaluation (Tab.~\ref{tab:real}) \\
+\quad 20 VOC classes                  & real      & 20 & 3,582 & 5,414 & seen in development (Tab.~\ref{tab:openvocab}) \\
+\quad other 60 classes                & real      & 60 & 3,038 & 4,402 & never used in development (Tab.~\ref{tab:openvocab}) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -227,6 +229,9 @@ No gate (ours, ablation)                 & no  & 78.2 & 66.2 & 67.3 & 63.9 \\
 \centering
 \caption{}
 % Real photographs, class word given, binary mask per (image, class) item.
+% Columns: the three object benchmarks reported by nearly all diffusion-based methods (OVDiff, iSeg,
+%   DiffSegmenter, FreeDA; also the first three of NERVE/NACLIP/SCLIP). Their datasets, OUR protocol
+%   (class word given), so published multi-class numbers are NOT comparable; every row is re-run (runs/44).
 % Every row re-run by us with the same items, thresholds rule and bootstrap.
 % SRC: NEW RUN for all baselines on real photos; ours from the frozen capture
 %      (runs/40 and runs/42 use the relevant pipelines but different seeds/arms).
@@ -234,9 +239,8 @@ No gate (ours, ablation)                 & no  & 78.2 & 66.2 & 67.3 & 63.9 \\
 \footnotesize\setlength{\tabcolsep}{3.5pt}
 \begin{tabular}{@{}llccc@{}}
 \toprule
- & & VOC 2012 & \multicolumn{2}{c}{COCO val2017} \\
-\cmidrule(lr){4-5}
-Family & Method & val & VOC classes & other 60 \\
+ & & PASCAL VOC & PASCAL Context & COCO-Object \\
+Family & Method & (20) & (59) & (80) \\
 \midrule
 \multirow{4}{*}{Diffusion attention}
  & DAAM~\cite{tang2023daam}            & \x & \x & \x \\
