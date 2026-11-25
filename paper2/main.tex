@@ -136,22 +136,25 @@
 
 \begin{table}[t]
 \centering
-\caption{}
+\caption{Datasets and their role. Items are (image, class) pairs scored as binary masks; for COCO val2017, only items whose class covers at least 1\% of the image are counted (primary items). Profile photos are selected by their captions only; no masks or labels are used.}
 % Evaluation sets and their role. One row per set used anywhere in the paper.
+% SRC: runs/43 (generated), runs/32-37 (VOC), runs/40 items_train (threshold check: 1,200 items, 993 photos),
+%      runs/42 items_val (val2017 minus Section 136 set, primary items) and items_prof (profile pool, 100 + 480 per word).
+% Roles of VOC train / COCO train threshold set depend on the Table 3 run plan; update if that plan changes them.
 \label{tab:sets}
 \footnotesize\setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}llcccl@{}}
 \toprule
 Set & Images & Classes & Photos & Items & Role \\
 \midrule
-VOC-Sim~\cite{marcosmanchon2024ovam}  & generated & 20 & \x & \x & \x \\
-COCO-Cap~\cite{marcosmanchon2024ovam} & generated & \x & \x & \x & \x \\
-PASCAL VOC 2012 train\citeneeded      & real      & 20 & \x & \x & \x \\
-PASCAL VOC 2012 val\citeneeded        & real      & 20 & \x & \x & \x \\
-COCO train2017 (threshold fit)\citeneeded & real  & 20 & \x & \x & \x \\
-COCO train2017 (profiles, captions only) & real   & 80 & \x & -- & \x \\
-COCO val2017, VOC classes             & real      & 20 & \x & \x & \x \\
-COCO val2017, other classes           & real      & 60 & \x & \x & \x \\
+VOC-Sim~\cite{marcosmanchon2024ovam}  & generated & 20 & 490 & 490 & evaluation (Tab.~\ref{tab:generated}) \\
+COCO-Cap~\cite{marcosmanchon2024ovam} & generated & 20 & 707 & 707 & evaluation (Tab.~\ref{tab:generated}) \\
+PASCAL VOC 2012 train\citeneeded      & real      & 20 & 1,464 & 2,170 & development only \\
+PASCAL VOC 2012 val\citeneeded        & real      & 20 & 1,449 & 2,148 & evaluation (Tab.~\ref{tab:real}) \\
+COCO train2017 (threshold check)\citeneeded & real & 20 & 993 & 1,200 & threshold check \\
+COCO train2017 (profiles, captions only) & real   & 80 & 7,986 & -- & reference profiles \\
+COCO val2017, VOC classes             & real      & 20 & 3,582 & 5,414 & evaluation (Tab.~\ref{tab:real}) \\
+COCO val2017, other classes           & real      & 60 & 3,038 & 4,402 & evaluation (Tabs.~\ref{tab:real},~\ref{tab:openvocab}) \\
 \bottomrule
 \end{tabular}
 \end{table}
