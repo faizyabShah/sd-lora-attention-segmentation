@@ -55,11 +55,11 @@ may be few for some words; counts are reported per class, and classes with < 5 p
 | DAAM | `daam` (pip) | noised pass of the photo, prompt "A photograph of a {class}" (same t as ours) | class-word heat map, its τ = 0.4 (as OVAM reports) | small |
 | OVAM (no token opt.) | `vpulab/ovam` | same noised pass | word attention + its SA refinement, τ 0.4, α 0.85 (OVAM §4.1) | small |
 | DiffSegmenter | `comparisons/diffsegmenter` (Narmeen's driver) | as released (real-image method) | its own rule | small |
-| iSeg | GitHub, to download | as released (real-image method) | its own rule | medium |
+| iSeg (T-PAMI 2026) | `linsun449/iseg.code` @ 57e9a17, cloned to `other repositories/iseg` | photo, **SD 2.1-base** (its base model) | released per-dataset settings (VOC: 8 iterations, ent 0.015; Context: 5, 0.002, att_mean; COCO: its COCO-2014 setting) and its image-label step (TagCLIP-predicted labels, `ovs/predict_labels.py`) + `cam_to_label`; mask = pixels labelled as the class. Secondary: the queried class given as the image label (our protocol) | medium |
 | SCLIP | `scripts/sg_clip_dense.py` (reproduces repo) | photo | VOC21, Context60 and COCO-Object configs (each with background), as released; pixels predicted as the class | small |
 | ClearCLIP, NACLIP, ProxyCLIP | GitHub, to download | photo | their VOC21 / Context60 / COCO-Object configs, same read-out | medium (3 repos, mostly shared mmseg code) |
 | NERVE | `other repositories/nerve` (run 43 driver) | photo, SD 2.1-base | released VOC21 and Context60 configs; COCO-Object: no released config → build one the same way (80 names + its background words), documented as the only deviation | small |
-| OVDiff | GitHub, to download | photo; builds prototypes from generated support images per class | its own rule | **large** (support-set generation for 80 classes) |
+| OVDiff (ECCV 2024) | `karazijal/ovdiff` @ 218566b, cloned to `other repositories/ovdiff` | photo; support sets generated with SD 1.5 (32 images per class, 30 steps, seed 42), prototypes from SD, CLIP ViT-B/16 and DINO ViT-B/8, CutLER masks | released VOC pipeline (`sample_support_set` → `gen_vit_features` → `gen_proto_*` → `predict`); its own prediction. **The release implements VOC only** (`mmdata.get_dataset` raises NotImplementedError otherwise): Context and COCO-Object need class lists added in the same format (data-only deviation, documented) | **large** (old stack: torch 1.12, mmcv-full 1.7.1, mmseg 0.30, detectron2 0.6, diffusers 0.14; support generation for 20 + 59 + 80 classes) |
 
 Multi-class baselines (CLIP methods, NERVE) see all class names of the dataset; the queried class's pixels form the mask.
 This is their released protocol; ours sees only the queried word plus profiles. State it in the caption.
@@ -72,7 +72,8 @@ Ours (raw, 0.55) − NERVE (own rule), and ours − best CLIP method, on each co
 
 0. Columns: **decided** (VOC, Context, COCO-Object). Item rule: **decided**, ≥ 1% on all three (§2b).
 
-1. **Scope:** keep iSeg and OVDiff (most effort), or quote their published real-image numbers in a separate block?
+1. **Scope: decided (owner, 2026-11-25): run iSeg and OVDiff ourselves.** Repos cloned (see §4). OVDiff needs its own
+   environment and Context / COCO-Object class lists (release is VOC-only).
 2. **NERVE on COCO:** accept a self-built COCO-Object vocabulary (documented deviation), or report NERVE on VOC val only?
 3. **VOC val profiles:** COCO-caption profiles (proposed, label-free) vs VOC train with labels (not label-free).
 4. **DAAM / OVAM on real photos:** noised single pass at t = 100 (proposed, same as ours) vs DDIM inversion.
