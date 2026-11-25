@@ -17,7 +17,7 @@ are not comparable and every row is re-run. The seen / unseen COCO split moves t
 
 | Column | Classes | Photos | Items | Notes |
 |---|---:|---:|---:|---|
-| PASCAL VOC 2012 val | 20 | 1,449 | 2,148 | all items, as runs 32–37 (VOC val seen 3× in development: say so) |
+| PASCAL VOC 2012 val | 20 | 1,409 | 1,947 | primary items (area ≥ 1%) of the 2,148 used in runs 32–37 (VOC val seen 3× in development: say so) |
 | PASCAL Context val | 59 | 5,104 | to count | **new; data not on the cluster** (see §2a) |
 | COCO-Object (val2017) | 80 | 4,571 | 9,816 | primary items (area ≥ 1%), val2017 minus the Section 136 set (runs 40–42) |
 
@@ -28,8 +28,8 @@ are not comparable and every row is re-run. The seen / unseen COCO split moves t
 - Size: annotations are small (< 100 MB); no new images needed if the VOC2012 check passes.
 
 ### 2b. Item-rule decision
-- Option 1 (proposed): primary items = class area ≥ 1% on **all three** columns (VOC val then changes from 2,148 items).
-- Option 2: keep each column as previously used (VOC all items; COCO ≥ 1%).
+- **Decided (owner, 2026-11-25): primary items = class area ≥ 1% on all three columns.** VOC val: 1,947 of 2,148 items
+  (1,409 photos; area over all pixels, `/home/shafa/sg_comp/tmp/voc_area.py`). All items are secondary.
 - COCO-Object: val2017 minus the Section 136 set (4,571 of 5,000 photos) keeps runs 40–42 untouched-set logic; state it.
 
 ### 2c. Expected weakness
@@ -70,7 +70,7 @@ Ours (raw, 0.55) − NERVE (own rule), and ours − best CLIP method, on each co
 
 ## 6. Open decisions for the owner
 
-0. Columns: **decided** (VOC, Context, COCO-Object). Item rule: §2b.
+0. Columns: **decided** (VOC, Context, COCO-Object). Item rule: **decided**, ≥ 1% on all three (§2b).
 
 1. **Scope:** keep iSeg and OVDiff (most effort), or quote their published real-image numbers in a separate block?
 2. **NERVE on COCO:** accept a self-built COCO-Object vocabulary (documented deviation), or report NERVE on VOC val only?
