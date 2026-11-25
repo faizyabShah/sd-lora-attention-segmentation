@@ -32,6 +32,13 @@ VOC_JPG = ROOT / "datasets/voc2012/VOCdevkit/VOC2012/JPEGImages"
 CTX_SEG = ROOT / "datasets/pascal_context/SegmentationClass"
 CTX_VAL = ROOT / "other repositories/nerve/data/voc/context_val.txt"      # the standard 5,104-image list
 assert len(CTX59) == 59 and len(set(CTX59)) == 59
+# Word given to prompt-based methods (ours, DAAM, OVAM, DiffSegmenter). Scoring stays by canonical name. PASCAL Context's
+# "table" class (459-label 'table') covers every table, so it is queried as "table", not "dining table".
+QUERY = {"context": {"dining table": "table"}}
+
+
+def query_word(s, cls):
+    return QUERY.get(s, {}).get(cls, cls)
 
 
 def items(a):
