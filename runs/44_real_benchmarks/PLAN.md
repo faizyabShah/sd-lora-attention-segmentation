@@ -58,7 +58,7 @@ may be few for some words; counts are reported per class, and classes with < 5 p
 | iSeg (T-PAMI 2026) | `linsun449/iseg.code` @ 57e9a17, cloned to `other repositories/iseg` | photo, **SD 2.1-base** (its base model) | released per-dataset settings (VOC: 8 iterations, ent 0.015; Context: 5, 0.002, att_mean; COCO: its COCO-2014 setting) and its image-label step (TagCLIP-predicted labels, `ovs/predict_labels.py`) + `cam_to_label`; mask = pixels labelled as the class. Secondary: the queried class given as the image label (our protocol) | medium |
 | SCLIP | `scripts/sg_clip_dense.py` (reproduces repo) | photo | VOC21, Context60 and COCO-Object configs (each with background), as released; pixels predicted as the class | small |
 | ClearCLIP, NACLIP, ProxyCLIP | GitHub, to download | photo | their VOC21 / Context60 / COCO-Object configs, same read-out | medium (3 repos, mostly shared mmseg code) |
-| NERVE | `other repositories/nerve` (run 43 driver) | photo, SD 2.1-base | released VOC21 and Context60 configs; COCO-Object: no released config → build one the same way (80 names + its background words), documented as the only deviation | small |
+| NERVE | `other repositories/nerve` (run 43 driver) | photo, SD 2.1-base | **all three released**: `ovs_voc21.yaml` + `cls_voc21.txt`; `ovs_context.yaml` + `cls_context60.txt` (openai templates, score_threshold 0.3, bkg_thre 0.3, no min-max); `ovs_coco5k.yaml` + `cls_coco81.txt` (COCO-Object, 80 classes + 23 background words; score 0.5, bkg 0.5, no min-max, resize 64). No vocabulary deviation | small |
 | OVDiff (ECCV 2024) | `karazijal/ovdiff` @ 218566b, cloned to `other repositories/ovdiff` | photo; support sets generated with SD 1.5 (32 images per class, 30 steps, seed 42), prototypes from SD, CLIP ViT-B/16 and DINO ViT-B/8, CutLER masks | released VOC pipeline (`sample_support_set` → `gen_vit_features` → `gen_proto_*` → `predict`); its own prediction. **The release implements VOC only** (`mmdata.get_dataset` raises NotImplementedError otherwise): Context and COCO-Object need class lists added in the same format (data-only deviation, documented) | **large** (old stack: torch 1.12, mmcv-full 1.7.1, mmseg 0.30, detectron2 0.6, diffusers 0.14; support generation for 20 + 59 + 80 classes) |
 
 Multi-class baselines (CLIP methods, NERVE) see all class names of the dataset; the queried class's pixels form the mask.
@@ -74,7 +74,8 @@ Ours (raw, 0.55) − NERVE (own rule), and ours − best CLIP method, on each co
 
 1. **Scope: decided (owner, 2026-11-25): run iSeg and OVDiff ourselves.** Repos cloned (see §4). OVDiff needs its own
    environment and Context / COCO-Object class lists (release is VOC-only).
-2. **NERVE on COCO:** accept a self-built COCO-Object vocabulary (documented deviation), or report NERVE on VOC val only?
+2. **NERVE on COCO: resolved, not needed.** NERVE ships a COCO-Object config and vocabulary (`ovs_coco5k.yaml`,
+   `cls_coco81.txt`) and a Context60 one; the earlier note that it lacked one was wrong. Each column uses its released config.
 3. **VOC val profiles:** COCO-caption profiles (proposed, label-free) vs VOC train with labels (not label-free).
 4. **DAAM / OVAM on real photos:** noised single pass at t = 100 (proposed, same as ours) vs DDIM inversion.
 
