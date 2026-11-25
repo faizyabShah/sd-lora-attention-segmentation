@@ -110,3 +110,20 @@ torch 2.0.1 cu118, mmcv 2.0.1, mmengine 0.8.4, mmseg 1.1.1), `ovdiff` (torch 1.1
 diffusers 0.14, transformers 4.25.1, timm 0.6.12, detectron2 0.6 — detectron2 may need a GPU-node build for CUDA ops),
 `ovam44` (diffusers 0.20.0), `daam44` (diffusers 0.21.2, transformers 4.30.2), `iseg` (its environment.yaml).
 SCLIP uses our port in `trdp`; NERVE uses `/home/sidna/miniconda3/envs/nerve`; DiffSegmenter `/home/sidna/miniconda3/envs/diffseg`.
+
+### 8b. Driver status (2026-11-25, smoke = 2–3 photos per column, outputs not used)
+
+| Method | Driver | Env | Smoke | Notes for the pre-registration |
+|---|---|---|---|---|
+| SCLIP, ClearCLIP, NACLIP, ProxyCLIP | `scripts/jc_clip44.py` | `clipseg` | ✓ all 3 columns | repo configs unchanged; VOC21 reproduction (`jc_repro44_voc21.py`) against published 59.1 / 51.8 / 58.9 / 61.3 running. **ClearCLIP's released `base_config.py` sets `model_type='vanilla'`, not the paper's q-q attention (`'ClearCLIP'`)**: both are reproduced; the one matching the paper's 51.8 is used |
+| NERVE | `scripts/jc_nerve44.py` | sidna `nerve` | ✓ | released YAML + vocabulary per column |
+| iSeg | `scripts/jc_iseg44.py` | `iseg` | ✓ | TagCLIP labels (released `predict_labels.py`, run unchanged) primary; `--given` (queried classes) secondary |
+| DiffSegmenter | `scripts/jc_diffseg44.py` | sidna `diffseg` | ✓ | faithful BLIP-large caption prompt; read-out: its released rule sweeps the background score 0.30–0.74 **on the evaluated set** (in-sample). Proposed: fixed 0.5 primary (no tuning, like everyone else), its in-sample sweep reported as an audit row |
+| DAAM | to write | `daam44` | — | DAAM's hook keeps the second half of the batch (assumes classifier-free guidance), so the single pass is run with an [unconditional, conditional] batch; heat map bilinear to photo size, min-max, τ = 0.4 (DAAM / OVAM evaluation notebook) |
+| OVAM | to write | `ovam44` | — | OVAM's evaluation uses SA refinement + DenseCRF with set-specific settings (VOC-Sim τ 0.4, min_sa 0.85; COCO-Cap τ 0.5, min_sa 0.91). Proposed: VOC-Sim settings for all three columns (no per-set tuning) |
+| OVDiff | to write | `ovdiff` (+ detectron2 GPU build ✓) | — | add Context / COCO-Object class lists in the release's format |
+| Ours | to write (from runs/42 pipeline) | `trdp` | — | Context needs caption rules for 39 non-VOC words, fixed before capture |
+
+Query word for prompt-based methods: canonical name, except Context "table" (its class covers every table).
+Smoke outputs were written into the production folders; they will be moved to `*_smoke` before the full run (one
+regenerated smoke file was overwritten during the Context query-word fix).
