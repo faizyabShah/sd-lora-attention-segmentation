@@ -18,6 +18,9 @@ CACHE = Path(os.environ.get("BRACE_CACHE_DIR", str(ROOT / "outputs/sg_comp"))).e
 WORK = CACHE / "jc_real44"
 REPOS = {"sclip": "clip_segmentor", "clearclip": "clearclip_segmentor", "naclip": "naclip", "proxyclip": "proxyclip_segmentor"}
 CFG = {"voc": "cfg_voc21.py", "context": "cfg_context60.py", "coco": "cfg_coco_object.py"}
+# ClearCLIP's released base_config.py sets model_type='vanilla'; that reproduces 32.0 VOC21 mIoU, while the paper's
+# q-q attention ('ClearCLIP') reproduces the published 51.8 exactly (jc_repro44_voc21.py, job 263464). Use the paper's.
+OVERRIDE = {"clearclip": {"model_type": "ClearCLIP"}}
 COCO_ROOT = ROOT / "datasets/coco2017"
 
 
@@ -41,6 +44,8 @@ def run(a):
     init_default_scope("mmseg")                       # as the runner does (default_scope='mmseg' in base_config)
     importlib.import_module(REPOS[a.repo]); importlib.import_module("custom_datasets")
     cfg = Config.fromfile(str(repo / "configs" / CFG[a.set]))
+    for k, v in OVERRIDE.get(a.repo, {}).items():
+        cfg.model[k] = v
     model = MODELS.build(cfg.model).cuda(); model.eval()      # the runner moves the whole model (incl. preprocessor) to the GPU
     pipe = Compose([t for t in cfg.test_pipeline if t["type"] != "LoadAnnotations"])
     names = [l.strip() for l in open(cfg.model.name_path) if l.strip()]       # line i = class index i (synonyms comma-separated)
