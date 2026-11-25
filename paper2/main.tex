@@ -181,7 +181,7 @@ COCO val2017, other classes           & real      & 60 & \x & \x & \x \\
 
 \begin{table}[t]
 \centering
-\caption{}
+\caption{Class-word segmentation on the generated benchmarks (mIoU, \%). The last two columns split COCO-Cap by whether the queried class word appears in the generation prompt (465 / 242 images). Published rows are quoted from~\cite{marcosmanchon2024ovam} and report only the full sets; $^\dagger$~re-run by us, as released, on the same images as our method. Our maps use a fixed threshold of 0.55, determined empirically in earlier experiments and not tuned here; bold marks the best method that uses no annotated masks.}
 % Comparison with published class-word results on the OVAM benchmarks (mIoU).
 % Last two columns: COCO-Cap split by whether the class word is in the
 % generation prompt (OVAM's word_included; the OVAM sense of querying a word
@@ -200,18 +200,19 @@ COCO val2017, other classes           & real      & 60 & \x & \x & \x \\
 \cmidrule(lr){5-6}
 Method & Training & VOC-Sim & COCO-Cap & in & not in \\
 \midrule
-DAAM~\cite{tang2023daam}                 & no  & \x & \x & -- & -- \\
-Attn2Mask\citeneeded                     & no  & \x & \x & -- & -- \\
-OVAM~\cite{marcosmanchon2024ovam}        & no  & \x & \x & -- & -- \\
-NERVE~\cite{mahatha2025nerve}$^\dagger$  & no  & \x & \x & \x & \x \\
-SCLIP\citeneeded$^\dagger$               & no  & \x & \x & \x & \x \\
+DAAM~\cite{tang2023daam}                 & no  & 66.2 & 48.4 & -- & -- \\
+Attn2Mask~\cite{yoshihashi2024attn2mask} & no  & 68.7 & 55.0 & -- & -- \\
+OVAM~\cite{marcosmanchon2024ovam}        & no  & 70.4 & 58.2 & -- & -- \\
+NERVE~\cite{mahatha2025nerve}$^\dagger$  & no  & \textbf{80.5} & 70.2 & 73.8 & 61.5 \\
+SCLIP~\cite{wang2024sclip}$^\dagger$     & no  & 71.9 & 58.3 & 61.6 & 51.4 \\
 \midrule
-Grounded Diffusion\citeneeded            & yes & \x & \x & -- & -- \\
-DatasetDM\citeneeded                     & yes & \x & \x & -- & -- \\
+Grounded Diffusion~\cite{li2023groundeddiffusion} & yes & 62.1 & 50.2 & -- & -- \\
+DatasetDM~\cite{wu2023datasetdm}         & yes & 80.3 & 59.3 & -- & -- \\
+OVAM + token opt.~\cite{marcosmanchon2024ovam} & 1 mask/cls & 82.5 & 69.2 & -- & -- \\
 \midrule
-No gate (ours, ablation)                 & no  & \x & \x & \x & \x \\
-\method{} (raw)                          & no  & \x & \x & \x & \x \\
-\method{} + DenseCRF                     & no  & \x & \x & \x & \x \\
+No gate (ours, ablation)                 & no  & 78.2 & 66.2 & 67.3 & 63.9 \\
+\method{} (raw)                          & no  & 80.1 & 73.6 & 74.6 & 71.7 \\
+\method{} + DenseCRF                     & no  & \textbf{80.5} & \textbf{74.4} & \textbf{75.3} & \textbf{72.8} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -241,7 +242,7 @@ Family & Method & val & VOC classes & other 60 \\
  & iSeg\citeneeded                     & \x & \x & \x \\
 \midrule
 \multirow{4}{*}{CLIP}
- & SCLIP\citeneeded                    & \x & \x & \x \\
+ & SCLIP~\cite{wang2024sclip}                    & \x & \x & \x \\
  & ClearCLIP\citeneeded                & \x & \x & \x \\
  & NACLIP\citeneeded                   & \x & \x & \x \\
  & ProxyCLIP\citeneeded                & \x & \x & \x \\
@@ -277,7 +278,7 @@ Prototypes & OVDiff~\cite{karazija2024ovdiff} & \x & \x & \x \\
 Method & VOC20 & VOC21 & COCO-Object \\
 \midrule
 MaskCLIP\citeneeded                 & \x & \x & \x \\
-SCLIP\citeneeded                    & \x & \x & \x \\
+SCLIP~\cite{wang2024sclip}                    & \x & \x & \x \\
 ClearCLIP\citeneeded                & \x & \x & \x \\
 NACLIP\citeneeded                   & \x & \x & \x \\
 ProxyCLIP\citeneeded                & \x & \x & \x \\
