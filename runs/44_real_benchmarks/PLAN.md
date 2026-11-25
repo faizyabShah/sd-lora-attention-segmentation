@@ -127,3 +127,19 @@ SCLIP uses our port in `trdp`; NERVE uses `/home/sidna/miniconda3/envs/nerve`; D
 Query word for prompt-based methods: canonical name, except Context "table" (its class covers every table).
 Smoke outputs were written into the production folders; they will be moved to `*_smoke` before the full run (one
 regenerated smoke file was overwritten during the Context query-word fix).
+
+### 8c. Reproduction and decided read-outs (2026-11-25)
+
+VOC21 val mIoU with each repo's own config and mmseg runner (`scripts/jc_repro44_voc21.py`, job 263464):
+
+| Method | Reproduced | Published (ViT-B/16) | Used config |
+|---|---:|---:|---|
+| SCLIP | 59.64 | 59.1 | as released |
+| ClearCLIP, released `model_type='vanilla'` | 32.01 | — | not used |
+| ClearCLIP, `model_type='ClearCLIP'` | **51.80** | 51.8 | **used** (paper's q-q attention) |
+| NACLIP | 64.06 | 64.1 with post-processing (58.9 without) | as released (PAMR on) |
+| ProxyCLIP | 61.24 | 61.3 | as released |
+
+**Owner decisions (2026-11-25), defaults accepted:** DiffSegmenter fixed background score 0.5 primary (its in-sample
+sweep = audit row only); OVAM VOC-Sim settings (τ 0.4, min_sa 0.85) for every column; iSeg TagCLIP labels primary,
+queried classes given secondary.
