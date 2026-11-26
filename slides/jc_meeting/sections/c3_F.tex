@@ -1,0 +1,48 @@
+% Comment 3: comparison methods (OVAM, optimized tokens, DAAM, SeeDiff, SCLIP, BRACE rows)
+% Owner: F. Only this side edits this file.
+% Add frames below; one message per frame. See docs/JC_REVIEW_WORKPLAN.md, Section 6.
+% Source of every number below: runs/20_new_reruns/result.md (corrected prompts), workplan Entry 16,
+% which corrects Entry 10 (runs/17).
+
+\begin{frame}{Comment 3: where NERVE's lead comes from (seed and propagation swapped)}
+\begin{slidetable}
+\begin{tabular}{lrrcrr}
+\toprule
+ & \multicolumn{2}{c}{VOC-Sim} & & \multicolumn{2}{c}{COCO-Cap} \\
+\cmidrule(lr){2-3}\cmidrule(lr){5-6}
+Propagation & our seed & CLIP seed & & our seed & CLIP seed \\
+\midrule
+None (seed alone)            & 0.736 & 0.761 & & 0.629 & 0.692 \\
+Our fine-only propagation    & 0.824 & 0.831 & & 0.673 & 0.713 \\
+Our capped hierarchy         & \textbf{0.832} & 0.840 & & \textbf{0.709} & 0.719 \\
+NERVE's random walk          & 0.831 & \textbf{0.843} & & 0.675 & \textbf{0.735} \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+  \item Bold: the two published pipelines. DenseCRF, VOC-Sim-selected threshold.
+  \item NERVE $-$ ours: $+0.011$ $[-0.003, +0.026]$ VOC-Sim; $+0.027$ $[+0.002, +0.054]$ COCO-Cap.
+\end{itemize}
+\src{runs/20\_new\_reruns/result.md; workplan Entry 16}\status{done, corrected, unreviewed}
+\end{frame}
+
+\begin{frame}{Comment 3: NERVE's lead on COCO-Cap is the combination, not either part}
+\begin{slidetable}
+\begin{tabular}{lrr}
+\toprule
+Contrast (with DenseCRF) & VOC-Sim & COCO-Cap \\
+\midrule
+CLIP seed $-$ our seed, under our hierarchy       & $+0.008$ & $+0.010$ \\
+CLIP seed $-$ our seed, under NERVE's walk        & $+0.012$ & $\mathbf{+0.060}$ \\
+NERVE's walk $-$ our hierarchy, on the CLIP seed  & $+0.003$ & $\mathbf{+0.016}$ \\
+NERVE's walk $-$ our hierarchy, on our seed       & $-0.001$ & $\mathbf{-0.033}$ \\
+Interaction                                       & $+0.004$ & $\mathbf{+0.049}$ \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+  \item Bold: interval excludes zero. Reading: \textbf{mixed}; the lead needs CLIP seed and walk together.
+  \item Corrected: the earlier 0.737 vs 0.696 was inflated by prompt mismatches.
+\end{itemize}
+\src{runs/20\_new\_reruns/result.md; workplan Entry 16}\status{done, corrected, unreviewed}
+\end{frame}

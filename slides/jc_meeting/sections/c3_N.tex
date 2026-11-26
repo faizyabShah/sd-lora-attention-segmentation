@@ -1,0 +1,104 @@
+% Comment 3: comparison methods (GoCA, NERVE, DiffSegmenter, SPARK, published block)
+% Owner: N. Only this side edits this file.
+% Add frames below; one message per frame. See docs/JC_REVIEW_WORKPLAN.md, Section 6.
+
+\begin{frame}{Three of four requested methods run with the class word}
+\status{done}
+\begin{slidetable}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+Method & Venue & Public code & Backbone used & Verdict \\
+\midrule
+GoCA & CVPR 2026 & yes & SD 1.5, SDXL & \textbf{go} \\
+NERVE & WACV 2026 & yes & SD 1.5 + CLIP ViT-L/14 & \textbf{go} \\
+DiffSegmenter & TIP 2025 & yes & SD 1.5 & \textbf{go} \\
+SPARK & 2026 & no & --- & no-go \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item Each method runs from its own repository and settings; the query is the class word.
+\item SPARK: no released code and no class query, so published block only.
+\end{itemize}
+\src{Workplan Entry 2; \texttt{comparisons/README.md}}
+\end{frame}
+
+\begin{frame}{Sanity check: every method finds the object}
+\status{done}
+\begin{slidetable}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Method (fixed threshold 0.5, no DenseCRF) & VOC-Sim & COCO-Cap & s / image \\
+\midrule
+GoCA, SD 1.5 & 0.671 & 0.452 & 0.14 \\
+GoCA, SDXL & 0.788 & 0.607 & 0.66 \\
+DiffSegmenter, SD 1.5 & 0.713 & 0.653 & 0.15 \\
+NERVE, SD 1.5 + CLIP, class word only & 0.830 & 0.729 & 0.30 \\
+NERVE, SD 1.5 + CLIP, 20-class vocabulary & 0.824 & 0.743 & 0.30 \\
+Centre prior (no model) & 0.318 & 0.225 & --- \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item Sanity numbers on all 490 + 707 images; the paired rows follow.
+\item Possible action: report NERVE in a separate ``with CLIP'' block.
+\end{itemize}
+\src{Workplan Entry 4; \texttt{outputs/segmentation/comparisons/n\_side/}}
+\end{frame}
+
+\begin{frame}{Comment 3: BRACE is best without CLIP; NERVE wins on COCO-Cap}
+\status{done, unreviewed}
+\begin{slidetable}
+\begin{tabular}{@{}llrr@{}}
+\toprule
+Block & Method & VOC-Sim & COCO-Cap \\
+\midrule
+Diffusion only & \textbf{BRACE} & \textbf{0.831} & \textbf{0.708} \\
+ & DiffSegmenter & 0.795 & 0.688 \\
+ & GoCA, SDXL & 0.797 & 0.606 \\
+ & GoCA, SD 1.5 & 0.753 & 0.599 \\
+\midrule
+With CLIP & NERVE, class word only & 0.844 & 0.740 \\
+ & NERVE, 20-class vocabulary & 0.839 & 0.747 \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item Same images, class word, DenseCRF; threshold chosen on VOC-Sim. Exploratory.
+\end{itemize}
+\src{\texttt{comparisons/official/result.md}; BRACE regenerated, matches runs/20 to 0.001}
+\end{frame}
+
+\begin{frame}{Comment 3: paired differences, method minus BRACE}
+\status{done, unreviewed}
+\begin{slidetable}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Method (DenseCRF) & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
+\midrule
+GoCA, SD 1.5 & $-0.078$ [$-0.095$, $-0.060$] & $-0.110$ [$-0.134$, $-0.084$] \\
+GoCA, SDXL & $-0.034$ [$-0.048$, $-0.021$] & $-0.102$ [$-0.124$, $-0.078$] \\
+DiffSegmenter & $-0.036$ [$-0.049$, $-0.023$] & $-0.020$ [$-0.041$, $+0.001$] \\
+NERVE, class word only & $+0.012$ [$-0.002$, $+0.028$] & $\mathbf{+0.032}$ [$+0.007$, $+0.060$] \\
+NERVE, 20-class vocabulary & $+0.008$ [$-0.007$, $+0.023$] & $\mathbf{+0.039}$ [$+0.013$, $+0.068$] \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item Threshold chosen on VOC-Sim; 95\% image-bootstrap intervals. Same signs without DenseCRF.
+\item With its own released rule (image-score gate), NERVE drops to 0.812 / 0.663, below BRACE.
+\end{itemize}
+\src{\texttt{comparisons/official/result.md}, paired section}
+\end{frame}
+
+\begin{frame}{Comment 3: caveats and possible actions}
+\status{planned}
+\begin{itemize}
+\item BRACE reads attention during generation, so it regenerates each image; the other methods segment the stored image (difference under one grey level on most images; every sign holds on the closest subset).
+\item DiffSegmenter's own evaluation tunes its background score on the test set, so it has no fair ``own rule'' row.
+\item No published paper reports VOC-Sim or COCO-Cap for these methods; the old Table 5 rows are OVAM's reruns.
+\item \textbf{Recommended:} main table with two paired blocks (diffusion only; with an extra model), published rows marked unpaired.
+\item To decide with JC: which blocks go in the main paper.
+\end{itemize}
+\src{\texttt{comparisons/official/result.md}; \texttt{comparisons/notes/entry\_venue\_and\_published\_block.md}}
+\end{frame}

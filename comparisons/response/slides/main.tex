@@ -1,0 +1,606 @@
+% Response to JC's review.
+% Part 1: his nine points, one by one (cover page, then one heading + one table per issue).
+% Part 2: additions (new experiments not asked for).
+% Numbers: comparisons/response/JC_RESPONSE_DOCUMENT.md and the workplan entries cited.
+% Overleaf: upload main.tex, style.tex, figures/; compiler pdfLaTeX.
+\documentclass[aspectratio=169,11pt]{beamer}
+\input{style}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+% Cover page for one of JC's points: number, topic, his comment.
+\newcommand{\pointcover}[3]{%
+\begin{frame}[plain]
+\vfill
+\begin{center}
+{\LARGE\bfseries Point #1}\par\vspace{0.6em}
+{\Large #2}\par\vspace{1.4em}
+\begin{minipage}{0.78\linewidth}\centering\itshape #3\end{minipage}
+\end{center}
+\vfill
+\end{frame}}
+\newcommand{\partcover}[2]{%
+\begin{frame}[plain]
+\vfill
+\begin{center}
+{\LARGE\bfseries #1}\par\vspace{1em}
+\begin{minipage}{0.78\linewidth}\centering #2\end{minipage}
+\end{center}
+\vfill
+\end{frame}}
+
+\title{BRACE: response to the review}
+\subtitle{Each point, what we did, what we found}
+\author{Faizyab Shah \and Narmeen}
+\date{}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+\begin{frame}{The nine points at a glance}
+\begin{slidetable}
+\begin{tabular}{@{}cL{0.30\linewidth}L{0.58\linewidth}@{}}
+\toprule
+& Point & Outcome \\
+\midrule
+1 & Contribution and claim & reframed around cluttered scenes; override disclosed \\
+2 & Contributions to evidence & mapping done; two contributions rely on the supplement \\
+3 & Comparison with the state of the art & nine methods rerun on the same images \\
+4 & Optimized tokens & no leakage; the hierarchy stops helping \\
+5 & Diffusion backbones & holds on SD 1.5 and SD 2.1, not on SDXL \\
+6 & Consistency & 162 numbers checked, 22 fixes \\
+7 & Table 1 & rebuilt on both benchmarks \\
+8 & Structure and cost & new order; 12.9\,s and 5.1\,GiB per image \\
+9 & Venue & ICPR 2027 confirmed \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\end{frame}
+
+% =====================================================================
+\pointcover{1}{Contribution and claim}{``The two new components add +0.006 each on VOC-Sim \ldots\ frame the contribution around COCO-Cap, rather than +12.5 points over OVAM. Both components were adopted after the selection rule had kept the simpler reference: the text must handle it carefully.''}
+
+\begin{frame}{Where the gain comes from}
+\begin{slidetable}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Step & VOC-Sim & COCO-Cap \\
+\midrule
+Configuration choices (CA scales, SA passes, DenseCRF, calls) & +0.113 & +0.083 \\
+SA-guided layer weights (new) & +0.005 & +0.015 \\
+Coarse-to-fine hierarchy with cap (new) & +0.007 & \textbf{+0.036} \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item JC is right: on simple images the novelty adds about one point.
+\item In cluttered scenes the new components add five points.
+\end{itemize}
+\src{Table 1 rebuilt on both benchmarks (Entry 19)}
+\end{frame}
+
+\begin{frame}{What the COCO-Cap gain of the hierarchy is}
+\begin{slidetable}
+\begin{tabular}{@{}lr@{}}
+\toprule
+How the threshold is set & Hierarchy gain on COCO-Cap \\
+\midrule
+Each pipeline at its own threshold chosen on VOC-Sim & \textbf{+0.036} \\
+Both pipelines at the same threshold (0.55) & +0.010 (not significant) \\
+Each image at its own best threshold (oracle) & tie (0.896 vs 0.895) \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item The hierarchy does not rank pixels better inside an image.
+\item It makes maps comparable across images, so one threshold transfers to clutter.
+\end{itemize}
+\src{runs/25 (F); paper Sec.~5.5}
+\end{frame}
+
+\begin{frame}{The selection rule and the override}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.25\linewidth}L{0.20\linewidth}L{0.47\linewidth}@{}}
+\toprule
+Our component & Rule kept & Why \\
+\midrule
+SA-guided weights & uniform weights & screen preferred uniform \\
+Hierarchy with cap & fine-only & sheep lost 0.06--0.10; the guard allows 0.05 \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item We adopted both anyway, after COCO-Cap had been scored.
+\item The paper says COCO-Cap was ``used only after freezing'': that must change.
+\end{itemize}
+\src{paper Sec.~4 (p.~4); protocol log, 31 October}
+\end{frame}
+
+\begin{frame}{How we handle it}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.42\linewidth}L{0.50\linewidth}@{}}
+\toprule
+Issue & Proposed solution \\
+\midrule
+Rule's choice not shown & print fine-only next to BRACE everywhere \\
+Override after COCO-Cap & say so in Sec.~4, with the date \\
+0.829 called out-of-fold & call it forced out-of-fold \\
+Contribution 4 overclaims & ``a protocol that records every decision'' \\
+No clean test of the decision & new backbones, scored after it (Point 5) \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\end{frame}
+
+\begin{frame}{Claims: keep, restate or drop}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.48\linewidth}L{0.44\linewidth}@{}}
+\toprule
+Claim in the draft & Decision \\
+\midrule
++12.5 points over OVAM & keep as a table row, not the headline \\
+Hierarchy gains on COCO-Cap & restate as calibration across images \\
+SA-guided layer weighting helps & keep \\
+One-sided cap beats no cap & weaken: holds on VOC-Sim only \\
+DenseCRF gains six times more on capped maps & drop (two-threshold artefact) \\
+Best training-free method & narrow to diffusion-only \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\end{frame}
+
+\begin{frame}{Where the text changes}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.36\linewidth}L{0.56\linewidth}@{}}
+\toprule
+Place in the paper & Change \\
+\midrule
+Abstract (p.~1) & clutter and calibration; override disclosed \\
+Introduction and contributions (p.~1--2) & new results paragraph and four contributions \\
+Sec.~4, Selection status (p.~4) & what the rule kept, why, and when \\
+Sec.~5.4 and Table 4 (p.~6--7) & ``six times'' removed \\
+Sec.~6 (p.~8) & paired comparison instead of +0.125 \\
+Sec.~7 and Conclusion (p.~8) & override timing; backbone scope \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\src{full replacement texts: JC\_RESPONSE\_DOCUMENT, Sec.~1.5}
+\end{frame}
+
+% =====================================================================
+\pointcover{2}{Mapping contributions to evidence}{``For each of the four contributions, which section, table and figure provide the evidence, and which number is the key result.''}
+
+\begin{frame}{Contribution to evidence}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.26\linewidth}L{0.30\linewidth}L{0.22\linewidth}L{0.14\linewidth}@{}}
+\toprule
+Contribution & Evidence & Key number & Where \\
+\midrule
+1 Pipeline & Tables 1, 5; Figs.~1, 2 & 0.829 / 0.696 & main paper \\
+2 Ablations & Tables 1--4; Figs.~3--5 & cap: 13\% background, 0.5\% object removed & main paper \\
+3 Oracle threshold analysis & Fig.~6; Table S7 & oracle tie 0.896 vs 0.895 & partly supplement \\
+4 Fold-safe protocol & Tables S8--S10 & rule's own choice: 0.823 & supplement only \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\src{\texttt{comparisons/notes/entry\_2\_mapping.md}}
+\end{frame}
+
+\begin{frame}{What the mapping shows}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.46\linewidth}L{0.46\linewidth}@{}}
+\toprule
+Finding & Proposed solution \\
+\midrule
+Protocol has no main-paper table & one small table: rule's choice next to ours \\
+Oracle analysis relies on the supplement & move one line of Table S7 into Sec.~5.5 \\
+Qualitative evidence uneven & add a fine-only map next to the coarse one \\
+Thirteen results support no contribution & shorten or move to the supplement \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\end{frame}
+
+% =====================================================================
+\pointcover{3}{Comparison with the state of the art}{``We need a paired block on the same images: our own OVAM reimplementation as the baseline (also OVAM's optimized-token results), GoCA, and if possible NERVE. Table 5 would have two blocks: published numbers and the paired comparison.''}
+
+\begin{frame}{What we ran}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.30\linewidth}L{0.36\linewidth}L{0.26\linewidth}@{}}
+\toprule
+Method & Code & Status \\
+\midrule
+OVAM (class word, token) & OVAM's release & done \\
+GoCA (SD 1.5, SD 2.1, SDXL) & github.com/Darkbblue/goca & done \\
+NERVE & authors' release & done \\
+DiffSegmenter, DAAM, SeeDiff & authors' releases & done \\
+SCLIP & authors' release & done \\
+SPARK & no public code & published only \\
+PEARL & CLIP/DINO, real images & cited only \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item Same 490 + 707 images, class word only, the same DenseCRF and threshold rule for all.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Paired results: methods that use only the diffusion model}
+\begin{slidetable}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Method & VOC-Sim & COCO-Cap \\
+\midrule
+\textbf{BRACE (ours)} & \textbf{0.831} & \textbf{0.708} \\
+Fine-only (ours, the rule's choice) & 0.824 & 0.673 \\
+DiffSegmenter & 0.795 & 0.688 \\
+GoCA, SDXL & 0.797 & 0.606 \\
+GoCA, SD 1.5 & 0.753 & 0.599 \\
+DAAM & 0.727 & 0.644$^*$ \\
+SeeDiff & 0.723 & 0.665$^*$ \\
+OVAM, class word (our run) & 0.703 & 0.568 \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\src{Entries 11, 21. All differences from BRACE significant except DiffSegmenter on COCO-Cap. $^*$437 images that contain the word}
+\end{frame}
+
+\begin{frame}{Paired results: methods with an extra model or extra training}
+\begin{slidetable}
+\begin{tabular}{@{}llrr@{}}
+\toprule
+Method & Uses & VOC-Sim & COCO-Cap \\
+\midrule
+\textbf{BRACE (ours)} & diffusion model only & \textbf{0.831} & \textbf{0.708} \\
+NERVE, class word & + CLIP & 0.844 & 0.740 \\
+NERVE, 20-class vocabulary & + CLIP & 0.839 & 0.747 \\
+SCLIP + DenseCRF & CLIP only & 0.764 & 0.652 \\
+OVAM, optimized token & + 57 annotated images & 0.828 & 0.664 \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item NERVE is better on COCO-Cap (+0.032); with its own released rule it drops to 0.812 / 0.663.
+\item OVAM with the token ties BRACE on VOC-Sim.
+\end{itemize}
+\src{Entries 11, 21}
+\end{frame}
+
+\begin{frame}{Published numbers: kept, marked as not paired}
+\begin{slidetable}
+\begin{tabular}{@{}llrr@{}}
+\toprule
+Method & Note & VOC-Sim & COCO-Cap \\
+\midrule
+DAAM & OVAM's run & .662 & .484 \\
+Attn2Mask & OVAM's run & .687 & .550 \\
+OVAM, class word & & .704 & .582 \\
+OVAM, optimized token & few-shot & .825 & -- \\
+Grounded Diffusion & trains a module & .621 & .502 \\
+DatasetDM & trains a decoder & .803 & .593 \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item New Table 5: paired, diffusion only $\mid$ paired, extra model $\mid$ few-shot $\mid$ published.
+\item None of GoCA, NERVE, DiffSegmenter, SeeDiff reports these benchmarks.
+\end{itemize}
+\src{OVAM (CVPR 2024), Table 1}
+\end{frame}
+
+% =====================================================================
+\pointcover{4}{BRACE with optimized tokens}{``Run BRACE with OVAM's optimized tokens and report it as a separate block. Check on which images the tokens were optimized, and state that this block is no longer training-free.''}
+
+\begin{frame}{Which images the tokens saw}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.46\linewidth}L{0.46\linewidth}@{}}
+\toprule
+Check & Result \\
+\midrule
+Images the tokens were optimized on & 63 separate generated training images \\
+Overlap with VOC-Sim (500 rows) & none (seeds and pixels) \\
+Overlap with COCO-Cap (707 images) & none \\
+Setting & few-shot: 57 annotated images, not training-free \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\src{Entry 5}
+\end{frame}
+
+\begin{frame}{BRACE with the optimized token}
+\begin{slidetable}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Query & VOC-Sim & COCO-Cap \\
+\midrule
+BRACE, class word & 0.832 & 0.708 \\
+BRACE, optimized token & \textbf{0.864} & 0.693 \\
+OVAM itself, optimized token & 0.828 & 0.664 \\
+\midrule
+Hierarchy gain, class word & +0.007 & \textbf{+0.036} \\
+Hierarchy gain, optimized token & $-0.011$ & $-0.007$ \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item The token is a much better seed; then the hierarchy has nothing left to fix.
+\item Proposed: few-shot block in Table 5, and a limitation sentence.
+\end{itemize}
+\src{runs/25 (F); Entry 21}
+\end{frame}
+
+% =====================================================================
+\pointcover{5}{Diffusion backbones}{``Evaluate fine-only, BRACE and GoCA with SD 1.5, SD 2.1 and SDXL on the existing images, adding noise and reading the attention in one denoising pass. SDXL has only two attention scales, so it tests the coarse-to-fine principle itself.''}
+
+\begin{frame}{How we ran it}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.26\linewidth}L{0.66\linewidth}@{}}
+\toprule
+Setting & Value \\
+\midrule
+Images & the stored benchmark images, so annotations stay valid \\
+Noise & Gaussian noise at step 100 of 1000, fixed seed \\
+Pass & one network call per image; SD 1.5 run the same way as reference \\
+Hierarchy & SD 1.5 and SD 2.1: 16 $\rightarrow$ 32 $\rightarrow$ 64; SDXL: 32 $\rightarrow$ 64 \\
+SD 2.1 weights & community copy, identical to a clone of Stability's repository \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\src{pre-registered: \texttt{comparisons/backbones/PREREG.md}}
+\end{frame}
+
+\begin{frame}{Does the hierarchy still help?}
+\begin{slidetable}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Hierarchy gain over fine-only & VOC-Sim & COCO-Cap \\
+\midrule
+SD 1.5 & +0.009 & \textbf{+0.038} \\
+SD 2.1 & \textbf{+0.054} & \textbf{+0.060} \\
+SDXL (two scales) & $-0.022$ & $-0.011$ \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item Yes on three-scale models, no on SDXL.
+\item SD3 and FLUX (one resolution): out of scope.
+\end{itemize}
+\src{Entry 15}
+\end{frame}
+
+\begin{frame}{BRACE against GoCA on each backbone}
+\begin{slidetable}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+BRACE minus GoCA & VOC-Sim & COCO-Cap \\
+\midrule
+SD 1.5 & +0.055 & +0.040 \\
+SD 2.1 & +0.083 & +0.072 \\
+SDXL & $-0.048$ & $-0.107$ \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item GoCA scales with the stronger model, as it claims; BRACE does not on SDXL.
+\item Proposed: a backbone subsection, SDXL reported as a limitation.
+\end{itemize}
+\src{Entries 14, 15}
+\end{frame}
+
+% =====================================================================
+\pointcover{6}{Consistency checks}{``One estimate throughout; no raw and DenseCRF values in one comparison; Eq.~?? in Fig.~2; citations for Attn2Mask, Grounded Diffusion and DatasetDM; every pointer to the supplementary landing on the right section.''}
+
+\begin{frame}{Each issue and its fix}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.30\linewidth}L{0.30\linewidth}L{0.32\linewidth}@{}}
+\toprule
+Issue & Cause & Fix \\
+\midrule
+0.829 vs 0.830 & three runs of one pipeline & one run everywhere \\
+Raw and DenseCRF mixed & Sec.~5.2, abstract, Table 5 & one stage per comparison \\
+Eq.~?? in Fig.~2 & label missing on Overleaf & add the label \\
+Missing citations & no BibTeX entries & three entries drafted \\
+Supplement pointers & ten vague pointers & exact sections \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item 162 numbers checked: 137 match, 22 to fix, 3 not traced.
+\end{itemize}
+\src{\texttt{comparisons/notes/entry\_6\_consistency.md}}
+\end{frame}
+
+% =====================================================================
+\pointcover{7}{Table 1: deltas}{``Add a COCO-Cap $\Delta$, the folds won for each row, and make the reference of each $\Delta$ explicit. Row 3 hides the largest jump of the pipeline (.691 $\rightarrow$ .789).''}
+
+\begin{frame}{New Table 1, both benchmarks, one run}
+\begin{slidetable}
+\begin{tabular}{@{}lrrcrr@{}}
+\toprule
+Step & VOC-Sim & Gain & Folds & COCO-Cap & Gain \\
+\midrule
+1 Cross-attention, all modules & .707 & & & .574 & \\
+2 Drop the 32-px modules & .714 & +.008 & 5/5 & .572 & $-$.002 \\
+3 Self-attention, one pass & .790 & \textbf{+.076} & 5/5 & .629 & \textbf{+.057} \\
+4 Second pass & .803 & +.012 & 5/5 & .636 & +.008 \\
+5 DenseCRF & .816 & +.013 & 5/5 & .651 & +.014 \\
+6 Calls 10--20 & .820 & +.004 & 4/5 & .657 & +.007 \\
+7 SA-guided weights & .825 & +.005 & 4/5 & .673 & +.015 \\
+8 Hierarchy with cap (BRACE) & .832 & +.007 & 4/5 & .708 & \textbf{+.036} \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\src{Entry 19. Gain = over the row above, paired, same run}
+\end{frame}
+
+\begin{frame}{What changed in the table}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.44\linewidth}L{0.48\linewidth}@{}}
+\toprule
+JC's concern & Now \\
+\midrule
+No COCO-Cap values in rows 1--3 & COCO-Cap for every row \\
+No COCO-Cap $\Delta$ & COCO-Cap gain column \\
+$\Delta$ not the row difference & every gain is against the row above, same run \\
+Folds won missing & folds column \\
+Largest jump hidden & self-attention is its own row (+.076) \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item The caption states the threshold rule (row 8 at a shared 0.55: +.010 on COCO-Cap).
+\end{itemize}
+\src{LaTeX: \texttt{comparisons/drafts/table1\_jc7.tex}}
+\end{frame}
+
+% =====================================================================
+\pointcover{8}{Paper structure and cost}{``Rename Sec.~5 Experimental results and move Sec.~6 into it. Sec.~4 should include the hardware and software details and the cost: runtime and memory per image.''}
+
+\begin{frame}{New structure}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.42\linewidth}L{0.50\linewidth}@{}}
+\toprule
+Now & Proposed \\
+\midrule
+4 Experimental setup & 4 Setup, with hardware and cost \\
+5 What each stage contributes & 5 Experimental results \\
+6 Comparison with published methods & 5.1 Comparison (new Table 5) \\
+ & 5.2 onward: former Sec.~5, tokens, backbones \\
+7 Discussion and limitations & 6 Discussion and limitations \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\end{frame}
+
+\begin{frame}{Cost per image}
+\begin{slidetable}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Stage & A100 & V100 \\
+\midrule
+Generation alone & 2.7\,s & 12.1\,s \\
+Generation with attention recording & 6.9\,s & 12.0\,s \\
+Building the maps (hierarchy included) & 0.04\,s & 0.10\,s \\
+DenseCRF (one CPU core) & 5.9\,s & 5.1\,s \\
+\textbf{Total} & \textbf{12.9\,s} & \textbf{17.2\,s} \\
+Peak GPU memory & 5.1\,GiB & 5.1\,GiB \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item The hierarchy costs nothing over fine-only.
+\end{itemize}
+\src{Entry 18; SD 1.5, 30 steps, median of 100 images}
+\end{frame}
+
+% =====================================================================
+\pointcover{9}{Target venue}{``A realistic and good target is ICPR 2027: virtual, Springer LNCS, registration on 1 March 2027 and submission on 8 March.''}
+
+\begin{frame}{ICPR 2027}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.36\linewidth}L{0.56\linewidth}@{}}
+\toprule
+Item & Confirmed \\
+\midrule
+Registration (author list fixed) & 1 March 2027 \\
+Submission & 8 March 2027 \\
+Format & Springer LNCS, 15 pages plus references \\
+Review & double-blind, self-review pages with LLM-use disclosure \\
+Conference & online only, October 2027 \\
+Page budget & current text already fills 13.5 of 15 pages \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item Proposed: move Table 4, Fig.~5 and one of Figs.~3 and 6 to the supplement.
+\end{itemize}
+\src{icpr2027.com}
+\end{frame}
+
+% =====================================================================
+\begin{frame}{Decisions for JC}
+\begin{enumerate}
+\item Headline: best diffusion-only method, with CLIP methods in their own block?
+\item Which blocks of the new Table 5 go in the main paper?
+\item Optimized tokens and SDXL: report as limitations?
+\item Which capture is canonical: original (0.829 / 0.696) or prompt-corrected (0.832 / 0.708)?
+\item SD 2.1 from the verified community copy: acceptable?
+\item Author list and order (fixed on 1 March).
+\end{enumerate}
+\end{frame}
+
+% =====================================================================
+\partcover{Additions}{New experiments beyond the nine points. Exploratory; not part of the frozen method.}
+
+\begin{frame}{Where NERVE's lead comes from}
+\begin{slidetable}
+\begin{tabular}{@{}llrr@{}}
+\toprule
+Seed & Propagation & VOC-Sim & COCO-Cap \\
+\midrule
+our cross-attention & our hierarchy (BRACE) & 0.832 & 0.709 \\
+our cross-attention & NERVE's random walk & 0.831 & 0.675 \\
+NERVE's CLIP seed & our hierarchy & 0.840 & 0.719 \\
+NERVE's CLIP seed & NERVE's random walk (NERVE) & \textbf{0.843} & \textbf{0.735} \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item With our seed, our hierarchy is the better propagator.
+\item NERVE's lead needs its CLIP seed and its walk together.
+\end{itemize}
+\src{runs/20, Entry 16 (F)}
+\end{frame}
+
+\begin{frame}{Our hierarchy on other seeds}
+\begin{slidetable}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Seed, then our hierarchy & VOC-Sim & COCO-Cap \\
+\midrule
+Cross-attention (BRACE) & 0.832 & 0.709 \\
+NERVE's CLIP seed & 0.840 & 0.719 \\
+SCLIP seed & \textbf{0.852} & \textbf{0.734} \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item The hierarchy helps every seed; on an SCLIP seed it matches NERVE.
+\item Uses a second model, so it belongs in the ``with CLIP'' block.
+\end{itemize}
+\src{runs/20 (F)}
+\end{frame}
+
+\begin{frame}{A label-free query-profile gate: the idea}
+\begin{itemize}
+\item The class word's attention also fires on pixels that are not the object.
+\item From unlabeled generations, learn per class where the word attends when the class is present and when it is absent.
+\item At test time, down-weight pixels that look like false firings, then run the unchanged pipeline.
+\item BRACE stays frozen; everything here is exploratory.
+\end{itemize}
+\src{runs/28--30 (F)}
+\end{frame}
+
+\begin{frame}{The gate: results so far}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.46\linewidth}rrl@{}}
+\toprule
+Test & VOC-Sim & COCO-Cap & Reading \\
+\midrule
+Gate on BRACE & +0.000 & +0.014 & fails on VOC-Sim \\
+Gate on the seed alone & +0.016 & +0.030 & helps \\
+Gate on fine-only & +0.007 & +0.036 & helps \\
+Absent-class profiles vs generic & +0.001 & & not needed \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\begin{itemize}
+\item COCO-Cap was used to screen this idea, so its COCO-Cap numbers are not untouched.
+\item A claim would need a pre-registered test on new annotated images.
+\end{itemize}
+\src{runs/29 (F)}
+\end{frame}
+
+\end{document}

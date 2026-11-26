@@ -1,0 +1,69 @@
+% Comment 4: BRACE with optimized tokens
+% Owner: F. Only this side edits this file.
+% Source of every number: runs/15_token_ladder/result.md (workplan Entry 8).
+
+\begin{frame}{Comment 4: the pipeline was rerun with OVAM's optimized token}
+\begin{itemize}
+  \item \textbf{Comment.} Run the method with OVAM's optimized token in place of the class word, as a separate block.
+  \item \textbf{Setting.} OVAM's released tokens (mean of 2--3 per-image tokens, optimized on separate VOC-Sim training images). The same tokens are used on COCO-Cap, as in OVAM.
+  \item \textbf{Design.} One generation per image gives both columns (class word, optimized token) and every pipeline step, so all differences are paired.
+  \item \textbf{Data.} 490 VOC-Sim and 707 COCO-Cap images, fixed threshold 0.55.
+  \item \textbf{Label.} The token column is few-shot, not training-free. Rules were registered before scoring.
+\end{itemize}
+\src{runs/15\_token\_ladder/PREREG.md, result.md}\status{done, unreviewed}
+\end{frame}
+
+\begin{frame}{Comment 4: the token helps on VOC-Sim but not on COCO-Cap}
+\begin{slidetable}
+\begin{tabular}{lrrrr}
+\toprule
+ & \multicolumn{2}{c}{VOC-Sim mIoU} & \multicolumn{2}{c}{COCO-Cap mIoU} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Step & word & token & word & token \\
+\midrule
+Cross-attention seed, uniform layers & 0.588 & 0.766 & 0.444 & 0.625 \\
++ guided layer weights               & 0.611 & 0.754 & 0.501 & 0.617 \\
++ fine-only propagation              & 0.791 & 0.845 & 0.677 & 0.689 \\
++ hierarchy, no cap                  & 0.807 & 0.835 & 0.687 & 0.669 \\
++ one-sided cap                      & 0.817 & 0.847 & 0.682 & 0.667 \\
+\textbf{+ DenseCRF (full pipeline)}  & \textbf{0.830} & \textbf{0.861} & \textbf{0.696} & \textbf{0.681} \\
+\midrule
+Fine-only + DenseCRF                 & 0.796 & 0.851 & 0.684 & 0.698 \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+Full pipeline, token minus word: VOC-Sim $+0.031$ [$+0.022$, $+0.039$]; COCO-Cap $-0.015$ [$-0.030$, $+0.000$].
+\src{runs/15\_token\_ladder/result.md; fixed threshold 0.55, paired}\status{done, unreviewed}
+\end{frame}
+
+\begin{frame}{Comment 4: with the token, the components do not hold on COCO-Cap}
+\begin{slidetable}
+\begin{tabular}{llrr}
+\toprule
+Comparison & Query & VOC-Sim $\Delta$ & COCO-Cap $\Delta$ \\
+\midrule
+Capped hierarchy vs fine-only & token & $+0.010$ & $\mathbf{-0.017}$ \\
+(both with DenseCRF)          & word  & $+0.034$ & $+0.012$ \\
+\midrule
+Guided vs uniform layer weights & token & $+0.003$ & $+0.004$ \\
+(full pipeline)                 & word  & $+0.004$ & $\mathbf{+0.024}$ \\
+\midrule
+Cap vs no cap & token & $+0.012$ & $-0.002$ \\
+(no DenseCRF) & word  & $+0.010$ & $-0.005$ \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+Bold: 95\% interval excludes zero on COCO-Cap. Registered rule (COCO-Cap gain above zero, VOC-Sim not below $-0.005$): none of the three holds with the token.
+\src{runs/15\_token\_ladder/result.md, registered comparisons}\status{done, unreviewed}
+\end{frame}
+
+\begin{frame}{Comment 4: reading and possible actions}
+\begin{itemize}
+  \item \textbf{Reading.} The token gives a much better seed ($+0.18$ on both benchmarks). Propagation then adds less, and on COCO-Cap the hierarchy lowers the token result.
+  \item \textbf{Consequence.} The contribution is not independent of how the query is obtained. It is strongest when the seed is weak (class word).
+  \item \textbf{Action A (recommended).} Report the token block as a separate few-shot table and state this limit in the text.
+  \item \textbf{Action B.} Keep the claim to the training-free setting and cite the token block only in the supplementary.
+  \item \textbf{Action C.} Investigate the COCO-Cap drop first: it is concentrated in a few classes (sofa 0.70 to 0.34, car 0.76 to 0.66; person rises 0.28 to 0.62).
+\end{itemize}
+\src{runs/15\_token\_ladder/result.md, per-class lines}\status{done, unreviewed}
+\end{frame}

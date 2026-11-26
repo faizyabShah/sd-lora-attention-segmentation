@@ -1,0 +1,7 @@
+fit 263513 ovdiff:263519:263522:263525 score:263526:263527:263528 report 263529 all:263491:263492:263493:263488:263489:263502:263501:263500:263499:263498:263497:263510:263509:263508:263507:263506:263505:263504:263503:263514:263515:263516
+sclip-coco rerun 263549 on A100 (263497 OOM on 16 GB V100 at COCO photo 89/4571; driver resumes); added afterany to score-coco 263528
+2026-11-26 resubmit (DAAM OOM -> no_grad fix + retry; SCLIP COCO on V100 with postprocess CPU fallback + retry; OVDiff sample --bs 2): new::::263569:263572:263575; scorers 263526-8 afterany:263514:263515:263516::::263569:263572:263575; report 263529 unchanged
+2026-11-26 resubmit (DAAM OOM -> no_grad fix + retry; SCLIP COCO on V100 with postprocess CPU fallback + retry; OVDiff sample --bs 2: voc44 263567->263568->263569, context44 263570->263571->263572, coco44 263573->263574->263575): scorers 263526-8 afterany:263514:263515:263516:263576:263577:263578:263569:263572:263575; report 263529 afterok scorers
+OVDiff links set to afterany (a failed step can't leave the scorers waiting forever)
+2026-11-26 OVDiff predict rerun (positional args first) + rescore:263646:263648:263650 (old scores moved to scores_<set>_pre_ovdiff) + report 263651; previous report kept as result_pre_ovdiff.md
+2026-11-26 OVDiff predict rerun #2 (release bugs patched: gt_mask size under arrays, similarities None without --save_sim; scorer resizes OVDiff preds nearest to GT) arrays 0-3 + rescore:263658:263660:263662 (partial no-OVDiff scores moved to scores_<set>_noovd_1126) + report 263663

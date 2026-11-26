@@ -1,0 +1,645 @@
+% =============================================================================
+% New paper (separate from paper/): skeleton only.
+% Single .tex file. Figures go in figures/. Bibliography in refs.bib.
+%
+% Method assumed: CA seed with uniform module weights -> low-resolution
+% consensus of negative-contrast gates (internally MK4-LR) -> fine-only 64x64
+% self-attention propagation (internally V0) -> threshold (+ DenseCRF).
+% No capped hierarchy, no SA-guided module weights.
+% The freeze of this pipeline is still an owner decision (see runs/42).
+%
+% Conventions
+%   \x          = empty table cell to fill.
+%   \citeneeded = citation still to add. Take bib entries from the PDFs in
+%                 "relevant literature/" and check every entry against them;
+%                 the entries copied from paper/references.bib are unverified.
+%   % SRC:      = where the numbers should come from (run, or NEW RUN).
+%   Manuscript text must not use internal names (A3, V3, V0, MK4, LR, SGxx).
+%
+% Format: Springer LNCS, used by recent ICPR editions. Check the ICPR 2027
+% call for the class, page limit and whether references count.
+% =============================================================================
+\documentclass[runningheads]{llncs}
+
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\IfFileExists{multirow.sty}{\usepackage{multirow}}{\newcommand{\multirow}[3]{##3}} % local TeX lacks multirow
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\graphicspath{{figures/}}
+
+\newcommand{\method}{\textsc{Method}}          % name to be decided
+\newcommand{\x}{\textcolor{gray}{--}}          % empty cell
+\newcommand{\citeneeded}{\textcolor{red}{[?]}} % missing citation
+\newcommand{\figbox}[2]{\fbox{\parbox[c][#2][c]{0.95\linewidth}{\centering\small\textcolor{gray}{#1}}}}
+
+\begin{document}
+
+\title{Title}
+\titlerunning{Title}
+\author{Author(s)}
+\authorrunning{Author(s)}
+\institute{Institution}
+
+\maketitle
+
+\begin{abstract}
+\end{abstract}
+
+\keywords{Keyword \and Keyword \and Keyword}
+
+% =============================================================================
+\section{Introduction}
+\label{sec:intro}
+% Problem, gap, idea, contributions, headline numbers.
+
+\begin{figure}[t]
+\centering
+\figbox{Teaser: photo, class word, cross-attention seed, gate, final mask; one seen and one unseen class.}{3.2cm}
+% FILE: figures/teaser.pdf
+\caption{}
+\label{fig:teaser}
+\end{figure}
+
+% =============================================================================
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Segmentation from diffusion attention}
+% DAAM, OVAM, DiffSegmenter, iSeg, SeeDiff, M2N2, FA-Seg, Meng et al. 2026.
+% FA-Seg (Fig. 3) already shows SD attends to absent classes; their fix is
+% distractor classes in the prompt.
+
+\subsection{Prototype and reference-set methods}
+% Position the novelty here.
+% OVDiff: per-class positive and negative (background-context) prototypes from
+%   generated support images, k-means, nearest prototype. Closest for negatives;
+%   ours = the word's own false activations on photos without the word, used as
+%   a gate on the attention map, not as the classifier.
+% MaViSeg: prototypes from the top 2% tokens of unlabelled real images, in the
+%   model's own features, positives only, DiT backbones. Closest for profiles.
+% ReCo: retrieved real images; hand-picked context classes as a 1-P gate.
+% FreeDA, FOSSIL: caption-driven generated references with DINO features.
+% Still to obtain: ConceptAttention, Seg4Diff, CLIP as RNN (CaR).
+
+\subsection{Training-free open-vocabulary segmentation with CLIP}
+% MaskCLIP, SCLIP, ClearCLIP, NACLIP, ProxyCLIP, PEARL.
+
+\subsection{Propagation and refinement}
+% Random walks (NERVE, SPARK), self-attention propagation, DenseCRF.
+
+% =============================================================================
+\section{Method}
+\label{sec:method}
+
+\begin{figure}[t]
+\centering
+\figbox{Method overview: one noising pass; cross-attention seed; reference profiles from captioned photos; per-module negative-contrast gates; low-resolution consensus; fine self-attention propagation; threshold.}{4cm}
+% FILE: figures/method.pdf
+\caption{}
+\label{fig:method}
+\end{figure}
+
+\subsection{Attention capture}
+\label{sec:capture}
+% One SD1.5 pass at t = 100, prompt template, image at 512.
+
+\subsection{Cross-attention seed}
+\label{sec:seed}
+% Uniform module weights.
+
+\subsection{Reference profiles from captioned photos}
+\label{sec:profiles}
+% Caption matching, object profile (top 5% queries), negatives (top 1% on
+% non-mentioning photos, 4 spherical k-means centroids). No labels.
+
+\subsection{Negative-contrast gate}
+\label{sec:gate}
+% Nearest-negative rule per module, gamma.
+
+\subsection{Low-resolution consensus}
+\label{sec:consensus}
+% Mean of the six gates below 64x64, upsampled to 64x64, applied at every module.
+
+\subsection{Propagation and read-out}
+\label{sec:propagation}
+% Two 64x64 self-attention steps, threshold, optional DenseCRF.
+
+% =============================================================================
+\section{Experimental Protocol}
+\label{sec:protocol}
+
+\subsection{Data}
+\label{sec:data}
+
+\begin{table}[t]
+\centering
+\caption{Datasets and their role. Items are (image, class) pairs scored as binary masks; on the real evaluation sets, only items whose class covers at least 1\% of the image are counted (primary items). Profile photos are selected by their captions only; no masks or labels are used.}
+% Evaluation sets and their role. One row per set used anywhere in the paper.
+% SRC: runs/43 (generated), runs/32-37 (VOC), runs/40 items_train (threshold check: 1,200 items, 993 photos),
+%      runs/42 items_val (val2017 minus Section 136 set, primary items) and items_prof (profile pool, 100 + 480 per word).
+% Roles of VOC train / COCO train threshold set depend on the Table 3 run plan; update if that plan changes them.
+\label{tab:sets}
+\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llcccl@{}}
+\toprule
+Set & Images & Classes & Photos & Items & Role \\
+\midrule
+VOC-Sim~\cite{marcosmanchon2024ovam}  & generated & 20 & 490 & 490 & evaluation (Tab.~\ref{tab:generated}) \\
+COCO-Cap~\cite{marcosmanchon2024ovam} & generated & 20 & 707 & 707 & evaluation (Tab.~\ref{tab:generated}) \\
+PASCAL VOC 2012 train\citeneeded      & real      & 20 & 1,464 & 2,170 & development only \\
+PASCAL VOC 2012 val\citeneeded        & real      & 20 & 1,409 & 1,947 & evaluation (Tab.~\ref{tab:real}) \\
+COCO train2017 (threshold check)\citeneeded & real & 20 & 993 & 1,200 & threshold check \\
+COCO train2017 (profiles, captions only) & real   & 80 & 7,986 & -- & reference profiles \\
+PASCAL Context val (59 classes)\citeneeded & real & 59 & 5,104 & 22,691 & evaluation (Tab.~\ref{tab:real}) \\
+COCO-Object (COCO val2017)\citeneeded & real & 80 & 4,571 & 9,816 & evaluation (Tab.~\ref{tab:real}) \\
+\quad 20 VOC classes                  & real      & 20 & 3,582 & 5,414 & seen in development (Tab.~\ref{tab:openvocab}) \\
+\quad other 60 classes                & real      & 60 & 3,038 & 4,402 & never used in development (Tab.~\ref{tab:openvocab}) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Metrics and statistics}
+\label{sec:metrics}
+% Class-macro mIoU on (image, class) items; >=1% area primary;
+% paired photo bootstrap, 2,000 resamples, 95% intervals.
+
+\subsection{Selection rules and pre-registration}
+\label{sec:prereg}
+% What was fixed before scoring; development vs confirmation sets.
+
+\subsection{Baselines}
+\label{sec:baselines}
+% Which methods we re-run under the same protocol, and which numbers are quoted.
+
+\subsection{Implementation details}
+\label{sec:impl}
+
+% =============================================================================
+\section{Results}
+\label{sec:results}
+
+\subsection{Generated benchmarks}
+\label{sec:res-generated}
+
+\begin{table}[t]
+\centering
+\caption{Class-word segmentation on the generated benchmarks (mIoU, \%). The last two columns split COCO-Cap by whether the queried class word appears in the generation prompt (465 / 242 images). Published rows are quoted from~\cite{marcosmanchon2024ovam} and report only the full sets; $^\dagger$~re-run by us, as released, on the same images as our method. Our maps use a fixed threshold of 0.55, determined empirically in earlier experiments and not tuned here; bold marks the best method that uses no annotated masks.}
+% Comparison with published class-word results on the OVAM benchmarks (mIoU).
+% Last two columns: COCO-Cap split by whether the class word is in the
+% generation prompt (OVAM's word_included; the OVAM sense of querying a word
+% not in the prompt). Published rows report only the full sets.
+% $^\dagger$ = re-run by us on the same regenerated images, as released
+%   (NERVE: SD 2.1-base, own binarisation; SCLIP: ViT-B/16 VOC21 prediction).
+% Ours: fixed threshold 0.55 ("determined empirically in earlier experiments",
+%   as OVAM words it; it came from VOC-Sim for the earlier pipeline: say so).
+%   Profiles from the other half of each set (no image in its own profile).
+% SRC: published rows quoted from OVAM Table 1; all other rows runs/43.
+\label{tab:generated}
+\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+ & & & & \multicolumn{2}{c}{word in prompt} \\
+\cmidrule(lr){5-6}
+Method & Training & VOC-Sim & COCO-Cap & in & not in \\
+\midrule
+DAAM~\cite{tang2023daam}                 & no  & 66.2 & 48.4 & -- & -- \\
+Attn2Mask~\cite{yoshihashi2024attn2mask} & no  & 68.7 & 55.0 & -- & -- \\
+OVAM~\cite{marcosmanchon2024ovam}        & no  & 70.4 & 58.2 & -- & -- \\
+NERVE~\cite{mahatha2025nerve}$^\dagger$  & no  & \textbf{80.5} & 70.2 & 73.8 & 61.5 \\
+SCLIP~\cite{wang2024sclip}$^\dagger$     & no  & 71.9 & 58.3 & 61.6 & 51.4 \\
+\midrule
+Grounded Diffusion~\cite{li2023groundeddiffusion} & yes & 62.1 & 50.2 & -- & -- \\
+DatasetDM~\cite{wu2023datasetdm}         & yes & 80.3 & 59.3 & -- & -- \\
+OVAM + token opt.~\cite{marcosmanchon2024ovam} & 1 mask/cls & 82.5 & 69.2 & -- & -- \\
+\midrule
+No gate (ours, ablation)                 & no  & 78.2 & 66.2 & 67.3 & 63.9 \\
+\method{} (raw)                          & no  & 80.1 & 73.6 & 74.6 & 71.7 \\
+\method{} + DenseCRF                     & no  & \textbf{80.5} & \textbf{74.4} & \textbf{75.3} & \textbf{72.8} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Real photographs}
+\label{sec:res-real}
+
+\begin{table}[t]
+\centering
+\caption{}
+% Real photographs, class word given, binary mask per (image, class) item.
+% Columns: the three object benchmarks reported by nearly all diffusion-based methods (OVDiff, iSeg,
+%   DiffSegmenter, FreeDA; also the first three of NERVE/NACLIP/SCLIP). Their datasets, OUR protocol
+%   (class word given), so published multi-class numbers are NOT comparable; every row is re-run (runs/44).
+% Every row re-run by us with the same items, thresholds rule and bootstrap.
+% SRC: NEW RUN for all baselines on real photos; ours from the frozen capture
+%      (runs/40 and runs/42 use the relevant pipelines but different seeds/arms).
+\label{tab:real}
+\footnotesize\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}llccc@{}}
+\toprule
+ & & PASCAL VOC & PASCAL Context & COCO-Object \\
+Family & Method & (20) & (59) & (80) \\
+\midrule
+\multirow{4}{*}{Diffusion attention}
+ & DAAM~\cite{tang2023daam}            & \x & \x & \x \\
+ & OVAM (no tok.\ opt.)~\cite{marcosmanchon2024ovam} & \x & \x & \x \\
+ & DiffSegmenter\citeneeded            & \x & \x & \x \\
+ & iSeg\citeneeded                     & \x & \x & \x \\
+\midrule
+\multirow{4}{*}{CLIP}
+ & SCLIP~\cite{wang2024sclip}                    & \x & \x & \x \\
+ & ClearCLIP\citeneeded                & \x & \x & \x \\
+ & NACLIP\citeneeded                   & \x & \x & \x \\
+ & ProxyCLIP\citeneeded                & \x & \x & \x \\
+\midrule
+Random walk & NERVE~\cite{mahatha2025nerve} & \x & \x & \x \\
+\midrule
+Prototypes & OVDiff~\cite{karazija2024ovdiff} & \x & \x & \x \\
+\midrule
+\multirow{2}{*}{Ours}
+ & \method{} (raw)                     & \x & \x & \x \\
+ & \method{} + DenseCRF                & \x & \x & \x \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Standard multi-class benchmarks}
+\label{sec:res-multiclass}
+
+\begin{table}[t]
+\centering
+\caption{}
+% Standard training-free open-vocabulary semantic segmentation (mIoU), all
+% classes compete per pixel. Published numbers quoted as reported.
+% OPTIONAL (owner decision 2026-11-24): the paper uses OVAM's sense of open
+% vocabulary and does not claim open-vocabulary segmentation. Keep only if a
+% multi-class rule is added later; otherwise move to supplementary or drop.
+% SRC: NEW RUN; needs the multi-class competition rule (not designed).
+% $^\ddagger$ = diffusion-transformer backbone (FLUX), not SD1.5; quote only.
+\label{tab:multiclass}
+\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Method & VOC20 & VOC21 & COCO-Object \\
+\midrule
+MaskCLIP\citeneeded                 & \x & \x & \x \\
+SCLIP~\cite{wang2024sclip}                    & \x & \x & \x \\
+ClearCLIP\citeneeded                & \x & \x & \x \\
+NACLIP\citeneeded                   & \x & \x & \x \\
+ProxyCLIP\citeneeded                & \x & \x & \x \\
+PEARL~\cite{pei2026pearl}           & \x & \x & \x \\
+DiffSegmenter\citeneeded            & \x & \x & \x \\
+iSeg\citeneeded                     & \x & \x & \x \\
+Meng et al.~\cite{meng2026making}   & \x & \x & \x \\
+OVDiff~\cite{karazija2024ovdiff}    & \x & \x & \x \\
+MaViSeg~\cite{chakraborty2026maviseg}$^\ddagger$ & \x & \x & \x \\
+\midrule
+\method{}                           & \x & \x & \x \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\figbox{Qualitative comparison: rows = photos (seen and unseen classes, VOC and COCO); columns = photo, ground truth, two strongest baselines, ours.}{4.5cm}
+% FILE: figures/qualitative.pdf
+\caption{}
+\label{fig:qualitative}
+\end{figure}
+
+\subsection{Classes never used in development}
+\label{sec:res-openvocab}
+
+\begin{table}[t]
+\centering
+\caption{}
+% Gate effect on the 20 development classes and the 60 classes never used in
+% development, by number of caption-matched reference photos per class.
+% mIoU (raw, threshold from seen-class COCO train items); differences with
+% 95% paired bootstrap intervals.
+% SRC: runs/42 (U1, U2, S1, S2; size 20 primary; sizes 5 and 100 descriptive).
+\label{tab:openvocab}
+\footnotesize\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+ & \multicolumn{2}{c}{VOC classes (20)} & \multicolumn{2}{c}{Other COCO classes (60)} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Gate & mIoU & $\Delta$ vs none & mIoU & $\Delta$ vs none \\
+\midrule
+None                                & \x & --  & \x & -- \\
+Per-module gate, 20 photos          & \x & \x  & \x & \x \\
+Low-res.\ consensus, 5 photos       & \x & \x  & \x & \x \\
+Low-res.\ consensus, 20 photos      & \x & \x  & \x & \x \\
+Low-res.\ consensus, 100 photos     & \x & \x  & \x & \x \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\figbox{Per-class gain over no gate for the 60 other COCO classes, against the number of reference photos; seen classes as a reference.}{4cm}
+% FILE: figures/openvocab_classes.pdf
+\caption{}
+\label{fig:openvocab}
+\end{figure}
+
+% =============================================================================
+\section{Analysis}
+\label{sec:analysis}
+
+\subsection{Components}
+\label{sec:ablation}
+
+\begin{table}[t]
+\centering
+\caption{}
+% Component ablation, one capture per dataset, raw mIoU unless stated.
+% The last block adds the two components of the earlier pipeline that we
+% remove (show they do not help once the consensus gate is on).
+% SRC: real sets from a NEW frozen capture; runs/37, /38, /40 give
+%      exploratory/confirmatory precedents (with SA weights on).
+\label{tab:ablation}
+\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+ & & & \multicolumn{2}{c}{COCO val2017} & \\
+\cmidrule(lr){4-5}
+Configuration & VOC-Sim & COCO-Cap & VOC cl. & other & VOC val \\
+\midrule
+Cross-attention seed                      & \x & \x & \x & \x & \x \\
+\quad + fine propagation                  & \x & \x & \x & \x & \x \\
+\quad + per-module gate                   & \x & \x & \x & \x & \x \\
+\quad + low-res.\ consensus (\method{}) & \x & \x & \x & \x & \x \\
+\quad + DenseCRF                          & \x & \x & \x & \x & \x \\
+\midrule
+\multicolumn{6}{@{}l}{\emph{Added back to \method{} (removed from the earlier pipeline):}} \\
+\quad + attention-guided weights & \x & \x & \x & \x & \x \\
+\quad + coarse-to-fine hierarchy     & \x & \x & \x & \x & \x \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Gate design}
+\label{sec:gate-design}
+
+\begin{table}[t]
+\centering
+\caption{}
+% Gate design choices; everything else fixed. Raw mIoU.
+% SRC: consensus variants: runs/39 (stage 1), runs/41 (end to end, median and
+%      trimmed fail); negative type and K sweep: NEW RUN on the frozen pipeline,
+%      all in one capture. The negative-type block carries the novelty claim:
+%      none = positives only (as MaViSeg's prototypes);
+%      context = background of the positive reference photos (as OVDiff);
+%      false activations = the word's top attention on photos without it (ours).
+\label{tab:gate}
+\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llccc@{}}
+\toprule
+ & & & \multicolumn{2}{c}{COCO val2017} \\
+\cmidrule(lr){4-5}
+Factor & Setting & VOC val & VOC cl. & other 60 \\
+\midrule
+\multirow{3}{*}{Negative type}
+ & none (object profile only) & \x & \x & \x \\
+ & context of reference photos & \x & \x & \x \\
+ & false activations (ours)   & \x & \x & \x \\
+\midrule
+\multirow{3}{*}{Centroids}
+ & 1                          & \x & \x & \x \\
+ & 2                          & \x & \x & \x \\
+ & 4 (ours)                   & \x & \x & \x \\
+\midrule
+\multirow{4}{*}{Modules}
+ & each module separately     & \x & \x & \x \\
+ & consensus, all modules     & \x & \x & \x \\
+ & consensus, $64{\times}64$ only & \x & \x & \x \\
+ & consensus, below $64{\times}64$ & \x & \x & \x \\
+\midrule
+\multirow{3}{*}{Combination}
+ & mean                       & \x & \x & \x \\
+ & median                     & \x & \x & \x \\
+ & trimmed mean               & \x & \x & \x \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Why low resolution}
+\label{sec:why-lowres}
+
+\begin{figure}[t]
+\centering
+\figbox{Object-vs-background separability (AUROC) of each module's gate, with 64$\times$64 modules pooled to low resolution; example gates per module.}{4cm}
+% FILE: figures/gate_resolution.pdf
+% SRC: runs/39 (exploratory).
+\caption{}
+\label{fig:why-lowres}
+\end{figure}
+
+% =============================================================================
+\section{Limitations}
+\label{sec:limitations}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+% =============================================================================
+\bibliographystyle{splncs04}
+\bibliography{refs}
+
+% =============================================================================
+% SUPPLEMENTARY MATERIAL
+% Kept in this file. Split into its own PDF at submission if ICPR requires it.
+% =============================================================================
+\clearpage
+\appendix
+\section*{Supplementary Material}
+
+\section{Pre-registration record}
+\label{sec:s-prereg}
+
+\begin{table}[h]
+\centering
+\caption{}
+% Every claim in the paper, the test behind it, when it was fixed, and status.
+% SRC: runs/*/PREREG.md and result.md, commit hashes.
+\label{tab:s-prereg}
+\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}p{3.2cm}p{2.6cm}p{2cm}p{1.8cm}p{1.6cm}@{}}
+\toprule
+Claim & Test & Data & Status & Result \\
+\midrule
+\x & \x & \x & \x & \x \\
+\x & \x & \x & \x & \x \\
+\x & \x & \x & \x & \x \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Hyperparameters}
+\label{sec:s-hparams}
+
+\begin{table}[h]
+\centering
+\caption{}
+% Every setting of the frozen pipeline and where it was chosen.
+\label{tab:s-hparams}
+\footnotesize
+\begin{tabular}{@{}lll@{}}
+\toprule
+Setting & Value & Chosen on \\
+\midrule
+Model, timestep, resolution        & \x & \x \\
+Prompt template                    & \x & \x \\
+Object-profile query fraction      & \x & \x \\
+Negative query fraction, centroids & \x & \x \\
+Gate exponent $\gamma$             & \x & \x \\
+Consensus modules                  & \x & \x \\
+Propagation steps                  & \x & \x \\
+Threshold                          & \x & \x \\
+DenseCRF parameters                & \x & \x \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Reference profiles}
+\label{sec:s-profiles}
+% Caption-matching rules, ambiguous words, photos per class.
+
+\begin{table}[h]
+\centering
+\caption{}
+% Caption rule and number of matched reference photos per class (80 classes).
+% SRC: runs/42 items/fit logs.
+\label{tab:s-profiles}
+\footnotesize
+\begin{tabular}{@{}llc@{}}
+\toprule
+Class & Caption rule & Photos \\
+\midrule
+\x & \x & \x \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Per-class results}
+\label{sec:s-perclass}
+
+\begin{table}[h]
+\centering
+\caption{}
+% Per-class IoU, PASCAL VOC 2012 val; ours vs strongest baselines.
+\label{tab:s-perclass-voc}
+\footnotesize\setlength{\tabcolsep}{2pt}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Class & No gate & Per-module gate & \method{} & Best baseline \\
+\midrule
+\x & \x & \x & \x & \x \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{}
+% Per-class IoU, COCO val2017, all 80 classes, with reference-photo counts.
+\label{tab:s-perclass-coco}
+\footnotesize\setlength{\tabcolsep}{2pt}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Class & Photos & No gate & Per-module gate & \method{} & Best baseline \\
+\midrule
+\x & \x & \x & \x & \x & \x \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Sensitivity}
+\label{sec:s-sensitivity}
+
+\begin{table}[h]
+\centering
+\caption{}
+% Threshold rule: selected on training photos vs fixed 0.55, and the whole grid;
+% gate exponent gamma grid. Raw mIoU.
+% SRC: runs/40, /41, /42 report every threshold; gamma grid in runs/37-41.
+\label{tab:s-sensitivity}
+\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llccc@{}}
+\toprule
+ & & & \multicolumn{2}{c}{COCO val2017} \\
+\cmidrule(lr){4-5}
+Factor & Setting & VOC val & VOC cl. & other 60 \\
+\midrule
+\multirow{2}{*}{Threshold} & selected on train & \x & \x & \x \\
+                           & fixed 0.55        & \x & \x & \x \\
+\midrule
+\multirow{4}{*}{$\gamma$}  & 0.5 & \x & \x & \x \\
+                           & 1   & \x & \x & \x \\
+                           & 1.5 & \x & \x & \x \\
+                           & 2   & \x & \x & \x \\
+\midrule
+\multirow{2}{*}{Timestep}  & \x  & \x & \x & \x \\
+                           & \x  & \x & \x & \x \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Evaluation subsets}
+\label{sec:s-subsets}
+
+\begin{table}[h]
+\centering
+\caption{}
+% Robustness of the main contrasts: primary items (>=1% area) vs all items;
+% person class excluded. Differences with 95% intervals.
+% SRC: runs/40 and runs/42 secondary outputs.
+\label{tab:s-subsets}
+\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Subset & VOC val & COCO, VOC cl. & COCO, other 60 \\
+\midrule
+Primary items ($\geq$1\% area) & \x & \x & \x \\
+All items                      & \x & \x & \x \\
+Person excluded                & \x & \x & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Cost}
+\label{sec:s-cost}
+
+\begin{table}[h]
+\centering
+\caption{}
+% Runtime and memory per image and class, and one-off cost of building
+% reference profiles; ours vs baselines on the same GPU.
+% SRC: NEW measurement on one GPU type.
+\label{tab:s-cost}
+\footnotesize
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Method & s / (image, class) & GPU memory & One-off cost \\
+\midrule
+\x & \x & \x & \x \\
+\method{} & \x & \x & \x \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Additional qualitative results and failure cases}
+\label{sec:s-qualitative}
+
+\begin{figure}[h]
+\centering
+\figbox{Gallery: more seen and unseen classes; failure cases (ambiguous words, small objects, co-occurring classes).}{5cm}
+% FILE: figures/supp_gallery.pdf
+\caption{}
+\label{fig:s-gallery}
+\end{figure}
+
+\end{document}

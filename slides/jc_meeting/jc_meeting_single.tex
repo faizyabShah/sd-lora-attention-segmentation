@@ -1,0 +1,594 @@
+% JC meeting deck, single file (all sections and the style merged).
+% Build: pdflatex jc_meeting_single.tex (twice). No figures or other files needed.
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[sc]{mathpazo}
+\linespread{1.05}
+\usefonttheme{serif}
+\usepackage{booktabs,graphicx,array,amsmath}
+
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{normal text}{fg=black,bg=white}
+\setbeamercolor{structure}{fg=black}
+\setbeamercolor{frametitle}{fg=black,bg=white}
+\setbeamercolor{title}{fg=black}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize items}{\textbullet}
+\setbeamertemplate{footline}{\hfill\footnotesize\insertframenumber\hspace{1em}\vspace{0.6em}}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{title}{size=\LARGE,series=\bfseries}
+\setbeamersize{text margin left=1.2em,text margin right=1.2em}
+
+\newcommand{\src}[1]{\par\vspace{0.3em}{\footnotesize Source: #1}}
+\newenvironment{slidetable}{\begin{center}\small\renewcommand{\arraystretch}{1.12}}{\end{center}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\pos}[1]{$\mathbf{#1}$}   % interval excludes zero
+
+\title{TRDP update}
+\author{Faizyab Shah \and Narmeen}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% =====================================================================
+
+
+
+
+
+
+
+
+% =====================================================================
+\section{Comment 1}
+\begin{frame}{1. The two new components add 0.012 on VOC-Sim, 0.051 on COCO-Cap}
+\begin{slidetable}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}llrrl@{}}
+\toprule
+Table 1 rows & Step & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap & Kind \\
+\midrule
+1 $\to$ 2 & drop the 32-px CA modules & $+0.008$ & $-0.002$ & configuration \\
+2 $\to$ 3 & SA propagation (64 px) & $+0.076$ & $+0.057$ & configuration \\
+3 $\to$ 6 & second pass, DenseCRF, calls 10--20 & $+0.030$ & $+0.028$ & configuration \\
+\midrule
+6 $\to$ 7 & \textbf{SA-guided layer weights} & $+0.005$ & $+0.015$ & new \\
+7 $\to$ 8 & \textbf{coarse-to-fine hierarchy + cap} & $+0.007$ & $+0.036$ & new \\
+\midrule
+ & total configuration / new & $+0.113$ / $+0.012$ & $+0.083$ / $+0.051$ & \\
+\bottomrule
+\end{tabular}}
+\end{slidetable}
+The novelty shows in clutter. Corrected data, threshold chosen on VOC-Sim.
+\src{workplan Entry 19 (Table 1 ladder)}
+\end{frame}
+
+\begin{frame}{1. Capped coarse-to-fine hierarchy vs fine-only propagation}
+\begin{slidetable}
+\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrcrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Threshold & fine-only & capped hier. & $\Delta$ & & fine-only & capped hier. & $\Delta$ \\
+\midrule
+VOC-Sim-selected & 0.811 & 0.818 & \pos{+0.007} & & 0.670 & 0.693 & \pos{+0.023} \\
+fixed 0.55 & 0.792 & 0.819 & \pos{+0.027} & & 0.690 & 0.693 & $+0.003$ \\
+best (uses labels) & 0.813 & 0.819 & \pos{+0.007} & & 0.693 & 0.709 & \pos{+0.017} \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+{\footnotesize Raw maps; one capture (Table 1 ladder, corrected data). Bold: 95\% paired interval excludes zero.}
+\end{frame}
+
+\begin{frame}{1. SA-guided cross-attention layer weights}
+\begin{slidetable}
+\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrcrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Threshold & uniform & guided & $\Delta$ & & uniform & guided & $\Delta$ \\
+\midrule
+VOC-Sim-selected & 0.807 & 0.811 & $+0.004$ & & 0.643 & 0.670 & \pos{+0.027} \\
+fixed 0.55 & 0.781 & 0.792 & \pos{+0.010} & & 0.662 & 0.690 & \pos{+0.028} \\
+best (uses labels) & 0.807 & 0.813 & \pos{+0.005} & & 0.662 & 0.693 & \pos{+0.030} \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+{\footnotesize Raw maps, fine-only stage; same capture. Bold: 95\% paired interval excludes zero.}
+\end{frame}
+
+\begin{frame}{1. What changes in the paper's claims}
+\begin{slidetable}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}L{0.28\linewidth}L{0.44\linewidth}L{0.24\linewidth}@{}}
+\toprule
+The draft says & What we find & Change in the paper \\
+\midrule
+$+0.125$ / $+0.114$ over OVAM & configuration $+0.113$ / $+0.083$; our two new parts $+0.012$ / $+0.051$ & credit only the new parts \\
+Hierarchy adds $+0.034$ on COCO-Cap & $+0.023$ (raw); $+0.017$ with each map at its best threshold & report both numbers? \\
+SA-guided weights help & $+0.004$ / $+0.027$ & keep \\
+The cap helps & about $+0.01$ on VOC-Sim; nothing on COCO-Cap & It is insignificant \\
+DenseCRF helps capped maps 6$\times$ more & comes from comparing at two thresholds & drop \\
+\bottomrule
+\end{tabular}}
+\end{slidetable}
+{\footnotesize VOC-Sim / COCO-Cap; threshold chosen on VOC-Sim. Raw maps except the OVAM and NERVE rows, which include DenseCRF. Cap: older capture.}
+\end{frame}
+
+\begin{frame}{1. Our gains show in clutter, but we selected on simple scenes}
+\begin{itemize}
+\item Most of our components barely change VOC-Sim (one object per image) and help on COCO-Cap (cluttered scenes).
+\item Our selection rule used VOC-Sim only, so it could not see these gains: it kept fine-only, and we adopted the hierarchy after seeing COCO-Cap.
+\item \textbf{Proposal:} change the selection set. Select on 50\% of VOC-Sim and 50\% of COCO-Cap images (split by class), and report every number on the other half of each.
+\item The test halves are then untouched by selection, and the rule can see clutter.
+\item We can then show final numbers on each dataset.
+\end{itemize}
+\end{frame}
+
+% =====================================================================
+\section{Comment 2}
+\begin{frame}{2. Three of four contributions are supported in the main paper}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.34\linewidth}L{0.36\linewidth}L{0.24\linewidth}@{}}
+\toprule
+Contribution & Main-paper evidence & Gap \\
+\midrule
+Coarse-to-fine pipeline with one-sided cap & Secs.~3, 5, 6; Tabs.~1, 5; Figs.~1, 2 & --- \\
+Stage-by-stage ablations & Secs.~3, 5.1--5.4; Tabs.~1--4; Figs.~3--5 & seed visuals only in supplement \\
+Oracle threshold analysis & Sec.~5.5; Fig.~6 & --- \\
+Fold-safe selection protocol & Secs.~4, 7 (text only) & no table or figure \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+Thirteen results support no contribution: candidates to move to the supplement.
+\src{\texttt{comparisons/notes/entry\_2\_mapping.md}}
+\end{frame}
+
+% =====================================================================
+\begin{frame}{3. Diffusion-only methods, same images, class word}
+\begin{slidetable}
+\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Method & VOC-Sim & COCO-Cap & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
+\midrule
+\textbf{BRACE} & \textbf{0.831} & \textbf{0.708} & --- & --- \\
+DiffSegmenter & 0.795 & 0.688 & \pos{-0.036} & $-0.020$ \\
+GoCA, SDXL & 0.797 & 0.606 & \pos{-0.034} & \pos{-0.102} \\
+GoCA, SD 1.5 & 0.753 & 0.599 & \pos{-0.078} & \pos{-0.110} \\
+GoCA, SD 2.1-base & 0.740 & 0.597 & \pos{-0.091} & \pos{-0.111} \\
+SeeDiff & 0.723 & 0.665$^*$ & \pos{-0.108} & \pos{-0.046} \\
+OVAM, class word$^\ddagger$ & 0.704 & 0.582 & $-0.127$ & $-0.126$ \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+{\footnotesize $\Delta$ = method $-$ BRACE, paired. DenseCRF; threshold chosen on VOC-Sim. Bold: interval excludes zero. $^*$437 COCO-Cap images whose caption contains the class word (BRACE 0.711 on them). $^\ddagger$Published in the OVAM paper; not paired, so no interval.}
+\end{frame}
+
+\begin{frame}{3. Few-shot and CLIP-based methods, same images}
+\begin{slidetable}
+\renewcommand{\arraystretch}{0.92}
+\resizebox{0.97\linewidth}{!}{%
+\begin{tabular}{@{}llrrrr@{}}
+\toprule
+Block & Method & VOC-Sim & COCO-Cap & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
+\midrule
+ & \textbf{BRACE} & \textbf{0.831} & \textbf{0.708} & --- & --- \\
+\midrule
+Few-shot & OVAM, optimized token$^\ddagger$ & 0.825 & 0.692 & $-0.006$ & $-0.016$ \\
+\midrule
+With CLIP & NERVE, class word & 0.844 & 0.740 & $+0.012$ & \pos{+0.032} \\
+ & NERVE, 20-class vocabulary & 0.839 & 0.747 & $+0.008$ & \pos{+0.039} \\
+ & SCLIP seed + fine-only$^\dagger$ & 0.838 & 0.712 & $+0.007$ & $+0.004$ \\
+ & SCLIP seed + BRACE$^\dagger$ & 0.852 & 0.734 & \pos{+0.020} & $+0.025$ \\
+\midrule
+Not rerun & Attn2Mask & TBR & TBR & TBR & TBR \\
+ & Grounded Diffusion & TBR & TBR & TBR & TBR \\
+ & DatasetDM & TBR & TBR & TBR & TBR \\
+ & SPARK & \multicolumn{4}{c}{no public code} \\
+\bottomrule
+\end{tabular}}
+\end{slidetable}
+{\footnotesize $\Delta$ = method $-$ BRACE, paired. DenseCRF; threshold chosen on VOC-Sim. Bold: interval excludes zero. $^\dagger$Other capture; vs BRACE 0.832 / 0.709 there. $^\ddagger$Published in the OVAM paper; not paired, so no interval.}
+\end{frame}
+
+\begin{frame}{3. Published numbers on the same benchmarks (OVAM paper)}
+\begin{slidetable}
+\renewcommand{\arraystretch}{1.0}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lrrrrl@{}}
+\toprule
+Method & VOC-Sim & COCO-Cap & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap & Note \\
+\midrule
+\textbf{BRACE} & \textbf{0.831} & \textbf{0.708} & --- & --- & \\
+DatasetDM & 0.803 & 0.593 & $-0.028$ & $-0.115$ & trains a decoder \\
+Attn2Mask & 0.687 & 0.550 & $-0.144$ & $-0.158$ & \\
+DAAM & 0.662 & 0.484 & $-0.169$ & $-0.224$ & \\
+Grounded Diffusion & 0.621 & 0.502 & $-0.210$ & $-0.206$ & trains a module \\
+OVAM, class word & 0.704 & 0.582 & $-0.127$ & $-0.126$ & \\
+OVAM, optimized token & 0.825 & 0.692 & $-0.006$ & $-0.016$ & few-shot \\
+\bottomrule
+\end{tabular}}
+\end{slidetable}
+{\footnotesize Numbers as printed in OVAM (CVPR 2024), Tables 1--2. $\Delta$ = published $-$ BRACE; not paired, so no interval.}
+\end{frame}
+
+\begin{frame}{3. NERVE's lead needs its CLIP seed and its walk together}
+\begin{slidetable}
+\begin{tabular}{lrrcrr}
+\toprule
+ & \multicolumn{2}{c}{VOC-Sim} & & \multicolumn{2}{c}{COCO-Cap} \\
+\cmidrule(lr){2-3}\cmidrule(lr){5-6}
+Propagation & our seed & CLIP seed & & our seed & CLIP seed \\
+\midrule
+None (seed alone)  & 0.736 & 0.761 & & 0.629 & 0.692 \\
+Fine-only          & 0.824 & 0.831 & & 0.673 & 0.713 \\
+Our hierarchy      & \textbf{0.832} & 0.840 & & \textbf{0.709} & 0.719 \\
+NERVE's walk       & 0.831 & \textbf{0.843} & & 0.675 & \textbf{0.735} \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+Bold: the two published pipelines. Seed and propagation swapped within one capture (corrected prompts).
+\src{runs/20\_new\_reruns/result.md; workplan Entry 16}
+\end{frame}
+
+\begin{frame}{3. Extra: a CLIP seed through our hierarchy}
+\begin{slidetable}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lrrrcrrr}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-8}
+Seed & seed & fine-only & hierarchy & & seed & fine-only & hierarchy \\
+\midrule
+Cross-attention, uniform layers & 0.748 & 0.820 & 0.828 & & 0.616 & 0.658 & 0.674 \\
+Cross-attention, SA-guided (BRACE) & 0.736 & 0.824 & 0.832 & & 0.629 & 0.673 & 0.709 \\
+NERVE CLIP seed (ViT-L/14) & 0.761 & 0.831 & 0.840 & & 0.692 & 0.713 & 0.719 \\
+SCLIP seed (ViT-B/16) & 0.757 & 0.838 & \textbf{0.852} & & 0.619 & 0.712 & \textbf{0.734} \\
+\bottomrule
+\end{tabular}}
+\end{slidetable}
+DenseCRF, threshold chosen on VOC-Sim. The hierarchy helps every seed; with SCLIP it matches NERVE (0.843 / 0.735). Uses a second model.
+\src{runs/20\_new\_reruns/result.md}
+\end{frame}
+
+% =====================================================================
+\section{Comment 4}
+\begin{frame}{4. Optimized token: better on VOC-Sim, not on COCO-Cap}
+\begin{slidetable}
+\begin{tabular}{lrrrr}
+\toprule
+ & \multicolumn{2}{c}{VOC-Sim} & \multicolumn{2}{c}{COCO-Cap} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Step (threshold 0.55) & word & token & word & token \\
+\midrule
+Seed, uniform layers      & 0.588 & 0.766 & 0.444 & 0.625 \\
++ guided layer weights    & 0.611 & 0.754 & 0.501 & 0.617 \\
++ fine-only propagation   & 0.791 & 0.845 & 0.677 & 0.689 \\
++ hierarchy, no cap       & 0.807 & 0.835 & 0.687 & 0.669 \\
++ one-sided cap           & 0.817 & 0.847 & 0.682 & 0.667 \\
+\textbf{+ DenseCRF (full)} & \textbf{0.830} & \textbf{0.861} & \textbf{0.696} & \textbf{0.681} \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+Pre-correction capture. Corrected data, full pipeline at 0.55: word 0.832 / 0.708, token 0.864 / 0.693 (VOC-Sim / COCO-Cap). Tokens: 57 separate images, no overlap; few-shot, no leakage.
+\src{runs/15\_token\_ladder/result.md; \texttt{comparisons/notes/entry\_4\_token\_provenance.md}}
+\end{frame}
+
+\begin{frame}{4. With the token, the components stop helping on COCO-Cap}
+\begin{slidetable}
+\begin{tabular}{llrr}
+\toprule
+Comparison & Query & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
+\midrule
+Capped hierarchy vs fine-only (DenseCRF) & token & $+0.010$ & \pos{-0.017} \\
+ & word  & $+0.034$ & $+0.012$ \\
+Guided vs uniform layer weights & token & $+0.003$ & $+0.004$ \\
+ & word  & $+0.004$ & \pos{+0.024} \\
+Cap vs no cap (raw) & token & $+0.012$ & $-0.002$ \\
+ & word  & $+0.010$ & $-0.005$ \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+The components matter most when the seed is weak. Recommended: separate few-shot block, limit stated in the text.
+\src{runs/15\_token\_ladder/result.md}
+\end{frame}
+
+% =====================================================================
+\section{Comment 5}
+\begin{frame}{5. Hierarchy vs fine-only on three backbones, three threshold rules (renoised images, one SD pass)}
+\begin{slidetable}
+\renewcommand{\arraystretch}{0.95}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}llrrrcrrr@{}}
+\toprule
+ & & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){3-5}\cmidrule(lr){7-9}
+Backbone & Threshold & fine-only & hierarchy & $\Delta$ & & fine-only & hierarchy & $\Delta$ \\
+\midrule
+SD 1.5 & VOC-Sim-selected & 0.784 & 0.793 & \pos{+0.009} & & 0.612 & 0.650 & \pos{+0.038} \\
+ & fixed 0.55 & 0.710 & 0.792 & \pos{+0.082} & & 0.611 & 0.654 & \pos{+0.043} \\
+ & best (uses labels) & 0.784 & 0.793 & \pos{+0.009} & & 0.629 & 0.661 & \pos{+0.032} \\
+\midrule
+SD 2.1-base & VOC-Sim-selected & 0.749 & 0.803 & \pos{+0.054} & & 0.599 & 0.658 & \pos{+0.060} \\
+ & fixed 0.55 & 0.674 & 0.803 & \pos{+0.129} & & 0.608 & 0.658 & \pos{+0.050} \\
+ & best (uses labels) & 0.750 & 0.803 & \pos{+0.053} & & 0.624 & 0.670 & \pos{+0.046} \\
+\midrule
+SDXL & VOC-Sim-selected & 0.761 & 0.739 & \pos{-0.022} & & 0.506 & 0.496 & \pos{-0.011} \\
+ & fixed 0.55 & 0.624 & 0.711 & \pos{+0.088} & & 0.439 & 0.488 & \pos{+0.049} \\
+ & best (uses labels) & 0.761 & 0.739 & \pos{-0.021} & & 0.513 & 0.500 & \pos{-0.013} \\
+\bottomrule
+\end{tabular}}
+\end{slidetable}
+{\footnotesize Raw maps; stored images, one noising pass. Bold: 95\% paired interval excludes zero.}
+\end{frame}
+
+\begin{frame}{5. Backbones: the hierarchy holds on SD 1.5 and 2.1, not on SDXL}
+\begin{slidetable}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+One noising pass, raw & fine-only & BRACE & GoCA & BRACE $-$ fine & BRACE $-$ GoCA \\
+\midrule
+SD 1.5      & 0.784 / 0.612 & 0.793 / 0.650 & 0.738 / 0.610 & \pos{+0.009} / \pos{+0.038} & \pos{+0.055} / \pos{+0.040} \\
+SD 2.1-base & 0.749 / 0.599 & 0.803 / 0.658 & 0.719 / 0.586 & \pos{+0.054} / \pos{+0.060} & \pos{+0.083} / \pos{+0.072} \\
+SDXL        & 0.761 / 0.506 & 0.739 / 0.496 & 0.787 / 0.602 & \pos{-0.022} / \pos{-0.011} & \pos{-0.048} / \pos{-0.107} \\
+\bottomrule
+\end{tabular}}
+\end{slidetable}
+Cells: VOC-Sim / COCO-Cap, threshold chosen on VOC-Sim. Stored images, noise at $t=100$, one UNet call; not comparable with generation-time numbers. SDXL has two attention scales, so the hierarchy has one step.
+\src{\texttt{comparisons/backbones/result.md}}
+\end{frame}
+
+% =====================================================================
+\begin{frame}{6. Issue with numbers in paper}
+\begin{itemize}
+\item The same result appears with slightly different values (0.829 / 0.830): use one run everywhere.
+\item Two comparisons mix numbers with and without DenseCRF: separate them.
+\item Say how each number was obtained (e.g. 0.829 uses out-of-fold thresholds).
+\item The stated failure case (frame-filling objects) is not supported: only sheep loses.
+\item Ten vague ``see supplement'' pointers to make specific; rebuild both PDFs.
+\end{itemize}
+\end{frame}
+
+% =====================================================================
+\section{Comment 7}
+\begin{frame}{7. Table 1 on the corrected data, both benchmarks}
+\begin{slidetable}
+\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{lrrcrr}
+\toprule
+ & \multicolumn{3}{c}{VOC-Sim} & \multicolumn{2}{c}{COCO-Cap} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-6}
+Step & mIoU & $\Delta$ & folds & mIoU & $\Delta$ \\
+\midrule
+1 Cross-attention, all 16 modules           & 0.707 & ---          & --- & 0.574 & --- \\
+2 Drop the five 32-px modules               & 0.714 & \pos{+0.008} & 5/5 & 0.572 & $-0.002$ \\
+3 One SA pass, 64-px module                 & 0.790 & \pos{+0.076} & 5/5 & 0.629 & \pos{+0.057} \\
+4 Second SA pass                            & 0.803 & \pos{+0.012} & 5/5 & 0.636 & \pos{+0.008} \\
+5 DenseCRF                                  & 0.816 & \pos{+0.013} & 5/5 & 0.651 & \pos{+0.014} \\
+6 SA calls 10--20                           & 0.820 & \pos{+0.004} & 4/5 & 0.657 & \pos{+0.007} \\
+7 SA-guided CA weights (fine-only)          & 0.825 & $+0.005$     & 4/5 & 0.673 & \pos{+0.015} \\
+\textbf{8 Hierarchy with one-sided cap (BRACE)} & \textbf{0.832} & \pos{+0.007} & 4/5 & \textbf{0.708} & \pos{+0.036} \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+Row minus row above, one capture, threshold chosen on VOC-Sim. Row 8 vs 7 at a shared 0.55: $+0.036$ / $+0.010$ (n.s.).
+\src{workplan Entry 19}
+\end{frame}
+
+\begin{frame}{7. The hierarchy's COCO-Cap gain depends on the threshold convention}
+\begin{slidetable}
+\begin{tabular}{lrrr}
+\toprule
+Convention (DenseCRF) & hierarchy & fine-only & $\Delta$ COCO-Cap \\
+\midrule
+Each at its VOC-Sim threshold (0.55 / 0.425) & 0.696 & 0.662 & \pos{+0.034} \\
+Both at 0.55                                 & 0.696 & 0.684 & $+0.012$ \\
+Both at 0.425                                & 0.623 & 0.662 & \pos{-0.039} \\
+Each at its COCO-Cap best (0.60 / 0.525)     & 0.707 & 0.689 & \pos{+0.018} \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+About half of the $+0.034$ is better localisation; the rest is threshold transfer. Pre-correction capture; last row uses COCO-Cap labels (diagnostic).
+\src{runs/16\_trace\_034/result.md}
+\end{frame}
+
+% =====================================================================
+\begin{frame}{8. Paper structure, as requested}
+\begin{itemize}
+\item Section 5 to renamed ``Experimental results''; the comparison with other methods moves into it as 5.1.
+\item Section 4 gains hardware, software, runtime and memory per image (next slide).
+\item The discussion adds the token, CLIP-seed and backbone findings.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{8. Cost: the hierarchy is free; attention recording and DenseCRF dominate}
+\begin{slidetable}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Per image (SD 1.5, 30 steps, median of 100) & A100 & V100 \\
+\midrule
+Generation alone & 2.66\,s & 12.11\,s \\
+Generation with attention recording & 6.94\,s & 12.02\,s \\
+Fine-only map / BRACE map & 0.03 / 0.04\,s & 0.08 / 0.10\,s \\
+DenseCRF (one CPU core) & 5.92\,s & 5.07\,s \\
+\textbf{Total, BRACE (same as fine-only)} & \textbf{12.9\,s} & \textbf{17.2\,s} \\
+Peak GPU memory & 5.1\,GiB & 5.1\,GiB \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\src{\texttt{comparisons/cost/result.md} (workplan Entry 18)}
+\end{frame}
+
+\begin{frame}{9. ICPR 2027}
+\begin{itemize}
+\item Agreed: ICPR 2027 is the target (submission 8 March 2027).
+\item We can also continue working on the paper after the TRDP defense, to find stronger ideas worth publishing.
+\end{itemize}
+\end{frame}
+
+
+
+
+
+
+
+
+
+
+
+
+
+% =====================================================================
+\section{Exploring}
+\begin{frame}{Exploring: a training-free query-profile gate}
+\begin{itemize}
+\item The class word's attention also fires on pixels that are not the object.
+\item From unlabeled generations, per class and layer: the mean query where the word attends on images \emph{of} the class, and where it attends when the class is \emph{absent} (caption does not mention it).
+\item At test time, each pixel's query is compared with the two profiles; a soft gate down-weights pixels that look like false firings. Then the unchanged pipeline.
+\item Label-free; BRACE stays frozen. All results here are exploratory.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Exploring: gate vs no gate}
+\begin{slidetable}
+\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}llrrrcrrr@{}}
+\toprule
+ &  & \multicolumn{3}{c}{VOC-Sim} & & \multicolumn{3}{c}{COCO-Cap} \\
+\cmidrule(lr){3-5}\cmidrule(lr){7-9}
+Comparison & Threshold & no gate & gate & $\Delta$ & & no gate & gate & $\Delta$ \\
+\midrule
+Seed & VOC-Sim-selected & 0.706 & 0.724 & \pos{+0.018} & & 0.591 & 0.620 & \pos{+0.029} \\
+ & fixed 0.55 & 0.613 & 0.550 & \pos{-0.063} & & 0.510 & 0.502 & $-0.008$ \\
+ & best (uses labels) & 0.706 & 0.724 & \pos{+0.018} & & 0.591 & 0.629 & \pos{+0.038} \\
+\midrule
+Fine-only & VOC-Sim-selected & 0.811 & 0.817 & \pos{+0.006} & & 0.670 & 0.704 & \pos{+0.034} \\
+ & fixed 0.55 & 0.792 & 0.774 & \pos{-0.018} & & 0.690 & 0.717 & \pos{+0.027} \\
+ & best (uses labels) & 0.813 & 0.818 & $+0.005$ & & 0.693 & 0.723 & \pos{+0.030} \\
+\midrule
+Hierarchy & VOC-Sim-selected & 0.818 & 0.816 & $-0.001$ & & 0.692 & 0.717 & \pos{+0.025} \\
+ & fixed 0.55 & 0.819 & 0.818 & $-0.001$ & & 0.692 & 0.717 & \pos{+0.025} \\
+ & best (uses labels) & 0.819 & 0.818 & $-0.001$ & & 0.709 & 0.730 & \pos{+0.021} \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+{\footnotesize Raw maps; profiles never include the test image. COCO-Cap was used to screen the gate. Bold: 95\% paired interval excludes zero.}
+\end{frame}
+
+\begin{frame}{Exploring: the gate needs a negative profile}
+\begin{slidetable}
+\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Each pixel's query compared with & VOC-Sim & COCO-Cap & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
+\midrule
+\textbf{No gate (BRACE)} & \textbf{0.832} & \textbf{0.709} & --- & --- \\
+object vs absent-class profile & 0.832 & 0.722 & $+0.000$ & \pos{+0.014} \\
+object vs all-pixel profile & 0.831 & 0.719 & $-0.001$ & \pos{+0.011} \\
+object profile only & 0.831 & 0.703 & $-0.001$ & $-0.006$ \\
+object vs the image's own average & 0.807 & 0.697 & \pos{-0.025} & $-0.011$ \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+{\footnotesize Hierarchy + DenseCRF; threshold chosen on VOC-Sim. Bold: 95\% paired interval excludes zero.}
+\end{frame}
+
+\begin{frame}{Exploring: choosing the gate strength per class}
+\begin{slidetable}
+\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Gate & VOC-Sim & COCO-Cap & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
+\midrule
+\textbf{No gate (BRACE)} & \textbf{0.832} & \textbf{0.709} & --- & --- \\
+Gate, same for every class & 0.832 & 0.722 & $+0.000$ & \pos{+0.014} \\
+Strength per class (none / half / full) & 0.836 & 0.726 & \pos{+0.004} & \pos{+0.018} \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+{\footnotesize Hierarchy + DenseCRF; threshold chosen on VOC-Sim. The strength is chosen per class on VOC-Sim (on the other folds) and applied unchanged to COCO-Cap; e.g.\ tv and train stay ungated. Bold: 95\% paired interval excludes zero.}
+\end{frame}
+
+\begin{frame}{Exploring: the gate on COCO-Cap is a class-dependent trade-off}
+\begin{slidetable}
+\begin{tabular}{lrrr}
+\toprule
+Class (hierarchy + DenseCRF) & BRACE & gate & $\Delta$ \\
+\midrule
+person       & 0.28 & 0.39 & $+0.11$ \\
+dining table & 0.47 & 0.54 & $+0.07$ \\
+aeroplane    & 0.80 & 0.85 & $+0.05$ \\
+chair        & 0.47 & 0.52 & $+0.05$ \\
+\midrule
+train        & 0.75 & 0.67 & $-0.08$ \\
+potted plant & 0.74 & 0.66 & $-0.08$ \\
+tv           & 0.79 & 0.69 & $-0.10$ \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+\src{runs/29\_absent\_class\_study/result.md, per-class line}
+\end{frame}
+
+\begin{frame}{Exploring: where it stands}
+\begin{slidetable}
+\begin{tabular}{@{}L{0.42\linewidth}L{0.50\linewidth}@{}}
+\toprule
+Question & Status \\
+\midrule
+Gate improves seeds and fine-only? & yes, both benchmarks \\
+Gate improves BRACE on VOC-Sim? & no \\
+Gate improves BRACE on COCO-Cap? & $+0.014$, screened (exploratory) \\
+Profiles estimated on VOC-sim work on COCO? & yes \\
+A class adaptive gate? & first gain on both: $+0.004$ / $+0.018$ \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+Not in the paper's method, something new that worked. 
+
+\end{frame}
+
+\begin{frame}{Exploring: several absent-class profiles instead of one}
+\begin{itemize}
+\item Wrong firings of a class word are not all alike, so one average absent-class profile blends them.
+\item Instead: group the absent-class queries into 4 profiles per class and layer; each pixel is compared with its nearest one.
+\item Profiles from unlabeled generations, built two ways:
+  \begin{itemize}
+  \item from VOC-Sim prompts only (transfer to COCO-Cap);
+  \item from VOC-Sim and COCO-Cap captions (no masks; the target domain's captions).
+  \end{itemize}
+\item Images split in half per class: profiles from one half; scores on the other half only.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Exploring: several profiles help most on COCO-Cap}
+\begin{slidetable}
+\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Gate & VOC-Sim & COCO-Cap & $\Delta$ VOC-Sim & $\Delta$ COCO-Cap \\
+\midrule
+\textbf{No gate (BRACE)} & \textbf{0.843} & \textbf{0.718} & --- & --- \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{Profiles from VOC-Sim prompts only}} \\
+one absent-class profile & 0.843 & 0.738 & $+0.001$ & \pos{+0.019} \\
+4 absent-class profiles & 0.845 & 0.744 & $+0.003$ & \pos{+0.025} \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{Profiles from VOC-Sim and COCO-Cap captions}} \\
+one absent-class profile & 0.849 & 0.742 & $+0.007$ & \pos{+0.024} \\
+4 absent-class profiles & 0.855 & 0.762 & \pos{+0.012} & \pos{+0.044} \\
+\bottomrule
+\end{tabular}
+\end{slidetable}
+{\footnotesize Held-out halves (237 VOC-Sim, 351 COCO-Cap); hierarchy + DenseCRF; fixed threshold 0.55, so no labels are used anywhere. Bold: 95\% paired interval excludes zero. Exploratory.}
+\end{frame}
+
+\end{document}

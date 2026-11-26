@@ -1,0 +1,1319 @@
+{
+ "eligible": 84,
+ "rejected": 16,
+ "queries_eligible": 237,
+ "class_counts_eligible": {
+  "building": 24,
+  "road": 24,
+  "vegetation": 24,
+  "sky": 21,
+  "sidewalk": 21,
+  "car": 15,
+  "bus": 14,
+  "person": 13,
+  "train": 12,
+  "bicycle": 12,
+  "traffic light": 11,
+  "pole": 11,
+  "rider": 11,
+  "truck": 7,
+  "traffic sign": 6,
+  "motorcycle": 4,
+  "terrain": 4,
+  "fence": 2,
+  "wall": 1
+ },
+ "core50_queries": 143,
+ "class_counts_core50": {
+  "sidewalk": 14,
+  "vegetation": 13,
+  "road": 12,
+  "sky": 11,
+  "building": 11,
+  "car": 8,
+  "bicycle": 8,
+  "traffic light": 7,
+  "pole": 7,
+  "train": 7,
+  "rider": 7,
+  "person": 7,
+  "bus": 7,
+  "truck": 7,
+  "traffic sign": 6,
+  "motorcycle": 4,
+  "terrain": 4,
+  "fence": 2,
+  "wall": 1
+ },
+ "images": {
+  "cs000": {
+   "kept": [
+    "traffic light",
+    "sky",
+    "sidewalk"
+   ],
+   "dropped": [
+    "motorcycle"
+   ],
+   "note": "motorcycle absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs001": {
+   "kept": [
+    "pole",
+    "train",
+    "building"
+   ],
+   "dropped": [
+    "terrain"
+   ],
+   "note": "terrain absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs002": {
+   "kept": [
+    "rider",
+    "road",
+    "vegetation"
+   ],
+   "dropped": [
+    "person"
+   ],
+   "note": "person ambiguous with riders",
+   "eligible": true,
+   "core50": true
+  },
+  "cs003": {
+   "kept": [],
+   "dropped": [
+    "bicycle",
+    "bus",
+    "fence",
+    "wall"
+   ],
+   "note": "bus/bicycle absent; wall/fence unclear",
+   "eligible": false,
+   "core50": false
+  },
+  "cs004": {
+   "kept": [
+    "car",
+    "sidewalk",
+    "road"
+   ],
+   "dropped": [
+    "truck"
+   ],
+   "note": "truck absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs005": {
+   "kept": [
+    "pole",
+    "sky"
+   ],
+   "dropped": [
+    "traffic sign",
+    "terrain"
+   ],
+   "note": "traffic sign too small; terrain absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs006": {
+   "kept": [
+    "person",
+    "bicycle",
+    "vegetation",
+    "building"
+   ],
+   "dropped": [],
+   "note": "",
+   "eligible": true,
+   "core50": true
+  },
+  "cs007": {
+   "kept": [
+    "traffic light",
+    "train"
+   ],
+   "dropped": [
+    "fence",
+    "wall"
+   ],
+   "note": "fence/wall absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs008": {
+   "kept": [],
+   "dropped": [
+    "truck",
+    "motorcycle",
+    "terrain",
+    "sky"
+   ],
+   "note": "only truck clear; motorcycle absent; terrain/sky tiny",
+   "eligible": false,
+   "core50": false
+  },
+  "cs009": {
+   "kept": [
+    "car",
+    "vegetation"
+   ],
+   "dropped": [
+    "rider",
+    "wall"
+   ],
+   "note": "rider tiny/ambiguous; wall absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs010": {
+   "kept": [
+    "bus",
+    "road",
+    "sidewalk"
+   ],
+   "dropped": [
+    "traffic sign"
+   ],
+   "note": "traffic sign too small",
+   "eligible": true,
+   "core50": true
+  },
+  "cs011": {
+   "kept": [
+    "person",
+    "traffic light",
+    "building"
+   ],
+   "dropped": [
+    "fence"
+   ],
+   "note": "fence absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs012": {
+   "kept": [
+    "traffic sign",
+    "pole",
+    "vegetation"
+   ],
+   "dropped": [
+    "fence"
+   ],
+   "note": "fence unclear",
+   "eligible": true,
+   "core50": true
+  },
+  "cs013": {
+   "kept": [
+    "rider",
+    "motorcycle",
+    "sidewalk",
+    "building"
+   ],
+   "dropped": [],
+   "note": "",
+   "eligible": true,
+   "core50": true
+  },
+  "cs014": {
+   "kept": [
+    "truck",
+    "wall",
+    "terrain"
+   ],
+   "dropped": [
+    "car"
+   ],
+   "note": "car absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs015": {
+   "kept": [
+    "road",
+    "sky"
+   ],
+   "dropped": [
+    "bus",
+    "train"
+   ],
+   "note": "vehicle ambiguous bus vs tram: both dropped",
+   "eligible": true,
+   "core50": false
+  },
+  "cs016": {
+   "kept": [
+    "bicycle",
+    "road"
+   ],
+   "dropped": [
+    "car",
+    "wall"
+   ],
+   "note": "car absent; wall absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs017": {
+   "kept": [
+    "person",
+    "sidewalk"
+   ],
+   "dropped": [
+    "motorcycle",
+    "fence"
+   ],
+   "note": "motorcycle/fence absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs018": {
+   "kept": [
+    "traffic light",
+    "sky",
+    "building"
+   ],
+   "dropped": [
+    "traffic sign"
+   ],
+   "note": "traffic sign too small",
+   "eligible": true,
+   "core50": true
+  },
+  "cs019": {
+   "kept": [
+    "rider",
+    "bicycle",
+    "vegetation"
+   ],
+   "dropped": [
+    "terrain"
+   ],
+   "note": "terrain unclear",
+   "eligible": true,
+   "core50": true
+  },
+  "cs020": {
+   "kept": [
+    "truck",
+    "bus",
+    "sidewalk",
+    "vegetation"
+   ],
+   "dropped": [],
+   "note": "",
+   "eligible": true,
+   "core50": true
+  },
+  "cs021": {
+   "kept": [
+    "train",
+    "pole",
+    "road"
+   ],
+   "dropped": [
+    "terrain"
+   ],
+   "note": "terrain absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs022": {
+   "kept": [
+    "person",
+    "building",
+    "sky"
+   ],
+   "dropped": [
+    "pole"
+   ],
+   "note": "pole too small",
+   "eligible": true,
+   "core50": true
+  },
+  "cs023": {
+   "kept": [],
+   "dropped": [
+    "rider",
+    "car",
+    "wall",
+    "fence"
+   ],
+   "note": "only car clear; rider tiny; wall/fence absent",
+   "eligible": false,
+   "core50": false
+  },
+  "cs024": {
+   "kept": [
+    "bicycle",
+    "building",
+    "sky"
+   ],
+   "dropped": [
+    "motorcycle"
+   ],
+   "note": "motorcycle ambiguous",
+   "eligible": true,
+   "core50": true
+  },
+  "cs025": {
+   "kept": [],
+   "dropped": [
+    "truck",
+    "train",
+    "fence",
+    "wall"
+   ],
+   "note": "vehicle ambiguous truck vs tram; fence/wall absent",
+   "eligible": false,
+   "core50": false
+  },
+  "cs026": {
+   "kept": [
+    "bus",
+    "traffic sign",
+    "road",
+    "vegetation"
+   ],
+   "dropped": [],
+   "note": "",
+   "eligible": true,
+   "core50": true
+  },
+  "cs027": {
+   "kept": [
+    "car",
+    "sidewalk"
+   ],
+   "dropped": [
+    "traffic light",
+    "terrain"
+   ],
+   "note": "traffic lights too small; terrain absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs028": {
+   "kept": [
+    "person",
+    "car",
+    "vegetation",
+    "building"
+   ],
+   "dropped": [],
+   "note": "",
+   "eligible": true,
+   "core50": true
+  },
+  "cs029": {
+   "kept": [
+    "train",
+    "sky"
+   ],
+   "dropped": [
+    "bicycle",
+    "wall"
+   ],
+   "note": "bicycle/wall absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs030": {
+   "kept": [
+    "rider",
+    "traffic sign",
+    "sidewalk",
+    "road"
+   ],
+   "dropped": [],
+   "note": "",
+   "eligible": true,
+   "core50": true
+  },
+  "cs031": {
+   "kept": [
+    "pole",
+    "truck",
+    "fence",
+    "terrain"
+   ],
+   "dropped": [],
+   "note": "",
+   "eligible": true,
+   "core50": true
+  },
+  "cs032": {
+   "kept": [
+    "bus",
+    "sky",
+    "sidewalk"
+   ],
+   "dropped": [
+    "motorcycle"
+   ],
+   "note": "motorcycle absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs033": {
+   "kept": [
+    "train",
+    "vegetation"
+   ],
+   "dropped": [
+    "motorcycle",
+    "terrain"
+   ],
+   "note": "motorcycle/terrain absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs034": {
+   "kept": [
+    "person",
+    "building"
+   ],
+   "dropped": [
+    "traffic sign",
+    "wall"
+   ],
+   "note": "traffic sign too small; wall absent",
+   "eligible": true,
+   "core50": false
+  },
+  "cs035": {
+   "kept": [
+    "rider",
+    "pole",
+    "road"
+   ],
+   "dropped": [
+    "fence"
+   ],
+   "note": "fence absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs036": {
+   "kept": [
+    "bus",
+    "sidewalk"
+   ],
+   "dropped": [
+    "truck",
+    "wall"
+   ],
+   "note": "truck ambiguous (second bus); wall absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs037": {
+   "kept": [
+    "car",
+    "vegetation",
+    "building"
+   ],
+   "dropped": [
+    "bicycle"
+   ],
+   "note": "bicycle too small",
+   "eligible": true,
+   "core50": false
+  },
+  "cs038": {
+   "kept": [
+    "traffic light",
+    "train",
+    "road"
+   ],
+   "dropped": [
+    "fence"
+   ],
+   "note": "fence absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs039": {
+   "kept": [
+    "rider",
+    "sky"
+   ],
+   "dropped": [
+    "person",
+    "terrain"
+   ],
+   "note": "person ambiguous with riders; terrain absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs040": {
+   "kept": [
+    "bicycle",
+    "building"
+   ],
+   "dropped": [
+    "motorcycle",
+    "terrain"
+   ],
+   "note": "motorcycle/terrain absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs041": {
+   "kept": [
+    "bus",
+    "sidewalk"
+   ],
+   "dropped": [
+    "truck",
+    "wall"
+   ],
+   "note": "truck/wall absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs042": {
+   "kept": [
+    "car",
+    "road"
+   ],
+   "dropped": [
+    "traffic sign",
+    "fence"
+   ],
+   "note": "traffic sign too small; fence absent",
+   "eligible": true,
+   "core50": false
+  },
+  "cs043": {
+   "kept": [
+    "traffic light",
+    "pole",
+    "vegetation",
+    "sky"
+   ],
+   "dropped": [],
+   "note": "",
+   "eligible": true,
+   "core50": true
+  },
+  "cs044": {
+   "kept": [
+    "traffic light",
+    "train",
+    "vegetation"
+   ],
+   "dropped": [
+    "fence"
+   ],
+   "note": "fence unclear",
+   "eligible": true,
+   "core50": true
+  },
+  "cs045": {
+   "kept": [
+    "bicycle",
+    "rider",
+    "building",
+    "road"
+   ],
+   "dropped": [],
+   "note": "",
+   "eligible": true,
+   "core50": true
+  },
+  "cs046": {
+   "kept": [],
+   "dropped": [
+    "motorcycle",
+    "traffic sign",
+    "terrain",
+    "wall"
+   ],
+   "note": "motorcycle/terrain/wall absent; traffic sign too small",
+   "eligible": false,
+   "core50": false
+  },
+  "cs047": {
+   "kept": [
+    "car",
+    "sidewalk",
+    "sky"
+   ],
+   "dropped": [
+    "bus"
+   ],
+   "note": "bus absent",
+   "eligible": true,
+   "core50": false
+  },
+  "cs048": {
+   "kept": [
+    "person",
+    "pole",
+    "vegetation",
+    "building"
+   ],
+   "dropped": [],
+   "note": "",
+   "eligible": true,
+   "core50": false
+  },
+  "cs049": {
+   "kept": [],
+   "dropped": [
+    "truck",
+    "motorcycle",
+    "terrain",
+    "sky"
+   ],
+   "note": "only truck clear; motorcycle absent; terrain/sky tiny",
+   "eligible": false,
+   "core50": false
+  },
+  "cs050": {
+   "kept": [
+    "bus",
+    "sidewalk"
+   ],
+   "dropped": [
+    "truck",
+    "wall"
+   ],
+   "note": "truck/wall absent",
+   "eligible": true,
+   "core50": false
+  },
+  "cs051": {
+   "kept": [
+    "train",
+    "road"
+   ],
+   "dropped": [
+    "bicycle",
+    "fence"
+   ],
+   "note": "bicycle/fence absent",
+   "eligible": true,
+   "core50": false
+  },
+  "cs052": {
+   "kept": [
+    "traffic light",
+    "sidewalk",
+    "road"
+   ],
+   "dropped": [
+    "rider"
+   ],
+   "note": "rider absent (parked bicycles only)",
+   "eligible": true,
+   "core50": false
+  },
+  "cs053": {
+   "kept": [
+    "person",
+    "pole",
+    "vegetation",
+    "building"
+   ],
+   "dropped": [],
+   "note": "",
+   "eligible": true,
+   "core50": false
+  },
+  "cs054": {
+   "kept": [
+    "car",
+    "sky"
+   ],
+   "dropped": [
+    "traffic sign",
+    "terrain"
+   ],
+   "note": "traffic sign too small; terrain absent",
+   "eligible": true,
+   "core50": false
+  },
+  "cs055": {
+   "kept": [],
+   "dropped": [
+    "truck",
+    "train",
+    "fence",
+    "wall"
+   ],
+   "note": "only train clear; truck/fence/wall absent",
+   "eligible": false,
+   "core50": false
+  },
+  "cs056": {
+   "kept": [],
+   "dropped": [
+    "traffic light",
+    "traffic sign",
+    "road",
+    "wall"
+   ],
+   "note": "only road clear; traffic light/sign too small; wall absent",
+   "eligible": false,
+   "core50": false
+  },
+  "cs057": {
+   "kept": [
+    "car",
+    "sidewalk",
+    "building"
+   ],
+   "dropped": [
+    "pole"
+   ],
+   "note": "pole too small",
+   "eligible": true,
+   "core50": false
+  },
+  "cs058": {
+   "kept": [
+    "motorcycle",
+    "sky"
+   ],
+   "dropped": [
+    "bicycle",
+    "fence"
+   ],
+   "note": "bicycle too small; fence absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs059": {
+   "kept": [
+    "rider",
+    "vegetation"
+   ],
+   "dropped": [
+    "person",
+    "terrain"
+   ],
+   "note": "person ambiguous with riders; terrain absent",
+   "eligible": true,
+   "core50": false
+  },
+  "cs060": {
+   "kept": [
+    "bus",
+    "vegetation"
+   ],
+   "dropped": [
+    "rider",
+    "fence"
+   ],
+   "note": "rider/fence absent",
+   "eligible": true,
+   "core50": false
+  },
+  "cs061": {
+   "kept": [],
+   "dropped": [
+    "traffic sign",
+    "truck",
+    "sidewalk",
+    "wall"
+   ],
+   "note": "truck/wall absent; traffic sign too small",
+   "eligible": false,
+   "core50": false
+  },
+  "cs062": {
+   "kept": [
+    "bicycle",
+    "traffic light",
+    "sky",
+    "building"
+   ],
+   "dropped": [],
+   "note": "",
+   "eligible": true,
+   "core50": false
+  },
+  "cs063": {
+   "kept": [
+    "person",
+    "car",
+    "road",
+    "terrain"
+   ],
+   "dropped": [],
+   "note": "",
+   "eligible": true,
+   "core50": true
+  },
+  "cs064": {
+   "kept": [],
+   "dropped": [
+    "motorcycle",
+    "pole",
+    "wall",
+    "fence"
+   ],
+   "note": "motorcycle tiny; pole small; wall/fence absent",
+   "eligible": false,
+   "core50": false
+  },
+  "cs065": {
+   "kept": [],
+   "dropped": [
+    "bus",
+    "train",
+    "sky",
+    "terrain"
+   ],
+   "note": "vehicles ambiguous bus vs tram; terrain absent; only sky clear",
+   "eligible": false,
+   "core50": false
+  },
+  "cs066": {
+   "kept": [
+    "rider",
+    "building",
+    "road"
+   ],
+   "dropped": [
+    "person"
+   ],
+   "note": "person ambiguous with riders",
+   "eligible": true,
+   "core50": false
+  },
+  "cs067": {
+   "kept": [
+    "bicycle",
+    "traffic sign",
+    "vegetation"
+   ],
+   "dropped": [
+    "sidewalk"
+   ],
+   "note": "sidewalk unclear",
+   "eligible": true,
+   "core50": true
+  },
+  "cs068": {
+   "kept": [
+    "car",
+    "fence",
+    "sky"
+   ],
+   "dropped": [
+    "traffic light"
+   ],
+   "note": "traffic light too small",
+   "eligible": true,
+   "core50": true
+  },
+  "cs069": {
+   "kept": [
+    "bus",
+    "road",
+    "vegetation"
+   ],
+   "dropped": [
+    "motorcycle"
+   ],
+   "note": "motorcycle absent",
+   "eligible": true,
+   "core50": false
+  },
+  "cs070": {
+   "kept": [
+    "train",
+    "building"
+   ],
+   "dropped": [
+    "pole",
+    "sidewalk"
+   ],
+   "note": "pole too small; sidewalk unclear",
+   "eligible": true,
+   "core50": false
+  },
+  "cs071": {
+   "kept": [],
+   "dropped": [
+    "truck",
+    "traffic light",
+    "wall",
+    "terrain"
+   ],
+   "note": "only truck clear; traffic light small; wall/terrain absent",
+   "eligible": false,
+   "core50": false
+  },
+  "cs072": {
+   "kept": [
+    "car",
+    "sky",
+    "vegetation"
+   ],
+   "dropped": [
+    "pole"
+   ],
+   "note": "pole too small",
+   "eligible": true,
+   "core50": false
+  },
+  "cs073": {
+   "kept": [
+    "train",
+    "road"
+   ],
+   "dropped": [
+    "rider",
+    "fence"
+   ],
+   "note": "rider absent; fence small",
+   "eligible": true,
+   "core50": false
+  },
+  "cs074": {
+   "kept": [
+    "truck",
+    "person",
+    "sidewalk",
+    "terrain"
+   ],
+   "dropped": [],
+   "note": "",
+   "eligible": true,
+   "core50": true
+  },
+  "cs075": {
+   "kept": [
+    "bus",
+    "motorcycle",
+    "building"
+   ],
+   "dropped": [
+    "wall"
+   ],
+   "note": "wall absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs076": {
+   "kept": [
+    "bicycle",
+    "building",
+    "vegetation"
+   ],
+   "dropped": [
+    "traffic sign"
+   ],
+   "note": "traffic sign absent",
+   "eligible": true,
+   "core50": false
+  },
+  "cs077": {
+   "kept": [
+    "person",
+    "sky"
+   ],
+   "dropped": [
+    "traffic light",
+    "wall"
+   ],
+   "note": "traffic light/wall absent",
+   "eligible": true,
+   "core50": false
+  },
+  "cs078": {
+   "kept": [
+    "truck",
+    "sidewalk"
+   ],
+   "dropped": [
+    "rider",
+    "terrain"
+   ],
+   "note": "rider/terrain absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs079": {
+   "kept": [
+    "car",
+    "traffic sign",
+    "road"
+   ],
+   "dropped": [
+    "fence"
+   ],
+   "note": "fence too small",
+   "eligible": true,
+   "core50": true
+  },
+  "cs080": {
+   "kept": [
+    "bicycle",
+    "sidewalk",
+    "building"
+   ],
+   "dropped": [
+    "pole"
+   ],
+   "note": "pole absent",
+   "eligible": true,
+   "core50": false
+  },
+  "cs081": {
+   "kept": [
+    "vegetation",
+    "sky"
+   ],
+   "dropped": [
+    "motorcycle",
+    "train"
+   ],
+   "note": "train too small; motorcycle absent",
+   "eligible": true,
+   "core50": false
+  },
+  "cs082": {
+   "kept": [
+    "bus",
+    "person",
+    "road"
+   ],
+   "dropped": [
+    "fence"
+   ],
+   "note": "fence absent",
+   "eligible": true,
+   "core50": false
+  },
+  "cs083": {
+   "kept": [
+    "traffic sign",
+    "bicycle"
+   ],
+   "dropped": [
+    "wall",
+    "terrain"
+   ],
+   "note": "wall/terrain absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs084": {
+   "kept": [],
+   "dropped": [
+    "truck",
+    "motorcycle",
+    "wall",
+    "terrain"
+   ],
+   "note": "vehicle ambiguous van vs truck; motorcycle distorted; wall/terrain absent",
+   "eligible": false,
+   "core50": false
+  },
+  "cs085": {
+   "kept": [
+    "rider",
+    "traffic light",
+    "building",
+    "sky"
+   ],
+   "dropped": [],
+   "note": "",
+   "eligible": true,
+   "core50": false
+  },
+  "cs086": {
+   "kept": [
+    "pole",
+    "bus",
+    "road"
+   ],
+   "dropped": [
+    "fence"
+   ],
+   "note": "fence small",
+   "eligible": true,
+   "core50": false
+  },
+  "cs087": {
+   "kept": [
+    "train",
+    "vegetation",
+    "sidewalk"
+   ],
+   "dropped": [
+    "car"
+   ],
+   "note": "car absent",
+   "eligible": true,
+   "core50": false
+  },
+  "cs088": {
+   "kept": [],
+   "dropped": [
+    "pole",
+    "motorcycle",
+    "terrain",
+    "vegetation"
+   ],
+   "note": "only vegetation clear; pole/motorcycle/terrain absent",
+   "eligible": false,
+   "core50": false
+  },
+  "cs089": {
+   "kept": [],
+   "dropped": [
+    "traffic sign",
+    "bicycle",
+    "sky",
+    "fence"
+   ],
+   "note": "black image (pipeline safety filter)",
+   "eligible": false,
+   "core50": false
+  },
+  "cs090": {
+   "kept": [
+    "bus",
+    "road",
+    "building"
+   ],
+   "dropped": [
+    "traffic light"
+   ],
+   "note": "traffic light too small",
+   "eligible": true,
+   "core50": false
+  },
+  "cs091": {
+   "kept": [
+    "car",
+    "truck"
+   ],
+   "dropped": [
+    "wall",
+    "sidewalk"
+   ],
+   "note": "wall/sidewalk absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs092": {
+   "kept": [
+    "rider",
+    "person",
+    "building"
+   ],
+   "dropped": [
+    "fence"
+   ],
+   "note": "fence absent",
+   "eligible": true,
+   "core50": false
+  },
+  "cs093": {
+   "kept": [
+    "train",
+    "pole",
+    "sky"
+   ],
+   "dropped": [
+    "wall"
+   ],
+   "note": "wall absent",
+   "eligible": true,
+   "core50": false
+  },
+  "cs094": {
+   "kept": [
+    "bus",
+    "road",
+    "sidewalk"
+   ],
+   "dropped": [
+    "rider"
+   ],
+   "note": "rider distorted (artefact)",
+   "eligible": true,
+   "core50": false
+  },
+  "cs095": {
+   "kept": [
+    "truck",
+    "vegetation"
+   ],
+   "dropped": [
+    "traffic sign",
+    "terrain"
+   ],
+   "note": "traffic sign too small; terrain absent",
+   "eligible": true,
+   "core50": true
+  },
+  "cs096": {
+   "kept": [
+    "traffic light",
+    "car",
+    "road"
+   ],
+   "dropped": [
+    "fence"
+   ],
+   "note": "fence absent",
+   "eligible": true,
+   "core50": false
+  },
+  "cs097": {
+   "kept": [
+    "bicycle",
+    "sky",
+    "vegetation"
+   ],
+   "dropped": [
+    "person"
+   ],
+   "note": "person ambiguous with riders",
+   "eligible": true,
+   "core50": false
+  },
+  "cs098": {
+   "kept": [],
+   "dropped": [
+    "train",
+    "motorcycle",
+    "terrain",
+    "building"
+   ],
+   "note": "train too small; motorcycle/terrain absent; only building clear",
+   "eligible": false,
+   "core50": false
+  },
+  "cs099": {
+   "kept": [
+    "motorcycle",
+    "sidewalk"
+   ],
+   "dropped": [
+    "pole",
+    "wall"
+   ],
+   "note": "pole/wall absent",
+   "eligible": true,
+   "core50": true
+  }
+ }
+}
