@@ -47,6 +47,22 @@ def run(a):
     for k, v in OVERRIDE.get(a.repo, {}).items():
         cfg.model[k] = v
     model = MODELS.build(cfg.model).cuda(); model.eval()      # the runner moves the whole model (incl. preprocessor) to the GPU
+    if hasattr(model, "postprocess_result") and hasattr(model, "query_idx"):
+        # run 44 fix (memory only): SCLIP's postprocess builds a classes x queries x H x W tensor (~18 GB for COCO-Object
+        # on a large photo; 16 GB V100s). On a GPU out-of-memory, the same postprocess runs on the CPU (fp32 if half).
+        _pp = model.postprocess_result
+        def _pp_fallback(seg_logits, data_samples):
+            try:
+                return _pp(seg_logits, data_samples)
+            except torch.cuda.OutOfMemoryError:
+                torch.cuda.empty_cache(); qi = model.query_idx; model.query_idx = qi.cpu()
+                print("  postprocess OOM on GPU -> CPU", flush=True)
+                try:
+                    x = seg_logits.detach().cpu()
+                    return _pp(x.float() if x.dtype == torch.half else x, data_samples)
+                finally:
+                    model.query_idx = qi
+        model.postprocess_result = _pp_fallback
     pipe = Compose([t for t in cfg.test_pipeline if t["type"] != "LoadAnnotations"])
     names = [l.strip() for l in open(cfg.model.name_path) if l.strip()]       # line i = class index i (synonyms comma-separated)
     out = WORK / f"clip_{a.repo}" / a.set; out.mkdir(parents=True, exist_ok=True)
@@ -61,6 +77,7 @@ def run(a):
         t0 = time.time(); d = pipe(dict(img_path=path))
         with torch.no_grad():
             r = model.test_step(dict(inputs=[d["inputs"]], data_samples=[d["data_samples"]]))[0]
+        torch.cuda.empty_cache()
         pred = r.pred_sem_seg.data[0].cpu().numpy().astype(np.uint8)
         tmp = o.with_name(o.stem + ".tmp.npz"); np.savez_compressed(tmp, pred=pred, sec=time.time() - t0); os.replace(tmp, o)
         print(f"[{a.repo}:{a.set}] {img} {pred.shape} classes {np.unique(pred).tolist()[:8]} {time.time() - t0:.2f}s", flush=True)

@@ -31,7 +31,8 @@ def zt_and_embeds(pipe, img_u8, prompt, dev):
     import torch.nn.functional as F
     x = torch.from_numpy(np.ascontiguousarray(img_u8)).permute(2, 0, 1)[None].float().to(dev) / 127.5 - 1
     x = F.interpolate(x, size=(PX, PX), mode="bicubic", align_corners=False).clamp(-1, 1)
-    z0 = pipe.vae.encode(x).latent_dist.mean * pipe.vae.config.scaling_factor
+    with torch.no_grad():                             # run 44 fix: no autograd graph (same values); DAAM jobs ran out of memory over items
+        z0 = pipe.vae.encode(x).latent_dist.mean * pipe.vae.config.scaling_factor
     eps = torch.randn(z0.shape, generator=torch.Generator(device="cpu").manual_seed(NOISE_SEED)).to(dev, z0.dtype)
     ac = pipe.scheduler.alphas_cumprod.to(dev)
     zt = ac[T_NOISE].sqrt() * z0 + (1 - ac[T_NOISE]).sqrt() * eps
@@ -88,6 +89,7 @@ def run(a):
         tmp = o.with_name(o.stem + ".tmp.npz"); np.savez_compressed(tmp, prompt=prompt, size=np.array(img.shape[:2]),
                                                                   sec=time.time() - t0, **res); os.replace(tmp, o)
         print(f"[{a.method}:{a.set}] {x['id']} '{prompt}' {[(k, v.shape) for k, v in res.items()]} {time.time() - t0:.2f}s", flush=True)
+        del lat, emb, res; torch.cuda.empty_cache()
 
 
 if __name__ == "__main__":
