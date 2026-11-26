@@ -108,6 +108,11 @@ def prep(a):
             if f.name in SCRIPTS:
                 n = s2.count('choices=["voc"]'); assert n == 1, (f, n)
                 s2 = s2.replace('choices=["voc"]', 'choices=["voc", "voc44", "context44", "coco44"]')
+            if f.name == "predict.py":   # release bug: under a SLURM array gt_mask is never set but sizes the output (= image size)
+                a_ = 'agg_similarity[None], size=gt_mask.shape[-2:], mode="bilinear"'; assert s2.count(a_) == 1
+                s2 = s2.replace(a_, 'agg_similarity[None], size=original_img_chw.shape[-2:], mode="bilinear"')
+                b_ = "similarities_to_save = {pcn: t for pcn, t in similarities.items() if t is not None}"   # release bug: None without --save_sim
+                assert s2.count(b_) == 1; s2 = s2.replace(b_, b_ + " if similarities is not None else None")
             if s2 != s:
                 f.write_text(s2)
         m = tmp / "mmdata.py"; m.write_text(m.read_text() + EXT)

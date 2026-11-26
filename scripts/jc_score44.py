@@ -114,6 +114,8 @@ def score_one(job):
         f = WORK / "ovdiff" / "pred" / OVK[s] / f"{ovd:0>5d}.pt"
         if f.exists():
             p = torch.load(f, map_location="cpu")["preds"].numpy()
+            if p.shape != tuple(hw):   # OVDiff predicts at its resized input (short side 448): nearest-neighbour back to the photo
+                p = p[(np.arange(hw[0]) * p.shape[0]) // hw[0]][:, (np.arange(hw[1]) * p.shape[1]) // hw[1]]
             res["ovdiff|own"] = cnt(p == label_of(tabs["ovdiff"], s, x["cls"]))
     f = WORK / "diffseg" / s / f"{x['id']}.npz"
     if f.exists():
