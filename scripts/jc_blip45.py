@@ -354,7 +354,8 @@ def report(a):
         if x in S and y in S:
             w(f"| {nm} | " + " | ".join(f3(dif(g, x, y)) for g in ("stuff 19", "things 40", "all 59")) + " |")
     if has_bip.sum() > 20:
-        S2 = sub(S, has_bip); B2 = O.Boot(S2, a.boot); A2, Bb = B2.stat(S2["B|ip|uL|V0"][:, T55]), B2.stat(S2["A|ip|uL|V0"][:, T55])
+        S2 = sub(S, has_bip); S2["B|ip|uL|V0"] = np.stack([z["B|ip|uL|V0"] for z, h in zip(Z, has_bip) if h])
+        B2 = O.Boot(S2, a.boot); A2, Bb = B2.stat(S2["B|ip|uL|V0"][:, T55]), B2.stat(S2["A|ip|uL|V0"][:, T55])
         dd = A2[1] - Bb[1]
         w(f"\nItems whose scene caption contains the word ({int(has_bip.sum())} of {len(has_bip)}): B in-prompt - A, MK4-LR "
           f"{A2[0] - Bb[0]:+.3f} [{np.percentile(dd, 2.5):+.3f}, {np.percentile(dd, 97.5):+.3f}].\n")
