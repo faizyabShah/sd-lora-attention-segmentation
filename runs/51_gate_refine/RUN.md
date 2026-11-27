@@ -19,6 +19,11 @@ equals the seed; k-means separates a two-texture field).
 the attention before clearing it, so its maps are not affected. Pull, then resume at `check --bb 15`; `items` and
 `caption` need not be rerun. Record the stop and the traceback in `run_notes.md`.
 
+**2026-11-27, second fix: the stop at `check --bb 21` (8-head shape error).** SD 2.1's setup replaces the attention
+helper with its 5-head version when the model loads. The check imported the helper before loading, so it kept the
+8-head one. It now imports after loading, as the capture already does, so the capture is unaffected. Pull, then
+resume at `check --bb 21` (`check --bb 15` passed and need not be rerun). Record this stop in `run_notes.md`.
+
 ## 0. Update
 
 ```bash

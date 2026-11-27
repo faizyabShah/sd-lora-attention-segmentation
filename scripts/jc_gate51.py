@@ -219,8 +219,8 @@ def check(a):
     """the new refinements reduce to known ones in their limits; the capture reproduces run 50 on its photos."""
     import torch
     from PIL import Image
-    from src.segmentation.sg25_sa import _attention, _apply
     rn = runner(a.bb); X = load_items(1); BL = json.loads((rdir() / "blist.json").read_text())
+    from src.segmentation.sg25_sa import _attention, _apply   # after runner(): SD 2.1's setup swaps in its 5-head _attention
     with torch.no_grad():
         for img_id, xs in D.by_photo(X):
             x = xs[0]; img = np.asarray(Image.open(J.COCO / x["path"]).convert("RGB"))
