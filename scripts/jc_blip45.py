@@ -189,13 +189,18 @@ def capture(a):
     with torch.no_grad():
         for x in X:
             o = out / f"{x['id']}.npz"
-            if o.exists():
+            if o.exists() or (out / f"{x['id']}.drop.json").exists():
                 continue
             t0 = time.perf_counter(); key, word = rn.U.keyword("context", x["cls"], rn.R.word_map())
             img = np.asarray(Image.open(ROOT / x["path"]).convert("RGB")); pr = prompts(x, cap, word); res = {}; qa = None; qcos = {}
+            dropped = False
             for arm, reads in (("A", ("ip", "op")), ("At", ("ip",)), ("C", ("ip",)), ("B", ("op", "ip"))):
                 found = rn.one_pass(img, pr[arm], word)
-                if arm in ("A", "At", "C"):
+                if arm == "C" and not found:
+                    # PREREG section 4a: BLIP rewrote the conditioning word ("bag" -> "baggy"); the item is dropped from
+                    # every arm (paired), and the drop is counted in the report.
+                    rn.rec.clear(); dropped = True; break
+                if arm in ("A", "At"):
                     assert found, (arm, pr[arm], word)
                 reads = tuple(r for r in reads if r == "op" or found)
                 mp, Q, miss = rn.maps(key, word, reads)
@@ -206,6 +211,10 @@ def capture(a):
                 else:
                     qcos[arm] = float(np.mean([float((qa[m] * Q[m]).sum(-1).mean()) for m in Q]))
                 rn.rec.clear()
+            if dropped:
+                (out / f"{x['id']}.drop.json").write_text(json.dumps({"id": x["id"], "cls": x["cls"], "word": word, "C": pr["C"]}))
+                print(f"[blip45] {x['id']} {x['cls']!r} DROPPED (C lacks the word): {pr['C']!r}", flush=True)
+                continue
             arr = np.stack([res[k] for k in ARMS if k in res])
             if not np.isfinite(arr).all():
                 raise ValueError(f"non-finite map for {x['id']}")
@@ -281,8 +290,9 @@ def report(a):
     THR, T55 = O.THR, O.T55
     fs = sorted(f for f in (WORK / "scores").glob("*.npz") if not f.stem.endswith(".tmp")); Z = [np.load(f, allow_pickle=False) for f in fs]
     X = {x["id"]: x for x in json.loads((WORK / "items.json").read_text())["items"] if x["primary"]}
-    if not a.tag and len(Z) != len(X):
-        raise SystemExit(f"{len(Z)} scored of {len(X)}")
+    D = [json.loads(f.read_text()) for f in sorted((WORK / "cap").glob("*.drop.json"))]
+    if not a.tag and len(Z) + len(D) != len(X):
+        raise SystemExit(f"{len(Z)} scored + {len(D)} dropped of {len(X)}")
     S = {"cls": np.array([str(z["cls"]) for z in Z]), "grp": np.array([str(z["img"]) for z in Z]),
          "g": np.array([X[f.stem]["grp"] for f in fs])}
     keys = sorted({k for z in Z for k in z.files if "|" in k})
@@ -310,6 +320,15 @@ def report(a):
     w(f"PASCAL Context **train** photos (development): {len(set(S['grp']))} photos, {len(Z)} primary items (area >= 1%). "
       "Run 44's method and profiles; only the prompt (and for B the read-out) changes. Class-macro mIoU, raw V0 at 0.55; "
       f"95% paired photo bootstrap ({a.boot}).\n")
+    gx = lambda g: sum(1 for x in X.values() if (x["grp"] == "stuff") == (g == "stuff"))
+    gd = lambda g: sum(1 for d in D if (X[d["id"]]["grp"] == "stuff") == (g == "stuff"))
+    w(f"**Dropped (PREREG 4a): {len(D)} of {len(X)} items**, where BLIP's conditional caption no longer contains the word's "
+      f"tokens. They are dropped from every arm: stuff {gd('stuff')} / {gx('stuff')}, things {gd('things')} / {gx('things')}. "
+      "Every number below is on the kept items only, so arm C is conditioned on BLIP keeping the word.\n")
+    from collections import Counter
+    if D:
+        w("Dropped by class: " + ", ".join(f"{c} {n}" for c, n in Counter(d["cls"] for d in D).most_common()) + ". Examples: "
+          + "; ".join(f"'{d['C']}'" for d in D[:5]) + ".\n")
     w("\n## 1. Primary contrasts (MK4-LR, raw 0.55): arm - A\n")
     w("| Arm | stuff 19 | things 40 | all 59 | pass rule (stuff >= +0.02 with CI > 0; things CI low >= -0.01) |\n|---|---|---|---|---|")
     verdict = {}

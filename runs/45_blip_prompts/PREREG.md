@@ -51,6 +51,22 @@ our maps, especially for stuff classes, without hurting objects?**
   - **A|op**: the template prompt read out-of-prompt. Combined with B, this separates the prompt from the read-out.
   - **B|ip**: B read in-prompt, only on items whose caption contains the word's tokens.
 
+### 4a. Amendment (2026-11-27, after the capture crash, before any scoring)
+
+The first full capture (jobs 263673–263676) stopped on items where BLIP-large's conditional caption **rewrote the
+conditioning word**, so its tokens no longer occur in the prompt: "bag" became "baggy dogs…", "potted plant" became
+"potted planters…", "curtain" became "curtained windows…", "wall" became "wallpapered room…". The design assumed
+the prefix always keeps the word (section 4, arm C).
+
+- **Rule:** an item whose C caption lacks the word's tokens is **dropped from every arm**, so all arms keep the same
+  paired item set. The capture writes a `<id>.drop.json` marker for each one.
+- **Rejected alternative:** reading the prefix token positions. In a merged token there is no token of the word to
+  read, so the C map would measure a different word.
+- **Reported:** the drop count by stuff / things and by class. Every contrast is on the kept items, so arm C's result
+  is conditional on BLIP keeping the word.
+- **Not changed:** arms, prompts, profiles, read-out, pass rule. No item had been scored when this was written; the
+  maps captured before the crash are kept, since the passes are deterministic and the amendment only skips items.
+
 ## 5. Primary contrasts and pass rule (MK4-LR, V0, raw 0.55)
 
 For each arm X in {At, C, B}: **X − A** on stuff (19), things (40) and all 59 (class-macro mIoU; 2,000-sample paired
