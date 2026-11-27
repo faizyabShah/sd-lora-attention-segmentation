@@ -224,7 +224,12 @@ def check(a):
     with torch.no_grad():
         for img_id, xs in D.by_photo(X):
             x = xs[0]; img = np.asarray(Image.open(J.COCO / x["path"]).convert("RGB"))
-            out, _, _ = rn.item(x, img, BL[x["id"]]); H = _attention(rn.rec.grid_qk[64], 64)
+            out, _, _ = rn.item(x, img, BL[x["id"]])                    # item() clears the recorder after each prompt,
+            from src.segmentation.attention_aggregation import find_token_subsequence   # so redo the T pass for H
+            tok = rn.pipe.tokenizer; _, word = rn.U.keyword("coco", x["cls"], rn.Wm); prompt = f"A photograph of a {word}"
+            ids = tok(prompt, padding="max_length", max_length=77, truncation=True)["input_ids"]
+            rn.run_pass(img, prompt, find_token_subsequence(ids, tok(word, add_special_tokens=False)["input_ids"]), [])
+            H = _attention(rn.rec.grid_qk[64], 64)
             v = torch.rand(4096, device=H.device)
             d1 = float((gated_prop(H, torch.ones(4096, device=H.device), v, 2) - _apply(H, _apply(H, v)).mean(0)).abs().max())
             lab = torch.arange(4096, device=H.device); d2 = float((region_blend(v, lab) - v).abs().max())

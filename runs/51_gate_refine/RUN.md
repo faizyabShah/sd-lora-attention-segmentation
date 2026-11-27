@@ -14,6 +14,11 @@ equals the seed; k-means separates a two-texture field).
 - **Needs run 50's cache:** `$BRACE_CACHE_DIR/jc_iseg50/r0/items.json`, its masks and its maps. Run 51 writes to
   `$BRACE_CACHE_DIR/jc_gate51` and never modifies run 50's files.
 
+**2026-11-27: fix for the stop at `check --bb 15` (KeyError: 64).** The check read the 64 × 64 self-attention after
+`item()` had cleared the recorder. It now redoes the T pass before reading it. Only `check` changed: the capture reads
+the attention before clearing it, so its maps are not affected. Pull, then resume at `check --bb 15`; `items` and
+`caption` need not be rerun. Record the stop and the traceback in `run_notes.md`.
+
 ## 0. Update
 
 ```bash
