@@ -299,11 +299,27 @@ def score(a):
 # ------------------------------------------------------------------ report
 def delta_q(T, a, b, q):
     """T.delta with a (1 - 2q) interval: percentiles q and 1 - q (q in percent)."""
+    if isinstance(T, Empty):
+        return float("nan"), float("nan"), float("nan")
     (Ta, Ua, sa), (Tb, Ub, sb) = T.mats(*a), T.mats(*b); cs = (sa.sum(0) > 0) & (sb.sum(0) > 0)
     f = lambda Tm, Um: np.where((T.Wb @ Um)[:, cs] > 0, (T.Wb @ Tm)[:, cs] / np.maximum((T.Wb @ Um)[:, cs], 1), np.nan)
     pt = float((Ta.sum(0)[cs] / np.maximum(Ua.sum(0)[cs], 1)).mean() - (Tb.sum(0)[cs] / np.maximum(Ub.sum(0)[cs], 1)).mean())
     bs = np.nanmean(f(Ta, Ua), 1) - np.nanmean(f(Tb, Ub), 1); lo, hi = np.nanpercentile(bs, [q, 100 - q])
     return pt, float(lo), float(hi)
+
+
+class Empty:
+    """stands in for D.Table on an empty subset: no cells, every number nan."""
+    by, photos, classes = {}, [], []
+
+    def miou(self, m, ro):
+        return float("nan")
+
+    def delta(self, a, b):
+        return float("nan"), float("nan"), float("nan")
+
+    def mats(self, m, ro):
+        raise KeyError(m)
 
 
 def report(a):
@@ -313,9 +329,10 @@ def report(a):
     recs = [dict(x, round=0) for x in Z["recs"]]; gs = Z["gstat"]
     sub = lambda f: [x for x in recs if f(x)]
     H = {hn: sub(lambda x, hn=hn: x["half"] == hn) for hn in ("random", "hard")}; H["pooled"] = recs
-    T = {hn: D.Table(r, a.boot) for hn, r in H.items()}
-    TS = {hn: D.Table([x for x in r if x["area"] < SMALL], a.boot) for hn, r in H.items()}
-    TL = {hn: D.Table([x for x in r if x["area"] >= SMALL], a.boot) for hn, r in H.items()}
+    tab = lambda r: D.Table(r, a.boot) if r else Empty()        # a subset can be empty in the smoke (1 photo per half)
+    T = {hn: tab(r) for hn, r in H.items()}
+    TS = {hn: tab([x for x in r if x["area"] < SMALL]) for hn, r in H.items()}
+    TL = {hn: tab([x for x in r if x["area"] >= SMALL]) for hn, r in H.items()}
     have = lambda m, hn="random": bool(T[hn].by.get(m))
     f3 = lambda m, t, ro="t55": f"{t.miou(m, ro):.3f}" if t.by.get(m) else "–"
     fd = D.fmt_d

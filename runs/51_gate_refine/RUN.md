@@ -24,6 +24,12 @@ helper with its 5-head version when the model loads. The check imported the help
 8-head one. It now imports after loading, as the capture already does, so the capture is unaffected. Pull, then
 resume at `check --bb 21` (`check --bb 15` passed and need not be rerun). Record this stop in `run_notes.md`.
 
+**2026-11-27, third fix: the stop at the smoke report (division by zero).** The smoke scores 1 photo per half, and
+its random photo has no object under 5%. So the random-half small-object subset was empty, and the bootstrap divided
+by its photo count (0). Empty subsets now report "–" / nan instead. The full run has 88 small items in the random
+half, so its numbers are unaffected, and capture and scoring are unchanged. Pull, then rerun only
+`report --tag _smoke --boot 200` and continue with step 2. Record this stop in `run_notes.md`.
+
 ## 0. Update
 
 ```bash
