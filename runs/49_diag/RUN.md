@@ -10,6 +10,14 @@ smoke was still queued when this was pushed. Run round 0 first.
   in `run_notes.md`.
 - **Then:** push `run_notes.md` and the round 0 report before starting round 1.
 
+**2026-11-27: round 0 reviewed, go for round 1.** Round 0 ran clean and its checks passed. Now run step 2 with `R=1`
+(same commands, no code change), then the pooled report of step 3. Push in the same way:
+- `result_r1.md`, `result_r0-1.md`, `gaps_r1.json` and the round 1 panels;
+- a `## Round 1` section added to `run_notes.md` (GPU, timing, the sanity checks of step 4).
+
+Leave `result_r0.md` as it is. Expected for round 1: 61 items, 32 classes; stop and report if `items` prints anything
+else.
+
 **Scope:** 2 rounds of 30 random COCO **train2017** photos each, with every primary item on them. Each item gets passes
 on SD 1.5 and SD 2.1, plus iSeg's own pass per photo.
 
