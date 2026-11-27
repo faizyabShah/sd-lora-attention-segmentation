@@ -135,14 +135,34 @@ def iseg_table():
     return AT, names, (lambda c: method_index("iseg", "coco", names, c))
 
 
+NTOK = {}   # class name -> its token count from the real tokenizer (set_tokenizer); iSeg's table says 2 for "fire hydrant"
+
+
+def set_tokenizer(tok):
+    """Count each iSeg name's tokens with the pipeline's tokenizer. iSeg's table gives "fire hydrant" 2 tokens, but CLIP's
+    BPE gives 3 (fire / hydr / ant), so iSeg's arithmetic shifts every later class by one token (onto "and"). Our-pass
+    prompts use the true counts; iSeg's own pass (21|iseg) keeps its code as released (run_notes / result.md say so)."""
+    AT, names, _ = iseg_table()
+    for nm in names:
+        NTOK[nm] = len(tok(nm, add_special_tokens=False)["input_ids"])
+
+
+def check_sel(tok, prompt, sel):
+    """the selected tokens of every class decode to a word of its iSeg name."""
+    _, names, idx = iseg_table(); ids = tok(prompt, padding="max_length", max_length=77, truncation=True)["input_ids"]
+    for c, pos in sel.items():
+        got = tok.decode([ids[p] for p in pos]).strip()
+        assert got and got in names[idx(c)], (c, names[idx(c)], got, prompt)
+
+
 def multi(classes, bg=True):
     """iSeg's prompt text for these canonical classes (in its index order) and each class's selected token positions
-    (jc_swap47.Runner.iseg); bg = append its released COCO bg_context."""
+    (jc_swap47.Runner.iseg, with true token counts once set_tokenizer ran); bg = append its released COCO bg_context."""
     AT, names, idx = iseg_table()
     order = sorted({idx(c): c for c in classes}.items()); text = "a photograph of "; sel, start, last = {}, [], None
     for j, (i, c) in enumerate(order):
         nm = names[i]; text += nm + " and "
-        start.append(start[j - 1] + 1 + AT[last][0] if j > 0 else 4); sel[c] = [start[-1] + t for t in AT[nm][1]]; last = nm
+        start.append(start[j - 1] + 1 + NTOK.get(last, AT[last][0]) if j > 0 else 4); sel[c] = [start[-1] + t for t in AT[nm][1]]; last = nm
     return text[:-5] + TAIL + (S.CFG["coco"]["bg"] if bg else ""), sel
 
 
@@ -249,7 +269,7 @@ class R50(S.Runner):
             if nm in S.FULL:
                 p = S.Full(p, nm, rec)
             procs[n] = CARec(p, nm, rec)
-        self.pipe.unet.set_attn_processor(procs)
+        self.pipe.unet.set_attn_processor(procs); set_tokenizer(self.pipe.tokenizer)
         assert S.ERS_SA in rec.pair, "iSeg's self-attention layer is not recorded"
         fit = torch.load(O.WORK / "fit.pt", weights_only=False)
         print(f"profiles: {O.WORK / 'fit.pt'} (model {fit.get('model', 'SD 1.5')})", flush=True)
@@ -326,7 +346,7 @@ class R50(S.Runner):
             else:
                 cls = {"S1": [x["cls"]], "S2": [x["cls"]], "S2n": [x["cls"]], "B": blist,
                        "F": [x["cls"]] + [c for c in FIXED if c != x["cls"]][:4]}[P]
-                prompt, sel = multi(cls, bg=P != "S1")
+                prompt, sel = multi(cls, bg=P != "S1"); check_sel(tok, prompt, sel)
             enh = reduce(add, sel.values()) if P in ("TE", "S1", "S2", "B", "F") else []
             self.run_pass(img, prompt, sel[x["cls"]], enh)
             m, ga = self.maps(x, sel, out, P); miss += m; prompts[P] = prompt
@@ -340,10 +360,7 @@ class R50(S.Runner):
         out = defaultdict(dict); miss = 0; prompts = {}; tok = self.pipe.tokenizer
         for P in PHOTO_PROMPTS:
             prompt, sel = multi([x["cls"] for x in xs])
-            ids = tok(prompt, padding="max_length", max_length=77, truncation=True)["input_ids"]
-            for c, pos in sel.items():                                   # the selected tokens are the class name's words
-                got = tok.decode([ids[p] for p in pos]).strip(); _, names, idx = iseg_table()
-                assert got and got in names[idx(c)], (c, names[idx(c)], got, prompt)
+            check_sel(tok, prompt, sel)                                  # the selected tokens are the class name's words
             first = not getattr(self, "checked_full", False); self.rec.want_full = first; self.rec.full = {}
             self.run_pass(img, prompt, sel[xs[0]["cls"]], reduce(add, sel.values()) if P == "K" else [])
             self.rec.want_full = False
@@ -375,6 +392,23 @@ def save(o, mp, extra):
     if not np.isfinite(arr.astype(np.float32)).all():
         raise ValueError(f"non-finite map in {o.name}")
     tmp = o.with_name(o.stem + ".tmp.npz"); np.savez(tmp, maps=arr, names=np.array(names), **extra); os.replace(tmp, o)
+
+
+BUG = re.compile(r"fire hydrant and (?!other object)")   # fire hydrant followed by another class: shifted positions
+
+
+def quarantine(a):
+    """move (never delete) maps captured before the token-count fix whose prompts put fire hydrant before another class;
+    the capture then redoes them. iSeg's own-pass files (maps_iseg) are kept: that cell keeps iSeg's code as released."""
+    for bb in ("15", "21"):
+        od = rdir() / f"maps_{bb}"; qd = rdir() / f"maps_{bb}_tokbug"; n = k = 0
+        for f in sorted(od.glob("*.npz")) if od.exists() else []:
+            if f.stem.endswith(".tmp"):
+                continue
+            n += 1; pr = json.loads(str(np.load(f)["prompts"]))
+            if any(BUG.search(t) for t in pr.values()):
+                qd.mkdir(exist_ok=True); os.replace(f, qd / f.name); k += 1; print(f"moved {bb}/{f.name}: {sorted(pr)}")
+        print(f"quarantine maps_{bb}: {k} of {n} files moved to {qd.name}", flush=True)
 
 
 def capture(a):
@@ -476,6 +510,8 @@ def report(a):
          "the gate map; In iSeg's without clustering. Read-outs: t55 ours; comp iSeg's competition (class list).", ""]
     ours = (REF, "t55")
     # 1. references
+    L += ["**Token-count fix (PREREG 3a):** our-pass multi-class prompts use the tokenizer's token counts; iSeg's own pass "
+          "(21|iseg) keeps its released table, which reads classes after \"fire hydrant\" one token early (photo 535981).", ""]
     L += ["## 1. Reference cells", "", "| Pipeline | Cell | read-out | all | small | not small |", "|---|---|---|---:|---:|---:|"]
     refs = [("ours (SD 1.5, frozen)", (REF, "t55")), ("ours on SD 2.1", ("21|T|UL|V0", "t55")),
             ("iSeg's prompt through our pass", ("21|K|I-|ERS", "comp")), ("iSeg's own pass", ("21|iseg|I-|ERS", "comp")),
@@ -622,7 +658,7 @@ def viz(a):
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(); sp = p.add_subparsers(dest="cmd", required=True)
-    q = sp.add_parser("items")
+    q = sp.add_parser("items"); q = sp.add_parser("quarantine")
     q = sp.add_parser("caption"); q.add_argument("--limit", type=int, default=0)
     q = sp.add_parser("capture"); q.add_argument("--bb", choices=("15", "21"), required=True); q.add_argument("--limit", type=int, default=0)
     q = sp.add_parser("score"); q.add_argument("--limit", type=int, default=0); q.add_argument("--workers", type=int, default=16)
@@ -630,4 +666,4 @@ if __name__ == "__main__":
     q = sp.add_parser("report"); q.add_argument("--boot", type=int, default=2000); q.add_argument("--tag", default="")
     q = sp.add_parser("viz"); q.add_argument("--n", type=int, default=10); q.add_argument("--tag", default="")
     a = p.parse_args()
-    {"items": items, "caption": caption, "capture": capture, "score": score, "report": report, "viz": viz}[a.cmd](a)
+    {"items": items, "quarantine": quarantine, "caption": caption, "capture": capture, "score": score, "report": report, "viz": viz}[a.cmd](a)

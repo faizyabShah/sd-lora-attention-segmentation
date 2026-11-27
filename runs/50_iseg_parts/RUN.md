@@ -12,6 +12,26 @@ classes) and the prompt and caption-matching checks. So step 1 is a 2-photo smok
 - **Built-in checks:** the capture asserts the recorder and prompt checks of PREREG section 3. If one fails, **stop and
   report**; do not relax it.
 
+**2026-11-27: resume after the stop at 318 / 364 items (SD 1.5).** The prompt check was right to stop. iSeg's token
+table gives "fire hydrant" 2 tokens, but CLIP's tokenizer gives 3 (fire / hydr / ant). iSeg's position arithmetic,
+copied into `multi()`, therefore read every class listed after fire hydrant one token early, on "and" (photo 535981:
+car, dog, fire hydrant). The fix (PREREG section 3a):
+- `multi()` counts tokens with the pipeline's tokenizer;
+- the same decode check now also runs on prompts S1, S2, S2n, B and F;
+- `quarantine` moves (never deletes) every saved map whose prompts put fire hydrant before another class, so the
+  capture redoes it. Prompt B can name fire hydrant from a caption, so earlier photos may be affected too.
+
+Resume with:
+
+```bash
+git pull --rebase && source scripts/brace_env.sh && export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 PYTHONUNBUFFERED=1
+python scripts/jc_iseg50.py quarantine                # prints "quarantine maps_15: k of n files moved"; note k in run_notes
+python scripts/jc_iseg50.py capture --bb 15           # resumes; redoes the moved items
+```
+
+Then continue from step 2 (`capture --bb 21`) and steps 3–4 unchanged. In `run_notes.md`, record the stop, the
+traceback, the quarantine line, and that the `*_tokbug` folders are kept and not committed.
+
 ## 0. Update
 
 ```bash

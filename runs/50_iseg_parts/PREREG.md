@@ -76,6 +76,20 @@ step changes only the prompt. Class names and token selection are iSeg's (`data/
 - the selected tokens decode to the class name;
 - iSeg's own text equals K's.
 
+### 3a. Amendment (2026-11-27, during the SD 1.5 capture, before any scoring)
+
+The decode check stopped the capture at photo 535981 (car, dog, fire hydrant): dog's selected token decoded to "and".
+- **Cause:** iSeg's released table (`coco_name80.py`) gives "fire hydrant" 2 tokens; CLIP's BPE gives 3. iSeg computes
+  each class's position from the table's counts, so every class after fire hydrant is read one token early. It is the
+  only one of the 80 names whose count is wrong.
+- **Fix in our-pass prompts:** positions come from the tokenizer's counts. Fire hydrant itself keeps iSeg's selected
+  word ("hydr"). The decode check runs on every multi-class prompt.
+- **iSeg's own pass (`21|iseg`) is unchanged.** It keeps the released behaviour, so on photos with fire hydrant plus a
+  later class it reads shifted tokens. That affects 1 of the 100 photos here, and it is reported.
+- **Maps saved before the fix** with such a prompt are moved aside and recaptured; no score had been computed.
+- **Scope:** the same table arithmetic sits in `jc_swap47.Runner.iseg`, so earlier iSeg runs (44, 47, 49) carry iSeg's
+  behaviour on fire-hydrant photos; that is iSeg as released.
+
 ## 4. Reported (class-macro mIoU, 95% paired photo bootstrap, all items and small items separately)
 
 1. **Reference cells:** ours, iSeg's prompt through our pass, and iSeg's own pass.
